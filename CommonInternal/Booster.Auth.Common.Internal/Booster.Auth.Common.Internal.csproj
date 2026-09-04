@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Mapster" Version="10.0.12" />
+	</ItemGroup>
+	<ItemGroup>
+
+		<ProjectReference Include="..\..\Common\Booster.Database\Booster.Database.csproj" />
+
+		<ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.WithCacheProvider\Booster.ExceptionManager.WithCacheProvider.csproj" />
+
+		<ProjectReference Include="..\Booster.Auth.Database\Booster.Auth.Database.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,36 @@
+<Solution>
+  <Folder Name="/Common/">
+    <Project Path="Common/Booster.Common.Extensions/Booster.Common.Extensions.csproj" />
+    <Project Path="Common/Booster.Database.Postgres/Booster.Database.Postgres.csproj" />
+    <Project Path="Common/Booster.Database/Booster.Database.csproj" />
+    <Project Path="Common/Booster.Hashing/Booster.Hashing.csproj" />
+  </Folder>
+  <Folder Name="/Common/Caching/">
+    <Project Path="Common/Caching/Booster.Caching.Abstraction/Booster.Caching.Abstraction.csproj" />
+    <Project Path="Common/Caching/Booster.Caching.Memory/Booster.Caching.Memory.csproj" />
+    <Project Path="Common/Caching/Booster.Caching.Redis/Booster.Caching.Redis.csproj" />
+  </Folder>
+  <Folder Name="/Common/ExceptionManagers/">
+    <Project Path="Common/ExceptionManagers/Booster.ExceptionManager.Abstraction/Booster.ExceptionManager.Abstraction.csproj" />
+    <Project Path="Common/ExceptionManagers/Booster.ExceptionManager.LocalDict/Booster.ExceptionManager.LocalDict.csproj" />
+    <Project Path="Common/ExceptionManagers/Booster.ExceptionManager.WithCacheProvider/Booster.ExceptionManager.WithCacheProvider.csproj" />
+  </Folder>
+  <Folder Name="/CommonInternal/">
+    <Project Path="CommonInternal/Booster.Auth.Common.Internal/Booster.Auth.Common.Internal.csproj" />
+    <Project Path="CommonInternal/Booster.Auth.Database/Booster.Auth.Database.csproj" />
+    <Project Path="CommonInternal/Booster.Auth.Manager/Booster.Auth.Manager.csproj" />
+  </Folder>
+  <Folder Name="/Gateways/">
+    <Project Path="Gateways/Booster.Auth.YarpGateway/Booster.Auth.YarpGateway.csproj" />
+  </Folder>
+  <Folder Name="/Idps/">
+    <Project Path="Idps/Booster.Auth.Idp.Providers.Abstractions/Booster.Auth.Idp.Providers.Abstractions.csproj" />
+    <Project Path="Idps/Booster.Auth.Idp/Booster.Auth.Idp.csproj" />
+  </Folder>
+  <Folder Name="/Idps/Providers/">
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Local/Booster.Auth.Idp.Providers.Local.csproj" />
+  </Folder>
+  <Folder Name="/Services/">
+    <Project Path="Services/Booster.Auth.N/Booster.Auth.N.csproj" />
+  </Folder>
+</Solution>
