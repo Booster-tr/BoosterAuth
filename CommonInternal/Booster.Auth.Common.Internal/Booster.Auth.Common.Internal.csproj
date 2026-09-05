@@ -12,6 +12,8 @@
 	</ItemGroup>
 	<ItemGroup>
 
+		<ProjectReference Include="..\..\Common\Booster.Common.Extensions\Booster.Common.Extensions.csproj" />
+
 		<ProjectReference Include="..\..\Common\Booster.Database\Booster.Database.csproj" />
 
 		<ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.WithCacheProvider\Booster.ExceptionManager.WithCacheProvider.csproj" />
