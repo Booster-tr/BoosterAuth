@@ -1,7 +1,7 @@
 ﻿using Booster.Auth.Database.Models.Enums;
-using Booster.Auth.Idp.Stores.ClientStore.Models;
+using Booster.Auth.Idp.Stores.ClientStores.Models;
 
-namespace Booster.Auth.Idp.Stores.ClientStore;
+namespace Booster.Auth.Idp.Stores.ClientStores;
 
 public sealed class MockClientDataStore : IClientDataStore
 {
@@ -22,9 +22,16 @@ public sealed class MockClientDataStore : IClientDataStore
             PostLogoutRedirectUris = ["http://localhost:5088/"],
             AllowedAudiences = ["http://localhost:5088/authn"],
             RequireConsent = false,
+            AllowedGrantTypes = OAuthGrantType.AuthorizationCode | OAuthGrantType.RefreshToken | OAuthGrantType.TokenExchange | OAuthGrantType.ClientCredentials,
+            AllowedScopes = ["openid", "profile", "email", "offline_access", "api", "std_user"],
+            DefaultScopes = ["openid", "profile"], 
+            DefaultRoles =
+            [
+                new DefaultRoleData { RoleId = Guid.Parse("08df0100-0000-0000-0000-000000000001"), RoleName = "user" }
+            ],
             Login = new LoginPolicyData
             {
-                AllowLocalLogin = true,
+                AllowedCredentialProviders = ["local", "ldap", "federation"],
                 AllowedIdentifiers = [IdentifierType.Email, IdentifierType.Username],
                 AllowFederatedLogin = true,
                 MaxFailedAttempts = 5,

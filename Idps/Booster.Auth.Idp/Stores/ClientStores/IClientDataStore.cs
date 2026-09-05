@@ -1,6 +1,6 @@
-﻿using Booster.Auth.Idp.Stores.ClientStore.Models;
+﻿using Booster.Auth.Idp.Stores.ClientStores.Models;
 
-namespace Booster.Auth.Idp.Stores.ClientStore;
+namespace Booster.Auth.Idp.Stores.ClientStores;
 
 public interface IClientDataStore
 {

@@ -1,5 +1,5 @@
 ﻿using Booster.Auth.Common.Internal.EntityExtensions;
-using Booster.Auth.Idp.Features;
+using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Features._base.Enums;
 using Booster.Caching.Abstraction;

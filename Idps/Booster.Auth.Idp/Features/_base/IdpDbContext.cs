@@ -3,7 +3,7 @@ using Booster.Auth.Idp.Features._base.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
-namespace Booster.Auth.Idp.Features;
+namespace Booster.Auth.Idp.Features._base;
 
 public class IdpDbContext(DbContextOptions<IdpDbContext> options) : PostgresDbContext(options)
 {
@@ -14,6 +14,9 @@ public class IdpDbContext(DbContextOptions<IdpDbContext> options) : PostgresDbCo
     public DbSet<PrincipalIdentity> PrincipalIdentities => Set<PrincipalIdentity>();
     public DbSet<ServiceAccount> ServiceAccounts => Set<ServiceAccount>();
     public DbSet<PrincipalLink> PrincipalLinks => Set<PrincipalLink>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<PrincipalRole> PrincipalRoles => Set<PrincipalRole>();
+    public DbSet<PrincipalScope> PrincipalScopes => Set<PrincipalScope>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

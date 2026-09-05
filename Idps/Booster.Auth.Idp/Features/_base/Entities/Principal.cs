@@ -1,4 +1,4 @@
-﻿using Booster.Auth.Idp.Features._base.Enums;
+﻿using Booster.Auth.Database.Models.Enums;
 using Booster.Database.Postgres.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

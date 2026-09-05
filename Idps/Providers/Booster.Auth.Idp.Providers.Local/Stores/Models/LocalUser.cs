@@ -10,4 +10,7 @@ public sealed record LocalUser
         = new Dictionary<string, string>();
 
     public bool IsActive { get; init; } = true;
+
+    public int FailedAttemptCount { get; init; }
+    public DateTimeOffset? LockedUntil { get; init; }
 }

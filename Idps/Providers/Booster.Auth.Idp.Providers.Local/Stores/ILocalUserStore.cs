@@ -10,5 +10,7 @@ public interface ILocalUserStore
     IReadOnlyList<IdentifierType> allowedIdentifiers,
     CancellationToken ct);
 
+    Task<PrincipalInfo?> GetByIdAsync(Guid id, CancellationToken ct);
+
     Task UpdatePasswordHashAsync(Guid principalId, string newHash, CancellationToken ct);
 }

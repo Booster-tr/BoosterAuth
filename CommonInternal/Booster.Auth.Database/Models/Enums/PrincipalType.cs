@@ -1,4 +1,4 @@
-﻿namespace Booster.Auth.Idp.Features._base.Enums;
+﻿namespace Booster.Auth.Database.Models.Enums;
 
 public enum PrincipalType
 {

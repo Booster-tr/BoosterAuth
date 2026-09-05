@@ -1,16 +1,17 @@
-﻿using Booster.Database.Postgres.Models;
+﻿using Booster.Auth.Idp.Features._base.Enums;
+using Booster.Database.Postgres.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Booster.Auth.Idp.Features._base.Entities;
 
-public class ServiceAccount : Entity
+public class ServiceAccount : IsolatedEntity
 {
     public Guid PrincipalId { get; set; }
 
     public virtual Principal Principal { get; set; } = default!;
 
-    public Guid IsolationId { get; set; }
+    public ServiceAccountStatus Status { get; set; }
 
     public string Key { get; set; } = default!;
 
@@ -33,6 +34,7 @@ public class ServiceAccountConfiguration : IEntityTypeConfiguration<ServiceAccou
         builder.Property(x => x.DeletedTime);
 
         builder.Property(x => x.PrincipalId).IsRequired();
+        builder.Property(x => x.Status).IsRequired();
         builder.Property(x => x.IsolationId).IsRequired();
         builder.Property(x => x.Key).HasMaxLength(200).IsRequired();
         builder.Property(x => x.SecretHash).HasMaxLength(500).IsRequired();

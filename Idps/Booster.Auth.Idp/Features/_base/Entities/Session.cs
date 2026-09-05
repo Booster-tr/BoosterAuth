@@ -27,6 +27,10 @@ public class Session : IsolatedEntity
     public DateTimeOffset ExpiresAt { get; set; }
     public DateTimeOffset? RevokedAt { get; set; }
     public string? AuthMethod { get; set; }
+
+    [JsonIgnore]
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+
 }
 
 public class SessionConfiguration : IEntityTypeConfiguration<Session>
