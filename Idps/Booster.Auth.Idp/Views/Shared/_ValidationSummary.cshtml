@@ -1,0 +1,66 @@
+@*
+    Başarısız POST sonrası form üstü hata özeti.
+
+    Neden alan bazlı odak değil de bu blok odaklanır:
+      1. Kapsamı yalnızca özet taşır. İlk hatalı alana odaklanmak tek bir sorunu
+         duyurur; kullanıcı düzeltip gönderir ve ikinciyi keşfeder.
+      2. Boş anahtarlı ModelState hatalarının ("Girdiğiniz bilgiler eşleşmedi")
+         odaklanacak bir alanı yoktur. Alan odaklı strateji bu hataları sessizce
+         düşürür — kimlik doğrulama ekranlarındaki en yaygın erişilebilirlik açığı.
+      3. Bağlantılar zaten tek tuşla ilgili alana götürür, hiçbir şey kaybolmaz.
+
+    role="alert" KULLANILMAZ: içerik sayfa yüklenirken zaten DOM'dadır.
+    Duyuruyu odak yapar; role="alert" eklemek NVDA'da çift okuma üretir.
+*@
+@{
+    var errors = ViewData.ModelState.AllErrors();
+}
+
+@if (errors.Count > 0)
+{
+    <div class="auth-summary" id="error-summary" tabindex="-1"
+         role="group" aria-labelledby="error-summary-title" data-autofocus-summary>
+        <div class="auth-summary__head">
+            <svg class="auth-summary__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                 aria-hidden="true" focusable="false">
+                <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6" />
+                <path d="M10 6.25v4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                <circle cx="10" cy="13.6" r="0.9" fill="currentColor" />
+            </svg>
+            <div>
+                <h2 class="auth-summary__title" id="error-summary-title">İşleminizi tamamlayamadık</h2>
+                <p class="auth-summary__intro">
+                    @if (errors.Count == 1)
+                    {
+                        <text>Devam etmek için aşağıdaki sorunu düzeltin.</text>
+                    }
+                    else
+                    {
+                        <text>Devam etmek için aşağıdaki @errors.Count sorunu düzeltin.</text>
+                    }
+                </p>
+            </div>
+        </div>
+
+        <ul class="auth-summary__list">
+            @foreach (var error in errors)
+            {
+                <li>
+                    @* Gizli alan hatası (InteractionKey vb.) bağlantı almaz:
+                       odaklanamayan bir hedefe giden bağlantı hiçbir şey yapmaz. *@
+                    @if (!ModelStateExtensions.IsFocusableField(error.Key))
+                    {
+                        @error.Message
+                    }
+                    else
+                    {
+                        @* Bağlantı metni hata mesajının kendisidir ("Bu alana git" değil):
+                           bağlamdan bağımsız anlamlı olmalı ve alandaki metinle
+                           birebir aynı kalmalıdır. *@
+                        <a href="#@error.Key">@error.Message</a>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+}

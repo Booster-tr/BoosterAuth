@@ -1,0 +1,35 @@
+@*
+    Alan seviyesi hata satırı.
+    Model: alan adı (ModelState anahtarı ve input id'si ile aynı).
+
+    Element hata olmasa da DOM'da kalır: input'un aria-describedby'si "{alan}-error"
+    id'sini her zaman listeler, böylece "JS describedby eklemeyi unuttu" hata sınıfı
+    tümüyle ortadan kalkar. Boşken hiçbir metin taşımaz ve erişilebilir açıklamaya
+    hiçbir şey eklemez.
+
+    Görsel gizli "Hata: " öneki koşulludur ve CSS ::before ile DEĞİL, gerçek metin
+    düğümüyle yazılır — üretilmiş içeriğin duyurulması ekran okuyucular arasında
+    tutarsızdır.
+
+    role="alert" / aria-live YOKTUR: içerik sayfa yüklenirken zaten DOM'dadır.
+    Duyuruyu hata özeti odağı yapar (bkz. _ValidationSummary).
+*@
+@model string
+
+@{
+    var hasError = ViewData.ModelState.HasError(Model);
+}
+
+<p class="auth-field__error" id="@(Model)-error">
+    @if (hasError)
+    {
+        <span class="u-visually-hidden">Hata: </span>
+        <svg class="auth-field__error-icon" width="14" height="14" viewBox="0 0 16 16"
+             fill="none" aria-hidden="true" focusable="false">
+            <circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5" />
+            <path d="M8 4.75v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <circle cx="8" cy="11.1" r="0.8" fill="currentColor" />
+        </svg>
+        @Html.ValidationMessage(Model)
+    }
+</p>

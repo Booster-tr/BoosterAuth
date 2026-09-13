@@ -5,6 +5,9 @@
     <Project Path="Common/Booster.Database/Booster.Database.csproj" />
     <Project Path="Common/Booster.Hashing/Booster.Hashing.csproj" />
   </Folder>
+  <Folder Name="/Common/AuthZ/">
+    <Project Path="Common/AuthZ/Booster.Authorization.Relational/Booster.Authorization.Relational.csproj" Id="d3617022-98ab-4bcf-930a-333d1d88eae0" />
+  </Folder>
   <Folder Name="/Common/Caching/">
     <Project Path="Common/Caching/Booster.Caching.Abstraction/Booster.Caching.Abstraction.csproj" />
     <Project Path="Common/Caching/Booster.Caching.Memory/Booster.Caching.Memory.csproj" />
@@ -32,5 +35,6 @@
   </Folder>
   <Folder Name="/Services/">
     <Project Path="Services/Booster.Auth.N/Booster.Auth.N.csproj" />
+    <Project Path="Services/Booster.Auth.Z/Booster.Auth.Z.csproj" Id="ca1a0785-17ec-46b9-b8f9-21fcca71fe3e" />
   </Folder>
 </Solution>

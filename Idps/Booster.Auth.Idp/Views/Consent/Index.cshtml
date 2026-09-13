@@ -1,0 +1,133 @@
+@model ConsentViewModel
+@{
+    Layout = "_AuthLayout";
+
+    ViewData["Title"] = $"Yetkilendirme isteği: {Model.ClientName} · Booster Auth";
+    ViewData["MainModifier"] = "auth-main--consent";
+    ViewData["BrandHeadline"] = "Hangi uygulamanın neye eriştiğini siz belirleyin.";
+    ViewData["BrandLead"] = "Verdiğiniz her izni görebilir, dilediğiniz an geri alabilirsiniz.";
+
+    var hasOptional = Model.Scopes.Any(s => !s.Required);
+    var hasRequired = Model.Scopes.Any(s => s.Required);
+}
+
+<section class="auth-card">
+    <div class="auth-consent__head">
+        @* Logo dekoratif-fazlalıktır: uygulama adı hemen yanında ve h1'de metin
+           olarak zaten var. alt="Contoso" yazmak "Contoso, Contoso hesabınıza..."
+           şeklinde kekeleyen bir duyuru üretirdi. *@
+        <div class="auth-appmark">
+            @if (Model.ClientLogoUri is not null)
+            {
+                <img class="auth-appmark__img" src="@Model.ClientLogoUri" alt=""
+                     width="48" height="48" referrerpolicy="no-referrer" data-logo-fallback />
+                <span class="auth-appmark__mono" aria-hidden="true" hidden>@Model.Monogram</span>
+            }
+            else
+            {
+                <span class="auth-appmark__mono" aria-hidden="true">@Model.Monogram</span>
+            }
+        </div>
+
+        <header class="auth-card__header">
+            @* h1 uygulamayı ADIYLA anar. Bu ekranın en önemli erişilebilirlik
+               kararı budur: başlık + h1 duyulduğunda istek kendi kendine yeter,
+               kullanıcı kimin izin istediğini duymadan onay veremez. *@
+            <h1 class="auth-card__title">@Model.ClientName hesabınıza erişmek istiyor</h1>
+        </header>
+    </div>
+
+    <p class="auth-card__subtitle">
+        Devam ederseniz <strong>@Model.ClientName</strong> aşağıdaki izinleri alacak.
+        Bu izinleri daha sonra hesap ayarlarınızdan geri alabilirsiniz.
+    </p>
+
+    @if (!string.IsNullOrEmpty(Model.UserDisplayName))
+    {
+        <p class="auth-consent__account">
+            <span><strong>@Model.UserDisplayName</strong> olarak oturum açtınız.</span>
+            <a class="auth-link auth-link--sm auth-link--standalone"
+               href="@Url.Idp($"/authorize?interaction_key={Uri.EscapeDataString(Model.InteractionKey)}&prompt=login")">Hesap değiştir</a>
+        </p>
+    }
+
+    <h2 class="auth-consent__scopes-title" id="scopes-title">@Model.ClientName şunları yapabilecek:</h2>
+
+    @* <ul>: yardımcı teknoloji "liste, 4 öğe" diye duyurur ve öğe sayısı,
+       kullanıcının onay vermeden önce ihtiyaç duyduğu tam bilgidir.
+       Onay kutusu KULLANILMAZ: arka uç kısmi izin desteklemiyor; etkileşimli
+       görünen ama olmayan bir kontrol, izin bütünlüğü açısından yanıltıcıdır. *@
+    <ul class="auth-scopes" role="list" aria-labelledby="scopes-title">
+        @foreach (var scope in Model.Scopes)
+        {
+            <li class="auth-scope">
+                <span class="auth-scope__icon">
+                    <partial name="_ScopeIcon" model="@scope.Icon" />
+                </span>
+                <div>
+                    <p class="auth-scope__title">
+                        @scope.Title
+                        @if (scope.Required)
+                        {
+                            <span class="auth-scope__tag">Zorunlu</span>
+                        }
+                        else if (hasRequired && hasOptional)
+                        {
+                            <span class="auth-scope__tag">İsteğe bağlı</span>
+                        }
+                        @* Ham protokol adı YALNIZCA tanınmayan scope'larda gösterilir:
+                           orada kullanıcının değerlendirebileceği tek ipucu odur.
+                           lang="en" şart, aksi hâlde Türkçe seslendirme okunmaz kılar. *@
+                        @if (!scope.IsKnown)
+                        {
+                            <code class="auth-scope__raw" lang="en">@scope.Name</code>
+                        }
+                    </p>
+                    <p class="auth-scope__desc">@scope.Description</p>
+                </div>
+            </li>
+        }
+    </ul>
+
+    <p class="auth-hint">Yalnızca tanıdığınız ve güvendiğiniz uygulamalara izin verin.</p>
+
+    @* Form action'ı ConsentController üzerinde [HttpPost("/ui/consent")] olmalıdır.
+       Sunucu güvenli tarafa düşmeli: action != "allow" olan HER POST — eksik, boş
+       veya tanınmayan — reddetme sayılmalıdır. "allow" asla "deny yok" diye
+       çıkarsanmamalıdır. *@
+    <form method="post" action="@Url.Idp("/ui/consent")" data-auth-form asp-antiforgery="false">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="InteractionKey" value="@Model.InteractionKey" />
+        <input type="hidden" name="ClientKey" value="@Model.ClientKey" />
+        <input type="hidden" name="Scope" value="@Model.Scope" />
+
+        @* DOM sırası: "İzin ver" önce gelir ve formun varsayılan butonudur.
+           Görsel sıra CSS ile ters çevrilmez — DOM/görsel uyuşmazlığı SC 2.4.3
+           ihlalidir ve tam da önlemeye çalıştığı kazayı üretir.
+           Sayfada hiçbir şey otomatik odaklanmaz: yanlışlıkla basılan bir Enter
+           hesaba erişim izni veremez. *@
+        <div class="auth-actions auth-actions--pair">
+            <button type="submit" name="action" value="allow"
+                    class="auth-btn auth-btn--primary auth-btn--block"
+                    data-submit-guard data-label-busy="İzin veriliyor…">
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">İzin ver</span>
+            </button>
+
+            <button type="submit" name="action" value="deny"
+                    class="auth-btn auth-btn--neutral auth-btn--block"
+                    data-submit-guard aria-describedby="deny-hint"
+                    data-label-busy="Reddediliyor…">
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">Reddet</span>
+            </button>
+        </div>
+
+        @* Sonucu ETKİNLEŞTİRMEDEN ÖNCE bildirir: aria-describedby, butonun
+           erişilebilir açıklaması olarak okunur. title niteliği bu işi yapmaz. *@
+        <p class="auth-hint" id="deny-hint">
+            Reddederseniz izin verilmez@(Model.RedirectHost is not null
+                ? $" ve {Model.RedirectHost} adresine geri döndürülürsünüz" : string.Empty).
+        </p>
+    </form>
+</section>

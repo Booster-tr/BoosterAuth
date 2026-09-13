@@ -1,0 +1,1145 @@
+/* ==========================================================================
+   Booster Auth - auth.css
+   Komponent katmani. base.css'teki semantik token'lardan baska hicbir ham
+   deger kullanmaz; boylece kiraci temasi tek noktadan devralinabilir.
+
+   Isimlendirme: BEM -> blok__eleman--degistirici, tum bloklar "auth-" onekli.
+   Durumlar mumkun oldugunca attribute ile ifade edilir
+   ([aria-invalid], [data-state], [disabled]) -> ARIA ile CSS ayrisamaz.
+
+   Icindekiler
+     1. Form iskeleti          .auth-form, .auth-actions
+     2. Alan                   .auth-field
+     3. Parola gorunurluk      .auth-toggle
+     4. Telefon                .auth-phone
+     5. Butonlar               .auth-btn
+     6. Bildirimler            .auth-alert, .auth-summary, .auth-note
+     7. Parola gucu            .auth-meter, .auth-reqs
+     8. Ayrac + federasyon     .auth-divider, .auth-alt, .auth-fed
+     9. Izin ekrani            .auth-appmark, .auth-scopes
+    10. Hata ekrani            .auth-status, .auth-details
+    11. Baglantilar            .auth-link
+    12. forced-colors
+
+   Not: .auth-alert (form ustu bildirim) su an hicbir ekranda kullanilmiyor;
+   TempData/ModelState kaynakli genel bildirimler icin hazir bekletiliyor.
+   .auth-alt / .auth-fed federasyon blogu ise Login ekraninda showFederation
+   bayragi acildiginda devreye girer.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. FORM ISKELETI
+   ========================================================================== */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+/* Kayit formu uzun oldugu icin daha once bir kademe daraltilmisti; geri alindi.
+   Etiket-kontrol araligi 8px iken alanlar arasi 16px yeterli ayrisma vermiyor:
+   alti alan ve altlarindaki ipuclariyla birlikte satirlar birbirine akiyordu. */
+
+/* Gonderim butonu blogu, son alandan biraz daha ayrik durur */
+.auth-form__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+/* Iki butonlu aksiyon satiri (izin ekrani).
+   Gorsel sira DOM sirasiyla AYNIDIR ve `order` ile ters cevrilmez:
+   DOM/gorsel uyusmazligi SC 2.4.3 ihlalidir ve tam da onlemeye calistigi
+   kazayi uretir -- kullanici "Reddet" sandigi seye sekip "Izin ver"i etkinlestirir. */
+.auth-actions {
+    display: grid;
+    gap: var(--space-3);
+}
+
+@media (min-width: 480px) {
+    .auth-actions--pair {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ==========================================================================
+   2. ALAN  (.auth-field)
+   ========================================================================== */
+
+/* display:block (flex degil) bilincli bir tercihtir: telefon alani bir
+   <fieldset>'tir ve <legend> bir flex/grid ogesi olarak tarayicilar arasinda
+   tutarsiz yerlesir. Alt ogeler zaten blok seviyesinde oldugu icin akis yeterli. */
+.auth-field {
+    display: block;
+}
+
+.auth-field__label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: -0.002em;
+    color: var(--color-text-primary);
+}
+
+.auth-field__optional {
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-muted);
+}
+
+.auth-field__hint {
+    margin-top: var(--space-2);
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    color: var(--color-text-muted);
+}
+
+/* --- Kontrol kabugu: kenarlik, odak halkasi ve ikon hizasi burada yasar ---
+   Input'un kendi outline'i yok; halkayi kabuk tasir, boylece ikon + eylem
+   butonu tek bir cerceve icinde gorunur. */
+.auth-field__control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: var(--color-surface);
+    border: var(--border-width-hairline) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-instant) var(--ease-out);
+}
+
+.auth-field__control:hover:not(:focus-within) {
+    border-color: var(--color-text-muted);
+}
+
+/* Temel kural :has() ICERMEZ. Iceriyor olsaydi, :has() desteklemeyen bir
+   tarayicida secicinin tamami gecersiz olur ve alanlarda odak halkasi HIC
+   cizilmezdi -- kabul edilemez bir bozulma. Ayirmanin bedeli, eski
+   tarayicilarda yalnizca ic ice iki halka gorunmesidir. */
+.auth-field__control:focus-within {
+    border-color: var(--color-action);
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 2px;
+}
+
+/* Ilerlemeli iyilestirme: odak goster/gizle dugmesindeyken kabuk kendi
+   halkasini birakir, yoksa ic ice iki halka cizilir. */
+.auth-field__control:has(.auth-toggle:focus-visible) {
+    outline: none;
+}
+
+.auth-field__icon {
+    position: absolute;
+    left: var(--space-3);
+    display: flex;
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
+.auth-field__input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--control-height);
+    padding: var(--space-2) var(--space-4);
+    font-size: 1rem; /* <768px'te 16px alti iOS'ta otomatik yakinlastirma yapar */
+    line-height: 1.4;
+    color: var(--color-text-primary);
+    background-color: transparent;
+    border: 0;
+    border-radius: inherit;
+    caret-color: var(--color-action);
+}
+
+.auth-field__input:focus {
+    outline: none; /* halka kabukta */
+}
+
+.auth-field__input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 1;
+}
+
+.auth-field--icon .auth-field__input {
+    padding-left: calc(var(--space-4) + var(--space-6));
+}
+
+.auth-field--action .auth-field__input {
+    padding-right: var(--control-height);
+}
+
+.auth-field__input:disabled {
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
+}
+
+.auth-field__control:has(.auth-field__input:disabled) {
+    background-color: var(--color-surface-sunken);
+}
+
+.auth-field__input:read-only:not(:disabled) {
+    background-color: var(--color-surface-sunken);
+}
+
+/* Tarayici otomatik doldurma zemini kontrast denetimini bozmasin */
+.auth-field__input:-webkit-autofill,
+.auth-field__input:-webkit-autofill:hover,
+.auth-field__input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-text-primary);
+    -webkit-box-shadow: inset 0 0 0 100px var(--color-surface-subtle);
+    caret-color: var(--color-text-primary);
+}
+
+/* --- Hata durumu --------------------------------------------------------- */
+
+.auth-field--invalid .auth-field__control {
+    border-color: var(--color-danger-solid);
+}
+
+.auth-field--invalid .auth-field__control:focus-within {
+    outline-color: var(--color-focus-ring-danger);
+}
+
+.auth-field--invalid .auth-field__icon {
+    color: var(--color-danger-solid);
+}
+
+/* Hata metni. Element her zaman DOM'da durur (aria-describedby id'si cozulsun),
+   icerigi yalnizca hata varken doldurulur. Boslukken gizlenir ve erisilebilir
+   aciklamaya hicbir sey eklemez. */
+.auth-field__error {
+    display: none;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    color: var(--color-danger-text);
+}
+
+.auth-field--invalid .auth-field__error {
+    display: flex;
+}
+
+.auth-field__error-icon {
+    flex: none;
+    margin-top: 1px;
+    color: var(--color-danger-solid);
+}
+
+/* --- Yardimci not (Caps Lock, eslesme onayi) ------------------------------ */
+
+.auth-note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+}
+
+.auth-note svg {
+    flex: none;
+    margin-top: 1px;
+}
+
+.auth-note--warn {
+    color: var(--color-warning-text);
+}
+
+.auth-note--warn svg {
+    color: var(--color-warning-solid);
+}
+
+.auth-note--ok {
+    color: var(--color-success-text);
+}
+
+.auth-note--ok svg {
+    color: var(--color-success-solid);
+}
+
+/* ==========================================================================
+   3. PAROLA GORUNURLUK DUGMESI  (.auth-toggle)
+   ========================================================================== */
+
+.auth-toggle {
+    position: absolute;
+    right: 0;
+    display: inline-grid;
+    place-items: center;
+    width: var(--control-height);
+    height: var(--control-height);
+    padding: 0;
+    color: var(--color-text-muted);
+    background: none;
+    border: 0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-in-out),
+                background-color var(--duration-fast) var(--ease-in-out);
+}
+
+.auth-toggle:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-sunken);
+}
+
+.auth-toggle:focus-visible {
+    outline-offset: -2px; /* halka kontrol cercevesinin icinde kalsin */
+}
+
+.auth-toggle__icon--off {
+    display: none;
+}
+
+.auth-toggle[data-visible="true"] .auth-toggle__icon--on {
+    display: none;
+}
+
+.auth-toggle[data-visible="true"] .auth-toggle__icon--off {
+    display: block;
+}
+
+/* ==========================================================================
+   4. TELEFON  (.auth-phone)
+   ========================================================================== */
+
+/* Iki input tek cerceve icinde yasar: kenarligi ve odak halkasini dis kabuk
+   (.auth-field__control) tasir, boylece iki ayri halka asla gorunmez.
+   Gorsel gizli <label>'lar position:absolute oldugu icin akis disidir ve
+   izgara yerlesimini etkilemez. */
+.auth-phone__row {
+    flex: 1 1 auto;
+    display: grid;
+    /* Ulke kodu SABIT genisliktedir. max-content verilirse input'un icsel
+       genisligi (UA varsayilani ~size=20, ~160px + dolgu) olculur ve iki haneli
+       kutu 200px'e sisip numara alanini 360-479px'te kullanilamaz hale getirir. */
+    grid-template-columns: 6.25rem auto minmax(0, 1fr);
+    align-items: stretch;
+    min-width: 0;
+}
+
+@media (max-width: 359px) {
+    .auth-phone__row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.auth-phone__country {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auth-phone__plus {
+    position: absolute;
+    left: var(--space-4);
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
+.auth-phone__code {
+    padding-left: calc(var(--space-4) + var(--space-3));
+    font-variant-numeric: tabular-nums;
+}
+
+/* Iki input tek cerceve icinde; aralarinda ince dikey ayrac */
+.auth-phone__divider {
+    align-self: stretch;
+    width: var(--border-width-hairline);
+    margin-block: var(--space-2);
+    background-color: var(--color-border);
+}
+
+.auth-phone__number {
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 359px) {
+    .auth-phone__divider {
+        width: auto;
+        height: var(--border-width-hairline);
+        margin: 0 var(--space-2);
+    }
+}
+
+/* ==========================================================================
+   5. BUTONLAR  (.auth-btn)
+   ========================================================================== */
+
+.auth-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 2.75rem; /* 44px dokunma hedefi */
+    padding: var(--space-2) var(--space-5);
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.005em;
+    text-align: center;
+    text-decoration: none;
+    border: var(--border-width-hairline) solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-in-out),
+                border-color var(--duration-fast) var(--ease-in-out),
+                color var(--duration-fast) var(--ease-in-out);
+}
+
+.auth-btn--block {
+    width: 100%;
+}
+
+.auth-btn:active {
+    transform: translateY(1px);
+}
+
+/* --- Birincil --- */
+.auth-btn--primary {
+    color: var(--color-action-fg);
+    background-color: var(--color-action);
+    box-shadow: var(--shadow-xs);
+}
+
+.auth-btn--primary:hover {
+    color: var(--color-action-fg);
+    background-color: var(--color-action-hover);
+    text-decoration: none;
+}
+
+.auth-btn--primary:active {
+    background-color: var(--color-action-active);
+    box-shadow: none;
+}
+
+/* --- Ikincil / cerceveli --- */
+.auth-btn--secondary,
+.auth-btn--neutral,
+.auth-btn--fed {
+    color: var(--color-neutral-action-fg);
+    background-color: var(--color-neutral-action);
+    border-color: var(--color-neutral-action-border);
+}
+
+.auth-btn--secondary:hover,
+.auth-btn--fed:hover {
+    color: var(--color-neutral-action-fg);
+    background-color: var(--color-neutral-action-hover);
+    text-decoration: none;
+}
+
+.auth-btn--secondary:active,
+.auth-btn--fed:active {
+    background-color: var(--color-neutral-action-active);
+}
+
+/* "Reddet": dolu kirmizi DEGIL. Izin vermemek mesru bir secimdir; dolu kirmizi
+   buton kullaniciyi hata yaptigi hissine sokar ve karanlik desen sayilir. */
+.auth-btn--neutral:hover {
+    color: var(--color-danger-text);
+    background-color: var(--color-danger-surface);
+    border-color: var(--color-danger-border);
+    text-decoration: none;
+}
+
+/* --- Devre disi / mesgul --- */
+.auth-btn[aria-disabled="true"],
+.auth-btn:disabled {
+    cursor: not-allowed;
+}
+
+.auth-btn[aria-disabled="true"] {
+    pointer-events: none;
+}
+
+.auth-btn--secondary[aria-disabled="true"],
+.auth-btn--neutral[aria-disabled="true"] {
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-sunken);
+    border-color: var(--color-border);
+}
+
+/* --- Yukleniyor ----------------------------------------------------------
+   Buton "disabled" YAPILMAZ: odak kaybolur, ekran okuyucu yeni etiketi
+   duyurmaz ve bazi tarayicilarda gonderim iptal olur. aria-disabled +
+   JS tarafinda tekrar-gonderim kilidi kullanilir. */
+
+.auth-btn__spinner {
+    display: none;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: var(--radius-full);
+}
+
+.auth-btn[data-state="loading"] .auth-btn__spinner {
+    display: block;
+    animation: auth-spin var(--duration-spin) linear infinite;
+}
+
+@keyframes auth-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Etiket "Giris yap" -> "Giris yapiliyor..." olurken buton genislemesin */
+.auth-btn__label {
+    display: inline-block;
+}
+
+/* --- Federasyon butonu --- */
+.auth-btn--fed {
+    justify-content: flex-start;
+    gap: var(--space-3);
+    font-weight: var(--font-weight-medium);
+}
+
+.auth-btn--fed .auth-btn__label {
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.auth-btn__brand {
+    display: flex;
+    flex: none;
+}
+
+/* ==========================================================================
+   6. BILDIRIMLER
+   ========================================================================== */
+
+/* --- Form ustu ozet / uyari ---------------------------------------------- */
+
+.auth-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    border: var(--border-width-hairline) solid;
+    border-radius: var(--radius-md);
+}
+
+.auth-alert__icon {
+    flex: none;
+    margin-top: 1px;
+}
+
+.auth-alert__title {
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.auth-alert__text {
+    margin-top: var(--space-1);
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+}
+
+.auth-alert--error {
+    color: var(--color-danger-text);
+    background-color: var(--color-danger-surface);
+    border-color: var(--color-danger-border);
+}
+
+.auth-alert--error .auth-alert__icon { color: var(--color-danger-solid); }
+
+.auth-alert--warning {
+    color: var(--color-warning-text);
+    background-color: var(--color-warning-surface);
+    border-color: var(--color-warning-border);
+}
+
+.auth-alert--warning .auth-alert__icon { color: var(--color-warning-solid); }
+
+.auth-alert--info {
+    color: var(--color-info-text);
+    background-color: var(--color-info-surface);
+    border-color: var(--color-info-border);
+}
+
+.auth-alert--info .auth-alert__icon { color: var(--color-info-solid); }
+
+.auth-alert--success {
+    color: var(--color-success-text);
+    background-color: var(--color-success-surface);
+    border-color: var(--color-success-border);
+}
+
+.auth-alert--success .auth-alert__icon { color: var(--color-success-solid); }
+
+/* --- Hata ozeti (basarisiz POST sonrasi odaklanan blok) ------------------- */
+
+.auth-summary {
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    color: var(--color-danger-text);
+    background-color: var(--color-danger-surface);
+    border: var(--border-width-hairline) solid var(--color-danger-border);
+    border-left: var(--border-width-rule) solid var(--color-danger-solid);
+    border-radius: var(--radius-md);
+}
+
+/* Programatik odak da gorunur olmali -> :focus-visible degil, :focus */
+.auth-summary:focus {
+    outline: 3px solid var(--color-focus-ring-danger);
+    outline-offset: 2px;
+}
+
+.auth-summary__head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.auth-summary__icon {
+    flex: none;
+    margin-top: 2px;
+    color: var(--color-danger-solid);
+}
+
+.auth-summary__title {
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.auth-summary__intro {
+    margin-top: var(--space-1);
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+}
+
+.auth-summary__list {
+    margin-top: var(--space-3);
+    padding-left: calc(var(--space-6) + var(--space-2));
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    list-style: disc;
+}
+
+.auth-summary__list li + li {
+    margin-top: var(--space-1);
+}
+
+.auth-summary__list a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.auth-summary__list a:hover {
+    color: inherit;
+}
+
+/* ==========================================================================
+   7. PAROLA GUCU  (.auth-meter, .auth-reqs)
+   ========================================================================== */
+
+.auth-meter {
+    margin-top: var(--space-3);
+}
+
+.auth-meter__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    color: var(--color-text-muted);
+}
+
+.auth-meter__level {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+}
+
+/* Cubuklar tamamen dekoratif (aria-hidden); bilgi metinle tasinir. */
+.auth-meter__track {
+    display: flex;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+}
+
+.auth-meter__seg {
+    flex: 1 1 0;
+    height: 4px;
+    background-color: var(--color-surface-sunken);
+    border: var(--border-width-hairline) solid var(--color-border-strong);
+    border-radius: var(--radius-xs);
+    transition: background-color var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out);
+}
+
+.auth-meter[data-level="1"] .auth-meter__seg:nth-child(-n+1),
+.auth-meter[data-level="2"] .auth-meter__seg:nth-child(-n+2),
+.auth-meter[data-level="3"] .auth-meter__seg:nth-child(-n+3),
+.auth-meter[data-level="4"] .auth-meter__seg:nth-child(-n+4) {
+    border-color: transparent;
+}
+
+.auth-meter[data-level="1"] .auth-meter__seg:nth-child(-n+1) { background-color: var(--color-danger-solid); }
+.auth-meter[data-level="2"] .auth-meter__seg:nth-child(-n+2) { background-color: var(--color-warning-solid); }
+.auth-meter[data-level="3"] .auth-meter__seg:nth-child(-n+3) { background-color: var(--color-success-solid); }
+.auth-meter[data-level="4"] .auth-meter__seg:nth-child(-n+4) { background-color: var(--color-success-solid); }
+
+/* --- Kosul listesi -------------------------------------------------------
+   Durum renk ve ikonla DEGIL, once metinle tasinir (.auth-reqs__state). */
+
+.auth-reqs {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-3);
+}
+
+@media (min-width: 480px) {
+    .auth-reqs {
+        grid-template-columns: 1fr 1fr;
+        column-gap: var(--space-4);
+    }
+}
+
+.auth-reqs__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 1.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    color: var(--color-text-muted);
+}
+
+.auth-reqs__mark {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    font-size: 0.75rem;
+    line-height: 1;
+    color: var(--color-text-muted);
+    border: var(--border-width-hairline) solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    transition: color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
+}
+
+/* Isaret metin karakteridir; background-image degil -> forced-colors'ta kaybolmaz */
+.auth-reqs__mark::before {
+    content: "\2022"; /* nokta: karsilanmadi */
+}
+
+.auth-reqs__item[data-met="true"] {
+    color: var(--color-text-secondary);
+}
+
+.auth-reqs__item[data-met="true"] .auth-reqs__mark {
+    color: var(--color-success-solid);
+    border-color: var(--color-success-solid);
+}
+
+.auth-reqs__item[data-met="true"] .auth-reqs__mark::before {
+    content: "\2713"; /* tik: karsilandi */
+}
+
+.auth-meter__tip {
+    margin-top: var(--space-3);
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   8. AYRAC + FEDERASYON
+   ========================================================================== */
+
+.auth-alt {
+    margin-top: var(--space-6);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-4);
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-muted);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1 1 auto;
+    border-top: var(--border-width-hairline) solid var(--color-border);
+}
+
+/* Bosluk >= 10px olmali: odak halkasi 3px kalinlik + 2px offset ile
+   her yandan 5px tasar, 8px'te iki buton halkalari birbirini kirpar. */
+.auth-fed {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+/* ==========================================================================
+   9. IZIN EKRANI
+   ========================================================================== */
+
+/* --- Uygulama isareti (logo veya monogram) -------------------------------- */
+
+.auth-appmark {
+    /* flex:none sart: .auth-consent__head bir flex kabidir ve grid olan bu kutunun
+       min-width:auto degeri monogram genisligine cozulur -> uzun bir uygulama
+       adinda 48px'lik logo bir dilime sikisir. */
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    background-color: var(--color-surface-subtle);
+    border: var(--border-width-hairline) solid var(--color-border);
+    border-radius: var(--radius-avatar);
+}
+
+.auth-appmark__img {
+    width: 100%;
+    height: 100%;
+    padding: var(--space-1);
+    object-fit: contain;
+    border-radius: inherit; /* overflow:hidden yerine: monogram metni kirpilmasin */
+}
+
+.auth-appmark__mono {
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+}
+
+.auth-consent__head {
+    display: flex;
+    /* Uzun bir uygulama adi h1'i 2-3 satira tasiyabilir; ortalama hizalama
+       o durumda logoyu basligin ortasina kaydirir ve bozuk gorunur. */
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+/* Baslik logo ile ayni satirda: kendi alt boslugunu kullanmaz */
+.auth-consent__head .auth-card__header {
+    margin-bottom: 0;
+}
+
+/* Izin ekraninda .auth-card__subtitle basligin disinda yasar ve ardindan gelen
+   bloklarin yalnizca margin-bottom'u vardir -> aralarinda 0px kalir. */
+.auth-card__subtitle + .auth-consent__account,
+.auth-card__subtitle + .auth-consent__scopes-title {
+    margin-top: var(--space-6);
+}
+
+.auth-consent__account {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    color: var(--color-text-secondary);
+}
+
+.auth-consent__scopes-title {
+    margin-bottom: var(--space-3);
+    font-size: 1.125rem;
+    line-height: 1.625rem;
+    letter-spacing: -0.01em;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+/* --- Izin listesi --------------------------------------------------------- */
+
+.auth-scopes {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2);
+    background-color: var(--color-surface-subtle);
+    border: var(--border-width-hairline) solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.auth-scope {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+}
+
+.auth-scope + .auth-scope {
+    border-top: var(--border-width-hairline) solid var(--color-border);
+}
+
+.auth-scope__icon {
+    margin-top: 2px;
+    color: var(--color-text-muted);
+}
+
+.auth-scope__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    letter-spacing: -0.006em;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.auth-scope__desc {
+    margin-top: var(--space-1);
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    color: var(--color-text-secondary);
+}
+
+.auth-scope__tag {
+    padding: 0 var(--space-2);
+    font-size: 0.6875rem;
+    line-height: 1.125rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-sunken);
+    border: var(--border-width-hairline) solid var(--color-border);
+    border-radius: var(--radius-full);
+}
+
+.auth-scope__raw {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-muted);
+    word-break: break-all;
+}
+
+/* Ikincil, aciklayici tek satir. Izin ve hata ekranlarinda ortak. */
+.auth-hint {
+    margin-top: var(--space-3);
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+  10. HATA / DURUM EKRANI
+   ========================================================================== */
+
+/* Sola hizali, kucuk ikonlu. Ortalanmis buyuk renkli daire tuketici urunu
+   hissi verir; kurumsal IdP hata ekranlari (Entra, Okta) sola hizalidir ve
+   ikonu metnin yaninda kucuk tutar. */
+.auth-status__icon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: var(--space-5);
+    color: var(--color-danger-solid);
+    background-color: var(--color-danger-surface);
+    border-radius: var(--radius-lg);
+}
+
+.auth-status__text {
+    max-width: 46ch;
+    margin-top: var(--space-3);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+}
+
+/* Tek birincil aksiyon + metin baglantisi. Iki tam genislikte yigilmis buton
+   agir durur ve ikisi de esit onemdeymis gibi okunur. */
+.auth-status__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+}
+
+/* --- Teknik ayrintilar ---------------------------------------------------- */
+
+.auth-details {
+    margin-top: var(--space-6);
+    text-align: left;
+}
+
+/* display:inline-flex, tarayicinin kendi acilis isaretini kaldirir; yerine
+   kendi chevron'umuz doner. Aksi halde blok sessizce acilip kapanir. */
+.auth-details__summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 1.5rem;
+    padding-block: var(--space-1);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    list-style: none;
+}
+
+.auth-details__summary::-webkit-details-marker {
+    display: none;
+}
+
+.auth-details__summary:hover {
+    color: var(--color-text-secondary);
+}
+
+.auth-details__summary svg {
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.auth-details[open] .auth-details__summary svg {
+    transform: rotate(90deg);
+}
+
+.auth-details__body {
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--space-3);
+    row-gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--color-surface-sunken);
+    border-radius: var(--radius-lg);
+}
+
+.auth-details__key,
+.auth-details__value {
+    margin: 0; /* <dd> varsayilan girintisi izgarayi bozar */
+}
+
+.auth-details__key {
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: var(--color-text-muted);
+}
+
+.auth-details__value {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    letter-spacing: 0.012em;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
+    word-break: break-all;
+}
+
+/* ==========================================================================
+  11. BAGLANTILAR
+   ========================================================================== */
+
+/* Cumle ICINDEKI baglantilar: teal ile cevre metin arasindaki kontrast 1.2:1
+   civarindadir, yani renk tek ayirt edici olamaz (SC 1.4.1 / teknik F73).
+   Kalinlik farki da kabul edilen bir ayirt edici degildir -- alti cizgi sart. */
+.auth-link {
+    font-weight: var(--font-weight-medium);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
+
+/* Cumle icinde olmayan tekil baglantilar 24px dokunma hedefini karsilamali */
+.auth-link--standalone {
+    display: inline-block;
+    min-height: 1.5rem;
+    padding-block: var(--space-1);
+}
+
+.auth-link--sm {
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+}
+
+/* ==========================================================================
+  12. FORCED-COLORS (Windows Yuksek Kontrast)
+   forced-colors modunda box-shadow ve background-image dusurulur; sinirlar
+   gercek border ile, durumlar sistem renkleriyle tasinmalidir.
+   ========================================================================== */
+
+@media (forced-colors: active) {
+    .auth-field__control {
+        border: 1px solid ButtonText;
+    }
+
+    .auth-field--invalid .auth-field__control {
+        border-width: 2px; /* durum kalinlikla tasinir, renkle degil */
+    }
+
+    .auth-field__control:focus-within {
+        outline: 3px solid Highlight;
+        outline-offset: 2px;
+        box-shadow: none;
+    }
+
+    .auth-btn {
+        border: 1px solid ButtonText;
+    }
+
+    .auth-btn[aria-disabled="true"] {
+        color: GrayText;
+        border-color: GrayText;
+    }
+
+    .auth-alert,
+    .auth-summary,
+    .auth-scopes,
+    .auth-appmark,
+    .auth-details__body {
+        /* Dolgu rengi bu modda dusurulur; sinir olmadan bloklar sayfaya karisir. */
+        border: 1px solid CanvasText;
+    }
+
+    .auth-meter__seg {
+        border: 1px solid ButtonText;
+        background: Canvas;
+    }
+
+    .auth-meter[data-level="1"] .auth-meter__seg:nth-child(-n+1),
+    .auth-meter[data-level="2"] .auth-meter__seg:nth-child(-n+2),
+    .auth-meter[data-level="3"] .auth-meter__seg:nth-child(-n+3),
+    .auth-meter[data-level="4"] .auth-meter__seg:nth-child(-n+4) {
+        background: Highlight;
+        border-color: ButtonText;
+    }
+
+    .auth-appmark__img {
+        forced-color-adjust: none;
+    }
+}
+
+/* Hareket azaltma: mesgul durumu yine bildirilmelidir, ama donen bir sekille
+   degil. Sonsuz donus, hareketi acikca reddetmis bir kullaniciya SC 2.2.2
+   sinirinda dakikalarca surebilen bir animasyon dayatir. Yerine nabiz. */
+@media (prefers-reduced-motion: reduce) {
+    .auth-btn[data-state="loading"] .auth-btn__spinner {
+        animation: auth-pulse 1.4s ease-in-out infinite !important;
+    }
+}
+
+@keyframes auth-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}

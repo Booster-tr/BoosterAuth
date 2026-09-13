@@ -1,0 +1,86 @@
+@model ErrorViewModel
+@{
+    Layout = "_AuthLayout";
+
+    ViewData["Title"] = $"{Model.Title} · Booster Auth";
+    ViewData["MainModifier"] = "auth-main--error";
+    ViewData["BrandHeadline"] = "Güvenliğiniz her zaman önce gelir.";
+    ViewData["BrandLead"] = "Emin olamadığımız hiçbir isteği tamamlamayız. Bu ekranı gördüyseniz hesabınıza bir şey olmadı.";
+}
+
+<section class="auth-card">
+    <div class="auth-status">
+        <div class="auth-status__icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" focusable="false">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+                <path d="M12 7.5v5.25" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <circle cx="12" cy="16.4" r="1.1" fill="currentColor" />
+            </svg>
+        </div>
+
+        @* h1 dostane mesajın kendisidir; teknik kod başlıkta yer almaz. *@
+        <h1 class="auth-card__title">@Model.Title</h1>
+        <p class="auth-status__text">@Model.Message</p>
+
+        @* Tek birincil aksiyon. Etkileşim anahtarı varsa akış kaldığı yerden
+           sürdürülebilir; yoksa yeniden denenecek bir akış da yoktur ve geriye
+           yalnızca başlangıç sayfası kalır — bu durumda o, birincil eylem olur. *@
+        <div class="auth-status__actions">
+            @if (Model.CanRetry)
+            {
+                <a class="auth-btn auth-btn--primary auth-btn--block"
+                   href="@Url.Idp($"/authorize?interaction_key={Uri.EscapeDataString(Model.InteractionKey!)}")">
+                    @Model.ActionLabel
+                </a>
+                <a class="auth-link auth-link--standalone auth-link--sm" href="@Url.Idp("/")">
+                    Başlangıç sayfasına dön
+                </a>
+            }
+            else
+            {
+                <a class="auth-btn auth-btn--primary auth-btn--block" href="@Url.Idp("/")">
+                    Başlangıç sayfasına dön
+                </a>
+            }
+        </div>
+
+        @if (Model.HasTechnicalDetails)
+        {
+            @* Ham error / error_description birincil metinde ASLA gösterilmez;
+               kapalı bir ayrıntı bloğunda, ikincil tonda durur. *@
+            <details class="auth-details">
+                <summary class="auth-details__summary">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Teknik ayrıntılar
+                </summary>
+
+                <dl class="auth-details__body">
+                    @if (!string.IsNullOrEmpty(Model.Error))
+                    {
+                        @* Protokol adları İngilizcedir: lang işaretlenmezse
+                           Türkçe seslendirme okunmaz hâle getirir. *@
+                        <dt class="auth-details__key" lang="en">error</dt>
+                        <dd class="auth-details__value" lang="en">@Model.Error</dd>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ErrorDescription))
+                    {
+                        <dt class="auth-details__key" lang="en">description</dt>
+                        <dd class="auth-details__value">@Model.ErrorDescription</dd>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.RequestId))
+                    {
+                        <dt class="auth-details__key" lang="en">request_id</dt>
+                        <dd class="auth-details__value" lang="en">@Model.RequestId</dd>
+                    }
+                </dl>
+
+                <p class="auth-hint">
+                    Sorun devam ederse bu bilgileri paylaşarak destek ekibine ulaşabilirsiniz.
+                </p>
+            </details>
+        }
+    </div>
+</section>

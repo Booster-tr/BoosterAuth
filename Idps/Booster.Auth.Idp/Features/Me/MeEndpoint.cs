@@ -1,3 +1,5 @@
+using Booster.Auth.Idp.Constants;
+using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Database.Repositories;
@@ -23,12 +25,13 @@ public class MeEndpoint(
     {
         var principalId = requestContextAccessor.RequestContext!.PrincipalId;
         if (principalId == Guid.Empty)
-            throw new BusinessException(AuthNMessageKeys.InvalidAccessToken);
+            throw new BusinessException(IdpMessageKeys.InvalidAccessToken);
 
         var principal = await principalRepository.Query()
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(p => p.Id == principalId && p.DeletedTime == null, ct);
-        principal.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.PrincipalNotFound);
+        if(principal == null)
+            throw new BusinessException(IdpMessageKeys.PrincipalNotFound);
 
         await Send.OkAsync(new UserInfoResponse
         {
@@ -36,7 +39,7 @@ public class MeEndpoint(
             Name = principal.DisplayName,
             Email = principal.Email,
             EmailVerified = principal.EmailVerified,
-            UserPool = principal.UserPoolId.ToString()
+            UserPool = principal.IsolationId.ToString()
         }, ct);
     }
 }

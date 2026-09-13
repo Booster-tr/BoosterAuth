@@ -1,0 +1,20 @@
+@*
+    Booster Auth marka işareti.
+    Model: "inverse" (koyu zemin) veya null/"" (açık zemin).
+
+    Geometri: kalkan + anahtar deliği, tek 2.25px kontur, currentColor.
+    20px'e kadar okunur; ters zeminde yalnızca renk devralınır.
+    Erişilebilir ad sarmalayıcıdadır; <svg> aria-hidden'dır.
+*@
+@model string
+
+<span class="ba-logo @(Model == "inverse" ? "ba-logo--inverse" : null)" role="img" aria-label="Booster Auth">
+    <svg class="ba-logo__mark" viewBox="0 0 32 32" width="32" height="32" fill="none"
+         xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M16 2.75 27.25 7.1v8.55c0 6.72-4.6 11.42-11.25 13.6C9.35 27.07 4.75 22.37 4.75 15.65V7.1L16 2.75Z"
+              stroke="currentColor" stroke-width="2.25" stroke-linejoin="round" />
+        <circle cx="16" cy="14" r="2.9" stroke="currentColor" stroke-width="2.25" />
+        <path d="M16 16.9v4.35" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" />
+    </svg>
+    <span class="ba-logo__wordmark" aria-hidden="true"><b>Booster</b>&nbsp;Auth</span>
+</span>

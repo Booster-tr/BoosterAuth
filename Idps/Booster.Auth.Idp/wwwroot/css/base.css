@@ -1,0 +1,856 @@
+/* ==========================================================================
+   Booster Auth - base.css
+   Tasarim token'lari, reset, tipografi ve sayfa iskeleti.
+
+   Katmanlar:
+     1. Primitive ramp'ler   -> --navy-*, --slate-*, --teal-*, semantik primitifler
+     2. Semantik token'lar   -> --color-*, --space-*, --radius-*, --shadow-*
+     3. Reset + tipografi
+     4. Sayfa iskeleti       -> .auth-shell, .auth-brand, .auth-main, .auth-card
+     5. Marka isareti + sayfa alti
+
+   Komponentler (input, buton, uyari, izin listesi vb.) auth.css icindedir.
+   Bilesenler YALNIZCA semantik token'lara referans verir, ramp'lere asla dokunmaz.
+   Bu sayede kiraci (tenant) temasi az sayida token ile devralinabilir.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. PRIMITIVE RAMP'LER
+   ========================================================================== */
+
+:root {
+    /* Marka lacivert */
+    --navy-50: #F1F5FC;
+    --navy-100: #E0E9F8;
+    --navy-200: #C2D3F0;
+    --navy-300: #96B0E0;
+    --navy-400: #6285C6;
+    --navy-500: #3B62A8;
+    --navy-600: #2A4C8C;
+    --navy-700: #203C70;
+    --navy-750: #1B3A6B;
+    --navy-800: #182D55;
+    --navy-900: #11203C;
+    --navy-950: #0A1526;
+
+    /* Notr slate (mavi tonlu) */
+    --slate-50: #F8FAFC;
+    --slate-100: #F1F4F9;
+    --slate-150: #EDF1F7;
+    --slate-200: #E4E9F0;
+    --slate-300: #CDD5E0;
+    --slate-400: #9AA6B8;
+    --slate-500: #7E8DA3; /* 3.37:1 beyaz uzerinde -> kontrol kenarligi */
+    --slate-600: #5B6B82; /* 5.43:1 beyaz uzerinde -> ikincil metin */
+    --slate-700: #3F4E63;
+    --slate-800: #263346;
+    --slate-900: #16202F;
+    --slate-950: #0B1220;
+
+    /* Aksiyon rengi (teal) - tek vurgu rengi */
+    --teal-50: #ECFDF8;
+    --teal-100: #CFF7EC;
+    --teal-200: #9FEDDA;
+    --teal-300: #5FDCC4;
+    --teal-400: #23C1A8;
+    --teal-500: #0FA48E;
+    --teal-600: #0A8375;
+    --teal-700: #0B6960;
+    --teal-800: #0D544E;
+    --teal-900: #0E4641;
+    --teal-950: #032B28;
+
+    /* Semantik primitifler */
+    --danger-tint: #FEF3F2;
+    --danger-border: #FDA29B;
+    --danger-border-strong: #E4736A;
+    --danger-solid: #B42318;
+    --danger-text: #B42318;
+
+    --warning-tint: #FFFAEB;
+    --warning-border: #FEDF89;
+    --warning-border-strong: #DC6803;
+    --warning-solid: #B54708;
+    --warning-text: #93370D;
+
+    --success-tint: #ECFDF3;
+    --success-border: #A6F4C5;
+    --success-border-strong: #067647;
+    --success-solid: #067647;
+    --success-text: #027A48;
+
+    --info-tint: #EFF8FF;
+    --info-border: #B2DDFF;
+    --info-border-strong: #2E90FA;
+    --info-solid: #175CD3;
+    --info-text: #175CD3;
+}
+
+/* ==========================================================================
+   2. SEMANTIK TOKEN'LAR
+   ========================================================================== */
+
+:root {
+    color-scheme: light;
+
+    /* --- Yuzeyler --- */
+    --color-bg-page: var(--slate-150);
+    --color-surface: #FFFFFF;
+    --color-surface-subtle: var(--slate-50);
+    --color-surface-sunken: var(--slate-100);
+    --color-overlay: rgba(11, 18, 32, 0.55);
+
+    /* --- Kenarliklar --- */
+    --color-border: var(--slate-200);        /* dekoratif ayirici */
+    --color-border-strong: var(--slate-500); /* kontrol kenarligi */
+    --color-border-inverse: rgba(255, 255, 255, 0.14);
+
+    /* --- Metin --- */
+    --color-text-primary: var(--slate-900);
+    --color-text-secondary: var(--slate-700);
+    --color-text-muted: var(--slate-600);
+    --color-text-disabled: var(--slate-500);
+    --color-text-inverse: #FFFFFF;
+    --color-text-inverse-secondary: var(--navy-200);
+    --color-text-inverse-muted: var(--navy-300);
+    --color-text-heading: var(--navy-900);
+
+    /* --- Aksiyon --- */
+    --color-action: var(--teal-700);
+    --color-action-hover: var(--teal-800);
+    --color-action-active: var(--teal-900);
+    --color-action-fg: #FFFFFF;
+    --color-action-subtle: var(--teal-50);
+    --color-action-subtle-hover: var(--teal-100);
+    --color-action-border: var(--teal-200);
+    --color-link: var(--teal-700);
+    --color-link-hover: var(--teal-900);
+    --color-link-inverse: var(--teal-300);
+
+    /* --- Notr (ikincil) aksiyon --- */
+    --color-neutral-action: #FFFFFF;
+    --color-neutral-action-hover: var(--slate-50);
+    --color-neutral-action-active: var(--slate-100);
+    --color-neutral-action-fg: var(--slate-800);
+    --color-neutral-action-border: var(--slate-500);
+
+    /* --- Odak ---
+       Halka LACIVERTTIR, teal degil: teal bir aksiyon butonunun uzerinde
+       kendi dolgusuyla neredeyse ayni tonda kalir ve halka yerine bulanik bir
+       kenar gibi okunur. Lacivert her iki zeminde de net ayrisir (beyazda 18:1). */
+    --color-focus-ring: var(--navy-900);
+    --color-focus-ring-danger: var(--danger-solid);
+
+    /* --- Durum yuzeyleri --- */
+    --color-danger-surface: var(--danger-tint);
+    --color-danger-border: var(--danger-border);
+    --color-danger-text: var(--danger-text);
+    --color-danger-solid: var(--danger-solid);
+    --color-danger-fg: #FFFFFF;
+
+    --color-warning-surface: var(--warning-tint);
+    --color-warning-border: var(--warning-border);
+    --color-warning-text: var(--warning-text);
+    --color-warning-solid: var(--warning-solid);
+
+    --color-success-surface: var(--success-tint);
+    --color-success-border: var(--success-border);
+    --color-success-text: var(--success-text);
+    --color-success-solid: var(--success-solid);
+
+    --color-info-surface: var(--info-tint);
+    --color-info-border: var(--info-border);
+    --color-info-text: var(--info-text);
+    --color-info-solid: var(--info-solid);
+
+    /* --- Marka paneli --- */
+    --color-panel-from: var(--navy-950);
+    --color-panel-mid: var(--navy-900);
+    --color-panel-to: var(--navy-750);
+    --color-panel-glow: 15, 164, 142;
+    --color-panel-glow-2: 59, 98, 168;
+
+    /* --- Tipografi --- */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Mono", "Segoe UI Mono", "JetBrains Mono", "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+
+    /* --- Bosluk (4px tabanli) --- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-7: 1.75rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-14: 3.5rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+
+    /* --- Kose yaricapi --- */
+    --radius-scale: 1;
+    --radius-xs: calc(4px * var(--radius-scale));
+    --radius-sm: calc(6px * var(--radius-scale));
+    --radius-md: calc(8px * var(--radius-scale));  /* input / buton */
+    --radius-lg: calc(12px * var(--radius-scale));
+    --radius-xl: calc(16px * var(--radius-scale)); /* kart */
+    --radius-avatar: calc(8px * var(--radius-scale));
+    --radius-full: 9999px;
+
+    /* --- Kenarlik kalinligi --- */
+    --border-width-hairline: 1px;
+    --border-width-strong: 1.5px;
+    --border-width-emphasis: 2px;
+    --border-width-rule: 3px;
+
+    /* --- Golge / derinlik --- */
+    --shadow-xs: 0 1px 2px 0 rgba(16, 32, 60, 0.06);
+    --shadow-sm: 0 1px 2px -1px rgba(16, 32, 60, 0.08), 0 2px 4px -2px rgba(16, 32, 60, 0.06);
+    --shadow-md: 0 2px 4px -2px rgba(16, 32, 60, 0.08), 0 8px 16px -4px rgba(16, 32, 60, 0.10);
+    --shadow-lg: 0 1px 2px 0 rgba(16, 32, 60, 0.05), 0 4px 8px -2px rgba(16, 32, 60, 0.06), 0 16px 32px -8px rgba(16, 32, 60, 0.12);
+    /* Odak icin golge TOKEN'I YOKTUR: tum odak gostergeleri `outline` ile
+       cizilir. Tek bir tarif olmasi hem gorsel tutarliligi hem de
+       forced-colors davranisini garanti eder (box-shadow o modda dusurulur). */
+
+    /* --- Hareket --- */
+    --duration-instant: 80ms;
+    --duration-fast: 140ms;
+    --duration-base: 200ms;
+    --duration-slow: 280ms;
+    --duration-spin: 720ms;
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.45, 0.05, 0.35, 1);
+    --ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+
+    /* --- Olculer --- */
+    --control-height: 44px;
+    --form-column-width: 400px;
+}
+
+/* --------------------------------------------------------------------------
+   Koyu tema.
+   Sistem tercihine uyar; <html data-theme="light"> ile devre disi birakilir,
+   <html data-theme="dark"> ile zorlanir. Yalnizca semantik katman degisir.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+
+        --color-bg-page: #070C14;
+        --color-surface: #0F1724;
+        --color-surface-subtle: #141E2E;
+        --color-surface-sunken: #0B1320;
+        --color-overlay: rgba(3, 7, 14, 0.72);
+
+        --color-border: #253248;
+        --color-border-strong: #54688A;
+        --color-border-inverse: rgba(0, 0, 0, 0.24);
+
+        --color-text-primary: #E8EDF5;
+        --color-text-secondary: #AFBDD0;
+        --color-text-muted: #96A6BC;
+        --color-text-disabled: #64748B;
+        --color-text-inverse: #FFFFFF;
+        --color-text-inverse-secondary: #C2D3F0;
+        --color-text-inverse-muted: #96B0E0;
+        --color-text-heading: #E8EDF5;
+
+        --color-action: #14B39C;
+        --color-action-hover: #23C1A8;
+        --color-action-active: #0FA48E;
+        --color-action-fg: #03211D; /* beyaz burada 2.64:1 -> AA basarisiz */
+        --color-action-subtle: rgba(20, 179, 156, 0.12);
+        --color-action-subtle-hover: rgba(20, 179, 156, 0.18);
+        --color-action-border: rgba(20, 179, 156, 0.35);
+        --color-link: #5FDCC4;
+        --color-link-hover: #9FEDDA;
+        --color-link-inverse: #5FDCC4;
+
+        --color-neutral-action: #16202F;
+        --color-neutral-action-hover: #1C283A;
+        --color-neutral-action-active: #223044;
+        --color-neutral-action-fg: #E8EDF5;
+        --color-neutral-action-border: #54688A;
+
+        /* Koyu temada lacivert halka kaybolur; acik teal devralir (yuzey uzerinde ~9.7:1) */
+        --color-focus-ring: #2DD4BF;
+
+        --color-danger-surface: #2A1211;
+        --color-danger-border: #6B231D;
+        --color-danger-text: #FDA29B;
+        --color-danger-solid: #D92D20;
+
+        --color-warning-surface: #2A1D06;
+        --color-warning-border: #6B4708;
+        --color-warning-text: #FEC84B;
+        --color-warning-solid: #B54708;
+
+        --color-success-surface: #06251A;
+        --color-success-border: #0C5238;
+        --color-success-text: #6CE9A6;
+        --color-success-solid: #067647;
+
+        --color-info-surface: #0A1B2E;
+        --color-info-border: #17427A;
+        --color-info-text: #84CAFF;
+        --color-info-solid: #175CD3;
+
+        --color-panel-from: #04080F;
+        --color-panel-mid: #0A1526;
+        --color-panel-to: #142C52;
+
+        --shadow-lg: 0 0 0 1px var(--color-border), 0 12px 32px -12px rgba(0, 0, 0, 0.8);
+    }
+}
+
+/* ==========================================================================
+   3. RESET + TIPOGRAFI
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    hyphens: none; /* Turkce icin tarayici hecelemesi guvenilir degil */
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-page);
+}
+
+h1,
+h2,
+h3,
+p,
+figure,
+fieldset {
+    margin: 0;
+}
+
+fieldset {
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+}
+
+legend {
+    padding: 0;
+}
+
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+img,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+/* [hidden] tek basina yeterli degildir: display:flex/grid tanimli bir elemanda
+   UA kurali ezilir. Federasyon blogu gibi gizli alanlarin sekme sirasina
+   sizmamasi icin zorunlu. */
+[hidden] {
+    display: none !important;
+}
+
+/* Uzun e-posta / istemci adi / hata kodu kartin disina tasmasin */
+.auth-card,
+.auth-brand {
+    overflow-wrap: anywhere;
+}
+
+a {
+    color: var(--color-link);
+    text-decoration: none;
+    text-underline-offset: 0.2em;
+    transition: color var(--duration-fast) var(--ease-in-out);
+}
+
+/* Alti cizgi hem hover hem focus-visible'da: renk tek ayirt edici olamaz. */
+a:hover,
+a:focus-visible {
+    color: var(--color-link-hover);
+    text-decoration: underline;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+/* Odak halkasi.
+   Once kosulsuz :focus stillenir (":focus-visible" desteklemeyen tarayicida
+   halka tamamen kaybolmasin), sonra @supports icinde fare odagi icin kaldirilir.
+   3px kalinlik + 2px offset, WCAG 2.2 SC 2.4.13 alanini asar. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 2px;
+}
+
+@supports selector(:focus-visible) {
+    :where(a, button, input, select, textarea, summary, [tabindex]):focus:not(:focus-visible) {
+        outline: none;
+    }
+}
+
+/* Odaklanan oge yapiskan bir kenarin altinda kalmasin (SC 2.4.11) */
+:where(a, button, input, select, textarea, [tabindex]) {
+    scroll-margin-block: var(--space-12);
+}
+
+/* Ekran okuyucuya ozel metin */
+.u-visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ==========================================================================
+   4. SAYFA ISKELETI
+   ========================================================================== */
+
+/* DOM sirasi: <main> her zaman ONCE gelir, marka paneli sonra.
+   Panelin gorsel olarak solda durmasi tamamen grid-area meselesidir.
+   Boylece klavye ve ekran okuyucu dogrudan forma girer; atlama baglantisina
+   (skip link) gerek kalmaz -- SC 2.4.1 "atlanacak tekrar eden blok" yoktur. */
+.auth-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "main";
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+/* --- Sol marka paneli (>=1024px) ----------------------------------------- */
+
+.auth-brand {
+    grid-area: brand;
+    display: none;
+
+    /* Koyu zeminde odak halkasi acik tonda olmali (navy uzerinde ~9.7:1) */
+    --color-focus-ring: var(--teal-300);
+    position: relative;
+    isolation: isolate;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-12);
+    color: var(--color-text-inverse);
+    background-color: var(--color-panel-mid);
+    background-image:
+        radial-gradient(115% 85% at 82% 6%, rgba(var(--color-panel-glow), 0.22) 0%, rgba(var(--color-panel-glow), 0) 58%),
+        radial-gradient(95% 75% at 10% 96%, rgba(var(--color-panel-glow-2), 0.30) 0%, rgba(var(--color-panel-glow-2), 0) 62%),
+        linear-gradient(155deg, var(--color-panel-from) 0%, var(--color-panel-mid) 42%, var(--color-panel-to) 100%);
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Sag ustten sonumlenen ince teknik izgara: "altyapi / erisim denetimi" */
+.auth-brand::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M56 0H0v56' fill='none' stroke='%23ffffff' stroke-opacity='0.05' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(120% 100% at 15% 0%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
+    mask-image: radial-gradient(120% 100% at 15% 0%, #000 0%, rgba(0, 0, 0, 0.35) 55%, transparent 85%);
+}
+
+.auth-brand__body {
+    max-width: 420px;
+    margin-block: auto;
+}
+
+.auth-brand__eyebrow {
+    display: block;
+    margin-bottom: var(--space-4);
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.085em;
+    text-transform: uppercase;
+    color: var(--color-link-inverse);
+}
+
+.auth-brand__headline {
+    font-size: 1.875rem;
+    line-height: 2.375rem;
+    letter-spacing: -0.02em;
+    font-weight: var(--font-weight-semibold);
+    max-width: 36ch;
+    text-wrap: balance;
+}
+
+.auth-brand__lead {
+    margin-top: var(--space-4);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: var(--color-text-inverse-secondary);
+    max-width: 46ch;
+    text-wrap: pretty;
+}
+
+/* Panelin sol-alt kosesi, navy glow'un merkezidir: orada zemin acilir ve
+   navy-300 12px metin 4.65:1'e kadar duser. Bir ton acik olan inverse-secondary
+   ayni noktada ~6.8:1 verir. */
+.auth-brand__footnote {
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    color: var(--color-text-inverse-secondary);
+}
+
+/* --- Mobil marka satiri (<1024px) ----------------------------------------
+   Panel gizliyken markanin kaybolmamasi icin kartin ustunde duran logo satiri.
+   <main> icinde yasar, boylece DOM sirasi bozulmaz. */
+
+.auth-brandline {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+}
+
+/* --- Form sutunu ---------------------------------------------------------- */
+
+.auth-main {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: var(--space-6) var(--space-4) var(--space-10);
+}
+
+.auth-container {
+    width: 100%;
+    max-width: var(--form-column-width);
+}
+
+/* Ekran bazli sutun genislikleri */
+.auth-main--register { --form-column-width: 480px; }
+.auth-main--consent { --form-column-width: 520px; }
+.auth-main--error { --form-column-width: 420px; }
+
+/* --- Kart ----------------------------------------------------------------- */
+
+.auth-card {
+    padding: var(--space-6);
+    background-color: var(--color-surface);
+    border: var(--border-width-hairline) solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-card__header {
+    margin-bottom: var(--space-7);
+}
+
+.auth-card__title {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    letter-spacing: -0.018em;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-heading);
+    text-wrap: balance;
+}
+
+.auth-card__subtitle {
+    margin-top: var(--space-2);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: var(--color-text-secondary);
+    text-wrap: pretty;
+}
+
+.auth-card__subtitle strong {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+/* Kart alti capraz baglanti ("Hesabiniz yok mu?") */
+.auth-card__footer {
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: var(--border-width-hairline) solid var(--color-border);
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+}
+
+.auth-card__footer a {
+    font-weight: var(--font-weight-medium);
+}
+
+/* --- Sayfa alti ----------------------------------------------------------- */
+
+.auth-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    max-width: var(--form-column-width);
+    margin-top: var(--space-8);
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.auth-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+}
+
+/* Cevresindeki metinle ayni renkte olduklari icin alti cizgi ZORUNLUDUR:
+   aksi halde baglantilar yalnizca hover'da ayirt edilebilir (SC 1.4.1). */
+.auth-footer__links a {
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
+
+.auth-footer__links a:hover,
+.auth-footer__links a:focus-visible {
+    color: var(--color-text-secondary);
+}
+
+.auth-footer__sep {
+    color: var(--color-text-disabled);
+}
+
+.auth-footer__secure {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.auth-footer__secure svg {
+    flex: none;
+    color: var(--color-success-solid);
+}
+
+/* ==========================================================================
+   5. MARKA ISARETI
+   ========================================================================== */
+
+.ba-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text-primary);
+}
+
+.ba-logo__mark {
+    flex: none;
+}
+
+.ba-logo__wordmark {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    font-weight: var(--font-weight-regular);
+    letter-spacing: -0.014em;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.ba-logo__wordmark b {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.ba-logo--inverse {
+    color: var(--color-text-inverse);
+}
+
+.ba-logo--inverse .ba-logo__wordmark {
+    color: var(--color-text-inverse-secondary);
+}
+
+.ba-logo--inverse .ba-logo__wordmark b {
+    color: var(--color-text-inverse);
+}
+
+/* ==========================================================================
+   6. BREAKPOINT'LER
+   ========================================================================== */
+
+/* <480px - kart tam ekrana yayilir.
+   Kenarligin TAMAMI kaldirilir: yalnizca yan kenarlar silinirse ust ve alt
+   hairline'lar ekrani bastan basa keser ve cizim hatasi gibi gorunur. */
+@media (max-width: 479px) {
+    .auth-card {
+        margin-inline: calc(var(--space-4) * -1);
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
+
+/* >=480px - kart yuzeye oturur */
+@media (min-width: 480px) {
+    .auth-main {
+        padding: var(--space-10) var(--space-6) var(--space-12);
+    }
+
+    .auth-card {
+        padding: var(--space-8);
+    }
+}
+
+/* >=768px - daha ferah dikey ritim */
+@media (min-width: 768px) {
+    .auth-main {
+        justify-content: center;
+        padding: var(--space-12) var(--space-8);
+    }
+}
+
+/* >=1024px - split layout devreye girer */
+@media (min-width: 1024px) {
+    .auth-shell {
+        grid-template-columns: minmax(400px, 44%) minmax(0, 1fr);
+        grid-template-areas: "brand main";
+    }
+
+    .auth-brandline {
+        display: none;
+    }
+
+    .auth-brand {
+        display: flex;
+    }
+
+    .auth-main {
+        padding: var(--space-12);
+    }
+
+    .auth-card {
+        padding: var(--space-10);
+    }
+
+    .auth-footer {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .auth-footer__links {
+        justify-content: flex-start;
+    }
+}
+
+/* >=1280px - panel tipografisi buyur */
+@media (min-width: 1280px) {
+    .auth-brand {
+        padding: var(--space-16);
+    }
+
+    .auth-brand__body {
+        max-width: 460px;
+    }
+
+    .auth-brand__headline {
+        font-size: 2.25rem;
+        line-height: 2.75rem;
+        letter-spacing: -0.022em;
+    }
+
+    .auth-main {
+        padding: var(--space-16);
+    }
+
+    .auth-card__title {
+        font-size: 1.75rem;
+        line-height: 2.125rem;
+    }
+}
+
+/* >=1536px - panel genisligi sinirlanir */
+@media (min-width: 1536px) {
+    .auth-shell {
+        grid-template-columns: minmax(480px, 620px) minmax(0, 1fr);
+    }
+
+    .auth-brand__body {
+        max-width: 480px;
+    }
+}
+
+/* ==========================================================================
+   7. ERISILEBILIRLIK TERCIHLERI
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Windows Yuksek Kontrast / forced-colors:
+   dekoratif katmanlar kaldirilir, sistem renkleri devralir. */
+@media (forced-colors: active) {
+    .auth-card {
+        border: 1px solid CanvasText;
+        box-shadow: none;
+    }
+
+    .auth-brand {
+        background-image: none;
+        background-color: Canvas;
+        color: CanvasText;
+        /* Degrade dustugu icin panel ile form sutunu ayni duz yuzeye donusur;
+           bolunmeyi gorunur kilan tek sey bu kenardir. */
+        border-inline-end: 1px solid CanvasText;
+    }
+
+    .auth-brand::before {
+        display: none;
+    }
+
+    :focus-visible {
+        outline: 3px solid Highlight;
+    }
+}
