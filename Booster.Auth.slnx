@@ -5,6 +5,9 @@
     <Project Path="Common/Booster.Database/Booster.Database.csproj" />
     <Project Path="Common/Booster.Hashing/Booster.Hashing.csproj" />
   </Folder>
+  <Folder Name="/Common/Amqp/">
+    <Project Path="Common/Amqp/Booster.Amqp/Booster.Amqp.csproj" />
+  </Folder>
   <Folder Name="/Common/AuthZ/">
     <Project Path="Common/AuthZ/Booster.Authorization.Relational/Booster.Authorization.Relational.csproj" Id="d3617022-98ab-4bcf-930a-333d1d88eae0" />
   </Folder>
