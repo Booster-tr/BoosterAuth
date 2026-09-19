@@ -1,0 +1,56 @@
+syntax = "proto3";
+option csharp_namespace = "Booster.Auth.Z.Grpc";
+package authz;
+
+service AuthorizationService {
+  rpc Check (CheckRequest) returns (CheckResponse);
+  rpc BatchCheck (BatchCheckRequest) returns (BatchCheckResponse);
+
+  // Lookup: grafiğe iki yönden bakma. Sonuç her iki yönde de aynı üçlüdür.
+  rpc LookupByUser (LookupByUserRequest) returns (LookupResponse);
+  rpc LookupByObject (LookupByObjectRequest) returns (LookupResponse);
+}
+
+message CheckRequest {
+  string isolation_id = 1;   // poolId (Guid string) — içeride storeId'ye çözülür
+  string user = 2;           // "user:{id}"
+  string relation = 3;       // "owner" | "viewer" | ...
+  string object = 4;         // "tenant:{id}" | "pool:{id}" | ...
+}
+message CheckResponse { bool allowed = 1; }
+
+message BatchCheckItem {
+  string user = 1;
+  string relation = 2;
+  string object = 3;
+  string correlation_id = 4;
+}
+message BatchCheckRequest {
+  string isolation_id = 1;
+  repeated BatchCheckItem checks = 2;
+}
+message BatchCheckResultItem {
+  string correlation_id = 1;
+  bool allowed = 2;
+}
+message BatchCheckResponse { repeated BatchCheckResultItem results = 1; }
+
+message LookupByUserRequest {
+  string isolation_id = 1;
+  string user = 2;          // "user:{id}"
+  string object_type = 3;   // "tenant" | "pool" | "client"
+  string relation = 4;      // opsiyonel; boşsa tipin tüm ilişkileri taranır
+}
+
+message LookupByObjectRequest {
+  string isolation_id = 1;
+  string object = 2;        // "tenant:{id}"
+  string relation = 3;      // opsiyonel; boşsa tipin tüm ilişkileri taranır
+}
+
+message LookupResultItem {
+  string user = 1;
+  string relation = 2;
+  string object = 3;
+}
+message LookupResponse { repeated LookupResultItem results = 1; }

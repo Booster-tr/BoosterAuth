@@ -1,4 +1,5 @@
 ﻿using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Model;
 
 namespace Booster.Authorization.Relational.Fga;
 
@@ -105,6 +106,51 @@ public sealed class FgaRelationManager(IFgaClientProvider clientProvider)
         return response.Result
             .Select(r => new BatchCheckResult(r.CorrelationId, r.Allowed))
             .ToList();
+    }
+
+    public async Task<IReadOnlyList<string>> ListObjectsAsync(
+        string storeId, string user, string relation, string objectType,
+        string? modelId = null, CancellationToken ct = default)
+    {
+        var client = clientProvider.GetClientForStore(storeId, modelId);
+        var response = await client.ListObjects(new ClientListObjectsRequest
+        {
+            User = user,
+            Relation = relation,
+            Type = objectType
+        }, cancellationToken: ct);
+
+        return response.Objects ?? [];
+    }
+
+    public async Task<IReadOnlyList<string>> ListUsersAsync(
+        string storeId, string @object, string relation, string userType,
+        string? modelId = null, CancellationToken ct = default)
+    {
+        var (objectType, objectId) = SplitObject(@object);
+
+        var client = clientProvider.GetClientForStore(storeId, modelId);
+        var response = await client.ListUsers(new ClientListUsersRequest
+        {
+            Object = new FgaObject { Type = objectType, Id = objectId },
+            Relation = relation,
+            UserFilters = [new UserTypeFilter { Type = userType }]
+        }, cancellationToken: ct);
+
+        return response.Users?
+            .Where(u => u.Object is not null)
+            .Select(u => $"{u.Object.Type}:{u.Object.Id}")
+            .ToList() ?? [];
+    }
+
+    private static (string Type, string Id) SplitObject(string @object)
+    {
+        var separator = @object.IndexOf(':');
+
+        if (separator <= 0 || separator == @object.Length - 1)
+            throw new ArgumentException("Nesne 'tip:id' biçiminde olmalıdır.", nameof(@object));
+
+        return (@object[..separator], @object[(separator + 1)..]);
     }
 }
 

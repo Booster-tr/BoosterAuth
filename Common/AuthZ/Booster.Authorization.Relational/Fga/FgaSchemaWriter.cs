@@ -20,6 +20,17 @@ public sealed class FgaSchemaWriter(IFgaClientProvider clientProvider)
         return response.AuthorizationModelId;
     }
 
+    public async Task<AuthorizationModel?> GetModelAsync(
+        string storeId, string modelId, CancellationToken ct = default)
+    {
+        var client = clientProvider.GetClientForStore(storeId, modelId);
+        var response = await client.ReadAuthorizationModel(
+            new ClientReadAuthorizationModelOptions { AuthorizationModelId = modelId },
+            cancellationToken: ct);
+
+        return response.AuthorizationModel;
+    }
+
     public async Task<AuthorizationModel?> GetLatestModelAsync(string storeId, CancellationToken ct = default)
     {
         var client = clientProvider.GetClientForStore(storeId);

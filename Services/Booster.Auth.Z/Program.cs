@@ -2,6 +2,7 @@ using Booster.Auth.Manager.Extensions;
 using Booster.Auth.Manager.Options;
 using Booster.Auth.Z.Bootstrappers;
 using Booster.Auth.Z.Extensions;
+using Booster.Auth.Z.Grpc;
 using Booster.Authorization.Relational.Extensions;
 using Booster.Authorization.Relational.Options;
 using Booster.Common.Extensions.ServiceExtensions;
@@ -20,6 +21,8 @@ builder.Services.AddAuthZServices(builder.Configuration);
 builder.Services.AddAuthorization();
 builder.Services.AddFastEndpoints();
 
+builder.Services.AddGrpc();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -34,6 +37,8 @@ app.UseBoosterAuthentication();
 app.UseAuthorization();
 
 app.UseFastEndpoints();
+
+app.MapGrpcService<AuthorizationGrpcService>();
 
 app.MapControllers();
 
