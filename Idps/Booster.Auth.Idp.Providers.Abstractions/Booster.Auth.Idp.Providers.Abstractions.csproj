@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Database\Booster.Auth.Database.csproj" />
+  </ItemGroup>
+
 </Project>

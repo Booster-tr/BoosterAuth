@@ -61,7 +61,9 @@ public sealed class CredentialLoginHandler(
 
         var result = await provider.AuthenticateAsync(
             new CredentialRequest(cmd.Identifier, cmd.Password),
-            BuildConfig(cmd.ProviderType, client), ct);
+            BuildConfig(cmd.ProviderType, client),
+            client.Login.AllowedIdentifiers,
+            ct);
 
         if (!result.Succeeded)
         {

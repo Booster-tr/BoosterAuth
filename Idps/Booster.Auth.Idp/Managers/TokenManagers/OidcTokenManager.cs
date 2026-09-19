@@ -18,7 +18,7 @@ public sealed class OidcTokenService(OidcKeyService keyService, IdpOptions optio
         IReadOnlyList<string> roles,
         int ttlSeconds,
         string principalType,
-        Guid isolation,
+        string actor,
         Guid? sessionId = null)
     {
         var now = DateTime.UtcNow;
@@ -29,6 +29,7 @@ public sealed class OidcTokenService(OidcKeyService keyService, IdpOptions optio
             new(JwtRegisteredClaimNames.Sub, subject.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new("azp", azp),
+            new("actor", actor),
             new("principal_type", principalType),
             new("scope", scope),
             new("iat", EpochTime.GetIntDate(now).ToString(), ClaimValueTypes.Integer64)
@@ -39,9 +40,6 @@ public sealed class OidcTokenService(OidcKeyService keyService, IdpOptions optio
 
         if (sessionId.HasValue)
             claims.Add(new Claim("sid", sessionId.Value.ToString()));
-
-        if (isolation != Guid.Empty)
-            claims.Add(new Claim("isolation", isolation.ToString()));
 
         var token = WriteToken(audience, claims, now, expires);
         return (token, (int)(expires - now).TotalSeconds);

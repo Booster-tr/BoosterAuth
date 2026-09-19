@@ -29,7 +29,7 @@ public class RequestContextMiddleware(RequestDelegate next)
 
             var accessToken = ExtractBearerToken(context);
 
-            var isolation = Guid.TryParse(user.FindFirst("isolation")?.Value, out var iso)
+            var isolation = Guid.TryParse(user.FindFirst("actor")?.Value, out var iso)
              ? iso
              : Guid.Empty;
 

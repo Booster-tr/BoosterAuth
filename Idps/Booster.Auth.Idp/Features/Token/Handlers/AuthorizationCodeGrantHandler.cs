@@ -77,7 +77,7 @@ public sealed class AuthorizationCodeGrantHandler(
             roles: roles,
             ttlSeconds: accessTtl,
             principalType: principal.Type.ToString(),
-            isolation: authCode.IsolationId,
+            actor: authCode.IsolationId.ToString(),
             sessionId: authCode.SessionId);
 
         var idToken = tokenService.CreateIdToken(

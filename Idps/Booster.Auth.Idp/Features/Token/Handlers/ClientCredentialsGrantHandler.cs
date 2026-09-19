@@ -76,7 +76,7 @@ public sealed class ClientCredentialsGrantHandler(
             roles: roles,
             ttlSeconds: client.Session.AccessTokenTtlSeconds,
             principalType: PrincipalType.Machine.ToString(),
-            isolation: client.IsolationId,
+            actor: client.IsolationId.ToString(),
             sessionId: null);
 
         return new TokenResponse

@@ -37,16 +37,14 @@ public sealed class TokenExchangeGrantHandler(
         if (!Guid.TryParse(claims.FindFirst("sub")?.Value, out var principalId))
             throw new BusinessException(IdpMessageKeys.InvalidSubjectToken);
 
-        var isolation = Guid.TryParse(claims.FindFirst("isolation")?.Value, out var iso)
-            ? iso
-            : Guid.Empty;
-        if (isolation == Guid.Empty)
+        var actor = claims.FindFirst("actor")?.Value ?? string.Empty;
+        if (string.IsNullOrEmpty(actor))
             throw new BusinessException(IdpMessageKeys.InvalidSubjectToken);
 
         var principalType = claims.FindFirst("principal_type")?.Value ?? PrincipalType.User.ToString();
         var subjectScope = claims.FindFirst("scope")?.Value ?? string.Empty;
 
-        using var scope = requestContextAccessor.BeginSystemContext(isolation);
+        using var scope = requestContextAccessor.BeginSystemContext(Guid.Parse(actor));
 
         if (Guid.TryParse(claims.FindFirst("sid")?.Value, out var sessionId))
         {
@@ -78,7 +76,7 @@ public sealed class TokenExchangeGrantHandler(
             roles: ExtractRoles(claims),
             ttlSeconds: client.Session.AccessTokenTtlSeconds,
             principalType: principalType,
-            isolation: isolation,
+            actor: claims.FindFirst("actor")?.Value ?? string.Empty,
             sessionId: Guid.TryParse(claims.FindFirst("sid")?.Value, out var sid) ? sid : null);
 
         return new TokenResponse

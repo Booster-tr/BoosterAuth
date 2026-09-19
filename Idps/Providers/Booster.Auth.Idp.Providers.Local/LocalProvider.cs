@@ -1,4 +1,5 @@
-﻿using Booster.Auth.Idp.Providers.Abstractions;
+﻿using Booster.Auth.Database.Models.Enums;
+using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.CredentialBased.Models;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.CredentialProviders;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.Models;
@@ -19,9 +20,10 @@ public sealed class LocalProvider(
     public async Task<IdentityResult> AuthenticateAsync(
         CredentialRequest request,
         ProviderConfig config,
+        IReadOnlyList<IdentifierType> allowedIdentifiers,
         CancellationToken ct)
     {
-        var user = await userStore.FindAsync(request.Identifier, ct);
+        var user = await userStore.FindAsync(request.Identifier, allowedIdentifiers, ct);
 
         if (user is null || !user.IsActive)
             return IdentityResult.Fail("invalid_credentials");

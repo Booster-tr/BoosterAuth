@@ -83,7 +83,7 @@ public sealed class RefreshTokenGrantHandler(
             roles: roles,
             ttlSeconds: accessTtl,
             principalType: principal.Type.ToString(),
-            isolation: stored.IsolationId,
+            actor: stored.IsolationId.ToString(),
             sessionId: session.Id);
 
         var newRefreshString = await RotateAsync(stored, session, refreshTtl, ct);
