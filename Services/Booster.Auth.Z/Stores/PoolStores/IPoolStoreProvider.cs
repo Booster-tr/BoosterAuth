@@ -6,7 +6,5 @@ public interface IPoolStoreProvider
 {
     Task<PoolStoreData?> GetByPoolIdAsync(Guid poolId, CancellationToken ct);
 
-    Task<PoolStoreData> UpsertAsync(Guid poolId, string storeId, string activeModelId, CancellationToken ct);
-
-    Task UpdateActiveModelAsync(Guid poolId, string activeModelId, CancellationToken ct);
+    Task RemoveCacheAsync(Guid poolId, CancellationToken ct);
 }
