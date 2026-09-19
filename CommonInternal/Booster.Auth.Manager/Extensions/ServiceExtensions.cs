@@ -1,7 +1,6 @@
 ﻿using Booster.Auth.Manager.Middlewares;
 using Booster.Auth.Manager.Options;
 using Booster.Auth.Manager.RequestContexts;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +26,6 @@ public static class ServiceExtensions
 
         authBuilder.AddJwtBearer(options =>
         {
-            //claimleri bizim verdiğimiz ad ile bırakır.
             options.MapInboundClaims = false;
 
             options.Authority = authOptions.Authority;
