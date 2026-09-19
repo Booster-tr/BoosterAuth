@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Services/Booster.Auth.N/Booster.Auth.N.csproj", "Services/Booster.Auth.N/"]
-RUN dotnet restore "./Services/Booster.Auth.N/Booster.Auth.N.csproj"
+COPY ["Services/Booster.Auth.Management.Api/Booster.Auth.Management.Api.csproj", "Services/Booster.Auth.Management.Api/"]
+RUN dotnet restore "./Services/Booster.Auth.Management.Api/Booster.Auth.Management.Api.csproj"
 COPY . .
-WORKDIR "/src/Services/Booster.Auth.N"
-RUN dotnet build "./Booster.Auth.N.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Services/Booster.Auth.Management.Api"
+RUN dotnet build "./Booster.Auth.Management.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Booster.Auth.N.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Booster.Auth.Management.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Booster.Auth.N.dll"]
+ENTRYPOINT ["dotnet", "Booster.Auth.Management.Api.dll"]
