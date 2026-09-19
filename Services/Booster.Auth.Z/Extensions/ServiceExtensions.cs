@@ -1,3 +1,4 @@
+using Booster.Auth.Z.Bootstrappers;
 using Booster.Auth.Z.Features._base;
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Caching.Redis;
@@ -22,6 +23,8 @@ public static class ServiceExtensions
         services.AddBoosterRedisCache(redisOptions);
 
         services.AddScoped<IPoolStoreProvider, PoolStoreProvider>();
+
+        services.AddScoped<ManagementBootstrapper>();
 
         return services;
     }

@@ -47,7 +47,7 @@ public class UpsertPoolStoreCommandHandler(
         var created = entity is null;
 
         entity = command.Adapt<PoolStore>();
-        if (created)
+        if (!created)
         {
             entity.SetId();
             await poolStoreRepository.AddAsync(entity, ct);

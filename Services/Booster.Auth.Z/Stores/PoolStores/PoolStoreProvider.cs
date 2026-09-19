@@ -21,6 +21,8 @@ public sealed class PoolStoreProvider(
             CacheKey(poolId),
             async (context, token) =>
             {
+                context.SetTags(Tag(poolId));
+
                 var entity = await repository.GetAsync(
                     predicate: x => x.PoolId == poolId,
                     enableTracking: false,
@@ -28,8 +30,6 @@ public sealed class PoolStoreProvider(
 
                 if (entity is null)
                     return null;
-
-                context.SetTags(Tag(poolId));
 
                 return new PoolStoreData(entity.PoolId, entity.StoreId, entity.ActiveModelId);
             },

@@ -1,5 +1,6 @@
 using Booster.Auth.Manager.Extensions;
 using Booster.Auth.Manager.Options;
+using Booster.Auth.Z.Bootstrappers;
 using Booster.Auth.Z.Extensions;
 using Booster.Authorization.Relational.Extensions;
 using Booster.Authorization.Relational.Options;
@@ -35,5 +36,11 @@ app.UseAuthorization();
 app.UseFastEndpoints();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var bootstrapper = scope.ServiceProvider.GetRequiredService<ManagementBootstrapper>();
+    await bootstrapper.InitializeAsync(CancellationToken.None);
+}
 
 app.Run();
