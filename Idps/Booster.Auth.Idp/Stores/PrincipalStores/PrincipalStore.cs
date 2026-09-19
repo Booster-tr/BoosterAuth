@@ -8,7 +8,6 @@ using Booster.Caching.Abstraction;
 using Booster.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Security.Principal;
 
 namespace Booster.Auth.Idp.Stores.PrincipalStores;
 
@@ -42,7 +41,7 @@ public sealed class PrincipalStore(
             {
                 var principal = await principalRepository.GetAsync(
                     predicate: BuildPredicate(identifier, allowedIdentifiers),
-                    include: q => q.Include(p => p.LocalCredential),
+                    include: q => q.Include(p => p.LocalCredential)!,
                     enableTracking: false,
                     cancellationToken: token);
 

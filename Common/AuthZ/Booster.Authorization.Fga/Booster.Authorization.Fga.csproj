@@ -16,7 +16,6 @@
     </Description>
   </PropertyGroup>
 
-  <!-- AuthorizeAttribute, IAuthorizationHandler, HttpContext, GetRouteValue -->
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
