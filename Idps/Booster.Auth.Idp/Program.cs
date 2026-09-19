@@ -1,9 +1,13 @@
+using Booster.Auth.Idp.Bootstrappers;
+using Booster.Auth.Idp.Extensions;
 using Booster.ExceptionManager.Abstraction.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddIdpServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -29,5 +33,10 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+using (var scope = app.Services.CreateScope())
+{
+    var bootstrapper = scope.ServiceProvider.GetRequiredService<AdminBootstrapper>();
+    await bootstrapper.InitializeAsync(CancellationToken.None);
+}
 
 app.Run();

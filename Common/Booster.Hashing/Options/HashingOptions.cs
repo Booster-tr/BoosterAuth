@@ -2,7 +2,7 @@
 
 public sealed class HashingOptions
 {
-    public required string Pepper { get; init; }
+    public string Pepper { get; init; }
 
     public int MemorySizeKb { get; init; } = 19456;
 

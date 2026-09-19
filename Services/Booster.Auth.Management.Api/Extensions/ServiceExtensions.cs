@@ -1,3 +1,5 @@
+using Booster.Auth.Common.Internal.Options;
+using Booster.Auth.Management.Api.Bootstrappers;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Caching.Redis;
@@ -16,16 +18,17 @@ public static class ServiceExtensions
     {
         var postgresSettings = services.AddSettings<PostgresSettings>(configuration);
         var redisOptions = services.AddSettings<RedisCacheOptions>(configuration);
+        services.AddSettings<BootstrapOptions>(configuration);
 
-        // PostgresDbContext izolasyon erişimcisine bağımlıdır. Bu serviste izolasyon
-        // filtresi kullanılmıyor (entity'ler Entity'den türüyor) ama base tipin
-        // bağımlılığı yine de karşılanmalı.
+        
         services.TryAddSingleton<IRequestContextAccessor, RequestContextAccessor>();
 
         services.AddPostgresDbContext<AuthNDbContext>(postgresSettings);
         services.AddScoped(typeof(IAsyncRepository<,>), typeof(RepositoryBase<,>));
 
         services.AddBoosterRedisCache(redisOptions);
+
+        services.AddScoped<ManagementBootstrapper>();
 
         return services;
     }

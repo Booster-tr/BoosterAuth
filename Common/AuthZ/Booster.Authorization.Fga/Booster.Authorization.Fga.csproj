@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>true</IsPackable>
+    <PackageId>Booster.Authorization.Fga</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Booster</Authors>
+    <Description>
+      Tüketici servislerin uçlarını attribute ile koruyup yetki kararını
+      Booster.Auth.Z (OpenFGA tabanlı AuthZ servisi) üzerinden veren
+      policy-based authorization paketi.
+    </Description>
+  </PropertyGroup>
+
+  <!-- AuthorizeAttribute, IAuthorizationHandler, HttpContext, GetRouteValue -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!--
+    Sözleşme TEK dosyadan derlenir: sunucu tarafı Booster.Auth.Z içinde aynı
+    proto'yu Server olarak üretir, bu paket Client olarak. Kopyalansaydı iki
+    dosya sessizce birbirinden ayrışabilirdi.
+
+    Paket kendi deposuna çıkarılırsa bu göreli yol kırılır; o noktada proto
+    ayrı bir sözleşme paketine taşınmalıdır.
+  -->
+  <ItemGroup>
+    <Protobuf Include="..\..\..\Services\Booster.Auth.Z\Protos\authorization.proto"
+              Link="Protos\authorization.proto"
+              GrpcServices="Client" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.27.2" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.66.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.66.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!--
+    IRequestContextAccessor için. Bu, Common -> CommonInternal yönünde bir
+    bağımlılıktır ve paketi Booster.Auth.Manager'a (dolayısıyla JwtBearer'a)
+    bağlar. Ayrıştırmak isterseniz: pakette küçük bir izolasyon sözleşmesi
+    tanımlanıp tüketici tarafında RequestContext'e bağlanan bir adaptör yazılır.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CommonInternal\Booster.Auth.Manager\Booster.Auth.Manager.csproj" />
+  </ItemGroup>
+
+</Project>

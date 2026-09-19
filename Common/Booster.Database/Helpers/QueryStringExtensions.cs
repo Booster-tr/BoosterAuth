@@ -1,4 +1,8 @@
-﻿namespace Booster.Database.Helpers;
+﻿using System.Collections.Specialized;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+
+namespace Booster.Database.Helpers;
 
 public static class QueryStringExtensions
 {

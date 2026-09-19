@@ -26,11 +26,24 @@ public sealed class ManagementBootstrapper(
 
         var modelId = await schemaWriter.WriteModelAsync(storeId, BuildManagementSchema(), ct);
 
-        await relationManager.WriteAsync(
+        await relationManager.WriteBatchAsync(
             storeId,
-            user: AuthConstants.User(AuthConstants.AdminUserId),
-            relation: AuthConstants.OwnerRelation,
-            @object: AuthConstants.Tenant(AuthConstants.ManagementTenantId),
+            [
+                new TupleInput(
+                    AuthConstants.User(AuthConstants.AdminUserId),
+                    AuthConstants.OwnerRelation,
+                    AuthConstants.Tenant(AuthConstants.ManagementTenantId)),
+
+                new TupleInput(
+                    AuthConstants.Tenant(AuthConstants.ManagementTenantId),
+                    AuthConstants.ParentRelation,
+                    AuthConstants.Pool(AuthConstants.ManagementPoolId)),
+
+                new TupleInput(
+                    AuthConstants.Pool(AuthConstants.ManagementPoolId),
+                    AuthConstants.ParentRelation,
+                    AuthConstants.Client(AuthConstants.ManagementClientId))
+            ],
             ct);
 
         var mapping = new PoolStore

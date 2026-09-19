@@ -3,7 +3,7 @@ using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
-using Booster.Auth.N.Extensions;
+using Booster.Database.Helpers;
 using Booster.Database.DynamicFilter.Models;
 using Booster.Database.NameValueCollectionHelpers;
 using Booster.Database.Repositories;
