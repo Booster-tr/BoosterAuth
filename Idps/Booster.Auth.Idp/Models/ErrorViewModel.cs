@@ -2,40 +2,22 @@ using Booster.Auth.Idp.Constants;
 
 namespace Booster.Auth.Idp.Models;
 
-/// <summary>
-/// Hata ekranının görüntü modeli.
-/// <para>
-/// Ham <c>error_description</c> asla birincil mesaj olarak gösterilmez:
-/// İngilizce, tekniktir ve zaman zaman iç ayrıntı sızdırır. Kullanıcı dostu
-/// metin hata kodundan türetilir; ham değerler yalnızca kapalı "Teknik
-/// ayrıntılar" bloğunda görünür.
-/// </para>
-/// </summary>
 public sealed class ErrorViewModel
 {
-    /// <summary>Ham hata kodu (<c>error</c> query parametresi).</summary>
     public string? Error { get; init; }
 
-    /// <summary>Ham açıklama (<c>error_description</c> query parametresi).</summary>
     public string? ErrorDescription { get; init; }
 
-    /// <summary>Varsa, akışa geri dönebilmek için etkileşim anahtarı.</summary>
     public string? InteractionKey { get; init; }
 
-    /// <summary>Destek ekibiyle paylaşılabilecek istek kimliği.</summary>
     public string? RequestId { get; init; }
 
     public required string Title { get; init; }
 
     public required string Message { get; init; }
 
-    /// <summary>Birincil eylemin etiketi.</summary>
     public required string ActionLabel { get; init; }
 
-    /// <summary>
-    /// Birincil eylem, akış devam ettirilebiliyorsa gösterilir.
-    /// Etkileşim anahtarı yoksa yeniden denenecek bir şey yoktur.
-    /// </summary>
     public bool CanRetry => !string.IsNullOrEmpty(InteractionKey);
 
     public bool HasTechnicalDetails =>
@@ -57,16 +39,17 @@ public sealed class ErrorViewModel
         };
     }
 
-    /// <summary>
-    /// Hata kodunu kullanıcı diline çevirir. Hem IdpMessageKeys anahtarları
-    /// (<c>idp.*</c>) hem de standart OAuth 2.0 / OIDC hata kodları desteklenir.
-    /// </summary>
     private static (string Title, string Message, string ActionLabel) Resolve(string? error) => error switch
     {
         IdpMessageKeys.InvalidInteraction or "invalid_interaction" => (
             "Giriş bağlantısı geçersiz",
             "Bu giriş bağlantısının süresi dolmuş ya da bağlantı artık geçerli değil. Lütfen uygulamaya dönüp yeniden başlayın.",
             "Yeniden başlayın"),
+
+        IdpMessageKeys.LoggedOut or "logged_out" => (
+            "Oturumunuz kapatıldı",
+            "Güvenle çıkış yaptınız. Devam etmek için uygulamaya dönüp yeniden giriş yapabilirsiniz.",
+            "Giriş sayfasına dönün"),
 
         IdpMessageKeys.SessionInvalid or "session_invalid" => (
             "Oturumunuz sona erdi",

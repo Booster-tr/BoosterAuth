@@ -33,6 +33,7 @@ public static class ServiceExtensions
         services.AddSettings<BootstrapOptions>(configuration);
 
         services.AddBoosterServices<IdpDbContext>(configuration);
+        services.AddBoosterMessaging<IdpDbContext>(configuration);
 
         var hashingOptions = services.AddSettings<HashingOptions>(configuration);
         services.AddHashing(hashingOptions);

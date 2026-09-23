@@ -1,3 +1,4 @@
+using MassTransit;
 using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Manager.RequestContexts;
@@ -22,6 +23,14 @@ public class IdpDbContext(DbContextOptions<IdpDbContext> options, IRequestContex
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // MassTransit outbox/inbox tablolari. Log ve audit mesajlari is
+        // islemiyle AYNI transaction'da outbox'a yazilir: broker o an kapaliysa
+        // bile kayit kaybolmaz, baglanti gelince teslim edilir.
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
+
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

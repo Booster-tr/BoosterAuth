@@ -1,6 +1,7 @@
 ﻿using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using Booster.ExceptionManager.Abstraction.Translations;
+using Booster.Logging.Abstraction;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +12,9 @@ namespace Booster.ExceptionManager.Abstraction.Middlewares;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {
+    private static readonly string ServiceName =
+        System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name ?? "unknown";
+
     public async ValueTask<bool> TryHandleAsync(
        HttpContext httpContext,
        Exception exception,
@@ -18,7 +22,8 @@ public class GlobalExceptionHandler : IExceptionHandler
     {
         var scope = httpContext.RequestServices;
         var translationService = scope.GetRequiredService<ITranslationManager>();
-        //var logWriter = scope.GetRequiredService<ILogWriter>();
+
+        var logWriter = scope.GetService<ILogWriter>();
         var correlationId = httpContext.Request.Headers[HeaderConstants.CorrelationIdHeaderName].ToString() ?? "unknown";
         
         var langHeader = httpContext.Request.Headers.AcceptLanguage.FirstOrDefault() ?? "tr-tr";
@@ -60,8 +65,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             validationErrors.AddRange(results);
             errorMessage = await translationService.GetAsync(ValidationErrors.ValidationError, langHeader, cancellationToken);
         }
-        // ForbiddenException BusinessException'dan türediği için ONDAN ÖNCE gelmeli:
-        // yetki reddi hatalı istek değildir, istemci ikisini durum kodundan ayırt edebilmeli.
+
         else if (exception is ForbiddenException fEx)
         {
             statusCode = StatusCodes.Status403Forbidden;
@@ -78,23 +82,22 @@ public class GlobalExceptionHandler : IExceptionHandler
         }
 
         
-        //if (logWriter != null)
-        //{
-        //    var logParameters = new Dictionary<string, string?>
-        //    {
-        //        { "CorrelationId", correlationId }
-        //    };
+        if (logWriter is not null)
+        {
+            var logParameters = new Dictionary<string, string?>
+            {
+                ["CorrelationId"] = correlationId,
+                ["IpAddress"] = ipAddress,
+                ["ServiceName"] = ServiceName,
+                ["Path"] = httpContext.Request.Path,
+                ["StatusCode"] = statusCode.ToString()
+            };
 
-        //    if (statusCode == StatusCodes.Status500InternalServerError)
-        //    {
-
-        //        await logWriter.LogErrorAsync(errorMessage, exception, logParameters , cancellationToken);
-        //    }
-        //    else
-        //    {
-        //        await logWriter.LogWarningAsync(errorMessage, logParameters, cancellationToken);
-        //    }
-        //}
+            if (statusCode == StatusCodes.Status500InternalServerError)
+                await logWriter.LogErrorAsync(errorMessage, exception, logParameters, cancellationToken);
+            else
+                await logWriter.LogWarningAsync(errorMessage, logParameters, cancellationToken);
+        }
 
 
         var problemDetails = new ProblemDetails

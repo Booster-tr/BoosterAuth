@@ -14,6 +14,7 @@ public static class ServiceExtensions
     public static IServiceCollection AddAuthNServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddBoosterServices<AuthNDbContext>(configuration);
+        services.AddBoosterMessaging<AuthNDbContext>(configuration);
         services.AddSettings<BootstrapOptions>(configuration);
 
         services.AddScoped<ManagementBootstrapper>();

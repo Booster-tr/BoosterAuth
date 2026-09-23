@@ -1,4 +1,4 @@
-﻿namespace Booster.Auth.Idp.Constants;
+﻿namespace Booster.Auth.Common.Internal.Constants.Messages;
 
 public class IdpMessageKeys
 {
@@ -39,12 +39,12 @@ public class IdpMessageKeys
     public const string SessionInvalid = "idp.session_invalid";
     public const string InvalidClient = "idp.invalid_client";
     public const string ServiceAccountKeyRequired = "idp.service_account_key_required";
-    public const string ServiceAccountSecretRequired = "idp.service_account_secret_required";
     public const string InvalidServiceAccount = "idp.invalid_service_account";
     public const string ServiceAccountDisabled = "idp.service_account_disabled";
     public const string ResourceRequiredForExchange = "idp.resource_required_for_exchange";
     public const string InvalidSubjectToken = "idp.invalid_subject_token";
     public const string AudienceNotAllowed = "idp.audience_not_allowed";
     public const string InvalidAccessToken = "idp.invalid_access_token";
+    public const string LoggedOut = "idp.logged_out";
 
 }

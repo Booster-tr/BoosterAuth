@@ -13,7 +13,7 @@ public class RequestContextMiddleware(RequestDelegate next)
 
         var acceptLanguage = ResolvePreferredLanguage(context);
 
-        requestContextAccessor.RequestContext = RequestContext.ForSystem();
+        requestContextAccessor.RequestContext = RequestContext.ForSystem(acceptLanguage: acceptLanguage);
         if (context.User.Identity is { IsAuthenticated: true })
         {
             var user = context.User;

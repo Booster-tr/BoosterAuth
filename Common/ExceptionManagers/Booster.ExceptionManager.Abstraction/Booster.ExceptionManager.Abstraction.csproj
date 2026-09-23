@@ -14,5 +14,9 @@
 	  <PackageReference Include="FluentValidation" Version="12.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Logging\Booster.Logging.Abstraction\Booster.Logging.Abstraction.csproj" />
+  </ItemGroup>
+
 
 </Project>

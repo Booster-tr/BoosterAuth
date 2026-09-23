@@ -45,8 +45,17 @@ public sealed class RequestContext
         Isolation = isolation
     };
 
+    /// <summary>
+    /// Kimliği doğrulanmamış istekler ve arka plan akışları için bağlam.
+    /// <para>
+    /// Dil parametre olarak alınır: anonim uçlar (dökümantasyon, giriş ve hata
+    /// ekranları) da Accept-Language'e uymalı. Sabit "tr-tr" yazılsaydı bu uçlar
+    /// istek ne derse desin daima Türkçe dönerdi.
+    /// </para>
+    /// </summary>
     public static RequestContext ForSystem(
-        Guid isolation = default)
+        Guid isolation = default,
+        string? acceptLanguage = null)
         => new()
         {
             PrincipalId = Guid.Empty,
@@ -54,7 +63,7 @@ public sealed class RequestContext
             SessionId = null,
             ClientId = "system",
             AccessToken = string.Empty,
-            AcceptLanguage = "tr-tr",
+            AcceptLanguage = string.IsNullOrWhiteSpace(acceptLanguage) ? "tr-tr" : acceptLanguage,
             Isolation = isolation
         };
 }

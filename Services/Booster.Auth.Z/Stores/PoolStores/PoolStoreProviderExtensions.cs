@@ -1,4 +1,3 @@
-using Booster.Auth.Z.Constants;
 using Booster.Auth.Z.Stores.PoolStores.Models;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 

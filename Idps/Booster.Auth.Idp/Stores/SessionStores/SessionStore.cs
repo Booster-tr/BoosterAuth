@@ -17,7 +17,7 @@ public sealed class SessionStore(
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
 
     private static string CacheKey(string tokenHash) => $"idp:session:{tokenHash}";
-    private static string Tag(Guid sessionId) => $"session:{sessionId}";
+    public static string Tag(Guid sessionId) => $"session:{sessionId}";
 
     public async Task<(Session Session, string Token)> CreateAsync(
         Guid principalId, Guid clientId, TimeSpan ttl,

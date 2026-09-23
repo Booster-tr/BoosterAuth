@@ -1,5 +1,4 @@
 using Booster.Auth.Common.Internal.EntityExtensions;
-using Booster.Auth.Z.Constants;
 using Booster.Auth.Z.Features._base;
 using Booster.Auth.Z.Features._base.Entities;
 using Booster.Auth.Z.Stores.PoolStores;

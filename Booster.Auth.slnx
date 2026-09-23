@@ -23,6 +23,12 @@
     <Project Path="Common/ExceptionManagers/Booster.ExceptionManager.LocalDict/Booster.ExceptionManager.LocalDict.csproj" />
     <Project Path="Common/ExceptionManagers/Booster.ExceptionManager.WithCacheProvider/Booster.ExceptionManager.WithCacheProvider.csproj" />
   </Folder>
+  <Folder Name="/Common/Logging/">
+    <Project Path="Common/Logging/Booster.Logging.Abstraction/Booster.Logging.Abstraction.csproj" />
+    <Project Path="Common/Logging/Booster.Logging.BoosterAmqp/Booster.Logging.BoosterAmqp.csproj" />
+    <Project Path="Common/Logging/Booster.Logging.BoosterDatabase/Booster.Logging.BoosterDatabase.csproj" />
+    <Project Path="Common/Logging/Booster.Logging.BoosterFile/Booster.Logging.BoosterFile.csproj" />
+  </Folder>
   <Folder Name="/CommonInternal/">
     <Project Path="CommonInternal/Booster.Auth.Common.Internal/Booster.Auth.Common.Internal.csproj" />
     <Project Path="CommonInternal/Booster.Auth.Database/Booster.Auth.Database.csproj" />
@@ -42,5 +48,8 @@
   <Folder Name="/Services/">
     <Project Path="Services/Booster.Auth.Management.Api/Booster.Auth.Management.Api.csproj" Id="01832b74-2452-407a-a9ca-218203cd078b" />
     <Project Path="Services/Booster.Auth.Z/Booster.Auth.Z.csproj" Id="ca1a0785-17ec-46b9-b8f9-21fcca71fe3e" />
+    <Project Path="Services/Booster.LoggingService/Booster.LoggingService.csproj" />
+    <Project Path="Services/Booster.NotificationService/Booster.NotificationService.csproj" />
+    <Project Path="Services/Booster.SystemMessageService/Booster.SystemMessageService.csproj" />
   </Folder>
 </Solution>

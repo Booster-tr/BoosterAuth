@@ -22,6 +22,7 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 app.UseBoosterServices();
+app.UseBoosterMessaging();
 app.UseBoosterApi();
 
 app.MapGrpcService<AuthorizationGrpcService>();

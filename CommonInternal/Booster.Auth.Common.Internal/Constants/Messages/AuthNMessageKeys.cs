@@ -1,4 +1,4 @@
-namespace Booster.Auth.Management.Api.Constants;
+namespace Booster.Auth.Common.Internal.Constants.Messages;
 
 public class AuthNMessageKeys
 {

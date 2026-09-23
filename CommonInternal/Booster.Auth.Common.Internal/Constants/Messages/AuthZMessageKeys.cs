@@ -1,4 +1,4 @@
-namespace Booster.Auth.Z.Constants;
+namespace Booster.Auth.Common.Internal.Constants.Messages;
 
 public class AuthZMessageKeys
 {

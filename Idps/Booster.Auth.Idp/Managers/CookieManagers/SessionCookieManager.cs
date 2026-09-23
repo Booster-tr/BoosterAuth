@@ -2,7 +2,7 @@
 
 public sealed class SessionCookieManager : ISessionCookieManager
 {
-    private const string CookieName = "booster_session";
+    private const string CookieName = "booster_idp_session";
 
     public void Set(HttpResponse response, string token, DateTimeOffset expiresAt)
         => response.Cookies.Append(CookieName, token, new CookieOptions

@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>3a2760de-1765-4a16-b5c4-f00bfeec953d</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerfileContext>..\..</DockerfileContext>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Common\Amqp\Booster.Amqp\Booster.Amqp.csproj" />
+		<ProjectReference Include="..\..\Common\Logging\Booster.Logging.BoosterAmqp\Booster.Logging.BoosterAmqp.csproj" />
+		<ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
+		<ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.WithCacheProvider\Booster.ExceptionManager.WithCacheProvider.csproj" />
+		<ProjectReference Include="..\..\CommonInternal\Booster.Auth.Common.Internal\Booster.Auth.Common.Internal.csproj" />
+		
+	</ItemGroup>
+
+</Project>

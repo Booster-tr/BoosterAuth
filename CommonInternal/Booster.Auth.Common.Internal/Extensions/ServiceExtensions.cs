@@ -1,3 +1,5 @@
+using Booster.Amqp.Constants;
+using Booster.Amqp.Extensions;
 using Booster.Auth.Manager.Extensions;
 using Booster.Auth.Manager.Options;
 using Booster.Auth.Manager.RequestContexts;
@@ -13,6 +15,8 @@ using Booster.Database.Postgres.Extensions;
 using Booster.Database.Postgres.Settings;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Extensions;
+using Booster.Logging.BoosterAmqp.Extensions;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -83,6 +87,58 @@ public static class ServiceExtensions
         app.UseBoosterAuthorization();
 
         app.UseFastEndpoints();
+
+        return app;
+    }
+
+    /// <summary>
+    /// Servisin AMQP (Kafka) hattını kurar: correlation bağlamı, log üreticisi
+    /// ve <see cref="Booster.Logging.BoosterAmqp.ILogPublisher"/>.
+    /// <para>
+    /// Log ÜRETEN her servis bunu çağırır. <c>AddLogProducer</c> burada kayıtlı:
+    /// kaydedilmezse <c>ITopicProducer</c> DI'dan çözülemez ve ilk log yazma
+    /// denemesinde patlar.
+    /// </para>
+    /// <para>
+    /// Broker kapalıyken servis yine de açılır (bkz. <c>WaitUntilStarted</c>);
+    /// mesajlar outbox'ta bekler.
+    /// </para>
+    /// </summary>
+    public static IServiceCollection AddBoosterMessaging<TContext>(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Action<IBusRegistrationConfigurator>? configureConsumers = null,
+        Action<IRiderRegistrationConfigurator>? configureRider = null,
+        Action<IKafkaFactoryConfigurator, IRiderRegistrationContext>? configureKafka = null)
+        where TContext : DbContext
+    {
+        var amqpSettings = services.AddSettings<AmqpSettings>(configuration);
+
+        services.AddBoosterCorrelationContext();
+        services.AddAmqpLogger();
+
+        services.AddKafkaBus<TContext>(
+            amqpSettings,
+            configureConsumers,
+            rider =>
+            {
+                rider.AddLogProducer();
+                configureRider?.Invoke(rider);
+            },
+            configureKafka);
+
+        return services;
+    }
+
+    /// <summary>
+    /// Correlation id'yi isteğin başlığından okuyup bağlama yerleştirir.
+    /// <see cref="UseBoosterApi"/>'den ÖNCE çağrılmalı: uç çalışmadan önce
+    /// bağlamın dolu olması gerekir, yoksa o istekte üretilen mesajlar
+    /// correlation id'siz kalır.
+    /// </summary>
+    public static WebApplication UseBoosterMessaging(this WebApplication app)
+    {
+        app.UseBoosterCorrelationContext();
 
         return app;
     }

@@ -19,6 +19,7 @@ app.UseBoosterServices();
 
 app.UseRouting();
 
+app.UseBoosterMessaging();
 app.UseBoosterApi();
 
 app.MapStaticAssets().AllowAnonymous();

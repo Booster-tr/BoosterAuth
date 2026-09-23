@@ -32,6 +32,10 @@
 
 		<ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.WithCacheProvider\Booster.ExceptionManager.WithCacheProvider.csproj" />
 
+		<ProjectReference Include="..\..\Common\Amqp\Booster.Amqp\Booster.Amqp.csproj" />
+
+		<ProjectReference Include="..\..\Common\Logging\Booster.Logging.BoosterAmqp\Booster.Logging.BoosterAmqp.csproj" />
+
 		<ProjectReference Include="..\Booster.Auth.Database\Booster.Auth.Database.csproj" />
 	</ItemGroup>
 

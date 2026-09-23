@@ -6,6 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Design-time factory (migration uretimi) icin -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Booster.Database.Postgres\Booster.Database.Postgres.csproj" />
     <ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.Abstraction\Booster.ExceptionManager.Abstraction.csproj" />

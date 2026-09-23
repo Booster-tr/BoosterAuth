@@ -54,7 +54,12 @@ public static class ServiceExtensions
         services.AddOptions<MassTransitHostOptions>()
             .Configure(options =>
             {
-                options.WaitUntilStarted = true;
+                // Kasıtlı olarak false: true olsaydı broker ayakta değilken
+                // uygulama HİÇ açılmazdı. Kimlik doğrulama ve yetkilendirme
+                // Kafka'ya bağımlı değil; mesajlaşma geçici olarak çalışmasa
+                // bile giriş akışı ayakta kalmalı. Üretilen mesajlar outbox'a
+                // yazıldığı için bağlantı geri geldiğinde teslim edilir.
+                options.WaitUntilStarted = false;
             });
 
         
