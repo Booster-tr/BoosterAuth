@@ -10,14 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace Booster.Auth.Idp.Managers.ExceptionManagers;
 
 public sealed class IdpExceptionHandler(
-    IdpUiOptions uiOptions,
-    ITranslationManager translationManager) : IExceptionHandler
+    IdpUiOptions uiOptions) : IExceptionHandler
 {
+    private ITranslationManager translationManager = null!;
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, Exception exception, CancellationToken ct)
     {
         var lang = ResolveLang(httpContext);
-
+        var scope = httpContext.RequestServices;
+        translationManager = scope.GetRequiredService<ITranslationManager>();
         switch (exception)
         {
             case AuthorizeRedirectException ex:

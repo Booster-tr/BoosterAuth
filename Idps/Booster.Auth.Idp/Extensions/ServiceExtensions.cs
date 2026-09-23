@@ -2,6 +2,8 @@ using Booster.Auth.Common.Internal.Extensions;
 using Booster.Auth.Common.Internal.Options;
 using Booster.Auth.Idp.Bootstrappers;
 using Booster.Auth.Idp.Features._base;
+using Booster.Auth.Idp.Features.Token.Handlers;
+using Booster.Auth.Idp.Features.Token.Handlers._base;
 using Booster.Auth.Idp.Managers.CookieManagers;
 using Booster.Auth.Idp.Managers.ExceptionManagers;
 using Booster.Auth.Idp.Managers.KeyManagers;
@@ -14,8 +16,10 @@ using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Idp.Stores.PrincipalStores;
 using Booster.Auth.Idp.Stores.SessionStores;
 using Booster.Common.Extensions.ServiceExtensions;
+using Booster.ExceptionManager.WithCacheProvider.Extensions;
 using Booster.Hashing.Extensions;
 using Booster.Hashing.Options;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace Booster.Auth.Idp.Extensions;
 
@@ -44,9 +48,15 @@ public static class ServiceExtensions
         services.AddScoped<IProviderFactory, ProviderFactory>();
 
         services.AddScoped<AdminBootstrapper>();
+        services.AddBoosterCacheLanguageTranslator();
+        services.AddSingleton<IExceptionHandler, IdpExceptionHandler>();
 
-        services.AddExceptionHandler<IdpExceptionHandler>();
-
+        services.AddScoped<IGrantTypeHandler, AuthorizationCodeGrantHandler>();
+        services.AddScoped<IGrantTypeHandler, ClientCredentialsGrantHandler>();
+        services.AddScoped<IGrantTypeHandler, RefreshTokenGrantHandler>();
+        services.AddScoped<IGrantTypeHandler, TokenExchangeGrantHandler>();
+        services.AddScoped<TokenHandler>();
+        
         return services;
     }
 }

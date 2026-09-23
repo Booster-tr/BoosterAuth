@@ -3,6 +3,8 @@ using Booster.Auth.Common.Internal.Options;
 using Booster.Auth.Management.Api.Bootstrappers;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Common.Extensions.ServiceExtensions;
+using Booster.ExceptionManager.Abstraction.Extensions;
+using Booster.ExceptionManager.WithCacheProvider.Extensions;
 
 namespace Booster.Auth.Management.Api.Extensions;
 
@@ -14,6 +16,10 @@ public static class ServiceExtensions
         services.AddSettings<BootstrapOptions>(configuration);
 
         services.AddScoped<ManagementBootstrapper>();
+
+        services.AddBoosterCacheLanguageTranslator();
+        services.AddBoosterExceptionHandler();
+
 
         return services;
     }

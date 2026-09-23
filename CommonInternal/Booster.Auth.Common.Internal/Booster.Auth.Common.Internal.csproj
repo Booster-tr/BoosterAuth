@@ -15,10 +15,6 @@
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="10.0.13" />
 		<PackageReference Include="FastEndpoints" Version="8.3.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.12">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
 	</ItemGroup>
