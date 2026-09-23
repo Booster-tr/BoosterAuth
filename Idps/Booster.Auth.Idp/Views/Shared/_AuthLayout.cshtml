@@ -1,17 +1,4 @@
-@*
-    Booster Auth — tüm kimlik doğrulama ekranlarının ortak layout'u.
 
-    DOM sırası kasıtlıdır: <main> her zaman marka panelinden ÖNCE gelir.
-    Panel görsel olarak solda durur; bu tamamen grid-area meselesidir.
-    Böylece klavye ve ekran okuyucu doğrudan forma girer, atlama bağlantısına
-    (skip link) gerek kalmaz — atlanacak tekrar eden bir blok yoktur.
-
-    View'ların kullanabileceği ViewData anahtarları:
-      Title          <title> metni (zorunlu)
-      MainModifier   "auth-main--register" | "auth-main--consent" | "auth-main--error"
-      BrandHeadline  Sol paneldeki başlık (varsayılan aşağıda)
-      BrandLead      Sol paneldeki açıklama
-*@
 @{
     var mainModifier = ViewData["MainModifier"] as string;
     var brandHeadline = ViewData["BrandHeadline"] as string ?? "Tek kimlik, tüm kurumsal uygulamalarınız.";
@@ -22,7 +9,6 @@
 <html lang="tr" dir="ltr">
 <head>
     <meta charset="utf-8" />
-    @* user-scalable=no / maximum-scale eklenmemeli: SC 1.4.4 ihlali olur. *@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>@ViewData["Title"]</title>
@@ -36,27 +22,18 @@
 
         <main id="main" class="auth-main @mainModifier">
             <div class="auth-container">
-                @* Panel gizliyken (<1024px) marka kaybolmasın *@
-                @* Model açıkça verilmelidir: model geçilmeyen bir partial,
-                   sayfanın kendi modelini devralır ve @@model string ile çakışır. *@
+               
                 <div class="auth-brandline">
                     @await Html.PartialAsync("_BrandLogo", string.Empty)
                 </div>
 
                 @RenderBody()
 
-                @* Tüm ekranların paylaştığı tek nazik canlı bölge.
-                   Parola görünürlüğü ve gönderim durumu buradan duyurulur.
-                   Parola gücü kendi ayrı bölgesini kullanır ki iki duyuru
-                   birbirini ezmesin. *@
                 <p class="u-visually-hidden" id="form-live" role="status" aria-live="polite"></p>
             </div>
 
             <footer class="auth-footer">
-                @* Dil göstergesi bilinçli olarak YOK: seçici gibi görünüp
-                   tıklanamayan bir "Türkçe" etiketi, demoda ilk tıklanan ve
-                   ilk hayal kırıklığı yaratan şeydir. Çok dilli olunduğunda
-                   buraya gerçek bir seçici gelir. *@
+
                 <div class="auth-footer__links">
                     <a href="@Url.Idp("/privacy")">Gizlilik Politikası</a>
                     <span class="auth-footer__sep" aria-hidden="true">·</span>
@@ -72,9 +49,6 @@
             </footer>
         </main>
 
-        @* Marka paneli dekoratif değildir: çok kiracılı bir IdP'de kullanıcıyı
-           "kimin giriş sayfasındayım" sorusuna karşı konumlandıran tek yerdir.
-           Bu yüzden aria-hidden yapılmaz; yalnızca süsleme katmanı gizlenir. *@
         <aside class="auth-brand" aria-label="Booster Auth tanıtımı">
             <div class="auth-brand__top">
                 @await Html.PartialAsync("_BrandLogo", "inverse")
@@ -85,10 +59,7 @@
                 <h2 class="auth-brand__headline">@brandHeadline</h2>
                 <p class="auth-brand__lead">@brandLead</p>
 
-                @* Burada bilinçli olarak özellik listesi YOK. Ikon + başlık +
-                   açıklama üçlüsünden oluşan bir fayda listesi, ürünü zaten satın
-                   almış ve sadece giriş yapmaya çalışan birine pazarlama yapar.
-                   Kurumsal IdP panelleri sessizdir: marka, tek cümle, çok boşluk. *@
+
             </div>
 
             <p class="auth-brand__footnote">Bu sayfa Booster Auth tarafından sunulmaktadır.</p>

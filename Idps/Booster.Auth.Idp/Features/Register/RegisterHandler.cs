@@ -4,6 +4,7 @@ using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
+using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
@@ -26,6 +27,7 @@ public sealed class RegisterHandler(
     IAsyncRepository<PrincipalScope, IdpDbContext> principalScopeRepository,
     IAsyncRepository<PrincipalRole, IdpDbContext> principalRoleRepository,
     IPasswordHasher passwordHasher,
+    IPasswordPolicyManager passwordPolicyManager,
     IRequestContextAccessor requestContextAccessor) : ICommandHandler<RegisterCommand, RegisterResult>
 {
     public async Task<RegisterResult> ExecuteAsync(RegisterCommand cmd, CancellationToken ct)
@@ -48,7 +50,7 @@ public sealed class RegisterHandler(
         var phone = CombinePhone(cmd.PhoneCountry, cmd.Phone);
 
         ValidateRequiredIdentifiers(client.Login, userName, email, phone);
-        ValidatePasswordPolicy(client.Password, cmd.Password);
+        passwordPolicyManager.Validate(client.Password, cmd.Password, nameof(RegisterCommand.Password));
 
         Guid principalId;
         using (requestContextAccessor.BeginSystemContext(client.IsolationId))
@@ -78,6 +80,7 @@ public sealed class RegisterHandler(
 
             await principalRepository.AddAsync(principal, ct);
             await credentialRepository.AddAsync(credential, ct);
+            await passwordPolicyManager.RecordAsync(principal.Id, credential.PasswordHash, client.Password, ct);
             await AssignDefaultsAsync(principal.Id, client, ct);
             await principalRepository.SaveChangesAsync(ct);
 
@@ -128,20 +131,6 @@ public sealed class RegisterHandler(
 
         if (email is null && userName is null && phone is null)
             throw Invalid(IdpMessageKeys.IdentifierRequired);
-    }
-
-    private static void ValidatePasswordPolicy(PasswordPolicyData policy, string password)
-    {
-        if (password.Length < policy.MinLength)
-            throw Invalid(nameof(RegisterCommand.Password), IdpMessageKeys.PasswordTooShort);
-        if (policy.RequireUppercase && !password.Any(char.IsUpper))
-            throw Invalid(nameof(RegisterCommand.Password), IdpMessageKeys.PasswordRequiresUppercase);
-        if (policy.RequireLowercase && !password.Any(char.IsLower))
-            throw Invalid(nameof(RegisterCommand.Password), IdpMessageKeys.PasswordRequiresLowercase);
-        if (policy.RequireDigit && !password.Any(char.IsDigit))
-            throw Invalid(nameof(RegisterCommand.Password), IdpMessageKeys.PasswordRequiresDigit);
-        if (policy.RequireNonAlphanumeric && password.All(char.IsLetterOrDigit))
-            throw Invalid(nameof(RegisterCommand.Password), IdpMessageKeys.PasswordRequiresNonAlphanumeric);
     }
 
     private async Task EnsureIdentifiersAreUniqueAsync(string? userName, string? email, string? phone, CancellationToken ct)

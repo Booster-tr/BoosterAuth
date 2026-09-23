@@ -14,6 +14,7 @@ namespace Booster.Auth.Idp.Bootstrappers;
 public sealed class AdminBootstrapper(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
+    IAsyncRepository<PasswordHistory, IdpDbContext> passwordHistoryRepository,
     IPasswordHasher passwordHasher,
     IRequestContextAccessor requestContextAccessor,
     BootstrapOptions bootstrapOptions)
@@ -57,6 +58,14 @@ public sealed class AdminBootstrapper(
 
         await principalRepository.AddAsync(admin, ct);
         await credentialRepository.AddAsync(credential, ct);
+
+        await passwordHistoryRepository.AddAsync(new PasswordHistory
+        {
+            Id = EntityId.New(),
+            PrincipalId = admin.Id,
+            PasswordHash = credential.PasswordHash,
+            CreatedTime = now
+        }, ct);
 
         await principalRepository.SaveChangesAsync(ct);
     }

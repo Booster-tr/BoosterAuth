@@ -59,6 +59,13 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.ResourceRequiredForExchange, "Token", "Jeton takası için hedef kaynak belirtilmelidir.", "Token", "A target resource is required for token exchange."),
         new(IdpMessageKeys.AudienceNotAllowed, "Token", "Bu hedef kitle uygulama için tanımlı değil.", "Token", "This audience is not allowed for the application."),
 
+        // --- Parola yönetimi ---
+        new(IdpMessageKeys.PasswordReused, "Parola", "Bu parolayı daha önce kullanmıştınız. Lütfen farklı bir parola seçin.", "Password", "You have used this password before. Please choose a different one."),
+        new(IdpMessageKeys.PasswordExpired, "Parola", "Parolanızın süresi doldu. Devam etmek için yeni bir parola belirleyin.", "Password", "Your password has expired. Set a new one to continue."),
+        new(IdpMessageKeys.CurrentPasswordInvalid, "Parola", "Mevcut parolanız hatalı.", "Password", "Your current password is incorrect."),
+        new(IdpMessageKeys.ResetTokenInvalid, "Sıfırlama bağlantısı", "Bu sıfırlama bağlantısı geçersiz ya da süresi dolmuş. Lütfen yeniden talep edin.", "Reset link", "This reset link is invalid or has expired. Please request a new one."),
+        new(IdpMessageKeys.PasswordResetRequested, "Parola sıfırlama", "Girdiğiniz bilgiye ait bir hesap varsa sıfırlama bağlantısı gönderildi.", "Password reset", "If an account matches what you entered, a reset link has been sent."),
+
         // --- Servis hesapları ---
         new(IdpMessageKeys.ServiceAccountKeyRequired, "Servis hesabı", "service_account_key ve service_account_secret parametreleri zorunludur.", "Service account", "The service_account_key and service_account_secret parameters are required."),
         new(IdpMessageKeys.InvalidServiceAccount, "Servis hesabı", "Servis hesabı bilgileri hatalı.", "Service account", "The service account credentials are incorrect."),

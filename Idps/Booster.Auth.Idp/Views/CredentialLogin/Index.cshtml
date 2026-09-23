@@ -184,6 +184,11 @@
         </div>
     }
 
+    <p class="auth-card__footnote">
+        <a class="auth-link auth-link--standalone"
+           href="@Url.Idp($"/ui/forgot-password?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">Parolamı unuttum</a>
+    </p>
+
     <footer class="auth-card__footer">
         Hesabınız yok mu?
         <a class="auth-link auth-link--standalone"

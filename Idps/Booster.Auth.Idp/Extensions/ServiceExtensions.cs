@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Extensions;
 using Booster.Auth.Common.Internal.Options;
 using Booster.Auth.Idp.Bootstrappers;
@@ -12,6 +13,7 @@ using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Local;
 using Booster.Auth.Idp.Providers.Local.Stores;
+using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Management.Grpc;
 using Booster.Auth.Idp.Stores.PrincipalStores;
@@ -33,7 +35,10 @@ public static class ServiceExtensions
         services.AddSettings<BootstrapOptions>(configuration);
 
         services.AddBoosterServices<IdpDbContext>(configuration);
-        services.AddBoosterMessaging<IdpDbContext>(configuration);
+
+        services.AddBoosterMessaging<IdpDbContext>(
+            configuration,
+            configureRider: rider => rider.AddNotificationProducer());
 
         var hashingOptions = services.AddSettings<HashingOptions>(configuration);
         services.AddHashing(hashingOptions);
@@ -56,6 +61,7 @@ public static class ServiceExtensions
             };
         });
 
+        services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();
         services.AddScoped<IClientDataStore, ClientDataStore>();
         services.AddScoped<ILocalUserStore, PrincipalStore>();
         services.AddScoped<ISessionStore, SessionStore>();

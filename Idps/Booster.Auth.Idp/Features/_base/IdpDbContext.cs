@@ -13,6 +13,7 @@ public class IdpDbContext(DbContextOptions<IdpDbContext> options, IRequestContex
     public DbSet<Consent> Consents => Set<Consent>();
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<LocalCredential> LocalCredentials => Set<LocalCredential>();
+    public DbSet<PasswordHistory> PasswordHistories => Set<PasswordHistory>();
     public DbSet<PrincipalIdentity> PrincipalIdentities => Set<PrincipalIdentity>();
     public DbSet<ServiceAccount> ServiceAccounts => Set<ServiceAccount>();
     public DbSet<PrincipalLink> PrincipalLinks => Set<PrincipalLink>();
@@ -24,9 +25,6 @@ public class IdpDbContext(DbContextOptions<IdpDbContext> options, IRequestContex
     {
         base.OnModelCreating(modelBuilder);
 
-        // MassTransit outbox/inbox tablolari. Log ve audit mesajlari is
-        // islemiyle AYNI transaction'da outbox'a yazilir: broker o an kapaliysa
-        // bile kayit kaybolmaz, baglanti gelince teslim edilir.
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();

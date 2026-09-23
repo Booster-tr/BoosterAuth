@@ -59,6 +59,8 @@ message PasswordPolicyMessage {
   bool require_lowercase = 3;
   bool require_digit = 4;
   bool require_non_alphanumeric = 5;
+  int32 history_count = 6;   // kac eski parola tekrar kullanilamaz
+  int32 expiry_days = 7;     // 0 = suresiz
 }
 
 message SessionPolicyMessage {

@@ -91,19 +91,7 @@ public static class ServiceExtensions
         return app;
     }
 
-    /// <summary>
-    /// Servisin AMQP (Kafka) hattını kurar: correlation bağlamı, log üreticisi
-    /// ve <see cref="Booster.Logging.BoosterAmqp.ILogPublisher"/>.
-    /// <para>
-    /// Log ÜRETEN her servis bunu çağırır. <c>AddLogProducer</c> burada kayıtlı:
-    /// kaydedilmezse <c>ITopicProducer</c> DI'dan çözülemez ve ilk log yazma
-    /// denemesinde patlar.
-    /// </para>
-    /// <para>
-    /// Broker kapalıyken servis yine de açılır (bkz. <c>WaitUntilStarted</c>);
-    /// mesajlar outbox'ta bekler.
-    /// </para>
-    /// </summary>
+
     public static IServiceCollection AddBoosterMessaging<TContext>(
         this IServiceCollection services,
         IConfiguration configuration,
@@ -130,12 +118,6 @@ public static class ServiceExtensions
         return services;
     }
 
-    /// <summary>
-    /// Correlation id'yi isteğin başlığından okuyup bağlama yerleştirir.
-    /// <see cref="UseBoosterApi"/>'den ÖNCE çağrılmalı: uç çalışmadan önce
-    /// bağlamın dolu olması gerekir, yoksa o istekte üretilen mesajlar
-    /// correlation id'siz kalır.
-    /// </summary>
     public static WebApplication UseBoosterMessaging(this WebApplication app)
     {
         app.UseBoosterCorrelationContext();

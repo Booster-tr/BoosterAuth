@@ -111,6 +111,39 @@ namespace Booster.Auth.Idp.Migrations
                     b.ToTable("LocalCredentials", (string)null);
                 });
 
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.PasswordHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("IsolationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("PrincipalId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PrincipalId", "CreatedTime")
+                        .IsDescending(false, true);
+
+                    b.ToTable("PasswordHistories", (string)null);
+                });
+
             modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.Principal", b =>
                 {
                     b.Property<Guid>("Id")
@@ -715,6 +748,17 @@ namespace Booster.Auth.Idp.Migrations
                     b.HasOne("Booster.Auth.Idp.Features._base.Entities.Principal", "Principal")
                         .WithOne("LocalCredential")
                         .HasForeignKey("Booster.Auth.Idp.Features._base.Entities.LocalCredential", "PrincipalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Principal");
+                });
+
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.PasswordHistory", b =>
+                {
+                    b.HasOne("Booster.Auth.Idp.Features._base.Entities.Principal", "Principal")
+                        .WithMany()
+                        .HasForeignKey("PrincipalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

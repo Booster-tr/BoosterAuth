@@ -58,6 +58,14 @@ public sealed record PasswordPolicyData
     public required bool RequireLowercase { get; init; }
     public required bool RequireDigit { get; init; }
     public required bool RequireNonAlphanumeric { get; init; }
+
+    /// <summary>
+    /// Son kac parolanin tekrar kullanilamayacagi. 0 = gecmis kontrolu yok.
+    /// </summary>
+    public required int HistoryCount { get; init; }
+
+    /// <summary>Parolanin kac gun sonra sureceginin dolacagi. 0 = suresiz.</summary>
+    public required int ExpiryDays { get; init; }
 }
 
 public sealed record SessionPolicyData

@@ -96,7 +96,9 @@ public sealed class ClientDataGrpcService(
                 RequireUppercase = policy.Password.RequireUppercase,
                 RequireLowercase = policy.Password.RequireLowercase,
                 RequireDigit = policy.Password.RequireDigit,
-                RequireNonAlphanumeric = policy.Password.RequireNonAlphanumeric
+                RequireNonAlphanumeric = policy.Password.RequireNonAlphanumeric,
+                HistoryCount = policy.Password.HistoryCount,
+                ExpiryDays = policy.Password.ExpiryDays
             },
             Session = new SessionPolicyData
             {

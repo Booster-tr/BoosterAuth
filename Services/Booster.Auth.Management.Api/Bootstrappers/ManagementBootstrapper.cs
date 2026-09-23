@@ -78,7 +78,7 @@ public sealed class ManagementBootstrapper(
             AllowedGrantTypes = OAuthGrantType.AuthorizationCode | OAuthGrantType.RefreshToken | OAuthGrantType.ClientCredentials,
             RedirectUris = [bootstrapOptions.ManagementClientRedirectUri],
             PostLogoutRedirectUris = [bootstrapOptions.ManagementClientPostLogoutRedirectUri],
-            AllowedAudiences = [bootstrapOptions.ManagementClientAudience],
+            AllowedAudiences = [bootstrapOptions.ManagementClientAudience, bootstrapOptions.IdpAudience],
             RequireConsent = false
         };
 

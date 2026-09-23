@@ -34,7 +34,9 @@ public static class ClientDataMapper
                 RequireUppercase = source.Password.RequireUppercase,
                 RequireLowercase = source.Password.RequireLowercase,
                 RequireDigit = source.Password.RequireDigit,
-                RequireNonAlphanumeric = source.Password.RequireNonAlphanumeric
+                RequireNonAlphanumeric = source.Password.RequireNonAlphanumeric,
+                HistoryCount = source.Password.HistoryCount,
+                ExpiryDays = source.Password.ExpiryDays
             },
             Session = new SessionPolicyMessage
             {
@@ -95,7 +97,9 @@ public static class ClientDataMapper
                 RequireUppercase = message.Password.RequireUppercase,
                 RequireLowercase = message.Password.RequireLowercase,
                 RequireDigit = message.Password.RequireDigit,
-                RequireNonAlphanumeric = message.Password.RequireNonAlphanumeric
+                RequireNonAlphanumeric = message.Password.RequireNonAlphanumeric,
+                HistoryCount = message.Password.HistoryCount,
+                ExpiryDays = message.Password.ExpiryDays
             },
             Session = new SessionPolicyData
             {

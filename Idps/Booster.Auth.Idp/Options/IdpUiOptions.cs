@@ -18,6 +18,8 @@ public class IdpUiOptions
     public string ConsentPath { get; set; } = "/consent";
     public string ErrorPath { get; set; } = "/error";
     public string AuthorizePath { get; set; } = "/authorize";
+    public string ForgotPasswordPath { get; set; } = "/forgot-password";
+    public string ResetPasswordPath { get; set; } = "/reset-password";
 
     public string GetLoginUrl(string interactionKey) =>
         Local($"{LoginPath}?interaction_key={Uri.EscapeDataString(interactionKey)}");
@@ -27,6 +29,13 @@ public class IdpUiOptions
 
     public string GetConsentUrl(string clientKey, string scope, string interactionKey) =>
         Local($"{ConsentPath}?client_id={Uri.EscapeDataString(clientKey)}&scope={Uri.EscapeDataString(scope)}&interaction_key={Uri.EscapeDataString(interactionKey)}");
+
+    public string GetForgotPasswordUrl(string interactionKey) =>
+        Local($"{ForgotPasswordPath}?interaction_key={Uri.EscapeDataString(interactionKey)}");
+
+    public string GetResetPasswordUrl(string interactionKey) =>
+        Local($"{ResetPasswordPath}?interaction_key={Uri.EscapeDataString(interactionKey)}");
+
 
     public string GetAuthorizeUrl(string interactionKey) =>
         Local($"{AuthorizePath}?interaction_key={Uri.EscapeDataString(interactionKey)}");

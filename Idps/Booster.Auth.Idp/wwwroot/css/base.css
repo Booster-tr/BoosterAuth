@@ -444,7 +444,7 @@ textarea {
    ========================================================================== */
 
 /* DOM sirasi: <main> her zaman ONCE gelir, marka paneli sonra.
-   Panelin gorsel olarak solda durmasi tamamen grid-area meselesidir.
+   Panelin gorsel olarak sagda durmasi tamamen grid-area meselesidir.
    Boylece klavye ve ekran okuyucu dogrudan forma girer; atlama baglantisina
    (skip link) gerek kalmaz -- SC 2.4.1 "atlanacak tekrar eden blok" yoktur. */
 .auth-shell {
@@ -455,7 +455,7 @@ textarea {
     min-height: 100dvh;
 }
 
-/* --- Sol marka paneli (>=1024px) ----------------------------------------- */
+/* --- Sag marka paneli (>=1024px) ----------------------------------------- */
 
 .auth-brand {
     grid-area: brand;
@@ -474,7 +474,7 @@ textarea {
         radial-gradient(115% 85% at 82% 6%, rgba(var(--color-panel-glow), 0.22) 0%, rgba(var(--color-panel-glow), 0) 58%),
         radial-gradient(95% 75% at 10% 96%, rgba(var(--color-panel-glow-2), 0.30) 0%, rgba(var(--color-panel-glow-2), 0) 62%),
         linear-gradient(155deg, var(--color-panel-from) 0%, var(--color-panel-mid) 42%, var(--color-panel-to) 100%);
-    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.06);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -747,8 +747,8 @@ textarea {
 /* >=1024px - split layout devreye girer */
 @media (min-width: 1024px) {
     .auth-shell {
-        grid-template-columns: minmax(400px, 44%) minmax(0, 1fr);
-        grid-template-areas: "brand main";
+        grid-template-columns: minmax(0, 1fr) minmax(400px, 44%);
+        grid-template-areas: "main brand";
     }
 
     .auth-brandline {
@@ -806,7 +806,7 @@ textarea {
 /* >=1536px - panel genisligi sinirlanir */
 @media (min-width: 1536px) {
     .auth-shell {
-        grid-template-columns: minmax(480px, 620px) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(480px, 620px);
     }
 
     .auth-brand__body {
@@ -843,7 +843,7 @@ textarea {
         color: CanvasText;
         /* Degrade dustugu icin panel ile form sutunu ayni duz yuzeye donusur;
            bolunmeyi gorunur kilan tek sey bu kenardir. */
-        border-inline-end: 1px solid CanvasText;
+        border-inline-start: 1px solid CanvasText;
     }
 
     .auth-brand::before {
