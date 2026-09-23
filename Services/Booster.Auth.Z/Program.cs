@@ -1,5 +1,4 @@
-using Booster.Auth.Manager.Extensions;
-using Booster.Auth.Manager.Options;
+using Booster.Auth.Common.Internal.Extensions;
 using Booster.Auth.Z.Bootstrappers;
 using Booster.Auth.Z.Extensions;
 using Booster.Auth.Z.Grpc;
@@ -10,33 +9,20 @@ using FastEndpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var fgaSettings = builder.Services.AddSettings<FgaOptions>(builder.Configuration);
-var apiAuthOptions = builder.Services.AddSettings<ApiAuthOptions>(builder.Configuration);
-
-builder.Services.AddBoosterAuthentication(apiAuthOptions); 
-builder.Services.AddBoosterAuthZ(fgaSettings);
+var fgaOptions = builder.Services.AddSettings<FgaOptions>(builder.Configuration);
+builder.Services.AddBoosterAuthZ(fgaOptions);
 
 builder.Services.AddAuthZServices(builder.Configuration);
 
-builder.Services.AddAuthorization();
-builder.Services.AddFastEndpoints();
+builder.Services.AddBoosterApi(builder.Configuration);
 
 builder.Services.AddGrpc();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseBoosterAuthentication();
-app.UseAuthorization();
-
-app.UseFastEndpoints();
+app.UseBoosterServices();
+app.UseBoosterApi();
 
 app.MapGrpcService<AuthorizationGrpcService>();
 

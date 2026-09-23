@@ -1,5 +1,6 @@
 using Booster.Auth.Z.Grpc;
 using Booster.Authorization.Fga.Authorization;
+using Booster.Authorization.Fga.Grpc;
 using Booster.Authorization.Fga.Handlers;
 using Booster.Authorization.Fga.Options;
 using Microsoft.AspNetCore.Authorization;
@@ -38,11 +39,14 @@ public static class ServiceExtensions
 
         services.AddSingleton(settings);
 
-        var builder = services
+        services.AddSingleton<BearerTokenForwardingInterceptor>();
+
+        services
             .AddGrpcClient<AuthorizationService.AuthorizationServiceClient>(options =>
             {
                 options.Address = new Uri(settings.GrpcAddress);
             })
+            .AddInterceptor<BearerTokenForwardingInterceptor>()
             .ConfigureChannel(channel =>
             {
                 channel.HttpHandler = new SocketsHttpHandler

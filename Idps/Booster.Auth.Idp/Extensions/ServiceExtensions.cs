@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Extensions;
 using Booster.Auth.Common.Internal.Options;
 using Booster.Auth.Idp.Bootstrappers;
 using Booster.Auth.Idp.Features._base;
@@ -12,12 +13,7 @@ using Booster.Auth.Idp.Providers.Local.Stores;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Idp.Stores.PrincipalStores;
 using Booster.Auth.Idp.Stores.SessionStores;
-using Booster.Caching.Redis;
-using Booster.Caching.Redis.Extensions;
 using Booster.Common.Extensions.ServiceExtensions;
-using Booster.Database.Postgres.Extensions;
-using Booster.Database.Postgres.Settings;
-using Booster.Database.Repositories;
 using Booster.Hashing.Extensions;
 using Booster.Hashing.Options;
 
@@ -31,16 +27,9 @@ public static class ServiceExtensions
         services.AddSettings<IdpUiOptions>(configuration);
         services.AddSettings<BootstrapOptions>(configuration);
 
-        var postgresSettings = services.AddSettings<PostgresSettings>(configuration);
-        var redisOptions = services.AddSettings<RedisCacheOptions>(configuration);
+        services.AddBoosterServices<IdpDbContext>(configuration);
 
         var hashingOptions = services.AddSettings<HashingOptions>(configuration);
-
-        services.AddSingleton(hashingOptions);
-
-        services.AddPostgresDbContext<IdpDbContext>(postgresSettings);
-        services.AddScoped(typeof(IAsyncRepository<,>), typeof(RepositoryBase<,>));
-
         services.AddHashing(hashingOptions);
 
         services.AddScoped<OidcTokenService>();
@@ -57,7 +46,6 @@ public static class ServiceExtensions
         services.AddScoped<AdminBootstrapper>();
 
         services.AddExceptionHandler<IdpExceptionHandler>();
-        services.AddBoosterRedisCache(redisOptions);
 
         return services;
     }

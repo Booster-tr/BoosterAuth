@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>true</IsPackable>
+    <PackageId>Booster.Authorization.Contracts</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Booster</Authors>
+    <Description>
+      AuthZ servisinin gRPC sözleşmesi. Hem sunucu (Booster.Auth.Z) hem istemci
+      (Booster.Authorization.Fga) stub'larını tek kaynaktan üretir.
+    </Description>
+  </PropertyGroup>
+
+  <!--
+    "Both": sunucu ve istemci aynı tipleri paylaşır.
+    Proto iki ayrı projede derlenseydi aynı tam adlı tipler iki assembly'de
+    üretilir, ikisini birden referanslayan proje CS0433 (belirsiz tip) alırdı.
+  -->
+  <ItemGroup>
+    <Protobuf Include="Protos\authorization.proto" GrpcServices="Both" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.27.2" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.66.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.66.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

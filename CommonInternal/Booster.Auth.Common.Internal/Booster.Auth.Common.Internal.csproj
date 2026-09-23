@@ -7,12 +7,26 @@
 	</PropertyGroup>
 
 
+	<!-- Ortak Use* uzantilari WebApplication tipine ihtiyac duyar -->
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="10.0.12" />
+		<PackageReference Include="FastEndpoints" Version="8.3.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
 	</ItemGroup>
 	<ItemGroup>
 
 		<ProjectReference Include="..\..\Common\Booster.Common.Extensions\Booster.Common.Extensions.csproj" />
+
+		<ProjectReference Include="..\..\Common\Booster.Database.Postgres\Booster.Database.Postgres.csproj" />
+
+		<ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
+
+		<ProjectReference Include="..\..\Common\AuthZ\Booster.Authorization.Fga\Booster.Authorization.Fga.csproj" />
 
 		<ProjectReference Include="..\..\Common\Booster.Database\Booster.Database.csproj" />
 

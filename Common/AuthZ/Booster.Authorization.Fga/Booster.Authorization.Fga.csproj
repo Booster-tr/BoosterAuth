@@ -20,27 +20,8 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-  <!--
-    Sözleşme TEK dosyadan derlenir: sunucu tarafı Booster.Auth.Z içinde aynı
-    proto'yu Server olarak üretir, bu paket Client olarak. Kopyalansaydı iki
-    dosya sessizce birbirinden ayrışabilirdi.
-
-    Paket kendi deposuna çıkarılırsa bu göreli yol kırılır; o noktada proto
-    ayrı bir sözleşme paketine taşınmalıdır.
-  -->
   <ItemGroup>
-    <Protobuf Include="..\..\..\Services\Booster.Auth.Z\Protos\authorization.proto"
-              Link="Protos\authorization.proto"
-              GrpcServices="Client" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.27.2" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.66.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.66.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <!--
@@ -50,6 +31,9 @@
     tanımlanıp tüketici tarafında RequestContext'e bağlanan bir adaptör yazılır.
   -->
   <ItemGroup>
+    <!-- gRPC sözleşmesi: istemci stub'ları buradan gelir -->
+    <ProjectReference Include="..\Booster.Authorization.Contracts\Booster.Authorization.Contracts.csproj" />
+
     <ProjectReference Include="..\..\..\CommonInternal\Booster.Auth.Manager\Booster.Auth.Manager.csproj" />
   </ItemGroup>
 

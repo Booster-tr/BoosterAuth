@@ -9,6 +9,7 @@
     <Project Path="Common/Amqp/Booster.Amqp/Booster.Amqp.csproj" />
   </Folder>
   <Folder Name="/Common/AuthZ/">
+    <Project Path="Common/AuthZ/Booster.Authorization.Contracts/Booster.Authorization.Contracts.csproj" />
     <Project Path="Common/AuthZ/Booster.Authorization.Fga/Booster.Authorization.Fga.csproj" />
     <Project Path="Common/AuthZ/Booster.Authorization.Relational/Booster.Authorization.Relational.csproj" Id="d3617022-98ab-4bcf-930a-333d1d88eae0" />
   </Folder>
