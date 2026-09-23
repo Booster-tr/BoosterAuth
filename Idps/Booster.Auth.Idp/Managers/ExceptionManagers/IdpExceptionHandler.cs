@@ -159,19 +159,20 @@ public sealed class IdpExceptionHandler(
     }
 
     /// <summary>
-    /// Dil önce Accept-Language başlığından, yoksa çerezden okunur.
+    /// Dil önce çerezden, yoksa Accept-Language başlığından okunur.
     /// <para>
-    /// Yalnızca çereze bakılsaydı başlık gönderen her istemci (panel, mobil,
-    /// servisler arası entegrasyon) hata mesajını daima Türkçe alırdı — çerez
-    /// yalnızca tarayıcıdaki dil tercihini taşır.
+    /// Çerez, kullanıcının dil seçicisiyle yaptığı AÇIK tercihtir ve tarayıcı
+    /// varsayılanını ezmelidir; ekran bir dilde, hata mesajı başka dilde
+    /// çıkmamalı. Başlık ise çerezi olmayan istemciler (mobil, servisler arası
+    /// entegrasyon) için geçerli kalır.
     /// </para>
     /// </summary>
     private static string ResolveLang(HttpContext ctx)
     {
-        var lang = ctx.Request.Headers.AcceptLanguage.FirstOrDefault();
+        var lang = ctx.Request.Cookies["accept-language"];
 
         if (string.IsNullOrWhiteSpace(lang))
-            lang = ctx.Request.Cookies["accept-language"];
+            lang = ctx.Request.Headers.AcceptLanguage.FirstOrDefault();
 
         if (string.IsNullOrWhiteSpace(lang))
             return "tr-tr";

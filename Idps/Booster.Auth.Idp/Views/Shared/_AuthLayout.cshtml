@@ -1,9 +1,9 @@
 
 @{
     var mainModifier = ViewData["MainModifier"] as string;
-    var brandHeadline = ViewData["BrandHeadline"] as string ?? "Tek kimlik, tüm kurumsal uygulamalarınız.";
+    var brandHeadline = ViewData["BrandHeadline"] as string ?? T["Layout.BrandHeadline"].Value;
     var brandLead = ViewData["BrandLead"] as string
-        ?? "Booster Auth, kurumunuzun uygulamalarına tek bir güvenli kimlikle erişmenizi sağlar.";
+        ?? T["Layout.BrandLead"].Value;
 }
 <!DOCTYPE html>
 <html lang="tr" dir="ltr">
@@ -34,35 +34,37 @@
 
             <footer class="auth-footer">
 
+                <partial name="_LanguageSwitcher" />
+
                 <div class="auth-footer__links">
-                    <a href="@Url.Idp("/privacy")">Gizlilik Politikası</a>
+                    <a href="@Url.Idp("/privacy")">@T["Layout.Privacy"]</a>
                     <span class="auth-footer__sep" aria-hidden="true">·</span>
-                    <a href="@Url.Idp("/terms")">Kullanım Koşulları</a>
+                    <a href="@Url.Idp("/terms")">@T["Layout.Terms"]</a>
                 </div>
                 <p class="auth-footer__secure">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
                         <rect x="3" y="7" width="10" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.5" />
                         <path d="M5.5 7V5.25a2.5 2.5 0 1 1 5 0V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
-                    Booster Auth hiçbir zaman parolanızı e-posta veya telefonla sormaz.
+                    @T["Layout.SecureNote"]
                 </p>
             </footer>
         </main>
 
-        <aside class="auth-brand" aria-label="Booster Auth tanıtımı">
+        <aside class="auth-brand" aria-label="@T["Layout.BrandAria"]">
             <div class="auth-brand__top">
                 @await Html.PartialAsync("_BrandLogo", "inverse")
             </div>
 
             <div class="auth-brand__body">
-                <span class="auth-brand__eyebrow">Kurumsal kimlik yönetimi</span>
+                <span class="auth-brand__eyebrow">@T["Layout.Eyebrow"]</span>
                 <h2 class="auth-brand__headline">@brandHeadline</h2>
                 <p class="auth-brand__lead">@brandLead</p>
 
 
             </div>
 
-            <p class="auth-brand__footnote">Bu sayfa Booster Auth tarafından sunulmaktadır.</p>
+            <p class="auth-brand__footnote">@T["Layout.Footnote"]</p>
         </aside>
 
     </div>

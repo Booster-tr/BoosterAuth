@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common.BrandName" xml:space="preserve">
+    <value>Booster Auth</value>
+  </data>
+  <data name="Common.ErrorPrefix" xml:space="preserve">
+    <value>Hata: </value>
+  </data>
+  <data name="Common.RequiredNote" xml:space="preserve">
+    <value>Aksi belirtilmedikçe tüm alanlar zorunludur.</value>
+  </data>
+  <data name="Common.Sending" xml:space="preserve">
+    <value>Gönderiliyor…</value>
+  </data>
+  <data name="Common.ShowPassword" xml:space="preserve">
+    <value>Parolayı göster</value>
+  </data>
+  <data name="Common.HidePassword" xml:space="preserve">
+    <value>Parolayı gizle</value>
+  </data>
+  <data name="Common.CapsLockOn" xml:space="preserve">
+    <value>Caps Lock açık.</value>
+  </data>
+  <data name="Common.SummaryTitle" xml:space="preserve">
+    <value>İşleminizi tamamlayamadık</value>
+  </data>
+  <data name="Common.SummaryIntroOne" xml:space="preserve">
+    <value>Devam etmek için aşağıdaki sorunu düzeltin.</value>
+  </data>
+  <data name="Common.SummaryIntroMany" xml:space="preserve">
+    <value>Devam etmek için aşağıdaki {0} sorunu düzeltin.</value>
+  </data>
+  <data name="Identifier.Label.Email" xml:space="preserve">
+    <value>E-posta adresiniz</value>
+  </data>
+  <data name="Identifier.Label.Username" xml:space="preserve">
+    <value>Kullanıcı adınız</value>
+  </data>
+  <data name="Identifier.Label.Phone" xml:space="preserve">
+    <value>Telefon numaranız</value>
+  </data>
+  <data name="Identifier.Label.EmailOrUsername" xml:space="preserve">
+    <value>E-posta veya kullanıcı adı</value>
+  </data>
+  <data name="Identifier.Label.EmailOrPhone" xml:space="preserve">
+    <value>E-posta veya telefon</value>
+  </data>
+  <data name="Identifier.Label.UsernameOrPhone" xml:space="preserve">
+    <value>Kullanıcı adı veya telefon</value>
+  </data>
+  <data name="Identifier.Label.Any" xml:space="preserve">
+    <value>E-posta, telefon veya kullanıcı adı</value>
+  </data>
+  <data name="Identifier.Hint.Email" xml:space="preserve">
+    <value>Hesabınızı açarken kullandığınız e-posta adresini girin.</value>
+  </data>
+  <data name="Identifier.Hint.Username" xml:space="preserve">
+    <value>Hesabınızı açarken belirlediğiniz kullanıcı adını girin.</value>
+  </data>
+  <data name="Identifier.Hint.Phone" xml:space="preserve">
+    <value>Numaranızı başında sıfır olmadan yazın.</value>
+  </data>
+  <data name="Identifier.Hint.Mixed" xml:space="preserve">
+    <value>Kayıt sırasında kullandığınız bilgilerden biriyle giriş yapabilirsiniz.</value>
+  </data>
+  <data name="Identifier.Placeholder.Email" xml:space="preserve">
+    <value>ad@ornek.com</value>
+  </data>
+  <data name="Identifier.Placeholder.Username" xml:space="preserve">
+    <value>kullaniciadi</value>
+  </data>
+  <data name="Identifier.Placeholder.Phone" xml:space="preserve">
+    <value>5XX XXX XX XX</value>
+  </data>
+  <data name="Login.PageTitle" xml:space="preserve">
+    <value>Giriş yapın</value>
+  </data>
+  <data name="Login.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} hata – Giriş yapın</value>
+  </data>
+  <data name="Login.Heading" xml:space="preserve">
+    <value>Giriş yapın</value>
+  </data>
+  <data name="Login.Subtitle" xml:space="preserve">
+    <value>Hesabınıza erişmek için bilgilerinizi girin.</value>
+  </data>
+  <data name="Login.PasswordLabel" xml:space="preserve">
+    <value>Parola</value>
+  </data>
+  <data name="Login.Submit" xml:space="preserve">
+    <value>Giriş yap</value>
+  </data>
+  <data name="Login.Busy" xml:space="preserve">
+    <value>Giriş yapılıyor…</value>
+  </data>
+  <data name="Login.ForgotPassword" xml:space="preserve">
+    <value>Parolamı unuttum</value>
+  </data>
+  <data name="Login.NoAccount" xml:space="preserve">
+    <value>Hesabınız yok mu?</value>
+  </data>
+  <data name="Login.SignUp" xml:space="preserve">
+    <value>Kayıt olun</value>
+  </data>
+  <data name="Login.BrandHeadline" xml:space="preserve">
+    <value>Tek hesapla tüm uygulamalarınıza.</value>
+  </data>
+  <data name="Login.BrandLead" xml:space="preserve">
+    <value>Booster Auth kimliğiniz, kurumunuzun yetkilendirdiği her uygulamada geçerlidir.</value>
+  </data>
+  <data name="Register.PageTitle" xml:space="preserve">
+    <value>Hesap oluşturun</value>
+  </data>
+  <data name="Register.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} hata – Hesap oluşturun</value>
+  </data>
+  <data name="Register.Heading" xml:space="preserve">
+    <value>Hesap oluşturun</value>
+  </data>
+  <data name="Register.Subtitle" xml:space="preserve">
+    <value>Birkaç adımda hesabınızı oluşturun, kaldığınız yerden devam edin.</value>
+  </data>
+  <data name="Register.DisplayName" xml:space="preserve">
+    <value>Ad soyad</value>
+  </data>
+  <data name="Register.UserName" xml:space="preserve">
+    <value>Kullanıcı adı</value>
+  </data>
+  <data name="Register.Email" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="Register.EmailHint" xml:space="preserve">
+    <value>Hesabınızla ilgili bildirimler bu adrese gönderilir.</value>
+  </data>
+  <data name="Register.Phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="Register.PhoneOptional" xml:space="preserve">
+    <value>(isteğe bağlı)</value>
+  </data>
+  <data name="Register.PhoneCountry" xml:space="preserve">
+    <value>Ülke kodu</value>
+  </data>
+  <data name="Register.PhoneNumber" xml:space="preserve">
+    <value>Telefon numarası</value>
+  </data>
+  <data name="Register.PhoneHint" xml:space="preserve">
+    <value>Numaranızı başında sıfır olmadan yazın.</value>
+  </data>
+  <data name="Register.Password" xml:space="preserve">
+    <value>Parola</value>
+  </data>
+  <data name="Register.PasswordConfirm" xml:space="preserve">
+    <value>Parola (tekrar)</value>
+  </data>
+  <data name="Register.Submit" xml:space="preserve">
+    <value>Hesap oluştur</value>
+  </data>
+  <data name="Register.Busy" xml:space="preserve">
+    <value>Oluşturuluyor…</value>
+  </data>
+  <data name="Register.HaveAccount" xml:space="preserve">
+    <value>Zaten hesabınız var mı?</value>
+  </data>
+  <data name="Register.SignIn" xml:space="preserve">
+    <value>Giriş yapın</value>
+  </data>
+  <data name="Register.BrandHeadline" xml:space="preserve">
+    <value>Bir hesap açın, her uygulamada geçerli olsun.</value>
+  </data>
+  <data name="Register.BrandLead" xml:space="preserve">
+    <value>Booster Auth hesabınız, kurumunuzun yetkilendirdiği tüm uygulamalarda tek kimliğiniz olur.</value>
+  </data>
+  <data name="Forgot.PageTitle" xml:space="preserve">
+    <value>Parolamı unuttum</value>
+  </data>
+  <data name="Forgot.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} hata – Parolamı unuttum</value>
+  </data>
+  <data name="Forgot.Heading" xml:space="preserve">
+    <value>Parolanızı mı unuttunuz?</value>
+  </data>
+  <data name="Forgot.Subtitle" xml:space="preserve">
+    <value>Hesabınıza kayıtlı bilgiyi girin, size doğrulama kodu gönderelim.</value>
+  </data>
+  <data name="Forgot.Submit" xml:space="preserve">
+    <value>Doğrulama kodu gönder</value>
+  </data>
+  <data name="Forgot.RememberedPassword" xml:space="preserve">
+    <value>Parolanızı hatırladınız mı?</value>
+  </data>
+  <data name="Forgot.SignIn" xml:space="preserve">
+    <value>Giriş yapın</value>
+  </data>
+  <data name="Forgot.BrandHeadline" xml:space="preserve">
+    <value>Parolanızı unutmanız hesabınızı kaybetmek demek değil.</value>
+  </data>
+  <data name="Forgot.BrandLead" xml:space="preserve">
+    <value>Kayıtlı adresinize tek kullanımlık bir kod gönderiyoruz; yeni parolanızı kendiniz belirliyorsunuz.</value>
+  </data>
+  <data name="Reset.PageTitle" xml:space="preserve">
+    <value>Yeni parola</value>
+  </data>
+  <data name="Reset.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} hata – Yeni parola</value>
+  </data>
+  <data name="Reset.Heading" xml:space="preserve">
+    <value>Yeni parola belirleyin</value>
+  </data>
+  <data name="Reset.Subtitle" xml:space="preserve">
+    <value>Size gönderdiğimiz kodu girin ve yeni parolanızı belirleyin.</value>
+  </data>
+  <data name="Reset.CodeLabel" xml:space="preserve">
+    <value>Doğrulama kodu</value>
+  </data>
+  <data name="Reset.CodeHint" xml:space="preserve">
+    <value>Altı haneli kod 15 dakika geçerlidir.</value>
+  </data>
+  <data name="Reset.NewPassword" xml:space="preserve">
+    <value>Yeni parola</value>
+  </data>
+  <data name="Reset.NewPasswordConfirm" xml:space="preserve">
+    <value>Yeni parola (tekrar)</value>
+  </data>
+  <data name="Reset.Submit" xml:space="preserve">
+    <value>Parolamı güncelle</value>
+  </data>
+  <data name="Reset.Busy" xml:space="preserve">
+    <value>Güncelleniyor…</value>
+  </data>
+  <data name="Reset.BrandHeadline" xml:space="preserve">
+    <value>Yeni parolanızı belirleyin.</value>
+  </data>
+  <data name="Reset.BrandLead" xml:space="preserve">
+    <value>Kod yalnızca bu tarayıcıda geçerlidir. Daha önce kullandığınız parolaları tekrar seçemeyebilirsiniz; kurumunuzun politikası bunu belirler.</value>
+  </data>
+  <data name="Consent.PageTitle" xml:space="preserve">
+    <value>İzin verin</value>
+  </data>
+  <data name="Consent.Allow" xml:space="preserve">
+    <value>İzin ver</value>
+  </data>
+  <data name="Consent.Deny" xml:space="preserve">
+    <value>Reddet</value>
+  </data>
+  <data name="Error.PageTitle" xml:space="preserve">
+    <value>Bir sorun oluştu</value>
+  </data>
+  <data name="Error.TechnicalDetails" xml:space="preserve">
+    <value>Teknik ayrıntılar</value>
+  </data>
+  <data name="Error.RequestId" xml:space="preserve">
+    <value>İstek kimliği</value>
+  </data>
+  <data name="Login.Federation.Google" xml:space="preserve">
+    <value>Google ile devam et</value>
+  </data>
+  <data name="Login.Federation.Microsoft" xml:space="preserve">
+    <value>Microsoft ile devam et</value>
+  </data>
+  <data name="Login.Federation.Sso" xml:space="preserve">
+    <value>Kurumsal SSO ile devam et</value>
+  </data>
+  <data name="Login.OtherMethods" xml:space="preserve">
+    <value>veya diğer yöntemlerle</value>
+  </data>
+  <data name="Layout.BrandHeadline" xml:space="preserve">
+    <value>Tek kimlik, tüm kurumsal uygulamalarınız.</value>
+  </data>
+  <data name="Layout.BrandLead" xml:space="preserve">
+    <value>Booster Auth, kurumunuzun uygulamalarına tek bir güvenli kimlikle erişmenizi sağlar.</value>
+  </data>
+  <data name="Layout.Privacy" xml:space="preserve">
+    <value>Gizlilik Politikası</value>
+  </data>
+  <data name="Layout.Terms" xml:space="preserve">
+    <value>Kullanım Koşulları</value>
+  </data>
+  <data name="Layout.BrandAria" xml:space="preserve">
+    <value>Booster Auth tanıtımı</value>
+  </data>
+  <data name="Layout.Eyebrow" xml:space="preserve">
+    <value>Kurumsal kimlik yönetimi</value>
+  </data>
+  <data name="Layout.Footnote" xml:space="preserve">
+    <value>Bu sayfa Booster Auth tarafından sunulmaktadır.</value>
+  </data>
+  <data name="Register.DisplayNameHint" xml:space="preserve">
+    <value>Uygulamalarda bu isimle görüneceksiniz.</value>
+  </data>
+  <data name="Register.LegalNotice" xml:space="preserve">
+    <value>Hesap oluşturarak {0} ve {1} belgelerini kabul etmiş olursunuz.</value>
+  </data>
+  <data name="Layout.LanguageAria" xml:space="preserve">
+    <value>Dil seçimi</value>
+  </data>
+  <data name="Layout.SecureNote" xml:space="preserve">
+    <value>Booster Auth hiçbir zaman parolanızı e-posta veya telefonla sormaz.</value>
+  </data>
+</root>

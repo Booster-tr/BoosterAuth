@@ -4,6 +4,7 @@ using Booster.Auth.Idp.Features._base.Enums;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
+using Booster.Auth.Idp.Stores.PasswordResetStores;
 using Booster.Auth.Idp.Stores.PasswordResetStores.Models;
 using Booster.Auth.Idp.Stores.PrincipalStores;
 using Booster.Auth.Idp.Stores.SessionStores;
@@ -124,12 +125,13 @@ public sealed class ResetPasswordHandler(
 
         if (reset.AttemptCount + 1 >= maxAttempts)
         {
-            await resetStore.RemoveAsync(interactionKey, ct);
+            await resetStore.RemoveAsync(PasswordResetKeys.ForInteraction(interactionKey), ct);
+            await resetStore.RemoveAsync(PasswordResetKeys.Pending(reset.IsolationId, reset.PrincipalId), ct);
             return;
         }
 
         await resetStore.StoreAsync(
-            interactionKey,
+            PasswordResetKeys.ForInteraction(interactionKey),
             reset with { AttemptCount = reset.AttemptCount + 1 },
             ResetCodeTtl,
             ct);

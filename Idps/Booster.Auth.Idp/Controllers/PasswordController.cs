@@ -2,6 +2,9 @@ using Booster.Auth.Idp.Controllers.Base;
 using Booster.Auth.Idp.Features.Password.ForgotPassword;
 using Booster.Auth.Idp.Features.Password.ResetPassword;
 using Booster.Auth.Idp.Options;
+using Booster.Auth.Idp.Stores.ClientStores;
+using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
+using Booster.Caching.Abstraction;
 using Booster.ExceptionManager.Abstraction.Translations;
 using FastEndpoints;
 using FluentValidation;
@@ -17,13 +20,18 @@ namespace Booster.Auth.Idp.Controllers;
 [AllowAnonymous]
 public class PasswordController(
     IdpUiOptions uiOptions,
+    ISecureCacheStore<InteractionStateData> interactionStore,
+    IClientDataStore clientDataStore,
     ITranslationManager translationManager) : IdpBaseController
 {
     [HttpGet("/ui/forgot-password")]
-    public IActionResult ForgotPassword([FromQuery(Name = "interaction_key")] string interactionKey)
+    public async Task<IActionResult> ForgotPassword(
+        [FromQuery(Name = "interaction_key")] string interactionKey, CancellationToken ct)
     {
         if (string.IsNullOrEmpty(interactionKey))
             return Redirect(uiOptions.GetErrorUrl(IdpMessageKeys.InvalidInteraction));
+
+        SetIdentifierField(await ResolveClientAsync(interactionStore, clientDataStore, interactionKey, ct));
 
         return View(new ForgotPasswordCommand { InteractionKey = interactionKey });
     }
@@ -41,6 +49,7 @@ public class PasswordController(
         catch (ValidationException ex)
         {
             await AddErrorsAsync(ex, ct);
+            SetIdentifierField(await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct));
             return View("ForgotPassword", command);
         }
 

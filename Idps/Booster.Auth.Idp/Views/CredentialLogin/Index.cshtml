@@ -7,10 +7,16 @@
     // Hata sayısı başlığın başına yazılır: ekran okuyucu kullanıcısı POST'un
     // başarısız olduğunu, sayfadan herhangi bir şey duymadan önce öğrenir.
     ViewData["Title"] = errorCount > 0
-        ? $"{errorCount} hata – Giriş yapın · Booster Auth"
-        : "Giriş yapın · Booster Auth";
+        ? T["Login.PageTitleWithErrors", errorCount].Value
+        : T["Login.PageTitle"].Value;
 
-    ViewData["BrandHeadline"] = "Tek kimlik, tüm kurumsal uygulamalarınız.";
+    ViewData["BrandHeadline"] = T["Login.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["Login.BrandLead"].Value;
+
+    // Hangi kimlik turlerinin kabul edildigi HAVUZ POLITIKASINDAN gelir;
+    // controller ViewData ile tasir. Sabit metin yazilsaydi yalnizca e-posta
+    // kabul eden bir kiracida kullanici telefon girmeye davet edilirdi.
+    var identifier = ViewData["IdentifierField"] as IdentifierField ?? IdentifierField.From([IdentifierType.Email]);
 
     var identifierInvalid = ViewData.ModelState.HasError(nameof(Model.Identifier));
     var passwordInvalid = ViewData.ModelState.HasError(nameof(Model.Password));
@@ -23,8 +29,8 @@
 
 <section class="auth-card">
     <header class="auth-card__header">
-        <h1 class="auth-card__title">Hesabınıza giriş yapın</h1>
-        <p class="auth-card__subtitle">Devam etmek için kimlik bilgilerinizi girin.</p>
+        <h1 class="auth-card__title">@T["Login.Heading"]</h1>
+        <p class="auth-card__subtitle">@T["Login.Subtitle"]</p>
     </header>
 
     <partial name="_ValidationSummary" />
@@ -39,9 +45,7 @@
 
         @* --- Kimlik --------------------------------------------------------- *@
         <div class="auth-field auth-field--icon @(identifierInvalid ? "auth-field--invalid" : null)">
-            <label class="auth-field__label" for="Identifier">
-                Kullanıcı adı, e-posta veya telefon
-            </label>
+            <label class="auth-field__label" for="Identifier">@T[identifier.LabelKey]</label>
 
             <div class="auth-field__control">
                 <span class="auth-field__icon" aria-hidden="true">
@@ -52,26 +56,27 @@
                     </svg>
                 </span>
 
-                @* type="email" DEĞİL: alan telefon ve kullanıcı adını da kabul eder. *@
-                <input class="auth-field__input" asp-for="Identifier" type="text"
-                       autocomplete="username" autocapitalize="none" autocorrect="off"
-                       spellcheck="false" enterkeyhint="next" required
-                       data-validate data-initial-focus
-                       data-msg-required="Lütfen kullanıcı adınızı, e-posta adresinizi veya telefonunuzu girin."
+                @* Tip ve otomatik doldurma POLİTİKADAN gelir: yalnızca tek tür
+                   kabul ediliyorsa ona özelleşir, karışıksa nötr kalır.
+                   type="email" sabitlenseydi telefonla da girilebilen bir alanda
+                   tarayıcı geçerli değeri reddederdi. *@
+                <input class="auth-field__input" asp-for="Identifier" type="@identifier.InputType"
+                       autocomplete="@identifier.AutoComplete" inputmode="@identifier.InputMode"
+                       placeholder="@T[identifier.PlaceholderKey]"
+                       autocapitalize="none" autocorrect="off"
+                       spellcheck="false" enterkeyhint="next" required data-initial-focus
                        aria-describedby="Identifier-error Identifier-hint"
                        aria-invalid="@(identifierInvalid ? "true" : null)" />
             </div>
 
-            <p class="auth-field__hint" id="Identifier-hint">
-                Kayıt sırasında kullandığınız bilgilerden herhangi biriyle giriş yapabilirsiniz.
-            </p>
+            <p class="auth-field__hint" id="Identifier-hint">@T[identifier.HintKey]</p>
 
             <partial name="_FieldError" model="@nameof(Model.Identifier)" />
         </div>
 
         @* --- Parola --------------------------------------------------------- *@
         <div class="auth-field auth-field--icon auth-field--action @(passwordInvalid ? "auth-field--invalid" : null)">
-            <label class="auth-field__label" for="Password">Parola</label>
+            <label class="auth-field__label" for="Password">@T["Login.PasswordLabel"]</label>
 
             <div class="auth-field__control">
                 <span class="auth-field__icon" aria-hidden="true">
@@ -84,8 +89,7 @@
 
                 <input class="auth-field__input" asp-for="Password" type="password"
                        autocomplete="current-password" autocapitalize="none" spellcheck="false"
-                       enterkeyhint="go" required data-validate data-caps-warn
-                       data-msg-required="Lütfen parolanızı girin."
+                       enterkeyhint="go" required data-caps-warn
                        aria-describedby="Password-error Password-caps"
                        aria-invalid="@(passwordInvalid ? "true" : null)" />
 
@@ -95,8 +99,8 @@
                    aria-pressed kullanılmaz; erişilebilir ad değişir. *@
                 <button type="button" class="auth-toggle" hidden
                         data-pw-toggle aria-controls="Password"
-                        data-label-show="Parolayı göster" data-label-hide="Parolayı gizle"
-                        aria-label="Parolayı göster" title="Parolayı göster">
+                        data-label-show="@T["Common.ShowPassword"]" data-label-hide="@T["Common.HidePassword"]"
+                        aria-label="@T["Common.ShowPassword"]" title="@T["Common.ShowPassword"]">
                     <svg class="auth-toggle__icon auth-toggle__icon--on" width="20" height="20"
                          viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
                         <path d="M1.75 10S4.75 4.75 10 4.75 18.25 10 18.25 10 15.25 15.25 10 15.25 1.75 10 1.75 10Z"
@@ -122,7 +126,7 @@
                     <path d="M8 6.75v2.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     <circle cx="8" cy="11.3" r="0.75" fill="currentColor" />
                 </svg>
-                Caps Lock açık.
+                @T["Common.CapsLockOn"]
             </p>
 
             <partial name="_FieldError" model="@nameof(Model.Password)" />
@@ -130,9 +134,9 @@
 
         <div class="auth-form__actions">
             <button type="submit" class="auth-btn auth-btn--primary auth-btn--block"
-                    data-submit-guard data-label-busy="Giriş yapılıyor…">
+                    data-submit-guard data-label-busy="@T["Login.Busy"]">
                 <span class="auth-btn__spinner" aria-hidden="true"></span>
-                <span class="auth-btn__label">Giriş yap</span>
+                <span class="auth-btn__label">@T["Login.Submit"]</span>
             </button>
         </div>
     </form>
@@ -144,7 +148,7 @@
     @if (showFederation)
     {
         <div class="auth-alt">
-            <h2 class="auth-divider"><span>veya diğer yöntemlerle</span></h2>
+            <h2 class="auth-divider"><span>@T["Login.OtherMethods"]</span></h2>
             <div class="auth-fed">
                 <a class="auth-btn auth-btn--fed"
                    href="@Url.Idp($"/ui/external/challenge?provider=google&interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">
@@ -156,7 +160,7 @@
                             <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .96 4.96l2.99 2.33C4.66 5.16 6.65 3.58 9 3.58Z" />
                         </svg>
                     </span>
-                    <span class="auth-btn__label">Google ile devam et</span>
+                    <span class="auth-btn__label">@T["Login.Federation.Google"]</span>
                 </a>
                 <a class="auth-btn auth-btn--fed"
                    href="@Url.Idp($"/ui/external/challenge?provider=microsoft&interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">
@@ -168,7 +172,7 @@
                             <path fill="#FFB900" d="M9.5 9.5H18V18H9.5z" />
                         </svg>
                     </span>
-                    <span class="auth-btn__label">Microsoft ile devam et</span>
+                    <span class="auth-btn__label">@T["Login.Federation.Microsoft"]</span>
                 </a>
                 <a class="auth-btn auth-btn--fed"
                    href="@Url.Idp($"/ui/external/challenge?provider=saml&interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">
@@ -178,7 +182,7 @@
                                   stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
                         </svg>
                     </span>
-                    <span class="auth-btn__label">Kurumsal SSO ile devam et</span>
+                    <span class="auth-btn__label">@T["Login.Federation.Sso"]</span>
                 </a>
             </div>
         </div>
@@ -186,12 +190,12 @@
 
     <p class="auth-card__footnote">
         <a class="auth-link auth-link--standalone"
-           href="@Url.Idp($"/ui/forgot-password?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">Parolamı unuttum</a>
+           href="@Url.Idp($"/ui/forgot-password?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">@T["Login.ForgotPassword"]</a>
     </p>
 
     <footer class="auth-card__footer">
-        Hesabınız yok mu?
+        @T["Login.NoAccount"]
         <a class="auth-link auth-link--standalone"
-           href="@Url.Idp($"/register?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">Kayıt olun</a>
+           href="@Url.Idp($"/register?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">@T["Login.SignUp"]</a>
     </footer>
 </section>

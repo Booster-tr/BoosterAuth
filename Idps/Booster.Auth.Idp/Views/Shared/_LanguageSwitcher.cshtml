@@ -1,0 +1,44 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.Extensions.Options
+@inject IOptions<RequestLocalizationOptions> LocalizationOptions
+@{
+    var cultures = LocalizationOptions.Value.SupportedUICultures ?? new List<CultureInfo>();
+
+    // Tek dil varsa seçim diye bir şey yoktur; boş bir kontrol göstermek
+    // kullanıcıya olmayan bir seçenek vaat etmek olurdu.
+    if (cultures.Count < 2) { return; }
+
+    var current = CultureInfo.CurrentUICulture.Name;
+
+    // Dönüş adresi SUNUCUDA üretilir. İstemciden alınsaydı doğrulanması gereken
+    // bir girdi olurdu; controller yine Url.IsLocalUrl ile kontrol ediyor.
+    //
+    // Url.Idp ŞART: gateway /authn önekini soyarak iletiyor, bu yüzden
+    // Request.Path uygulamanın İÇ yolunu (/ui/login) veriyor. Önek eklenmeseydi
+    // tarayıcı gateway kökündeki /ui/login adresine gider ve 404 alırdı.
+    var returnUrl = Url.Idp($"{Context.Request.Path}{Context.Request.QueryString}");
+}
+
+@* Form, JS OLMADAN çalışır: her dil kendi submit butonudur.
+   Açılır liste kullanılsaydı seçim yapmak için JS gerekirdi. *@
+<form class="auth-lang" method="post" action="@Url.Idp("/ui/culture")"
+      asp-antiforgery="false" aria-label="@T["Layout.LanguageAria"]">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+    @foreach (var culture in cultures)
+    {
+        var isCurrent = string.Equals(culture.Name, current, StringComparison.OrdinalIgnoreCase);
+
+        <button type="submit" name="culture" value="@culture.Name"
+                class="auth-lang__item"
+                lang="@culture.Name"
+                @* Seçili dil devre dışı bırakılmaz, basılı olarak işaretlenir:
+                   devre dışı bir düğme odak almaz ve ekran okuyucu onu hiç
+                   duyurmaz — kullanıcı hangi dilde olduğunu anlayamazdı. *@
+                aria-pressed="@(isCurrent ? "true" : "false")">
+            @culture.NativeName.Split(' ')[0]
+        </button>
+    }
+</form>

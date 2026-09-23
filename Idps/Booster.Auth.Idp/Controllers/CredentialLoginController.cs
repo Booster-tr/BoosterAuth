@@ -3,6 +3,9 @@ using Booster.Auth.Idp.Controllers.Base;
 using Booster.Auth.Idp.Features.Login.CredentialLogin;
 using Booster.Auth.Idp.Managers.CookieManagers;
 using Booster.Auth.Idp.Options;
+using Booster.Auth.Idp.Stores.ClientStores;
+using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
+using Booster.Caching.Abstraction;
 using Booster.ExceptionManager.Abstraction.Translations;
 using FastEndpoints;
 using FluentValidation;
@@ -14,13 +17,19 @@ namespace Booster.Auth.Idp.Controllers;
 [AllowAnonymous]
 public class CredentialLoginController(IdpUiOptions uiOptions,
     ISessionCookieManager cookieManager,
+    ISecureCacheStore<InteractionStateData> interactionStore,
+    IClientDataStore clientDataStore,
     ITranslationManager translationManager) : IdpBaseController
 {
     [Microsoft.AspNetCore.Mvc.HttpGet("/ui/login")]
-    public IActionResult Index([Microsoft.AspNetCore.Mvc.FromQuery(Name = "interaction_key")] string interactionKey)
+    public async Task<IActionResult> Index(
+        [Microsoft.AspNetCore.Mvc.FromQuery(Name = "interaction_key")] string interactionKey,
+        CancellationToken ct)
     {
         if (string.IsNullOrEmpty(interactionKey))
             return Redirect(uiOptions.GetErrorUrl(IdpMessageKeys.InvalidInteraction));
+
+        SetIdentifierField(await ResolveClientAsync(interactionStore, clientDataStore, interactionKey, ct));
 
         return View(new CredentialLoginCommand { InteractionKey = interactionKey });
     }
@@ -48,6 +57,7 @@ public class CredentialLoginController(IdpUiOptions uiOptions,
                 var msg = await translationManager.GetAsync(err.ErrorMessage, lang, ct);
                 ModelState.AddModelError(err.PropertyName, msg);
             }
+            SetIdentifierField(await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct));
             return View("Index", command);
         }
     }

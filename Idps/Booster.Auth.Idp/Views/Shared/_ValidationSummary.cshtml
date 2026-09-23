@@ -28,15 +28,15 @@
                 <circle cx="10" cy="13.6" r="0.9" fill="currentColor" />
             </svg>
             <div>
-                <h2 class="auth-summary__title" id="error-summary-title">İşleminizi tamamlayamadık</h2>
+                <h2 class="auth-summary__title" id="error-summary-title">@T["Common.SummaryTitle"]</h2>
                 <p class="auth-summary__intro">
                     @if (errors.Count == 1)
                     {
-                        <text>Devam etmek için aşağıdaki sorunu düzeltin.</text>
+                        <text>@T["Common.SummaryIntroOne"]</text>
                     }
                     else
                     {
-                        <text>Devam etmek için aşağıdaki @errors.Count sorunu düzeltin.</text>
+                        <text>@T["Common.SummaryIntroMany", errors.Count]</text>
                     }
                 </p>
             </div>

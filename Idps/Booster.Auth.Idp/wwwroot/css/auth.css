@@ -14,7 +14,6 @@
      4. Telefon                .auth-phone
      5. Butonlar               .auth-btn
      6. Bildirimler            .auth-alert, .auth-summary, .auth-note
-     7. Parola gucu            .auth-meter, .auth-reqs
      8. Ayrac + federasyon     .auth-divider, .auth-alt, .auth-fed
      9. Izin ekrani            .auth-appmark, .auth-scopes
     10. Hata ekrani            .auth-status, .auth-details
@@ -640,124 +639,6 @@
 }
 
 /* ==========================================================================
-   7. PAROLA GUCU  (.auth-meter, .auth-reqs)
-   ========================================================================== */
-
-.auth-meter {
-    margin-top: var(--space-3);
-}
-
-.auth-meter__head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-3);
-    font-size: 0.8125rem;
-    line-height: 1.125rem;
-    color: var(--color-text-muted);
-}
-
-.auth-meter__level {
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-secondary);
-}
-
-/* Cubuklar tamamen dekoratif (aria-hidden); bilgi metinle tasinir. */
-.auth-meter__track {
-    display: flex;
-    gap: var(--space-1);
-    margin-top: var(--space-2);
-}
-
-.auth-meter__seg {
-    flex: 1 1 0;
-    height: 4px;
-    background-color: var(--color-surface-sunken);
-    border: var(--border-width-hairline) solid var(--color-border-strong);
-    border-radius: var(--radius-xs);
-    transition: background-color var(--duration-base) var(--ease-out),
-                border-color var(--duration-base) var(--ease-out);
-}
-
-.auth-meter[data-level="1"] .auth-meter__seg:nth-child(-n+1),
-.auth-meter[data-level="2"] .auth-meter__seg:nth-child(-n+2),
-.auth-meter[data-level="3"] .auth-meter__seg:nth-child(-n+3),
-.auth-meter[data-level="4"] .auth-meter__seg:nth-child(-n+4) {
-    border-color: transparent;
-}
-
-.auth-meter[data-level="1"] .auth-meter__seg:nth-child(-n+1) { background-color: var(--color-danger-solid); }
-.auth-meter[data-level="2"] .auth-meter__seg:nth-child(-n+2) { background-color: var(--color-warning-solid); }
-.auth-meter[data-level="3"] .auth-meter__seg:nth-child(-n+3) { background-color: var(--color-success-solid); }
-.auth-meter[data-level="4"] .auth-meter__seg:nth-child(-n+4) { background-color: var(--color-success-solid); }
-
-/* --- Kosul listesi -------------------------------------------------------
-   Durum renk ve ikonla DEGIL, once metinle tasinir (.auth-reqs__state). */
-
-.auth-reqs {
-    display: grid;
-    gap: var(--space-1);
-    margin-top: var(--space-3);
-}
-
-@media (min-width: 480px) {
-    .auth-reqs {
-        grid-template-columns: 1fr 1fr;
-        column-gap: var(--space-4);
-    }
-}
-
-.auth-reqs__item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    min-height: 1.5rem;
-    font-size: 0.8125rem;
-    line-height: 1.125rem;
-    color: var(--color-text-muted);
-}
-
-.auth-reqs__mark {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: 1rem;
-    height: 1rem;
-    font-size: 0.75rem;
-    line-height: 1;
-    color: var(--color-text-muted);
-    border: var(--border-width-hairline) solid var(--color-border-strong);
-    border-radius: var(--radius-full);
-    transition: color var(--duration-fast) var(--ease-out),
-                border-color var(--duration-fast) var(--ease-out);
-}
-
-/* Isaret metin karakteridir; background-image degil -> forced-colors'ta kaybolmaz */
-.auth-reqs__mark::before {
-    content: "\2022"; /* nokta: karsilanmadi */
-}
-
-.auth-reqs__item[data-met="true"] {
-    color: var(--color-text-secondary);
-}
-
-.auth-reqs__item[data-met="true"] .auth-reqs__mark {
-    color: var(--color-success-solid);
-    border-color: var(--color-success-solid);
-}
-
-.auth-reqs__item[data-met="true"] .auth-reqs__mark::before {
-    content: "\2713"; /* tik: karsilandi */
-}
-
-.auth-meter__tip {
-    margin-top: var(--space-3);
-    font-size: 0.75rem;
-    line-height: 1.125rem;
-    color: var(--color-text-muted);
-}
-
-/* ==========================================================================
    8. AYRAC + FEDERASYON
    ========================================================================== */
 
@@ -1112,19 +993,6 @@
         border: 1px solid CanvasText;
     }
 
-    .auth-meter__seg {
-        border: 1px solid ButtonText;
-        background: Canvas;
-    }
-
-    .auth-meter[data-level="1"] .auth-meter__seg:nth-child(-n+1),
-    .auth-meter[data-level="2"] .auth-meter__seg:nth-child(-n+2),
-    .auth-meter[data-level="3"] .auth-meter__seg:nth-child(-n+3),
-    .auth-meter[data-level="4"] .auth-meter__seg:nth-child(-n+4) {
-        background: Highlight;
-        border-color: ButtonText;
-    }
-
     .auth-appmark__img {
         forced-color-adjust: none;
     }
@@ -1142,4 +1010,59 @@
 @keyframes auth-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.35; }
+}
+
+/* ==========================================================================
+   Dil secici  (.auth-lang)
+   Footer'da durur: sayfanin isi degil, ortam ayaridir. Formun icinde degil
+   ALTINDA yasar -- ic ice form HTML'de gecersizdir ve tarayici ikinci formu
+   sessizce atar.
+   ========================================================================== */
+
+.auth-lang {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  margin-block-end: var(--space-3);
+}
+
+.auth-lang__item {
+  appearance: none;
+  border: 1px solid transparent;
+  background: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  /* Dokunma hedefi 24px altina dusmemeli (WCAG 2.5.8). */
+  min-height: 24px;
+  transition: color var(--duration-fast), background-color var(--duration-fast);
+}
+
+.auth-lang__item:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface-muted);
+}
+
+.auth-lang__item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Secili dil yalnizca renkle DEGIL, cerceveyle de isaretlenir (SC 1.4.1). */
+.auth-lang__item[aria-pressed="true"] {
+  color: var(--color-text);
+  border-color: var(--color-border);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-lang__item { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .auth-lang__item[aria-pressed="true"] { border-color: Highlight; }
 }

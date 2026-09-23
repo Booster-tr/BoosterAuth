@@ -5,11 +5,11 @@
     var errorCount = ViewData.ModelState.AllErrors().Count;
 
     ViewData["Title"] = errorCount > 0
-        ? $"{errorCount} hata – Hesap oluşturun · Booster Auth"
-        : "Hesap oluşturun · Booster Auth";
+        ? T["Register.PageTitleWithErrors", errorCount].Value
+        : T["Register.PageTitle"].Value;
 
     ViewData["MainModifier"] = "auth-main--register";
-    ViewData["BrandHeadline"] = "Bir hesap açın, her uygulamada geçerli olsun.";
+    ViewData["BrandHeadline"] = T["Register.BrandHeadline"].Value;
     ViewData["BrandLead"] = "Booster Auth hesabınız, kurumunuzun yetkilendirdiği tüm uygulamalarda tek kimliğiniz olur.";
 
     var displayNameInvalid = ViewData.ModelState.HasError(nameof(Model.DisplayName));
@@ -31,8 +31,8 @@
 
 <section class="auth-card">
     <header class="auth-card__header">
-        <h1 class="auth-card__title">Hesap oluşturun</h1>
-        <p class="auth-card__subtitle">Birkaç adımda hesabınızı oluşturun, kaldığınız yerden devam edin.</p>
+        <h1 class="auth-card__title">@T["Register.Heading"]</h1>
+        <p class="auth-card__subtitle">@T["Register.Subtitle"]</p>
     </header>
 
     <partial name="_ValidationSummary" />
@@ -43,11 +43,11 @@
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="InteractionKey" />
 
-        <p class="auth-field__hint">Aksi belirtilmedikçe tüm alanlar zorunludur.</p>
+        <p class="auth-field__hint">@T["Common.RequiredNote"]</p>
 
         @* --- Ad soyad ------------------------------------------------------- *@
         <div class="auth-field auth-field--icon @(displayNameInvalid ? "auth-field--invalid" : null)">
-            <label class="auth-field__label" for="DisplayName">Ad soyad</label>
+            <label class="auth-field__label" for="DisplayName">@T["Register.DisplayName"]</label>
             <div class="auth-field__control">
                 <span class="auth-field__icon" aria-hidden="true">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" focusable="false">
@@ -58,22 +58,21 @@
                 </span>
                 <input class="auth-field__input" asp-for="DisplayName" type="text"
                        autocomplete="name" autocapitalize="words" enterkeyhint="next"
-                       maxlength="300" required data-validate
-                       data-msg-required="Lütfen adınızı ve soyadınızı girin."
+                       maxlength="300" required
                        aria-describedby="DisplayName-error DisplayName-hint"
                        aria-invalid="@(displayNameInvalid ? "true" : null)" />
             </div>
-            <p class="auth-field__hint" id="DisplayName-hint">Uygulamalarda bu isimle görüneceksiniz.</p>
+            <p class="auth-field__hint" id="DisplayName-hint">@T["Register.DisplayNameHint"]</p>
             <partial name="_FieldError" model="@nameof(Model.DisplayName)" />
         </div>
 
         @* --- Kullanıcı adı --------------------------------------------------- *@
         <div class="auth-field auth-field--icon @(userNameInvalid ? "auth-field--invalid" : null)">
             <label class="auth-field__label" for="UserName">
-                Kullanıcı adı
+                @T["Register.UserName"]
                 @if (!userNameRequired)
                 {
-                    <span class="auth-field__optional">(isteğe bağlı)</span>
+                    <span class="auth-field__optional">@T["Register.PhoneOptional"]</span>
                 }
             </label>
             <div class="auth-field__control">
@@ -86,10 +85,7 @@
                 <input class="auth-field__input" asp-for="UserName" type="text"
                        autocomplete="username" autocapitalize="none" autocorrect="off"
                        spellcheck="false" enterkeyhint="next" maxlength="100"
-                       required="@(userNameRequired ? "required" : null)"
-                       data-msg-required="Lütfen bir kullanıcı adı belirleyin."
-                       data-validate data-username data-rule="username"
-                       data-msg-rule="Kullanıcı adı 3-100 karakter olmalı; yalnızca harf, rakam, nokta, alt çizgi ve tire içerebilir."
+                       required="@(userNameRequired ? "required" : null)" data-username
                        aria-describedby="UserName-error UserName-hint"
                        aria-invalid="@(userNameInvalid ? "true" : null)" />
             </div>
@@ -102,10 +98,10 @@
         @* --- E-posta --------------------------------------------------------- *@
         <div class="auth-field auth-field--icon @(emailInvalid ? "auth-field--invalid" : null)">
             <label class="auth-field__label" for="Email">
-                E-posta
+                @T["Register.Email"]
                 @if (!emailRequired)
                 {
-                    <span class="auth-field__optional">(isteğe bağlı)</span>
+                    <span class="auth-field__optional">@T["Register.PhoneOptional"]</span>
                 }
             </label>
             <div class="auth-field__control">
@@ -120,13 +116,10 @@
                        autocomplete="email" autocapitalize="none" autocorrect="off"
                        spellcheck="false" enterkeyhint="next" maxlength="320"
                        required="@(emailRequired ? "required" : null)"
-                       data-validate data-rule="email"
-                       data-msg-required="Lütfen e-posta adresinizi girin."
-                       data-msg-rule="Geçerli bir e-posta adresi girin. Örnek: ad@@ornek.com"
                        aria-describedby="Email-error Email-hint"
                        aria-invalid="@(emailInvalid ? "true" : null)" />
             </div>
-            <p class="auth-field__hint" id="Email-hint">Hesabınızla ilgili bildirimler bu adrese gönderilir.</p>
+            <p class="auth-field__hint" id="Email-hint">@T["Register.EmailHint"]</p>
             <partial name="_FieldError" model="@nameof(Model.Email)" />
         </div>
 
@@ -137,14 +130,14 @@
            olan bir alanda ihtiyaç duyulan tam olarak budur. *@
         <fieldset class="auth-field @(phoneInvalid ? "auth-field--invalid" : null)">
             <legend class="auth-field__label">
-                Telefon <span class="auth-field__optional">(isteğe bağlı)</span>
+                @T["Register.Phone"] <span class="auth-field__optional">@T["Register.PhoneOptional"]</span>
             </legend>
 
             <div class="auth-field__control">
                 <div class="auth-phone__row">
                     <div class="auth-phone__country">
                         <span class="auth-phone__plus" aria-hidden="true">+</span>
-                        <label class="u-visually-hidden" for="PhoneCountry">Ülke kodu</label>
+                        <label class="u-visually-hidden" for="PhoneCountry">@T["Register.PhoneCountry"]</label>
                         @* "+" işareti input'un değeri değil, statik süstür: alana yalnızca
                            "90" yazılır ve PhoneCountry olarak "90" gönderilir. *@
                         <input class="auth-field__input auth-phone__code" asp-for="PhoneCountry"
@@ -157,18 +150,17 @@
 
                     <span class="auth-phone__divider" aria-hidden="true"></span>
 
-                    <label class="u-visually-hidden" for="Phone">Telefon numarası</label>
+                    <label class="u-visually-hidden" for="Phone">@T["Register.PhoneNumber"]</label>
                     <input class="auth-field__input auth-phone__number" asp-for="Phone"
                            type="tel" inputmode="numeric" maxlength="15" placeholder="5XX XXX XX XX"
                            autocomplete="tel-national" enterkeyhint="next"
-                           data-phone-number data-validate data-rule="phone"
-                           data-msg-rule="Telefon numarasını yalnızca rakamlarla girin."
+                           data-phone-number
                            aria-describedby="Phone-error Phone-hint"
                            aria-invalid="@(phoneInvalid ? "true" : null)" />
                 </div>
             </div>
 
-            <p class="auth-field__hint" id="Phone-hint">Numaranızı başında sıfır olmadan yazın.</p>
+            <p class="auth-field__hint" id="Phone-hint">@T["Register.PhoneHint"]</p>
             @* İki yarımın da kendi hata satırı olmalı: yalnızca ülke kodu hatalıysa
                fieldset kırmızıya boyanıp hiçbir metin çıkmaması kabul edilemez. *@
             <partial name="_FieldError" model="@nameof(Model.PhoneCountry)" />
@@ -189,16 +181,14 @@
                 </span>
                 <input class="auth-field__input" asp-for="Password" type="password"
                        autocomplete="new-password" autocapitalize="none" spellcheck="false"
-                       enterkeyhint="next" required data-validate data-caps-warn data-rule="password"
-                       data-msg-required="Lütfen bir parola belirleyin."
-                       data-msg-rule="Parolanız aşağıdaki koşulların tümünü sağlamalıdır."
+                       enterkeyhint="next" required data-caps-warn
                        aria-describedby="Password-error Password-caps Password-hint"
                        aria-invalid="@(passwordInvalid ? "true" : null)" />
 
                 <button type="button" class="auth-toggle" hidden
                         data-pw-toggle aria-controls="Password"
-                        data-label-show="Parolayı göster" data-label-hide="Parolayı gizle"
-                        aria-label="Parolayı göster" title="Parolayı göster">
+                        data-label-show="@T["Common.ShowPassword"]" data-label-hide="@T["Common.HidePassword"]"
+                        aria-label="@T["Common.ShowPassword"]" title="@T["Common.ShowPassword"]">
                     <svg class="auth-toggle__icon auth-toggle__icon--on" width="20" height="20"
                          viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
                         <path d="M1.75 10S4.75 4.75 10 4.75 18.25 10 18.25 10 15.25 15.25 10 15.25 1.75 10 1.75 10Z"
@@ -217,7 +207,7 @@
 
             @* JS kapalıyken politikayı anlatan tek kaynak. JS açılınca bu düğüm
                tamamen kaldırılır (canlı koşul listesi aynı bilgiyi taşır). *@
-            <p class="auth-field__hint" id="Password-hint" data-nojs-hint>
+            <p class="auth-field__hint" id="Password-hint">
                 En az 8 karakter olmalı; büyük harf, küçük harf ve rakam içermeli, boşluk içermemelidir.
             </p>
 
@@ -228,58 +218,17 @@
                     <path d="M8 6.75v2.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     <circle cx="8" cy="11.3" r="0.75" fill="currentColor" />
                 </svg>
-                Caps Lock açık.
+                @T["Common.CapsLockOn"]
             </p>
 
             @* --- Güç göstergesi ---------------------------------------------
                Çubuklar tamamen dekoratiftir (aria-hidden); bilgi metinle taşınır.
                Bloğun kendisi sunucuda hidden'dır, JS açar. *@
-            <div class="auth-meter" data-strength-for="Password"
-                 data-context="DisplayName,UserName,Email" hidden>
-                <div class="auth-meter__head">
-                    <span>Parola gücü</span>
-                    <span class="auth-meter__level"></span>
-                </div>
 
-                <div class="auth-meter__track" aria-hidden="true">
-                    <span class="auth-meter__seg"></span>
-                    <span class="auth-meter__seg"></span>
-                    <span class="auth-meter__seg"></span>
-                    <span class="auth-meter__seg"></span>
-                </div>
-
-                @* Durum önce METİNLE taşınır (.auth-reqs__state); renk ve işaret
-                   yalnızca pekiştirmedir — SC 1.4.1. *@
-                <ul class="auth-reqs" role="list" id="Password-reqs">
-                    <li class="auth-reqs__item" data-req="len" data-met="false">
-                        <span class="auth-reqs__mark" aria-hidden="true"></span>
-                        <span>En az 8 karakter</span>
-                        <span class="u-visually-hidden auth-reqs__state">, eksik</span>
-                    </li>
-                    <li class="auth-reqs__item" data-req="upper" data-met="false">
-                        <span class="auth-reqs__mark" aria-hidden="true"></span>
-                        <span>En az bir büyük harf</span>
-                        <span class="u-visually-hidden auth-reqs__state">, eksik</span>
-                    </li>
-                    <li class="auth-reqs__item" data-req="lower" data-met="false">
-                        <span class="auth-reqs__mark" aria-hidden="true"></span>
-                        <span>En az bir küçük harf</span>
-                        <span class="u-visually-hidden auth-reqs__state">, eksik</span>
-                    </li>
-                    <li class="auth-reqs__item" data-req="digit" data-met="false">
-                        <span class="auth-reqs__mark" aria-hidden="true"></span>
-                        <span>En az bir rakam</span>
-                        <span class="u-visually-hidden auth-reqs__state">, eksik</span>
-                    </li>
-                </ul>
-
-                <p class="auth-meter__tip">Noktalama işareti eklemek parolanızı daha da güçlendirir.</p>
             </div>
 
             @* Güç göstergesinin kendi nazik bölgesi: 500 ms geciktirilir ve
                yalnızca seviye ETİKETİ değiştiğinde yazılır. *@
-            <p class="u-visually-hidden" id="Password-live" role="status"
-               aria-live="polite" aria-atomic="true"></p>
 
             <partial name="_FieldError" model="@nameof(Model.Password)" />
         </div>
@@ -304,17 +253,14 @@
                    blur'dan sonra her tuş vuruşunda yeniden değerlendirilir. *@
                 <input class="auth-field__input" asp-for="PasswordConfirm" type="password"
                        autocomplete="new-password" autocapitalize="none" spellcheck="false"
-                       enterkeyhint="go" required data-validate data-caps-warn
-                       data-match-for="Password"
-                       data-msg-required="Lütfen parolanızı tekrar girin."
-                       data-msg-match="Parolalar eşleşmiyor."
+                       enterkeyhint="go" required data-caps-warn
                        aria-describedby="PasswordConfirm-error PasswordConfirm-caps"
                        aria-invalid="@(confirmInvalid ? "true" : null)" />
 
                 <button type="button" class="auth-toggle" hidden
                         data-pw-toggle aria-controls="PasswordConfirm"
-                        data-label-show="Parolayı göster" data-label-hide="Parolayı gizle"
-                        aria-label="Parolayı göster" title="Parolayı göster">
+                        data-label-show="@T["Common.ShowPassword"]" data-label-hide="@T["Common.HidePassword"]"
+                        aria-label="@T["Common.ShowPassword"]" title="@T["Common.ShowPassword"]">
                     <svg class="auth-toggle__icon auth-toggle__icon--on" width="20" height="20"
                          viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
                         <path d="M1.75 10S4.75 4.75 10 4.75 18.25 10 18.25 10 15.25 15.25 10 15.25 1.75 10 1.75 10Z"
@@ -338,7 +284,7 @@
                     <path d="M8 6.75v2.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     <circle cx="8" cy="11.3" r="0.75" fill="currentColor" />
                 </svg>
-                Caps Lock açık.
+                @T["Common.CapsLockOn"]
             </p>
 
             @* Sessiz görsel onay: canlı bölge yok, duyurulmaz. *@
@@ -356,22 +302,23 @@
 
         <div class="auth-form__actions">
             <button type="submit" class="auth-btn auth-btn--primary auth-btn--block"
-                    data-submit-guard data-label-busy="Hesabınız oluşturuluyor…">
+                    data-submit-guard data-label-busy="@T["Register.Busy"]">
                 <span class="auth-btn__spinner" aria-hidden="true"></span>
-                <span class="auth-btn__label">Hesap oluştur</span>
+                <span class="auth-btn__label">@T["Register.Submit"]</span>
             </button>
 
             <p class="auth-field__hint">
-                Hesap oluşturarak
-                <a class="auth-link" href="@Url.Idp("/terms")">Kullanım Koşulları</a>'nı ve
-                <a class="auth-link" href="@Url.Idp("/privacy")">Gizlilik Politikası</a>'nı kabul etmiş olursunuz.
+                @Html.Raw(string.Format(
+                    T["Register.LegalNotice"].Value,
+                    $"<a class=\"auth-link\" href=\"{Url.Idp("/terms")}\">{T["Layout.Terms"]}</a>",
+                    $"<a class=\"auth-link\" href=\"{Url.Idp("/privacy")}\">{T["Layout.Privacy"]}</a>"))
             </p>
         </div>
     </form>
 
     <footer class="auth-card__footer">
-        Zaten hesabınız var mı?
+        @T["Register.HaveAccount"]
         <a class="auth-link auth-link--standalone"
-           href="@Url.Idp($"/ui/login?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">Giriş yapın</a>
+           href="@Url.Idp($"/ui/login?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">@T["Register.SignIn"]</a>
     </footer>
 </section>

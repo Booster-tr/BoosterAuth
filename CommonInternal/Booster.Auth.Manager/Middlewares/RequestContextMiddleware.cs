@@ -44,11 +44,11 @@ public class RequestContextMiddleware(RequestDelegate next)
 
     private static string ResolvePreferredLanguage(HttpContext context)
     {
-        var query = Normalize(context.Request.Headers["accept-language"].FirstOrDefault());
-        if (query is not null)
-            return query;
+        var chosen = Normalize(context.Request.Cookies["accept-language"]);
+        if (chosen is not null)
+            return chosen;
 
-        return Normalize(context.Request.Cookies["accept-language"]) ?? "tr-tr";
+        return Normalize(context.Request.Headers["accept-language"].FirstOrDefault()) ?? "tr-tr";
     }
 
     private static string? Normalize(string? value)
