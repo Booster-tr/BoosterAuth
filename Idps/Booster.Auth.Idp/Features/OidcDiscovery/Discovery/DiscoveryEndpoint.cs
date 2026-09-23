@@ -1,4 +1,5 @@
 using Booster.Auth.Idp.Options;
+using Booster.Auth.Idp.Constants;
 using FastEndpoints;
 using System.Text.Json.Serialization;
 
@@ -35,7 +36,7 @@ public class DiscoveryEndpoint(IdpOptions options) : EndpointWithoutRequest<Disc
             ],
             SubjectTypesSupported = ["public"],
             IdTokenSigningAlgValuesSupported = ["RS256"],
-            ScopesSupported = ["openid", "profile", "email", "offline_access"],
+            ScopesSupported = OidcScopes.All,
             TokenEndpointAuthMethodsSupported = ["client_secret_post"],
             ClaimsSupported = ["sub", "booster:panel:access", "offline_access", "azp", "scope", "aud", "jti", "iat", "exp", "nbf", "name", "email", "auth_time", "nonce"],
             CodeChallengeMethodsSupported = ["S256"]

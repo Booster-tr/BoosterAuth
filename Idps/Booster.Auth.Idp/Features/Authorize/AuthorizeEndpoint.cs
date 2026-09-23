@@ -125,7 +125,7 @@ public class AuthorizeEndpoint(
                 "scope zorunludur");
 
         var requested = interaction.Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (!requested.All(s => client.AllowedScopes.Contains(s, StringComparer.Ordinal)))
+        if (!requested.All(s => OidcScopes.IsStandard(s) || client.AllowedScopes.Contains(s, StringComparer.Ordinal)))
             throw new AuthorizeRedirectException("invalid_scope", interaction.RedirectUri, interaction.State,
                 "istenen scope istemci için izinli değil");
     }
