@@ -3,6 +3,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
@@ -34,7 +35,8 @@ public readonly record struct UpdateUserPoolDefaultScopesResponse(Guid Id);
 
 public class UpdateUserPoolDefaultScopesCommandHandler(
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IAsyncRepository<ScopeDefinition, AuthNDbContext> scopeDefinitionRepository)
+    IAsyncRepository<ScopeDefinition, AuthNDbContext> scopeDefinitionRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<UpdateUserPoolDefaultScopesCommand, UpdateUserPoolDefaultScopesResponse>
 {
     public async Task<UpdateUserPoolDefaultScopesResponse> ExecuteAsync(
@@ -48,7 +50,6 @@ public class UpdateUserPoolDefaultScopesCommandHandler(
             .Distinct()
             .ToList();
 
-        // Sayı eşleşmiyorsa en az bir scope bu havuzda tanımlı değil.
         if (distinctScopes.Count > 0)
         {
             var definedCount = await scopeDefinitionRepository.CountAsync(
@@ -62,6 +63,8 @@ public class UpdateUserPoolDefaultScopesCommandHandler(
         pool!.DefaultScopes = distinctScopes;
 
         await userPoolRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidatePoolAsync(pool.Id, ct);
 
         return new UpdateUserPoolDefaultScopesResponse(pool.Id);
     }

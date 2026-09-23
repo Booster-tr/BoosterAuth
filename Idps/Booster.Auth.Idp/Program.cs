@@ -21,7 +21,7 @@ app.UseRouting();
 
 app.UseBoosterApi();
 
-app.MapStaticAssets();
+app.MapStaticAssets().AllowAnonymous();
 
 app.MapControllerRoute(
     name: "default",

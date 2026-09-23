@@ -1,4 +1,5 @@
-﻿using Booster.Auth.Database.Models.Enums;
+﻿using Booster.Auth.Database.Models;
+using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -6,13 +7,11 @@ using Booster.Auth.Idp.Managers.CookieManagers;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Stores.ClientStores;
-using Booster.Auth.Idp.Stores.ClientStores.Models;
 using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
 using Booster.Auth.Idp.Stores.SessionStores;
 using Booster.Caching.Abstraction;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
-using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
 

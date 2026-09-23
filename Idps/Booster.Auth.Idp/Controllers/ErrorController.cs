@@ -1,15 +1,12 @@
 using System.Diagnostics;
 using Booster.Auth.Idp.Controllers.Base;
 using Booster.Auth.Idp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Booster.Auth.Idp.Controllers;
 
-/// <summary>
-/// Kullanıcıya dönük hata ekranı.
-/// <see cref="Options.IdpUiOptions.GetErrorUrl"/> ve
-/// <see cref="Managers.ExceptionManagers.IdpExceptionHandler"/> buraya yönlendirir.
-/// </summary>
+[AllowAnonymous]
 public class ErrorController : IdpBaseController
 {
     [HttpGet("/error")]

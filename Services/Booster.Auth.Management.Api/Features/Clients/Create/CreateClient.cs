@@ -4,6 +4,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
@@ -44,7 +45,8 @@ public readonly record struct CreateClientResponse(Guid Id, string ClientKey);
 
 public class CreateClientCommandHandler(
     IAsyncRepository<Client, AuthNDbContext> clientRepository,
-    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository)
+    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<CreateClientCommand, CreateClientResponse>
 {
     public async Task<CreateClientResponse> ExecuteAsync(CreateClientCommand command, CancellationToken ct)
@@ -53,13 +55,11 @@ public class CreateClientCommandHandler(
             p => p.Id == command.UserPoolId, enableTracking: false, cancellationToken: ct);
         pool.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.UserPoolNotFound);
 
-        // Pasif havuz altında aktif uygulama açılmaz.
         if (pool!.Status != EntityStatus.Active)
             throw new BusinessException(AuthNMessageKeys.ParentNotActive);
 
         command = command with { ClientKey = command.ClientKey.Trim().ToLowerInvariant() };
 
-        // ClientKey sistem genelinde tekildir: token isteklerinde havuz bilgisi olmadan çözülür.
         var keyExists = await clientRepository.AnyAsync(
             c => c.ClientKey == command.ClientKey, cancellationToken: ct);
 
@@ -72,6 +72,8 @@ public class CreateClientCommandHandler(
 
         await clientRepository.AddAsync(client, ct);
         await clientRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidateClientAsync(client.ClientKey, ct);
 
         return new CreateClientResponse(client.Id, client.ClientKey);
     }

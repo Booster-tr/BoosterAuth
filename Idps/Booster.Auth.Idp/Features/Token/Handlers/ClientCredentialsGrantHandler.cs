@@ -7,7 +7,7 @@ using Booster.Auth.Idp.Features.Token.Handlers._base;
 using Booster.Auth.Idp.Features.Token.Handlers.Models;
 using Booster.Auth.Idp.Managers.TokenManagers;
 using Booster.Auth.Idp.Providers.Local.Stores;
-using Booster.Auth.Idp.Stores.ClientStores.Models;
+using Booster.Auth.Database.Models;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Exceptions;

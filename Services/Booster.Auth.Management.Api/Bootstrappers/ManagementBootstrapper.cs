@@ -105,8 +105,7 @@ public sealed class ManagementBootstrapper(
         {
             Login = new LoginPolicy
             {
-                AllowLocalLogin = true,
-                AllowFederatedLogin = true,
+                AllowedCredentialProviders = CredentialProviderType.Local | CredentialProviderType.Federation,
                 AllowedIdentifiers = [IdentifierType.Email, IdentifierType.Username],
                 MaxFailedAttempts = 5,
                 LockoutSeconds = 900

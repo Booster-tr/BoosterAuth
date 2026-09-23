@@ -3,6 +3,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
@@ -34,7 +35,8 @@ public readonly record struct UpdateUserPoolDefaultRolesResponse(Guid Id);
 
 public class UpdateUserPoolDefaultRolesCommandHandler(
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IAsyncRepository<Role, AuthNDbContext> roleRepository)
+    IAsyncRepository<Role, AuthNDbContext> roleRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<UpdateUserPoolDefaultRolesCommand, UpdateUserPoolDefaultRolesResponse>
 {
     public async Task<UpdateUserPoolDefaultRolesResponse> ExecuteAsync(
@@ -45,7 +47,6 @@ public class UpdateUserPoolDefaultRolesCommandHandler(
 
         var distinctRoleIds = command.RoleIds.Distinct().ToList();
 
-        // Sayı eşleşmiyorsa en az bir rol ya yok ya da başka havuza ait.
         if (distinctRoleIds.Count > 0)
         {
             var poolRoleCount = await roleRepository.CountAsync(
@@ -59,6 +60,8 @@ public class UpdateUserPoolDefaultRolesCommandHandler(
         pool!.DefaultRoleIds = distinctRoleIds;
 
         await userPoolRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidatePoolAsync(pool.Id, ct);
 
         return new UpdateUserPoolDefaultRolesResponse(pool.Id);
     }

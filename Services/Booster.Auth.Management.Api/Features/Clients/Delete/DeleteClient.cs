@@ -3,6 +3,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 
@@ -30,7 +31,8 @@ public record DeleteClientCommand(Guid Id) : ICommand<DeleteClientResponse>;
 public readonly record struct DeleteClientResponse(Guid Id);
 
 public class DeleteClientCommandHandler(
-    IAsyncRepository<Client, AuthNDbContext> clientRepository)
+    IAsyncRepository<Client, AuthNDbContext> clientRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<DeleteClientCommand, DeleteClientResponse>
 {
     public async Task<DeleteClientResponse> ExecuteAsync(DeleteClientCommand command, CancellationToken ct)
@@ -40,6 +42,8 @@ public class DeleteClientCommandHandler(
 
         clientRepository.Delete(client!);
         await clientRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidateClientAsync(client!.ClientKey, ct);
 
         return new DeleteClientResponse(client!.Id);
     }

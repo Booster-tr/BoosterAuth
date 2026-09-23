@@ -1,6 +1,6 @@
 ﻿using Booster.Auth.Database.Models.Enums;
 
-namespace Booster.Auth.Idp.Stores.ClientStores.Models;
+namespace Booster.Auth.Database.Models;
 
 public sealed record ClientData
 {
@@ -35,11 +35,10 @@ public sealed record DefaultRoleData
 }
 public sealed record LoginPolicyData
 {
-    public required IReadOnlyList<string> AllowedCredentialProviders { get; init; }
+    public required CredentialProviderType AllowedCredentialProviders { get; init; }
 
     public required IReadOnlyList<IdentifierType> AllowedIdentifiers { get; init; }
 
-    public required bool AllowFederatedLogin { get; init; }
     public required int MaxFailedAttempts { get; init; }
     public required int LockoutSeconds { get; init; }
 }

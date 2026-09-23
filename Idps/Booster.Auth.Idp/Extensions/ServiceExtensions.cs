@@ -13,6 +13,7 @@ using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Local;
 using Booster.Auth.Idp.Providers.Local.Stores;
 using Booster.Auth.Idp.Stores.ClientStores;
+using Booster.Auth.Management.Grpc;
 using Booster.Auth.Idp.Stores.PrincipalStores;
 using Booster.Auth.Idp.Stores.SessionStores;
 using Booster.Common.Extensions.ServiceExtensions;
@@ -39,7 +40,22 @@ public static class ServiceExtensions
         services.AddScoped<OidcTokenService>();
         services.AddSingleton<OidcKeyService>();
 
-        services.AddScoped<IClientDataStore, MockClientDataStore>();
+        var managementSettings = services.AddSettings<ManagementSettings>(configuration);
+
+        services.AddGrpcClient<ClientDataService.ClientDataServiceClient>(options =>
+        {
+            options.Address = new Uri(managementSettings.GrpcAddress);
+        })
+        .ConfigureChannel(channel =>
+        {
+            channel.HttpHandler = new SocketsHttpHandler
+            {
+                ConnectTimeout = TimeSpan.FromSeconds(managementSettings.TimeoutSeconds),
+                EnableMultipleHttp2Connections = true
+            };
+        });
+
+        services.AddScoped<IClientDataStore, ClientDataStore>();
         services.AddScoped<ILocalUserStore, PrincipalStore>();
         services.AddScoped<ISessionStore, SessionStore>();
         services.AddScoped<ISessionCookieManager, SessionCookieManager>();

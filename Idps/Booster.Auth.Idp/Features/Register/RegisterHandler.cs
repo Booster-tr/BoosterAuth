@@ -5,7 +5,7 @@ using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Stores.ClientStores;
-using Booster.Auth.Idp.Stores.ClientStores.Models;
+using Booster.Auth.Database.Models;
 using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Caching.Abstraction;
@@ -36,7 +36,8 @@ public sealed class RegisterHandler(
         var client = await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
 
-        if (client.Registration.Mode != RegistrationMode.SelfSignup || !client.Login.AllowedCredentialProviders.Contains("local"))
+        if (client.Registration.Mode != RegistrationMode.SelfSignup
+            || !client.Login.AllowedCredentialProviders.HasFlag(CredentialProviderType.Local))
             throw Invalid(IdpMessageKeys.RegistrationNotAllowed);
 
         if (!string.Equals(cmd.Password, cmd.PasswordConfirm, StringComparison.Ordinal))

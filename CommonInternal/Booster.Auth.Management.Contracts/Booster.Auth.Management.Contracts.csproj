@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!--
+    "Both": sunucu (Management) ve istemci (IdP) stub'ları tek kaynaktan üretilir.
+    Proto iki projede ayrı ayrı derlenseydi aynı tam adlı tipler iki assembly'de
+    oluşur, ikisini de referanslayan proje CS0433 alırdı.
+  -->
+  <ItemGroup>
+    <Protobuf Include="Protos\clientdata.proto" GrpcServices="Both" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.36.2" />
+    <PackageReference Include="Grpc.Core.Api" Version="2.84.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.84.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- ClientData POCO'su ve enum'lar: iki taraf da aynı modeli kullanır -->
+  <ItemGroup>
+    <ProjectReference Include="..\Booster.Auth.Database\Booster.Auth.Database.csproj" />
+  </ItemGroup>
+
+</Project>

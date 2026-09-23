@@ -3,6 +3,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
@@ -33,7 +34,8 @@ public record UpdateUserPoolPolicyCommand(Guid Id, UserPoolPolicy Policy) : ICom
 public readonly record struct UpdateUserPoolPolicyResponse(Guid Id);
 
 public class UpdateUserPoolPolicyCommandHandler(
-    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository)
+    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<UpdateUserPoolPolicyCommand, UpdateUserPoolPolicyResponse>
 {
     public async Task<UpdateUserPoolPolicyResponse> ExecuteAsync(
@@ -45,6 +47,8 @@ public class UpdateUserPoolPolicyCommandHandler(
         pool!.Policy = command.Policy;
 
         await userPoolRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidatePoolAsync(pool.Id, ct);
 
         return new UpdateUserPoolPolicyResponse(pool.Id);
     }

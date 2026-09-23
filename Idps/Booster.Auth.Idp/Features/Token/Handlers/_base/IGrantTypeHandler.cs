@@ -1,6 +1,6 @@
 ﻿using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Features.Token.Handlers.Models;
-using Booster.Auth.Idp.Stores.ClientStores.Models;
+using Booster.Auth.Database.Models;
 
 namespace Booster.Auth.Idp.Features.Token.Handlers._base;
 

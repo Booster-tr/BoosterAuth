@@ -4,6 +4,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
@@ -34,7 +35,8 @@ public readonly record struct ChangeUserPoolStatusResponse(Guid Id);
 
 public class ChangeUserPoolStatusCommandHandler(
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IAsyncRepository<Client, AuthNDbContext> clientRepository)
+    IAsyncRepository<Client, AuthNDbContext> clientRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<ChangeUserPoolStatusCommand, ChangeUserPoolStatusResponse>
 {
     public async Task<ChangeUserPoolStatusResponse> ExecuteAsync(ChangeUserPoolStatusCommand command, CancellationToken ct)
@@ -42,8 +44,6 @@ public class ChangeUserPoolStatusCommandHandler(
         var pool = await userPoolRepository.GetAsync(p => p.Id == command.Id, cancellationToken: ct);
         pool.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.UserPoolNotFound);
 
-        // Pasife alınan havuzun altında çalışan uygulama kalmamalı; aksi hâlde
-        // kapalı bir havuz üzerinden giriş akışı sürmeye devam eder.
         if (command.Status == EntityStatus.Passive)
         {
             var hasActiveClient = await clientRepository.AnyAsync(
@@ -57,6 +57,8 @@ public class ChangeUserPoolStatusCommandHandler(
         pool!.Status = command.Status;
 
         await userPoolRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidatePoolAsync(pool.Id, ct);
 
         return new ChangeUserPoolStatusResponse(pool.Id);
     }

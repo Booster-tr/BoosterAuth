@@ -4,6 +4,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
@@ -34,7 +35,8 @@ public readonly record struct ChangeClientStatusResponse(Guid Id);
 
 public class ChangeClientStatusCommandHandler(
     IAsyncRepository<Client, AuthNDbContext> clientRepository,
-    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository)
+    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<ChangeClientStatusCommand, ChangeClientStatusResponse>
 {
     public async Task<ChangeClientStatusResponse> ExecuteAsync(
@@ -43,7 +45,6 @@ public class ChangeClientStatusCommandHandler(
         var client = await clientRepository.GetAsync(c => c.Id == command.Id, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
-        // Kapalı bir havuzun altında çalışan uygulama olmamalı.
         if (command.Status == EntityStatus.Active)
         {
             var pool = await userPoolRepository.GetAsync(
@@ -57,6 +58,8 @@ public class ChangeClientStatusCommandHandler(
         client!.Status = command.Status;
 
         await clientRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidateClientAsync(client.ClientKey, ct);
 
         return new ChangeClientStatusResponse(client.Id);
     }

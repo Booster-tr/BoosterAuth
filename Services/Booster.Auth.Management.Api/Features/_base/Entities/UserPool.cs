@@ -73,9 +73,10 @@ public class RegistrationPolicy
 
 public class LoginPolicy
 {
-    public bool AllowLocalLogin { get; set; } = true;
+    public CredentialProviderType AllowedCredentialProviders { get; set; } =
+        CredentialProviderType.Local | CredentialProviderType.Federation;
+
     public List<IdentifierType> AllowedIdentifiers { get; set; } = [IdentifierType.Email];
-    public bool AllowFederatedLogin { get; set; } = true;
     public int MaxFailedAttempts { get; set; } = 5;
     public int LockoutSeconds { get; set; } = 900;
 }

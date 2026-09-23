@@ -1,4 +1,4 @@
-﻿using Booster.Auth.Idp.Stores.ClientStores.Models;
+﻿using Booster.Auth.Database.Models;
 
 namespace Booster.Auth.Idp.Stores.ClientStores;
 

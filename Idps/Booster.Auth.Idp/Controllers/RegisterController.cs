@@ -5,10 +5,12 @@ using Booster.Auth.Idp.Options;
 using Booster.ExceptionManager.Abstraction.Translations;
 using FastEndpoints;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Booster.Auth.Idp.Controllers;
 
+[AllowAnonymous]
 public class RegisterController(
     IdpUiOptions uiOptions,
     ITranslationManager translationManager) : IdpBaseController

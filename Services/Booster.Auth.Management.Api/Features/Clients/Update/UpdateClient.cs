@@ -4,6 +4,7 @@ using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
@@ -43,7 +44,8 @@ public record UpdateClientCommand(
 public readonly record struct UpdateClientResponse(Guid Id);
 
 public class UpdateClientCommandHandler(
-    IAsyncRepository<Client, AuthNDbContext> clientRepository)
+    IAsyncRepository<Client, AuthNDbContext> clientRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<UpdateClientCommand, UpdateClientResponse>
 {
     public async Task<UpdateClientResponse> ExecuteAsync(UpdateClientCommand command, CancellationToken ct)
@@ -54,6 +56,8 @@ public class UpdateClientCommandHandler(
         command.Adapt(client);
 
         await clientRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidateClientAsync(client!.ClientKey, ct);
 
         return new UpdateClientResponse(client!.Id);
     }

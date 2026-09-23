@@ -1,0 +1,73 @@
+syntax = "proto3";
+option csharp_namespace = "Booster.Auth.Management.Grpc";
+package management;
+
+// IdP'nin, bir OAuth isteğini karşılarken ihtiyaç duyduğu istemci ve havuz
+// politikalarını tek çağrıda döndürür. IdP bu veriyi kendi veritabanında
+// tutmaz; sahibi Management servisidir.
+service ClientDataService {
+  rpc GetByClientKey (GetClientDataRequest) returns (GetClientDataResponse);
+}
+
+message GetClientDataRequest {
+  string client_key = 1;
+}
+
+// found=false, "istemci yok" demektir. Bulunamayan istemci hata değildir:
+// IdP bunu kendi akışında invalid_client olarak karşılar.
+message GetClientDataResponse {
+  bool found = 1;
+  ClientDataMessage client = 2;
+}
+
+message ClientDataMessage {
+  string client_id = 1;                  // Guid
+  string client_key = 2;
+  int32 allowed_grant_types = 3;         // OAuthGrantType (flags)
+  repeated string allowed_scopes = 4;
+  string isolation_id = 5;               // Havuz (pool) id
+  bool is_active = 6;
+  repeated string redirect_uris = 7;
+  repeated string post_logout_redirect_uris = 8;
+  repeated string allowed_audiences = 9;
+  bool require_consent = 10;
+  LoginPolicyMessage login = 11;
+  RegistrationPolicyMessage registration = 12;
+  PasswordPolicyMessage password = 13;
+  SessionPolicyMessage session = 14;
+  repeated string default_scopes = 15;
+  repeated DefaultRoleMessage default_roles = 16;
+}
+
+message LoginPolicyMessage {
+  int32 allowed_credential_providers = 1;   // CredentialProviderType (flags)
+  repeated int32 allowed_identifiers = 2;   // IdentifierType
+  int32 max_failed_attempts = 4;
+  int32 lockout_seconds = 5;
+}
+
+message RegistrationPolicyMessage {
+  int32 mode = 1;                           // RegistrationMode
+  bool require_email_verification = 2;
+  bool require_phone_verification = 3;
+  bool allow_federated_jit = 4;
+}
+
+message PasswordPolicyMessage {
+  int32 min_length = 1;
+  bool require_uppercase = 2;
+  bool require_lowercase = 3;
+  bool require_digit = 4;
+  bool require_non_alphanumeric = 5;
+}
+
+message SessionPolicyMessage {
+  int32 access_token_ttl_seconds = 1;
+  int32 refresh_token_ttl_seconds = 2;
+  int32 idle_timeout_seconds = 3;
+}
+
+message DefaultRoleMessage {
+  string role_id = 1;                       // Guid
+  string role_name = 2;
+}

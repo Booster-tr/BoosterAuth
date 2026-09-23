@@ -8,7 +8,8 @@ using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.Models;
 using Booster.Auth.Idp.Providers.Local.Stores;
 using Booster.Auth.Idp.Providers.Local.Stores.Models;
 using Booster.Auth.Idp.Stores.ClientStores;
-using Booster.Auth.Idp.Stores.ClientStores.Models;
+using Booster.Auth.Database.Models;
+using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
 using Booster.Auth.Idp.Stores.PrincipalStores;
 using Booster.Auth.Idp.Stores.SessionStores;
@@ -44,8 +45,12 @@ public sealed class CredentialLoginHandler(
         var client = await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
 
-        if (!client.Login.AllowedCredentialProviders.Contains(cmd.ProviderType, StringComparer.OrdinalIgnoreCase))
+        if (!Enum.TryParse<CredentialProviderType>(cmd.ProviderType, ignoreCase: true, out var providerType)
+            || providerType == CredentialProviderType.None
+            || !client.Login.AllowedCredentialProviders.HasFlag(providerType))
+        {
             throw new AuthorizeException(IdpMessageKeys.ProviderNotAllowed);
+        }
 
         var provider = providerFactory.GetCredentialProvider(cmd.ProviderType)
             ?? throw new AuthorizeException(IdpMessageKeys.ProviderNotAvailable);
