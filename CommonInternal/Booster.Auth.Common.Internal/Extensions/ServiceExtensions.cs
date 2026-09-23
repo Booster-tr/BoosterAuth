@@ -7,6 +7,7 @@ using Booster.Caching.Redis;
 using FastEndpoints;
 using Booster.Caching.Redis.Extensions;
 using Booster.Common.Extensions.ServiceExtensions;
+using Booster.Auth.Database.Interceptors;
 using Booster.Database.Interceptors;
 using Booster.Database.Postgres.Extensions;
 using Booster.Database.Postgres.Settings;
@@ -31,6 +32,7 @@ public static class ServiceExtensions
         var redisOptions = services.AddSettings<RedisCacheOptions>(configuration);
 
         services.AddSingleton<IInterceptor, AuditInterceptor>();
+        services.AddSingleton<IInterceptor, IsolationInterceptor>();
 
         services.AddPostgresDbContext<TContext>(postgresSettings);
         services.AddScoped(typeof(IAsyncRepository<,>), typeof(RepositoryBase<,>));

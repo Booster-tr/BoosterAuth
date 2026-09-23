@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Booster.Database.Postgres\Booster.Database.Postgres.csproj" />
+    <ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.Abstraction\Booster.ExceptionManager.Abstraction.csproj" />
     <ProjectReference Include="..\Booster.Auth.Manager\Booster.Auth.Manager.csproj" />
   </ItemGroup>
 

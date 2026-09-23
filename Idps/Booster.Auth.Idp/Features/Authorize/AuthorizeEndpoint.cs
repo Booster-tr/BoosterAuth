@@ -39,9 +39,9 @@ public class AuthorizeEndpoint(
 
     public override async Task HandleAsync(AuthorizeRequest req, CancellationToken ct)
     {
-        var client = await ResolveAndValidateClientAsync(req, ct);
-
         var (interactionKey, interaction) = await EnsureInteractionAsync(req, ct);
+
+        var client = await ResolveAndValidateClientAsync(interaction, ct);
 
         ValidateProtocol(interaction, client);
 
@@ -94,18 +94,18 @@ public class AuthorizeEndpoint(
         return (key, interaction);
     }
 
-    private async Task<ClientData> ResolveAndValidateClientAsync(AuthorizeRequest request, CancellationToken ct)
+    private async Task<ClientData> ResolveAndValidateClientAsync(InteractionStateData interaction, CancellationToken ct)
     {
-        if(string.IsNullOrEmpty(request.ClientKey))
+        if (string.IsNullOrEmpty(interaction.ClientKey))
             throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
 
-        var client = await clientDataStore.GetByClientKeyAsync(request.ClientKey, ct)
+        var client = await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
 
         if (!client.IsActive)
             throw new AuthorizeException(IdpMessageKeys.ClientInactive);
 
-        if (string.IsNullOrEmpty(request.RedirectUri) || !client.RedirectUris.Contains(request.RedirectUri, StringComparer.Ordinal))
+        if (string.IsNullOrEmpty(interaction.RedirectUri) || !client.RedirectUris.Contains(interaction.RedirectUri, StringComparer.Ordinal))
             throw new AuthorizeException(IdpMessageKeys.InvalidRedirectUri);
 
         if (!client.AllowedGrantTypes.HasFlag(OAuthGrantType.AuthorizationCode))

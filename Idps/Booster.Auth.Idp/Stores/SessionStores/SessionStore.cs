@@ -3,7 +3,6 @@ using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Features._base.Enums;
 using Booster.Caching.Abstraction;
-using Booster.Database.Postgres.Models;
 using Booster.Database.Repositories;
 using Booster.Hashing.OneWays.Simple;
 using System.Security.Cryptography;
@@ -64,7 +63,8 @@ public sealed class SessionStore(
             async (context, innerCt) =>
             {
                 var found = await sessionRepository.GetAsync(
-                    predicate: s => s.TokenHash == tokenHash,
+                    predicate: s => s.TokenHash == tokenHash && s.DeletedTime == null,
+                    withoutGlobalFilter: true,
                     enableTracking: false,
                     cancellationToken: innerCt);
 

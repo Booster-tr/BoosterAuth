@@ -35,7 +35,6 @@ public sealed class AdminBootstrapper(
         var admin = new Principal
         {
             Id = AuthConstants.AdminUserId,
-            IsolationId = AuthConstants.ManagementPoolId,
 
             Type = PrincipalType.User,
             Status = PrincipalStatus.Active,
