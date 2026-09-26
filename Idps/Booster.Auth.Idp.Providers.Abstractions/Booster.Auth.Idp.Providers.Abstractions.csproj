@@ -15,4 +15,16 @@
     <ProjectReference Include="..\..\Common\Booster.Hashing\Booster.Hashing.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Federasyon: dis saglayiciya HTTP cagrisi icin IHttpClientFactory. -->
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+
+    <!-- OIDC discovery belgesi ve JWKS yonetimi. ConfigurationManager belgeyi ve
+         imza anahtarlarini onbellege alip suresi gectiginde kendisi yeniler;
+         elle yazsak her girise iki ek HTTP cagrisi ve elle anahtar
+         gecersizlestirme dusecekti. -->
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.23.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
+  </ItemGroup>
+
 </Project>

@@ -26,6 +26,8 @@ public sealed record ClientData
     public required IReadOnlyList<string> DefaultScopes { get; init; }
 
     public required IReadOnlyList<DefaultRoleData> DefaultRoles { get; init; }
+
+    public IReadOnlyList<FederationProviderData> FederationProviders { get; init; } = [];
 }
 
 public sealed record DefaultRoleData
@@ -71,4 +73,14 @@ public sealed record SessionPolicyData
     public required int AccessTokenTtlSeconds { get; init; }
     public required int RefreshTokenTtlSeconds { get; init; }
     public required int IdleTimeoutSeconds { get; init; }
+}
+public sealed record FederationProviderData
+{
+    public required Guid Id { get; init; }
+
+    public required string Key { get; init; }
+
+    public required string ProviderType { get; init; }
+
+    public required string DisplayName { get; init; }
 }

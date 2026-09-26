@@ -31,6 +31,15 @@
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Local\Booster.Auth.Idp.Providers.Local.csproj" />
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.EmailCode\Booster.Auth.Idp.Providers.EmailCode.csproj" />
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.PhoneCode\Booster.Auth.Idp.Providers.PhoneCode.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Google\Booster.Auth.Idp.Providers.Google.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Microsoft\Booster.Auth.Idp.Providers.Microsoft.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Apple\Booster.Auth.Idp.Providers.Apple.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.LinkedIn\Booster.Auth.Idp.Providers.LinkedIn.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Facebook\Booster.Auth.Idp.Providers.Facebook.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.GitHub\Booster.Auth.Idp.Providers.GitHub.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.X\Booster.Auth.Idp.Providers.X.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Oidc\Booster.Auth.Idp.Providers.Oidc.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Saml\Booster.Auth.Idp.Providers.Saml.csproj" />
   </ItemGroup>
 
 </Project>

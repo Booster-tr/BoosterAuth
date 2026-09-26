@@ -63,6 +63,17 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.LoginCodeInvalid, "Giriş kodu", "Girdiğiniz kod hatalı. Lütfen kontrol edip tekrar deneyin.", "Sign-in code", "The code you entered is incorrect. Please check it and try again."),
         new(IdpMessageKeys.LoginCodeExpired, "Giriş kodu", "Kodun süresi doldu. Lütfen yeni bir kod isteyin.", "Sign-in code", "The code has expired. Please request a new one."),
 
+        // --- Federasyon (dış sağlayıcıyla giriş) ---
+        new(IdpMessageKeys.FederationProviderNotFound, "Sağlayıcı", "Bu giriş yöntemi tanımlı değil ya da kapatılmış.", "Provider", "This sign-in method is not configured or has been disabled."),
+        new(IdpMessageKeys.FederationStateInvalid, "Giriş", "Giriş isteğinin süresi dolmuş. Lütfen baştan deneyin.", "Sign-in", "The sign-in request has expired. Please start again."),
+        new(IdpMessageKeys.FederationFailed, "Giriş", "Sağlayıcıyla giriş tamamlanamadı. Lütfen tekrar deneyin.", "Sign-in", "Sign-in with the provider could not be completed. Please try again."),
+        new(IdpMessageKeys.FederationCancelled, "Giriş", "Giriş isteğini onaylamadınız.", "Sign-in", "You did not approve the sign-in request."),
+        new(IdpMessageKeys.FederationEmailMissing, "E-posta", "Sağlayıcı bize bir e-posta adresi vermedi; bu yöntemle hesap açılamıyor.", "Email", "The provider did not give us an email address, so an account cannot be created this way."),
+        new(IdpMessageKeys.FederationEmailNotVerified, "E-posta", "Sağlayıcıdaki e-posta adresiniz doğrulanmamış. Önce orada doğrulayın.", "Email", "Your email address is not verified at the provider. Please verify it there first."),
+        new(IdpMessageKeys.FederationJitDisabled, "Kayıt", "Bu uygulamada dış sağlayıcıyla yeni hesap açılamıyor.", "Registration", "Creating a new account through an external provider is not allowed for this application."),
+        new(IdpMessageKeys.FederationAccountInactive, "Hesap", "Hesabınızın erişimi durdurulmuş.", "Account", "Your account access has been suspended."),
+        new(IdpMessageKeys.FederationLocalAccountExists, "Hesap", "Bu e-posta adresiyle sisteme daha önce giriş yapılmış. Parolanızla girebilir ya da parolanızı sıfırlayabilirsiniz.", "Account", "This email address has signed in here before. You can sign in with your password or reset it."),
+
         // --- Parola yönetimi ---
         new(IdpMessageKeys.PasswordReused, "Parola", "Bu parolayı daha önce kullanmıştınız. Lütfen farklı bir parola seçin.", "Password", "You have used this password before. Please choose a different one."),
         new(IdpMessageKeys.PasswordExpired, "Parola", "Parolanızın süresi doldu. Devam etmek için yeni bir parola belirleyin.", "Password", "Your password has expired. Set a new one to continue."),

@@ -55,6 +55,18 @@ public class IdpBaseController : Controller
         ViewData["PasswordlessMethods"] = methods;
     }
 
+    protected void SetFederationMethods(ClientData? client)
+    {
+        var methods = client is null
+            || !client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.Federation)
+            ? []
+            : client.FederationProviders
+                .Select(p => new FederationMethod(p.Key, p.ProviderType, p.DisplayName))
+                .ToList();
+
+        ViewData["FederationMethods"] = methods;
+    }
+
     protected void SetIdentifierField(ClientData? client)
         => ViewData["IdentifierField"] = client is null
             ? IdentifierField.From([IdentifierType.Email])

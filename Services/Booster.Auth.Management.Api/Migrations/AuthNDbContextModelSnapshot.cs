@@ -121,6 +121,58 @@ namespace Booster.Auth.Management.Api.Migrations
                     b.ToTable("ClientAllowedScopes", (string)null);
                 });
 
+            modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.IdentityProvider", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ClientSecretEncrypted")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ProviderType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Settings")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserPoolId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserPoolId", "Key")
+                        .IsUnique()
+                        .HasFilter("\"DeletedTime\" IS NULL");
+
+                    b.ToTable("IdentityProviders", (string)null);
+                });
+
             modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -524,6 +576,17 @@ namespace Booster.Auth.Management.Api.Migrations
                     b.Navigation("Client");
                 });
 
+            modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.IdentityProvider", b =>
+                {
+                    b.HasOne("Booster.Auth.Management.Api.Features._base.Entities.UserPool", "UserPool")
+                        .WithMany("IdentityProviders")
+                        .HasForeignKey("UserPoolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserPool");
+                });
+
             modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.Role", b =>
                 {
                     b.HasOne("Booster.Auth.Management.Api.Features._base.Entities.UserPool", "UserPool")
@@ -735,6 +798,8 @@ namespace Booster.Auth.Management.Api.Migrations
             modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.UserPool", b =>
                 {
                     b.Navigation("Clients");
+
+                    b.Navigation("IdentityProviders");
 
                     b.Navigation("Roles");
 

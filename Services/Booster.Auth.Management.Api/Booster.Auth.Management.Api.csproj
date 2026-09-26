@@ -27,6 +27,8 @@
 		<ProjectReference Include="..\..\Common\AuthZ\Booster.Authorization.Relational\Booster.Authorization.Relational.csproj" />
 		<ProjectReference Include="..\..\Common\Booster.Common.Extensions\Booster.Common.Extensions.csproj" />
 		<ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
+		<!-- Saglayici istemci sirlarini sifrelemek icin ISecretProtector -->
+		<ProjectReference Include="..\..\Common\Booster.Hashing\Booster.Hashing.csproj" />
 	</ItemGroup>
 
 

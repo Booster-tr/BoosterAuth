@@ -1,0 +1,42 @@
+@model ExternalConflictModel
+@{
+    Layout = "_AuthLayout";
+
+    ViewData["Title"] = T["ExternalConflict.PageTitle"].Value;
+    ViewData["MainModifier"] = "auth-main--conflict";
+    ViewData["BrandHeadline"] = T["ExternalConflict.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["ExternalConflict.BrandLead"].Value;
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["ExternalConflict.Heading"]</h1>
+
+        @* Adres GÖSTERİLİR: kullanıcı az önce kendi sağlayıcısında bu adresle
+           doğrulama yaptı, dolayısıyla adresi zaten biliyor. Gizlemek bilgi
+           korumaz, yalnızca hangi hesaptan bahsedildiğini belirsizleştirirdi. *@
+        @if (!string.IsNullOrEmpty(Model.Email))
+        {
+            <p class="auth-card__subtitle">@T["ExternalConflict.Subtitle", Model.Email]</p>
+        }
+        else
+        {
+            <p class="auth-card__subtitle">@T["ExternalConflict.SubtitleNoEmail"]</p>
+        }
+    </header>
+
+    @* Hesaplar OTOMATİK BİRLEŞTİRİLMEZ; karar kullanıcınındır. Bu yüzden ekran
+       iki yol sunuyor ve ikisi de kullanıcının kendi bildiği bir şeyi
+       kanıtlamasını gerektiriyor: parolası ya da posta kutusuna erişimi. *@
+    <p class="auth-note">@T["ExternalConflict.Explanation"]</p>
+
+    <div class="auth-actions">
+        <a class="auth-btn auth-btn--primary" href="@Model.LoginUrl">
+            <span class="auth-btn__label">@T["ExternalConflict.SignIn"]</span>
+        </a>
+
+        <a class="auth-btn auth-btn--secondary" href="@Model.ForgotPasswordUrl">
+            <span class="auth-btn__label">@T["ExternalConflict.ResetPassword"]</span>
+        </a>
+    </div>
+</section>

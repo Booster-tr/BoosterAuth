@@ -56,4 +56,15 @@ public class IdpMessageKeys
     public const string LoginCodeInvalid = "idp.login_code_invalid";
     public const string LoginCodeExpired = "idp.login_code_expired";
 
+
+    // --- Federasyon ---------------------------------------------------------
+    public const string FederationProviderNotFound = "idp.federation_provider_not_found";
+    public const string FederationStateInvalid = "idp.federation_state_invalid";
+    public const string FederationFailed = "idp.federation_failed";
+    public const string FederationCancelled = "idp.federation_cancelled";
+    public const string FederationEmailMissing = "idp.federation_email_missing";
+    public const string FederationEmailNotVerified = "idp.federation_email_not_verified";
+    public const string FederationJitDisabled = "idp.federation_jit_disabled";
+    public const string FederationAccountInactive = "idp.federation_account_inactive";
+    public const string FederationLocalAccountExists = "idp.federation_local_account_exists";
 }

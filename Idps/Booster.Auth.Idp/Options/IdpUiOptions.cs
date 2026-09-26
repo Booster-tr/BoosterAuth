@@ -21,6 +21,9 @@ public class IdpUiOptions
     public string PasswordlessPath { get; set; } = "/passwordless";
     public string PasswordlessVerifyPath { get; set; } = "/passwordless/verify";
     public string ForgotPasswordPath { get; set; } = "/forgot-password";
+    public string ExternalChallengePath { get; set; } = "/ui/external/challenge";
+    public string ExternalCallbackPath { get; set; } = "/ui/external/callback";
+    public string ExternalConflictPath { get; set; } = "/ui/external/conflict";
     public string ResetPasswordPath { get; set; } = "/reset-password";
 
     public string GetLoginUrl(string interactionKey) =>
@@ -46,6 +49,17 @@ public class IdpUiOptions
     public string GetPasswordlessVerifyUrl(string interactionKey, string providerType) =>
         Local($"{PasswordlessVerifyPath}?interaction_key={Uri.EscapeDataString(interactionKey)}" +
               $"&provider={Uri.EscapeDataString(providerType)}");
+
+    public string GetExternalChallengeUrl(string interactionKey, string providerKey) =>
+        Local($"{ExternalChallengePath}?interaction_key={Uri.EscapeDataString(interactionKey)}" +
+              $"&provider={Uri.EscapeDataString(providerKey)}");
+
+    public string GetExternalCallbackUrl() =>
+        $"{BaseUrl.TrimEnd('/')}{ExternalCallbackPath}";
+
+    public string GetExternalConflictUrl(string interactionKey, string email) =>
+        Local($"{ExternalConflictPath}?interaction_key={Uri.EscapeDataString(interactionKey)}" +
+              $"&email={Uri.EscapeDataString(email)}");
 
     public string GetAuthorizeUrl(string interactionKey) =>
         Local($"{AuthorizePath}?interaction_key={Uri.EscapeDataString(interactionKey)}");

@@ -1,4 +1,6 @@
 using Booster.Auth.Common.Internal.Extensions;
+using Booster.Hashing.Extensions;
+using Booster.Hashing.Options;
 using Booster.Auth.Common.Internal.Options;
 using Booster.Auth.Management.Api.Bootstrappers;
 using Booster.Auth.Management.Api.Features._base;
@@ -16,6 +18,9 @@ public static class ServiceExtensions
         services.AddBoosterServices<AuthNDbContext>(configuration);
         services.AddBoosterMessaging<AuthNDbContext>(configuration);
         services.AddSettings<BootstrapOptions>(configuration);
+
+        var hashingOptions = services.AddSettings<HashingOptions>(configuration);
+        services.AddHashing(hashingOptions);
 
         services.AddScoped<ManagementBootstrapper>();
         services.AddScoped<IClientDataCacheStore, ClientDataCacheStore>();

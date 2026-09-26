@@ -38,4 +38,13 @@ public class AuthNMessageKeys
     public const string TokenScopePolicyPermissionEmpty = "authn.token_scope_policy_permission_empty";
     public const string TokenScopePolicyPermissionDuplicate = "authn.token_scope_policy_permission_duplicate";
     public const string TokenScopePolicyPermissionsNotAllowed = "authn.token_scope_policy_permissions_not_allowed";
+
+    // --- Dis kimlik saglayicilari -----------------------------------------
+    public const string IdentityProviderNotFound = "authn.identity_provider_not_found";
+    public const string IdentityProviderKeyAlreadyExists = "authn.identity_provider_key_already_exists";
+    public const string IdentityProviderKeyInvalidFormat = "authn.identity_provider_key_invalid_format";
+    public const string IdentityProviderTypeUnknown = "authn.identity_provider_type_unknown";
+    public const string IdentityProviderClientIdRequired = "authn.identity_provider_client_id_required";
+    public const string IdentityProviderIssuerRequired = "authn.identity_provider_issuer_required";
+    public const string IdentityProviderSamlSettingsRequired = "authn.identity_provider_saml_settings_required";
 }

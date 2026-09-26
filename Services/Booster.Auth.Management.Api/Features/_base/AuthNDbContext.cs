@@ -19,14 +19,12 @@ public class AuthNDbContext(
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<RoleScope> RoleScopes => Set<RoleScope>();
     public DbSet<ScopeDefinition> ScopeDefinitions => Set<ScopeDefinition>();
+    public DbSet<IdentityProvider> IdentityProviders => Set<IdentityProvider>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // MassTransit outbox/inbox tabloları. Log mesajları iş işlemiyle AYNI
-        // transaction'da outbox'a yazılır: broker o an kapalıysa bile kayıt
-        // kaybolmaz, bağlantı geri geldiğinde teslim edilir.
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();

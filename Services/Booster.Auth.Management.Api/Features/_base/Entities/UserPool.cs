@@ -24,6 +24,7 @@ public class UserPool : Entity
     public virtual ICollection<Client> Clients { get; set; } = [];
     public virtual ICollection<Role> Roles { get; set; } = [];
     public virtual ICollection<ScopeDefinition> ScopeDefinitions { get; set; } = [];
+    public virtual ICollection<IdentityProvider> IdentityProviders { get; set; } = [];
     
 }
 

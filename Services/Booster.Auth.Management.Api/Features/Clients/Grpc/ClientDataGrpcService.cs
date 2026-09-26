@@ -4,6 +4,7 @@ using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Auth.Management.Grpc;
 using Booster.Database.Repositories;
+using Booster.Hashing.TwoWays.Aes;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,9 @@ namespace Booster.Auth.Management.Api.Features.Clients.Grpc;
 [AllowAnonymous]
 public sealed class ClientDataGrpcService(
     IAsyncRepository<Client, AuthNDbContext> clientRepository,
-    IAsyncRepository<Role, AuthNDbContext> roleRepository)
+    IAsyncRepository<Role, AuthNDbContext> roleRepository,
+    IAsyncRepository<IdentityProvider, AuthNDbContext> identityProviderRepository,
+    ISecretProtector secretProtector)
     : ClientDataService.ClientDataServiceBase
 {
     public override async Task<GetClientDataResponse> GetByClientKey(
@@ -35,11 +38,12 @@ public sealed class ClientDataGrpcService(
             return new GetClientDataResponse { Found = false };
 
         var defaultRoles = await ResolveDefaultRolesAsync(client.UserPool, ct);
+        var federationProviders = await ResolveFederationProvidersAsync(client.UserPool.Id, ct);
 
         return new GetClientDataResponse
         {
             Found = true,
-            Client = ClientDataMapper.ToMessage(BuildClientData(client, defaultRoles))
+            Client = ClientDataMapper.ToMessage(BuildClientData(client, defaultRoles, federationProviders))
         };
     }
 
@@ -55,7 +59,58 @@ public sealed class ClientDataGrpcService(
             .ToListAsync(ct);
     }
 
-    private static ClientData BuildClientData(Client client, List<DefaultRoleData> defaultRoles)
+    private async Task<List<FederationProviderData>> ResolveFederationProvidersAsync(Guid userPoolId, CancellationToken ct)
+        => await identityProviderRepository.Query()
+            .AsNoTracking()
+            .Where(p => p.UserPoolId == userPoolId && p.Status == EntityStatus.Active)
+            .OrderBy(p => p.DisplayName)
+            .Select(p => new FederationProviderData
+            {
+                Id = p.Id,
+                Key = p.Key,
+                ProviderType = p.ProviderType,
+                DisplayName = p.DisplayName
+            })
+            .ToListAsync(ct);
+
+    public override async Task<GetFederationProviderResponse> GetFederationProvider(
+        GetFederationProviderRequest request, ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.UserPoolId, out var userPoolId) || string.IsNullOrWhiteSpace(request.Key))
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "user_pool_id ve key zorunludur."));
+
+        var provider = await identityProviderRepository.Query()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.UserPoolId == userPoolId && p.Key == request.Key, context.CancellationToken);
+
+        if (provider is null)
+            return new GetFederationProviderResponse { Found = false };
+
+        var message = new FederationProviderConfigMessage
+        {
+            Id = provider.Id.ToString(),
+            Key = provider.Key,
+            ProviderType = provider.ProviderType,
+            DisplayName = provider.DisplayName,
+            IsActive = provider.Status == EntityStatus.Active
+        };
+
+        foreach (var (name, value) in provider.Settings)
+            message.Settings[name] = value;
+
+        if (!string.IsNullOrEmpty(provider.ClientSecretEncrypted)
+            && secretProtector.Unprotect(provider.ClientSecretEncrypted) is { } secret)
+        {
+            message.Settings[ClientSecretSetting] = secret;
+        }
+
+        return new GetFederationProviderResponse { Found = true, Provider = message };
+    }
+
+    private const string ClientSecretSetting = "client_secret";
+
+    private static ClientData BuildClientData(
+        Client client, List<DefaultRoleData> defaultRoles, List<FederationProviderData> federationProviders)
     {
         var pool = client.UserPool;
         var policy = pool.Policy;
@@ -108,7 +163,8 @@ public sealed class ClientDataGrpcService(
                 IdleTimeoutSeconds = policy.Session.IdleTimeoutSeconds
             },
             DefaultScopes = [.. pool.DefaultScopes],
-            DefaultRoles = defaultRoles
+            DefaultRoles = defaultRoles,
+            FederationProviders = federationProviders
         };
     }
 }

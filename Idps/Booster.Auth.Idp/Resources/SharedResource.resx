@@ -427,4 +427,31 @@
   <data name="Login.Passwordless.Phone" xml:space="preserve">
     <value>SMS koduyla giriş yap</value>
   </data>
+  <data name="ExternalConflict.PageTitle" xml:space="preserve">
+    <value>Bu e-posta zaten kayıtlı</value>
+  </data>
+  <data name="ExternalConflict.BrandHeadline" xml:space="preserve">
+    <value>Hesabınız zaten var</value>
+  </data>
+  <data name="ExternalConflict.BrandLead" xml:space="preserve">
+    <value>Bu adresle daha önce bir hesap oluşturulmuş. Kaldığınız yerden devam edebilirsiniz.</value>
+  </data>
+  <data name="ExternalConflict.Heading" xml:space="preserve">
+    <value>Bu e-posta zaten kayıtlı</value>
+  </data>
+  <data name="ExternalConflict.Subtitle" xml:space="preserve">
+    <value>{0} adresiyle sisteme daha önce giriş yapılmış.</value>
+  </data>
+  <data name="ExternalConflict.SubtitleNoEmail" xml:space="preserve">
+    <value>Bu adresle sisteme daha önce giriş yapılmış.</value>
+  </data>
+  <data name="ExternalConflict.Explanation" xml:space="preserve">
+    <value>Hesapları sizin onayınız olmadan birleştirmiyoruz. Parolanızla giriş yapabilir ya da parolanızı hatırlamıyorsanız sıfırlayabilirsiniz.</value>
+  </data>
+  <data name="ExternalConflict.SignIn" xml:space="preserve">
+    <value>Parolamla giriş yap</value>
+  </data>
+  <data name="ExternalConflict.ResetPassword" xml:space="preserve">
+    <value>Parolamı sıfırla</value>
+  </data>
 </root>

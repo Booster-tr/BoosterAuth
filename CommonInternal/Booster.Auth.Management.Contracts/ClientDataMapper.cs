@@ -61,6 +61,14 @@ public static class ClientDataMapper
             RoleName = r.RoleName
         }));
 
+        message.FederationProviders.AddRange(source.FederationProviders.Select(f => new FederationProviderMessage
+        {
+            Id = f.Id.ToString(),
+            Key = f.Key,
+            ProviderType = f.ProviderType,
+            DisplayName = f.DisplayName
+        }));
+
         return message;
     }
 
@@ -115,6 +123,13 @@ public static class ClientDataMapper
             {
                 RoleId = Guid.Parse(r.RoleId),
                 RoleName = r.RoleName
+            })],
+            FederationProviders = [.. message.FederationProviders.Select(f => new FederationProviderData
+            {
+                Id = Guid.Parse(f.Id),
+                Key = f.Key,
+                ProviderType = f.ProviderType,
+                DisplayName = f.DisplayName
             })]
         };
 }

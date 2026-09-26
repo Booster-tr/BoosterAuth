@@ -7,6 +7,11 @@ package management;
 // tutmaz; sahibi Management servisidir.
 service ClientDataService {
   rpc GetByClientKey (GetClientDataRequest) returns (GetClientDataResponse);
+
+  // Tek bir saglayicinin TAM yapilandirmasi, istemci sirri cozulmus halde.
+  // Ayri cagri olmasinin sebebi: bu yanit onbellege ALINMAZ. ClientData ile
+  // birlikte tasinsaydi sirlar Redis'te 30 dakika duz metin beklerdi.
+  rpc GetFederationProvider (GetFederationProviderRequest) returns (GetFederationProviderResponse);
 }
 
 message GetClientDataRequest {
@@ -37,6 +42,11 @@ message ClientDataMessage {
   SessionPolicyMessage session = 14;
   repeated string default_scopes = 15;
   repeated DefaultRoleMessage default_roles = 16;
+
+  // Havuzun ACIK dis kimlik saglayicilari. Yalnizca giris ekraninin ihtiyaci
+  // olan kadari: ayarlar BURADA TASINMAZ cunku bazi ayarlar sir niteliginde
+  // (Apple ozel anahtari gibi) ve ClientData IdP tarafinda onbellege alinir.
+  repeated FederationProviderMessage federation_providers = 17;
 }
 
 message LoginPolicyMessage {
@@ -73,4 +83,33 @@ message SessionPolicyMessage {
 message DefaultRoleMessage {
   string role_id = 1;                       // Guid
   string role_name = 2;
+}
+
+// Giris ekraninin gordugu kadari. Ayar YOK.
+message FederationProviderMessage {
+  string id = 1;                 // Guid — PrincipalIdentity.IdentityProviderId
+  string key = 2;                // havuz icinde tekil, URL'de gorunur
+  string provider_type = 3;      // google | github | oidc | saml ...
+  string display_name = 4;
+}
+
+message GetFederationProviderRequest {
+  string user_pool_id = 1;       // Guid
+  string key = 2;
+}
+
+message GetFederationProviderResponse {
+  bool found = 1;
+  FederationProviderConfigMessage provider = 2;
+}
+
+// Saglayicinin calismasi icin gereken her sey. settings icinde client_secret
+// COZULMUS olarak bulunur; bu mesaj hicbir yerde onbellege alinmamalidir.
+message FederationProviderConfigMessage {
+  string id = 1;
+  string key = 2;
+  string provider_type = 3;
+  string display_name = 4;
+  bool is_active = 5;
+  map<string, string> settings = 6;
 }

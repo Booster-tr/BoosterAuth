@@ -1,4 +1,14 @@
 using Booster.Auth.Common.Internal.Amqp.Extensions;
+using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.FederationBased;
+using Booster.Auth.Idp.Providers.Apple;
+using Booster.Auth.Idp.Providers.Facebook;
+using Booster.Auth.Idp.Providers.GitHub;
+using Booster.Auth.Idp.Providers.Google;
+using Booster.Auth.Idp.Providers.LinkedIn;
+using Booster.Auth.Idp.Providers.Microsoft;
+using Booster.Auth.Idp.Providers.Oidc;
+using Booster.Auth.Idp.Providers.Saml;
+using Booster.Auth.Idp.Providers.X;
 using Booster.Auth.Common.Internal.Extensions;
 using Booster.Auth.Common.Internal.Options;
 using Booster.Auth.Idp.Bootstrappers;
@@ -17,6 +27,7 @@ using Booster.Auth.Idp.Providers.PhoneCode;
 using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
+using Booster.Auth.Idp.Stores.FederationStores;
 using Booster.Auth.Management.Grpc;
 using Booster.Auth.Idp.Stores.PrincipalStores;
 using Booster.Auth.Idp.Stores.SessionStores;
@@ -67,11 +78,27 @@ public static class ServiceExtensions
         services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();
         services.AddScoped<ILocalUserStore, LocalPrincipalStore>();
         services.AddScoped<ISessionStore, SessionStore>();
+
+        services.AddScoped<IFederationProviderConfigStore, FederationProviderConfigStore>();
         services.AddScoped<ISessionCookieManager, SessionCookieManager>();
 
         services.AddScoped<IIdentityProvider, LocalProvider>();
         services.AddScoped<IIdentityProvider, EmailCodeProvider>();
         services.AddScoped<IIdentityProvider, PhoneCodeProvider>();
+        services.AddScoped<IIdentityProvider, GoogleProvider>();
+        services.AddScoped<IIdentityProvider, MicrosoftProvider>();
+        services.AddScoped<IIdentityProvider, AppleProvider>();
+        services.AddScoped<IIdentityProvider, LinkedInProvider>();
+        services.AddScoped<IIdentityProvider, FacebookProvider>();
+        services.AddScoped<IIdentityProvider, GitHubProvider>();
+        services.AddScoped<IIdentityProvider, XProvider>();
+        services.AddScoped<IIdentityProvider, OidcProvider>();
+        services.AddScoped<IIdentityProvider, SamlProvider>();
+
+        services.AddHttpClient(FederationProviderBase.HttpClientName, client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(20);
+        });
         services.AddScoped<IProviderFactory, ProviderFactory>();
 
         services.AddScoped<AdminBootstrapper>();

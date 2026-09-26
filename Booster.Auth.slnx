@@ -46,6 +46,15 @@
     <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Local/Booster.Auth.Idp.Providers.Local.csproj" />
     <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.EmailCode/Booster.Auth.Idp.Providers.EmailCode.csproj" />
     <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.PhoneCode/Booster.Auth.Idp.Providers.PhoneCode.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Google/Booster.Auth.Idp.Providers.Google.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Microsoft/Booster.Auth.Idp.Providers.Microsoft.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Apple/Booster.Auth.Idp.Providers.Apple.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.LinkedIn/Booster.Auth.Idp.Providers.LinkedIn.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Facebook/Booster.Auth.Idp.Providers.Facebook.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.GitHub/Booster.Auth.Idp.Providers.GitHub.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.X/Booster.Auth.Idp.Providers.X.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Oidc/Booster.Auth.Idp.Providers.Oidc.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Saml/Booster.Auth.Idp.Providers.Saml.csproj" />
   </Folder>
   <Folder Name="/Services/">
     <Project Path="Services/Booster.Auth.Management.Api/Booster.Auth.Management.Api.csproj" Id="01832b74-2452-407a-a9ca-218203cd078b" />

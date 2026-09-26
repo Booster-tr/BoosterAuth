@@ -32,6 +32,7 @@ public class CredentialLoginController(IdpUiOptions uiOptions,
         var client = await ResolveClientAsync(interactionStore, clientDataStore, interactionKey, ct);
         SetIdentifierField(client);
         SetPasswordlessMethods(client);
+        SetFederationMethods(client);
 
         return View(new CredentialLoginCommand { InteractionKey = interactionKey });
     }
@@ -62,6 +63,7 @@ public class CredentialLoginController(IdpUiOptions uiOptions,
             var errorClient = await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct);
             SetIdentifierField(errorClient);
             SetPasswordlessMethods(errorClient);
+            SetFederationMethods(errorClient);
             return View("Index", command);
         }
     }

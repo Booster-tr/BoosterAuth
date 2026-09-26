@@ -47,7 +47,7 @@ public sealed class OidcTokenService(OidcKeyService keyService, IdpOptions optio
 
     public string CreateIdToken(
         string audience, Guid subject, string? nonce, string? name, string? email,
-        DateTime authTime, int ttlSeconds)
+        bool emailVerified, DateTime authTime, int ttlSeconds)
     {
         var now = DateTime.UtcNow;
         var expires = now.AddSeconds(ttlSeconds);
@@ -61,7 +61,11 @@ public sealed class OidcTokenService(OidcKeyService keyService, IdpOptions optio
         };
 
         if (!string.IsNullOrEmpty(name)) claims.Add(new Claim("name", name));
-        if (!string.IsNullOrEmpty(email)) claims.Add(new Claim(JwtRegisteredClaimNames.Email, email));
+        if (!string.IsNullOrEmpty(email))
+        {
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, email));
+            claims.Add(new Claim("email_verified", emailVerified ? "true" : "false", ClaimValueTypes.Boolean));
+        }
         if (!string.IsNullOrEmpty(nonce)) claims.Add(new Claim(JwtRegisteredClaimNames.Nonce, nonce));
 
         return WriteToken(audience, claims, now, expires);

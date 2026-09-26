@@ -87,6 +87,7 @@ public sealed class AuthorizationCodeGrantHandler(
             nonce: authCode.Nonce,
             name: principal.DisplayName,
             email: principal.Email,
+            emailVerified: principal.EmailVerified,
             authTime: DateTime.UtcNow,
             ttlSeconds: accessTtl);
 

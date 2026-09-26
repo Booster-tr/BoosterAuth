@@ -44,5 +44,14 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.TokenScopePolicyPermissionEmpty, "Token politikası", "İzin adı boş olamaz.", "Token policy", "A permission name cannot be empty."),
         new(AuthNMessageKeys.TokenScopePolicyPermissionDuplicate, "Token politikası", "Aynı izin birden fazla kez verilmiş.", "Token policy", "The same permission is listed more than once."),
         new(AuthNMessageKeys.TokenScopePolicyPermissionsNotAllowed, "Token politikası", "Bu izinler uygulama için tanımlı değil.", "Token policy", "These permissions are not defined for the client."),
+
+        // --- Dış kimlik sağlayıcıları ---
+        new(AuthNMessageKeys.IdentityProviderNotFound, "Sağlayıcı", "Sağlayıcı bulunamadı.", "Provider", "The provider was not found."),
+        new(AuthNMessageKeys.IdentityProviderKeyAlreadyExists, "Sağlayıcı", "Bu sağlayıcı anahtarı havuzda zaten kullanımda.", "Provider", "This provider key is already in use in the pool."),
+        new(AuthNMessageKeys.IdentityProviderKeyInvalidFormat, "Sağlayıcı", "Sağlayıcı anahtarı yalnızca küçük harf, rakam ve tire içerebilir.", "Provider", "The provider key may contain only lowercase letters, digits and hyphens."),
+        new(AuthNMessageKeys.IdentityProviderTypeUnknown, "Sağlayıcı", "Bu sağlayıcı türü desteklenmiyor.", "Provider", "This provider type is not supported."),
+        new(AuthNMessageKeys.IdentityProviderClientIdRequired, "Sağlayıcı", "İstemci kimliği (client_id) zorunludur.", "Provider", "The client id is required."),
+        new(AuthNMessageKeys.IdentityProviderIssuerRequired, "Sağlayıcı", "Issuer adresi (issuer_url) zorunludur.", "Provider", "The issuer url is required."),
+        new(AuthNMessageKeys.IdentityProviderSamlSettingsRequired, "Sağlayıcı", "SAML için sp_entity_id, sign_on_url ve signing_certificate zorunludur.", "Provider", "SAML requires sp_entity_id, sign_on_url and signing_certificate."),
     ];
 }

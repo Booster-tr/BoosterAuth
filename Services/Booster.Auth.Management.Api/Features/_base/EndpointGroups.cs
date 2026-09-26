@@ -37,3 +37,9 @@ public class ClientsEndpointGroup : Group
     public ClientsEndpointGroup()
         => Configure("clients", ep => ep.Description(b => b.WithTags("Clients")));
 }
+
+public class IdentityProvidersEndpointGroup : Group
+{
+    public IdentityProvidersEndpointGroup()
+        => Configure("identity-providers", ep => ep.Description(b => b.WithTags("IdentityProviders")));
+}

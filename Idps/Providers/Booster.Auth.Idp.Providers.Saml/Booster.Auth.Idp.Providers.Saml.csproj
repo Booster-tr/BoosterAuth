@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Booster.Auth.Idp.Providers.Abstractions\Booster.Auth.Idp.Providers.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- SAML imza dogrulamasi elle YAZILMAZ: imza sarmalama (XSW) ve XXE
+         siniflari, referans/transform kontrollerinin tam dogru olmasina bagli.
+         BSD-3-Clause, net10.0 hedefi var. -->
+    <PackageReference Include="ITfoxtec.Identity.Saml2" Version="4.21.0" />
+  </ItemGroup>
+
+</Project>
