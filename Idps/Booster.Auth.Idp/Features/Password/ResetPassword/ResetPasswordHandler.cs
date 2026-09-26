@@ -85,7 +85,7 @@ public sealed class ResetPasswordHandler(
 
         await ConsumeAsync(cmd.InteractionKey, reset, ct);
 
-        await cacheService.RemoveByTagAsync(PrincipalStore.Tag(reset.PrincipalId), ct);
+        await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(reset.PrincipalId), ct);
 
         return new ResetPasswordResult { InteractionKey = cmd.InteractionKey };
     }

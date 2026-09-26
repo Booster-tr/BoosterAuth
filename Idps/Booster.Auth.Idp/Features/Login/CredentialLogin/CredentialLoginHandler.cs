@@ -5,8 +5,8 @@ using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.CredentialBased.Models;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.Models;
-using Booster.Auth.Idp.Providers.Local.Stores;
-using Booster.Auth.Idp.Providers.Local.Stores.Models;
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
+using Booster.Auth.Idp.Providers.Abstractions.Stores.Models;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
@@ -45,12 +45,6 @@ public sealed class CredentialLoginHandler(
         var client = await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
 
-        // Önce sağlayıcı çözülür, sonra politika sorulur.
-        //
-        // Ad üzerinden Enum.TryParse YAPILMAZ: "email_code" gibi adlar
-        // "EmailCode" üyesine eşleşmez, kontrol sessizce reddetme tarafına düşer
-        // ve sağlayıcı hiçbir zaman çalışmazdı. Hangi bayrağa karşılık geldiğini
-        // sağlayıcının kendisi söyler.
         var provider = providerFactory.GetCredentialProvider(cmd.ProviderType)
             ?? throw new AuthorizeException(IdpMessageKeys.ProviderNotAvailable);
 
@@ -107,7 +101,7 @@ public sealed class CredentialLoginHandler(
         if (user.FailedAttemptCount != 0 || user.LockedUntil is not null)
             await UpdateLockoutAsync(user.Id, 0, null, ct);
 
-        if (passwordHasher.NeedsRehash(user.PasswordHash))
+        if (user.HasPassword && passwordHasher.NeedsRehash(user.PasswordHash!))
         {
             var credential = await credentialRepository.GetAsync(c => c.PrincipalId == user.Id, cancellationToken: ct);
             if (credential is not null)
@@ -115,7 +109,7 @@ public sealed class CredentialLoginHandler(
                 credential.PasswordHash = passwordHasher.Hash(password);
                 credential.PasswordChangedAt = DateTimeOffset.UtcNow;
                 await credentialRepository.SaveChangesAsync(ct);
-                await cacheService.RemoveByTagAsync(PrincipalStore.Tag(user.Id), ct);
+                await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(user.Id), ct);
             }
         }
     }
@@ -128,7 +122,7 @@ public sealed class CredentialLoginHandler(
         credential.FailedAttemptCount = failedCount;
         credential.LockedUntil = lockedUntil;
         await credentialRepository.SaveChangesAsync(ct);
-        await cacheService.RemoveByTagAsync(PrincipalStore.Tag(principalId), ct);
+        await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
     }
 
     private static ProviderConfig BuildConfig(string providerType, ClientData client)

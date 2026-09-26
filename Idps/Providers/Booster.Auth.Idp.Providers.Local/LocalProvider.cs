@@ -3,7 +3,7 @@ using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.CredentialBased.Models;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.CredentialProviders;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.Models;
-using Booster.Auth.Idp.Providers.Local.Stores;
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Hashing.OneWays.Argon;
 
 namespace Booster.Auth.Idp.Providers.Local;
@@ -30,7 +30,10 @@ public sealed class LocalProvider(
         if (user is null || !user.IsActive)
             return IdentityResult.Fail("invalid_credentials");
 
-        if (!passwordHasher.Verify(request.Password, user.PasswordHash))
+        if (!user.HasPassword)
+            return IdentityResult.Fail("invalid_credentials");
+
+        if (!passwordHasher.Verify(request.Password, user.PasswordHash!))
             return IdentityResult.Fail("invalid_credentials");
 
         return IdentityResult.Success(

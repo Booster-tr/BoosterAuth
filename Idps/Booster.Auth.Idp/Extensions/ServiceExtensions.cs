@@ -11,11 +11,10 @@ using Booster.Auth.Idp.Managers.KeyManagers;
 using Booster.Auth.Idp.Managers.TokenManagers;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Providers.Abstractions;
-using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.PasswordlessBased.Stores;
 using Booster.Auth.Idp.Providers.EmailCode;
 using Booster.Auth.Idp.Providers.Local;
 using Booster.Auth.Idp.Providers.PhoneCode;
-using Booster.Auth.Idp.Providers.Local.Stores;
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Management.Grpc;
@@ -64,11 +63,9 @@ public static class ServiceExtensions
             };
         });
 
-        services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();
         services.AddScoped<IClientDataStore, ClientDataStore>();
-        services.AddScoped<PrincipalStore>();
-        services.AddScoped<ILocalUserStore>(sp => sp.GetRequiredService<PrincipalStore>());
-        services.AddScoped<IProviderPrincipalStore>(sp => sp.GetRequiredService<PrincipalStore>());
+        services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();
+        services.AddScoped<ILocalUserStore, LocalPrincipalStore>();
         services.AddScoped<ISessionStore, SessionStore>();
         services.AddScoped<ISessionCookieManager, SessionCookieManager>();
 

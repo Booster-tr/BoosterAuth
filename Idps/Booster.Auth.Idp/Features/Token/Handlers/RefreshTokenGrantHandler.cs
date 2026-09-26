@@ -1,4 +1,6 @@
 ﻿using Booster.Auth.Common.Internal.EntityExtensions;
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
+using Booster.Auth.Idp.Stores.PrincipalStores;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features._base;
@@ -7,7 +9,6 @@ using Booster.Auth.Idp.Features._base.Enums;
 using Booster.Auth.Idp.Features.Token.Handlers._base;
 using Booster.Auth.Idp.Features.Token.Handlers.Models;
 using Booster.Auth.Idp.Managers.TokenManagers;
-using Booster.Auth.Idp.Providers.Local.Stores;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Idp.Stores.SessionStores;
 using Booster.Auth.Manager.RequestContexts;

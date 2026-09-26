@@ -78,7 +78,7 @@ public class ChangePasswordEndpoint(
 
         await credentialRepository.SaveChangesAsync(ct);
 
-        await cacheService.RemoveByTagAsync(PrincipalStore.Tag(principalId), ct);
+        await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
 
         await Send.NoContentAsync(ct);
     }
