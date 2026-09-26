@@ -454,4 +454,28 @@
   <data name="ExternalConflict.ResetPassword" xml:space="preserve">
     <value>Parolamı sıfırla</value>
   </data>
+  <data name="Password.Rules.Intro" xml:space="preserve">
+    <value>Parolanız şu kuralları karşılamalı:</value>
+  </data>
+  <data name="Password.Rules.MinLength" xml:space="preserve">
+    <value>En az {0} karakter</value>
+  </data>
+  <data name="Password.Rules.Uppercase" xml:space="preserve">
+    <value>En az bir büyük harf</value>
+  </data>
+  <data name="Password.Rules.Lowercase" xml:space="preserve">
+    <value>En az bir küçük harf</value>
+  </data>
+  <data name="Password.Rules.Digit" xml:space="preserve">
+    <value>En az bir rakam</value>
+  </data>
+  <data name="Password.Rules.NonAlphanumeric" xml:space="preserve">
+    <value>En az bir özel karakter</value>
+  </data>
+  <data name="Password.Rules.NoWhitespace" xml:space="preserve">
+    <value>Boşluk içermemeli</value>
+  </data>
+  <data name="Register.UserNameHint" xml:space="preserve">
+    <value>3-100 karakter. Harf, rakam, nokta, alt çizgi ve tire kullanabilirsiniz.</value>
+  </data>
 </root>

@@ -67,6 +67,32 @@ public class IdpBaseController : Controller
         ViewData["FederationMethods"] = methods;
     }
 
+    /// <summary>
+    /// Parola kurallarini goruntuye tasir.
+    /// <para>
+    /// Yedek varsayilan YOK: istemci cozulemediyse null kalir ve ekran kural
+    /// gostermez. Uydurma bir varsayilan koymak, havuz politikasi yaninda ikinci
+    /// bir dogruluk kaynagi yaratir ve politika degistiginde sessizce yanlisa
+    /// donerdi.
+    /// </para>
+    /// </summary>
+    protected void SetPasswordPolicy(ClientData? client)
+        => ViewData["PasswordPolicy"] = client?.Password;
+
+    /// <summary>
+    /// Kayit formunda hangi kimlik alanlarinin tarayici tarafindan zorunlu
+    /// tutulacagini bildirir. Havuz politikasindan okunur; sabit yazilsaydi
+    /// e-postanin istege bagli oldugu bir havuzda form gereksiz yere bloke
+    /// edilirdi.
+    /// </summary>
+    protected void SetRegistrationRequirements(ClientData? client)
+    {
+        var allowed = client?.Login.AllowedIdentifiers;
+
+        ViewData["EmailRequired"] = allowed?.Contains(IdentifierType.Email) ?? false;
+        ViewData["UserNameRequired"] = allowed?.Contains(IdentifierType.Username) ?? false;
+    }
+
     protected void SetIdentifierField(ClientData? client)
         => ViewData["IdentifierField"] = client is null
             ? IdentifierField.From([IdentifierType.Email])

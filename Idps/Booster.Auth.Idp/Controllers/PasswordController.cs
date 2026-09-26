@@ -57,10 +57,16 @@ public class PasswordController(
     }
 
     [HttpGet("/ui/reset-password")]
-    public IActionResult ResetPassword([FromQuery(Name = "interaction_key")] string interactionKey)
+    public async Task<IActionResult> ResetPassword(
+        [FromQuery(Name = "interaction_key")] string interactionKey, CancellationToken ct)
     {
         if (string.IsNullOrEmpty(interactionKey))
             return Redirect(uiOptions.GetErrorUrl(IdpMessageKeys.InvalidInteraction));
+
+        // Yeni parola kurallari havuz politikasindan gosterilir; gosterilmezse
+        // kullanici sunucunun kabul etmeyecegi bir parola yazip sebebini ancak
+        // gonderdikten sonra ogrenirdi.
+        SetPasswordPolicy(await ResolveClientAsync(interactionStore, clientDataStore, interactionKey, ct));
 
         return View(new ResetPasswordCommand { InteractionKey = interactionKey });
     }
@@ -80,6 +86,7 @@ public class PasswordController(
         catch (ValidationException ex)
         {
             await AddErrorsAsync(ex, ct);
+            SetPasswordPolicy(await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct));
             return View("ResetPassword", command);
         }
     }

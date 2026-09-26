@@ -10,7 +10,7 @@
 
     ViewData["MainModifier"] = "auth-main--register";
     ViewData["BrandHeadline"] = T["Register.BrandHeadline"].Value;
-    ViewData["BrandLead"] = "Booster Auth hesabınız, kurumunuzun yetkilendirdiği tüm uygulamalarda tek kimliğiniz olur.";
+    ViewData["BrandLead"] = T["Register.BrandLead"].Value;
 
     var displayNameInvalid = ViewData.ModelState.HasError(nameof(Model.DisplayName));
     var userNameInvalid = ViewData.ModelState.HasError(nameof(Model.UserName));
@@ -27,6 +27,9 @@
     // gereksiz yere bloke ederdi.
     var emailRequired = ViewData["EmailRequired"] as bool? ?? true;
     var userNameRequired = ViewData["UserNameRequired"] as bool? ?? false;
+
+    // Parola kurallari havuz politikasindan gelir; controller set eder.
+    var passwordPolicy = ViewData["PasswordPolicy"] as Booster.Auth.Database.Models.PasswordPolicyData;
 }
 
 <section class="auth-card">
@@ -89,9 +92,7 @@
                        aria-describedby="UserName-error UserName-hint"
                        aria-invalid="@(userNameInvalid ? "true" : null)" />
             </div>
-            <p class="auth-field__hint auth-note" id="UserName-hint">
-                3-100 karakter. Harf, rakam, nokta, alt çizgi ve tire kullanabilirsiniz.
-            </p>
+            <p class="auth-field__hint auth-note" id="UserName-hint">@T["Register.UserNameHint"]</p>
             <partial name="_FieldError" model="@nameof(Model.UserName)" />
         </div>
 
@@ -169,7 +170,7 @@
 
         @* --- Parola ---------------------------------------------------------- *@
         <div class="auth-field auth-field--icon auth-field--action @(passwordInvalid ? "auth-field--invalid" : null)">
-            <label class="auth-field__label" for="Password">Parola</label>
+            <label class="auth-field__label" for="Password">@T["Register.Password"]</label>
 
             <div class="auth-field__control">
                 <span class="auth-field__icon" aria-hidden="true">
@@ -205,11 +206,7 @@
                 </button>
             </div>
 
-            @* JS kapalıyken politikayı anlatan tek kaynak. JS açılınca bu düğüm
-               tamamen kaldırılır (canlı koşul listesi aynı bilgiyi taşır). *@
-            <p class="auth-field__hint" id="Password-hint">
-                En az 8 karakter olmalı; büyük harf, küçük harf ve rakam içermeli, boşluk içermemelidir.
-            </p>
+            <partial name="_PasswordRules" model="passwordPolicy" />
 
             <p class="auth-note auth-note--warn" id="Password-caps" hidden>
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
@@ -221,21 +218,12 @@
                 @T["Common.CapsLockOn"]
             </p>
 
-            @* --- Güç göstergesi ---------------------------------------------
-               Çubuklar tamamen dekoratiftir (aria-hidden); bilgi metinle taşınır.
-               Bloğun kendisi sunucuda hidden'dır, JS açar. *@
-
-            </div>
-
-            @* Güç göstergesinin kendi nazik bölgesi: 500 ms geciktirilir ve
-               yalnızca seviye ETİKETİ değiştiğinde yazılır. *@
-
             <partial name="_FieldError" model="@nameof(Model.Password)" />
         </div>
 
         @* --- Parola tekrar ---------------------------------------------------- *@
         <div class="auth-field auth-field--icon auth-field--action @(confirmInvalid ? "auth-field--invalid" : null)">
-            <label class="auth-field__label" for="PasswordConfirm">Parola (tekrar)</label>
+            <label class="auth-field__label" for="PasswordConfirm">@T["Register.PasswordConfirm"]</label>
 
             <div class="auth-field__control">
                 <span class="auth-field__icon" aria-hidden="true">
@@ -285,16 +273,6 @@
                     <circle cx="8" cy="11.3" r="0.75" fill="currentColor" />
                 </svg>
                 @T["Common.CapsLockOn"]
-            </p>
-
-            @* Sessiz görsel onay: canlı bölge yok, duyurulmaz. *@
-            <p class="auth-note auth-note--ok" id="PasswordConfirm-ok" hidden>
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
-                    <circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5" />
-                    <path d="m5.5 8.2 1.7 1.7 3.3-3.6" stroke="currentColor" stroke-width="1.5"
-                          stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                Parolalar eşleşiyor.
             </p>
 
             <partial name="_FieldError" model="@nameof(Model.PasswordConfirm)" />

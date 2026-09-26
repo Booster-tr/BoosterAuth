@@ -454,4 +454,28 @@
   <data name="ExternalConflict.ResetPassword" xml:space="preserve">
     <value>Reset my password</value>
   </data>
+  <data name="Password.Rules.Intro" xml:space="preserve">
+    <value>Your password must meet these rules:</value>
+  </data>
+  <data name="Password.Rules.MinLength" xml:space="preserve">
+    <value>At least {0} characters</value>
+  </data>
+  <data name="Password.Rules.Uppercase" xml:space="preserve">
+    <value>At least one uppercase letter</value>
+  </data>
+  <data name="Password.Rules.Lowercase" xml:space="preserve">
+    <value>At least one lowercase letter</value>
+  </data>
+  <data name="Password.Rules.Digit" xml:space="preserve">
+    <value>At least one digit</value>
+  </data>
+  <data name="Password.Rules.NonAlphanumeric" xml:space="preserve">
+    <value>At least one special character</value>
+  </data>
+  <data name="Password.Rules.NoWhitespace" xml:space="preserve">
+    <value>No spaces</value>
+  </data>
+  <data name="Register.UserNameHint" xml:space="preserve">
+    <value>3-100 characters. Letters, digits, dot, underscore and hyphen are allowed.</value>
+  </data>
 </root>

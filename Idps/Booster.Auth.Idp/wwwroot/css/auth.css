@@ -96,6 +96,20 @@
     color: var(--color-text-muted);
 }
 
+
+/* --- Parola kural listesi -------------------------------------------------
+   Kurallar havuz politikasindan geldigi icin sayilari degisken; liste olarak
+   yazilir. Isaretci disa tasmasin diye padding iceriden verilir. */
+.auth-rules {
+    margin: var(--space-1) 0 0;
+    padding-left: 1.125rem;
+    list-style: disc;
+}
+
+.auth-rules li {
+    margin-top: 0.125rem;
+}
+
 /* --- Kontrol kabugu: kenarlik, odak halkasi ve ikon hizasi burada yasar ---
    Input'un kendi outline'i yok; halkayi kabuk tasir, boylece ikon + eylem
    butonu tek bir cerceve icinde gorunur. */
