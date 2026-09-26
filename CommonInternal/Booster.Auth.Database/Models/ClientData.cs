@@ -35,12 +35,14 @@ public sealed record DefaultRoleData
 }
 public sealed record LoginPolicyData
 {
-    public required CredentialProviderType AllowedCredentialProviders { get; init; }
+    public required LoginProviderType AllowedLoginProviders { get; init; }
 
     public required IReadOnlyList<IdentifierType> AllowedIdentifiers { get; init; }
 
     public required int MaxFailedAttempts { get; init; }
     public required int LockoutSeconds { get; init; }
+
+    public string? DefaultCountryCode { get; init; }
 }
 
 public sealed record RegistrationPolicyData
@@ -59,12 +61,8 @@ public sealed record PasswordPolicyData
     public required bool RequireDigit { get; init; }
     public required bool RequireNonAlphanumeric { get; init; }
 
-    /// <summary>
-    /// Son kac parolanin tekrar kullanilamayacagi. 0 = gecmis kontrolu yok.
-    /// </summary>
     public required int HistoryCount { get; init; }
 
-    /// <summary>Parolanin kac gun sonra sureceginin dolacagi. 0 = suresiz.</summary>
     public required int ExpiryDays { get; init; }
 }
 

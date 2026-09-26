@@ -1,6 +1,7 @@
 ﻿using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
+using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.PasswordlessBased.Stores;
 using Booster.Auth.Idp.Providers.Local.Stores;
 using Booster.Auth.Idp.Providers.Local.Stores.Models;
 using Booster.Auth.Manager.RequestContexts;
@@ -15,7 +16,7 @@ public sealed class PrincipalStore(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IAsyncRepository<LocalCredential, IdpDbContext> localCredentialRepository,
     ICacheService cacheService,
-    IRequestContextAccessor requestContextAccessor) : ILocalUserStore
+    IRequestContextAccessor requestContextAccessor) : ILocalUserStore, IProviderPrincipalStore
 {
     private static readonly TimeSpan Ttl = TimeSpan.FromMinutes(5);
 
@@ -56,6 +57,83 @@ public sealed class PrincipalStore(
             ct: ct);
     }
 
+    /// <summary>
+    /// Tek bir kimlik alanına göre arar; parola kaydı ŞART DEĞİLDİR.
+    /// <para>
+    /// <see cref="FindAsync"/> kullanılamaz: o arama LocalCredential'ı zorunlu
+    /// tutar ve parolasız kullanıcıyı hiçbir zaman bulamaz.
+    /// </para>
+    /// </summary>
+    public async Task<ProviderPrincipal?> FindByIdentifierAsync(
+        string identifier, IdentifierType identifierType, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(identifier))
+            return null;
+
+        var isolation = requestContextAccessor.Context().Isolation;
+
+        // Anahtar alan adını taşır: aynı değer farklı alanlarda başka
+        // kullanıcılara ait olabilir, ön ek olmasaydı biri diğerinin
+        // önbellek girdisini okurdu.
+        var key = $"idp:principal-by-identifier:{isolation}:{identifierType}:{identifier}";
+
+        return await cacheService.GetOrSetAsync(
+            key,
+            async (context, token) =>
+            {
+                var principal = await principalRepository.GetAsync(
+                    predicate: BuildIdentifierPredicate(identifier, identifierType),
+                    enableTracking: false,
+                    cancellationToken: token);
+
+                if (principal is null)
+                    return null;
+
+                context.SetTags(Tag(principal.Id));
+
+                return ToProviderPrincipal(principal);
+            },
+            expiry: Ttl,
+            ct: ct);
+    }
+
+    public async Task MarkIdentifierVerifiedAsync(
+        Guid principalId, IdentifierType identifierType, CancellationToken ct)
+    {
+        // Yalnizca e-posta ve telefon dogrulanabilir; kullanici adi bir adres
+        // degil, dogrulanacak bir seyi yok.
+        if (identifierType is not (IdentifierType.Email or IdentifierType.Phone))
+            return;
+
+        var principal = await principalRepository.GetAsync(
+            p => p.Id == principalId, cancellationToken: ct);
+
+        if (principal is null)
+            return;
+
+        // Zaten dogrulanmissa CIKILIR: parolasiz giris her oturumda tekrarlanir,
+        // her seferinde yazmak bos bir UPDATE ve gereksiz onbellek
+        // gecersizlestirmesi demekti.
+        var alreadyVerified = identifierType == IdentifierType.Email
+            ? principal.EmailVerified
+            : principal.PhoneVerified;
+
+        if (alreadyVerified)
+            return;
+
+        if (identifierType == IdentifierType.Email)
+            principal.EmailVerified = true;
+        else
+            principal.PhoneVerified = true;
+
+        principalRepository.Update(principal);
+        await principalRepository.SaveChangesAsync(ct);
+
+        // Onbellekteki kopya eski bayragi tasiyor; temizlenmezse token bir
+        // sonraki okumaya kadar email_verified=false tasimaya devam ederdi.
+        await cacheService.RemoveByTagAsync(Tag(principalId), ct);
+    }
+
     public async Task<PrincipalInfo?> GetByIdAsync(Guid id, CancellationToken ct)
     {
         var isolation = requestContextAccessor.Context().Isolation;
@@ -94,6 +172,28 @@ public sealed class PrincipalStore(
             (allowed.Contains(IdentifierType.Email) && p.Email == identifier) ||
             (allowed.Contains(IdentifierType.Phone) && p.PhoneNumber == identifier);
     }
+
+    private static Expression<Func<Principal, bool>> BuildIdentifierPredicate(
+        string identifier, IdentifierType identifierType)
+        => identifierType switch
+        {
+            IdentifierType.Email => p => p.Email == identifier,
+            IdentifierType.Phone => p => p.PhoneNumber == identifier,
+            IdentifierType.Username => p => p.UserName == identifier,
+            // Bilinmeyen alan için HİÇBİR kaydı döndürmeyen bir koşul: "hepsi"
+            // dönmek, yanlış kullanıcıyla giriş yapılmasına yol açardı.
+            _ => p => false
+        };
+
+    private static ProviderPrincipal ToProviderPrincipal(Principal principal)
+        => new()
+        {
+            Id = principal.Id,
+            IsActive = principal.Status == PrincipalStatus.Active,
+            Email = principal.Email,
+            PhoneNumber = principal.PhoneNumber,
+            Claims = BuildClaims(principal)
+        };
 
     private static LocalUser ToLocalUser(Principal principal)
         => new()

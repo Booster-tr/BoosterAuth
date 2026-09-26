@@ -1,0 +1,75 @@
+@model StartPasswordlessLoginCommand
+@{
+    Layout = "_AuthLayout";
+
+    var errorCount = ViewData.ModelState.AllErrors().Count;
+    var methodKey = ViewData["ProviderLabelKey"] as string ?? "Passwordless.Method.Email";
+
+    ViewData["Title"] = errorCount > 0
+        ? T["Passwordless.PageTitleWithErrors", errorCount].Value
+        : T["Passwordless.PageTitle"].Value;
+
+    ViewData["MainModifier"] = "auth-main--passwordless";
+    ViewData["BrandHeadline"] = T["Passwordless.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["Passwordless.BrandLead"].Value;
+
+    // Alan tanımı controller'dan gelir ve TEK yöntemi tanımlar: bu ekran
+    // yalnızca seçilen sağlayıcı için açılmıştır.
+    var identifier = ViewData["IdentifierField"] as IdentifierField
+        ?? IdentifierField.From([IdentifierType.Email]);
+
+    var identifierInvalid = ViewData.ModelState.HasError(nameof(Model.Identifier));
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["Passwordless.Heading"]</h1>
+        <p class="auth-card__subtitle">@T["Passwordless.Subtitle", T[methodKey]]</p>
+    </header>
+
+    <partial name="_ValidationSummary" />
+
+    @* Gerçek route PasswordlessLoginController üzerindeki [HttpPost("/ui/passwordless")]'dır. *@
+    <form method="post" action="@Url.Idp("/ui/passwordless")" class="auth-form"
+          data-auth-form asp-antiforgery="false">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="InteractionKey" />
+        <input type="hidden" asp-for="ProviderType" />
+
+        <div class="auth-field auth-field--icon @(identifierInvalid ? "auth-field--invalid" : null)">
+            <label class="auth-field__label" for="Identifier">@T[identifier.LabelKey]</label>
+            <div class="auth-field__control">
+                <span class="auth-field__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" focusable="false">
+                        <circle cx="10" cy="6.75" r="3.25" stroke="currentColor" stroke-width="1.6" />
+                        <path d="M3.75 16.25c0-2.9 2.8-4.75 6.25-4.75s6.25 1.85 6.25 4.75"
+                              stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </span>
+                <input class="auth-field__input" asp-for="Identifier" type="@identifier.InputType"
+                       autocomplete="@identifier.AutoComplete" inputmode="@identifier.InputMode"
+                       placeholder="@T[identifier.PlaceholderKey]"
+                       autocapitalize="none" autocorrect="off" spellcheck="false"
+                       enterkeyhint="send" maxlength="320" required data-initial-focus
+                       aria-describedby="Identifier-error Identifier-hint"
+                       aria-invalid="@(identifierInvalid ? "true" : null)" />
+            </div>
+            <p class="auth-field__hint" id="Identifier-hint">@T[identifier.HintKey]</p>
+            <partial name="_FieldError" model="@nameof(Model.Identifier)" />
+        </div>
+
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-btn auth-btn--primary auth-btn--block"
+                    data-submit-guard data-label-busy="@T["Common.Sending"]">
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["Passwordless.Submit"]</span>
+            </button>
+        </div>
+    </form>
+
+    <footer class="auth-card__footer">
+        @T["Passwordless.UsePassword"]
+        <a class="auth-link auth-link--standalone"
+           href="@Url.Idp($"/ui/login?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">@T["Passwordless.SignInWithPassword"]</a>
+    </footer>
+</section>

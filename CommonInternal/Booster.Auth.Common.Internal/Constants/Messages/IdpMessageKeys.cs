@@ -47,11 +47,13 @@ public class IdpMessageKeys
     public const string InvalidAccessToken = "idp.invalid_access_token";
     public const string LoggedOut = "idp.logged_out";
 
-    // --- Parola yonetimi ---
     public const string PasswordReused = "idp.password_reused";
     public const string PasswordExpired = "idp.password_expired";
     public const string CurrentPasswordInvalid = "idp.current_password_invalid";
     public const string ResetTokenInvalid = "idp.reset_token_invalid";
     public const string PasswordResetRequested = "idp.password_reset_requested";
+
+    public const string LoginCodeInvalid = "idp.login_code_invalid";
+    public const string LoginCodeExpired = "idp.login_code_expired";
 
 }

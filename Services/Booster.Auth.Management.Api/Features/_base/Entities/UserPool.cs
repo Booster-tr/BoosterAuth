@@ -73,12 +73,14 @@ public class RegistrationPolicy
 
 public class LoginPolicy
 {
-    public CredentialProviderType AllowedCredentialProviders { get; set; } =
-        CredentialProviderType.Local | CredentialProviderType.Federation;
+    public LoginProviderType AllowedLoginProviders { get; set; } =
+        LoginProviderType.Local | LoginProviderType.Federation;
 
     public List<IdentifierType> AllowedIdentifiers { get; set; } = [IdentifierType.Email];
     public int MaxFailedAttempts { get; set; } = 5;
     public int LockoutSeconds { get; set; } = 900;
+
+    public string? DefaultCountryCode { get; set; }
 }
 
 public class UserPoolConfiguration : IEntityTypeConfiguration<UserPool>

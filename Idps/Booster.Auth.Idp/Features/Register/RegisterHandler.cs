@@ -39,7 +39,7 @@ public sealed class RegisterHandler(
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
 
         if (client.Registration.Mode != RegistrationMode.SelfSignup
-            || !client.Login.AllowedCredentialProviders.HasFlag(CredentialProviderType.Local))
+            || !client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.Local))
             throw Invalid(IdpMessageKeys.RegistrationNotAllowed);
 
         if (!string.Equals(cmd.Password, cmd.PasswordConfirm, StringComparison.Ordinal))

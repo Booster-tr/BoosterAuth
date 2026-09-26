@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Yalnizca soyutlamalar: ortak OTP iskeleti, onbellek ve ozetleme oradan
+       gelir. Veritabani, mesajlasma ve web katmani BILINCLI olarak yok. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Booster.Auth.Idp.Providers.Abstractions\Booster.Auth.Idp.Providers.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

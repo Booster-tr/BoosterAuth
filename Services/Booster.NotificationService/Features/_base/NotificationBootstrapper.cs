@@ -63,18 +63,13 @@ public class NotificationBootstrapper(
         string EnSubject,
         string EnBody);
 
-    // Gövdeler tek bir HTML iskeletinden üretilir; dile göre yalnız metinler değişir.
-    // Tüm doğrulamalar (giriş, e-posta/telefon doğrulama, parola sıfırlama) 6 haneli kod kullanır.
     private static string CodeBody(string preheader, string heading, string intro, string footer) =>
         EmailLayout.Wrap(preheader, heading,
             EmailLayout.Paragraph(intro) +
             EmailLayout.CodeBox("{{Code}}"),
             footer);
 
-    /// <summary>
-    /// Davet, kod değil BAĞLANTI taşır: davet edilen kullanıcının kodu ayrıca girebileceği açık
-    /// bir oturumu yoktur.
-    /// </summary>
+
     private static string InvitationBody(
         string preheader, string heading, string intro, string button, string fallback, string footer) =>
         EmailLayout.Wrap(preheader, heading,
@@ -103,6 +98,26 @@ public class NotificationBootstrapper(
                 fallback: "If the button does not work, paste this link into your browser:",
                 footer: "The link is valid for 1 day. If you were not expecting this invitation, you can ignore this email.")),
 
+        new(NotificationTemplateKeys.EmailLoginCode, NotificationChannel.Email,
+            "Giriş kodunuz",
+            CodeBody(
+                preheader: "Giriş kodunuz 5 dakika geçerli.",
+                heading: "Giriş kodunuz",
+                intro: "Merhaba {{DisplayName}}, hesabınıza giriş yapmak için aşağıdaki kodu giriş ekranına girin.",
+                footer: "Kod 5 dakika geçerlidir ve yalnız girişi başlattığınız tarayıcıda çalışır. Bu girişi siz başlatmadıysanız bu e-postayı yok sayabilirsiniz; hesabınıza erişilmez."),
+            "Your sign-in code",
+            CodeBody(
+                preheader: "Your sign-in code is valid for 5 minutes.",
+                heading: "Your sign-in code",
+                intro: "Hi {{DisplayName}}, enter the code below on the sign-in screen to access your account.",
+                footer: "The code is valid for 5 minutes and only works in the browser where you started signing in. If you did not start this, you can ignore this email; nobody gains access to your account.")),
+
+        new(NotificationTemplateKeys.PhoneLoginCode, NotificationChannel.Sms,
+            "Giriş kodu",
+            "Booster giriş kodun: {{Code}}. Kodu kimseyle paylaşma.",
+            "Sign-in code",
+            "Your Booster sign-in code: {{Code}}. Do not share it with anyone."),
+
         new(NotificationTemplateKeys.PasswordReset, NotificationChannel.Email,
             "Parola sıfırlama kodunuz",
             CodeBody(
@@ -117,14 +132,12 @@ public class NotificationBootstrapper(
                 intro: "A password reset was requested for your account. Enter the code below on the reset screen to choose a new password.",
                 footer: "The code is valid for 15 minutes and only works in the browser where you started the reset. If you did not request this, you can ignore this email; your password stays unchanged.")),
 
-        // Hesabında e-posta olmayan kullanıcı sıfırlama kodunu SMS ile alır.
         new(NotificationTemplateKeys.PasswordReset, NotificationChannel.Sms,
             "Parola sıfırlama kodu",
             "Booster parola sıfırlama kodun: {{Code}}. Kodu kimseyle paylaşma.",
             "Password reset code",
             "Your Booster password reset code: {{Code}}. Do not share it with anyone."),
 
-        // Doğrulama artık bağlantı değil kod ile yapılır: kod, girişin başlatıldığı ekrana girilir.
         new(NotificationTemplateKeys.EmailVerification, NotificationChannel.Email,
             "E-posta doğrulama kodunuz",
             CodeBody(
@@ -153,7 +166,6 @@ public class NotificationBootstrapper(
                 intro: "Enter the code below on the verification screen to finish signing in.",
                 footer: "If you did not request this code, someone may know your password; change it as soon as possible.")),
 
-        // SMS'te HTML yoktur; gövde düz metindir ve kısa tutulur (tek segment).
         new(NotificationTemplateKeys.MfaCode, NotificationChannel.Sms,
             "Giriş doğrulama kodu",
             "Booster giriş kodun: {{Code}}. Kodu kimseyle paylaşma.",

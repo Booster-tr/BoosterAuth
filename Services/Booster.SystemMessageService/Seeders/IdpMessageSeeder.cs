@@ -59,6 +59,10 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.ResourceRequiredForExchange, "Token", "Jeton takası için hedef kaynak belirtilmelidir.", "Token", "A target resource is required for token exchange."),
         new(IdpMessageKeys.AudienceNotAllowed, "Token", "Bu hedef kitle uygulama için tanımlı değil.", "Token", "This audience is not allowed for the application."),
 
+        // --- Parolasız giriş ---
+        new(IdpMessageKeys.LoginCodeInvalid, "Giriş kodu", "Girdiğiniz kod hatalı. Lütfen kontrol edip tekrar deneyin.", "Sign-in code", "The code you entered is incorrect. Please check it and try again."),
+        new(IdpMessageKeys.LoginCodeExpired, "Giriş kodu", "Kodun süresi doldu. Lütfen yeni bir kod isteyin.", "Sign-in code", "The code has expired. Please request a new one."),
+
         // --- Parola yönetimi ---
         new(IdpMessageKeys.PasswordReused, "Parola", "Bu parolayı daha önce kullanmıştınız. Lütfen farklı bir parola seçin.", "Password", "You have used this password before. Please choose a different one."),
         new(IdpMessageKeys.PasswordExpired, "Parola", "Parolanızın süresi doldu. Devam etmek için yeni bir parola belirleyin.", "Password", "Your password has expired. Set a new one to continue."),

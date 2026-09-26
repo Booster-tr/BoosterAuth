@@ -355,4 +355,76 @@
   <data name="Layout.SecureNote" xml:space="preserve">
     <value>Booster Auth hiçbir zaman parolanızı e-posta veya telefonla sormaz.</value>
   </data>
+  <data name="Passwordless.Method.Email" xml:space="preserve">
+    <value>e-posta adresinize</value>
+  </data>
+  <data name="Passwordless.Method.Phone" xml:space="preserve">
+    <value>telefonunuza</value>
+  </data>
+  <data name="Passwordless.PageTitle" xml:space="preserve">
+    <value>Parolasız giriş</value>
+  </data>
+  <data name="Passwordless.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} hata – Parolasız giriş</value>
+  </data>
+  <data name="Passwordless.Heading" xml:space="preserve">
+    <value>Parolasız giriş yapın</value>
+  </data>
+  <data name="Passwordless.Subtitle" xml:space="preserve">
+    <value>Bilgilerinizi girin, {0} tek kullanımlık bir kod gönderelim.</value>
+  </data>
+  <data name="Passwordless.Submit" xml:space="preserve">
+    <value>Kod gönder</value>
+  </data>
+  <data name="Passwordless.UsePassword" xml:space="preserve">
+    <value>Parolanızla mı gireceksiniz?</value>
+  </data>
+  <data name="Passwordless.SignInWithPassword" xml:space="preserve">
+    <value>Parolayla giriş yapın</value>
+  </data>
+  <data name="Passwordless.BrandHeadline" xml:space="preserve">
+    <value>Parola hatırlamanıza gerek yok.</value>
+  </data>
+  <data name="Passwordless.BrandLead" xml:space="preserve">
+    <value>Size tek kullanımlık bir kod gönderiyoruz; kodu girmeniz yeterli.</value>
+  </data>
+  <data name="PasswordlessVerify.PageTitle" xml:space="preserve">
+    <value>Giriş kodu</value>
+  </data>
+  <data name="PasswordlessVerify.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} hata – Giriş kodu</value>
+  </data>
+  <data name="PasswordlessVerify.Heading" xml:space="preserve">
+    <value>Kodu girin</value>
+  </data>
+  <data name="PasswordlessVerify.Subtitle" xml:space="preserve">
+    <value>Bilgileriniz kayıtlıysa {0} altı haneli bir kod gönderdik.</value>
+  </data>
+  <data name="PasswordlessVerify.CodeLabel" xml:space="preserve">
+    <value>Giriş kodu</value>
+  </data>
+  <data name="PasswordlessVerify.CodeHint" xml:space="preserve">
+    <value>Altı haneli kod 5 dakika geçerlidir.</value>
+  </data>
+  <data name="PasswordlessVerify.Submit" xml:space="preserve">
+    <value>Giriş yap</value>
+  </data>
+  <data name="PasswordlessVerify.NoCode" xml:space="preserve">
+    <value>Kod gelmedi mi?</value>
+  </data>
+  <data name="PasswordlessVerify.TryAgain" xml:space="preserve">
+    <value>Yeniden deneyin</value>
+  </data>
+  <data name="PasswordlessVerify.BrandHeadline" xml:space="preserve">
+    <value>Kodunuzu bekliyoruz.</value>
+  </data>
+  <data name="PasswordlessVerify.BrandLead" xml:space="preserve">
+    <value>Kod yalnızca bu tarayıcıda ve 5 dakika boyunca geçerlidir.</value>
+  </data>
+  <data name="Login.Passwordless.Email" xml:space="preserve">
+    <value>E-posta koduyla giriş yap</value>
+  </data>
+  <data name="Login.Passwordless.Phone" xml:space="preserve">
+    <value>SMS koduyla giriş yap</value>
+  </data>
 </root>

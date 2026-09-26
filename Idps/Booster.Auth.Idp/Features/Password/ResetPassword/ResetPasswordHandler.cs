@@ -38,6 +38,12 @@ public sealed class ResetPasswordHandler(
         var reset = await resetStore.GetAsync(cmd.InteractionKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ResetTokenInvalid);
 
+        if (reset.ExpiresAt <= DateTimeOffset.UtcNow)
+        {
+            await ConsumeAsync(cmd.InteractionKey, reset, ct);
+            throw Invalid(nameof(ResetPasswordCommand.Code), IdpMessageKeys.ResetTokenInvalid);
+        }
+
         if (!simpleHasher.Verify(cmd.Code.Trim(), reset.CodeHash))
         {
             await RegisterFailedAttemptAsync(cmd.InteractionKey, reset, ct);
@@ -77,7 +83,7 @@ public sealed class ResetPasswordHandler(
 
         await credentialRepository.SaveChangesAsync(ct);
 
-        await resetStore.RemoveAsync(cmd.InteractionKey, ct);
+        await ConsumeAsync(cmd.InteractionKey, reset, ct);
 
         await cacheService.RemoveByTagAsync(PrincipalStore.Tag(reset.PrincipalId), ct);
 
@@ -125,8 +131,7 @@ public sealed class ResetPasswordHandler(
 
         if (reset.AttemptCount + 1 >= maxAttempts)
         {
-            await resetStore.RemoveAsync(PasswordResetKeys.ForInteraction(interactionKey), ct);
-            await resetStore.RemoveAsync(PasswordResetKeys.Pending(reset.IsolationId, reset.PrincipalId), ct);
+            await ConsumeAsync(interactionKey, reset, ct);
             return;
         }
 
@@ -135,6 +140,12 @@ public sealed class ResetPasswordHandler(
             reset with { AttemptCount = reset.AttemptCount + 1 },
             ResetCodeTtl,
             ct);
+    }
+
+    private async Task ConsumeAsync(string interactionKey, PasswordResetData reset, CancellationToken ct)
+    {
+        await resetStore.RemoveAsync(PasswordResetKeys.ForInteraction(interactionKey), ct);
+        await resetStore.RemoveAsync(PasswordResetKeys.Pending(reset.IsolationId, reset.PrincipalId), ct);
     }
 
     private static readonly TimeSpan ResetCodeTtl = TimeSpan.FromMinutes(15);

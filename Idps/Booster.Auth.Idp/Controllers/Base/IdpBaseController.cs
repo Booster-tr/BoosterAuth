@@ -32,10 +32,29 @@ public class IdpBaseController : Controller
         return await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct);
     }
 
-    /// <summary>
-    /// Kimlik alanının politikaya göre nasıl davranacağını view'a taşır.
-    /// İstemci çözülemezse en yaygın kurulum (e-posta) varsayılır.
-    /// </summary>
+    protected void SetPasswordlessMethods(ClientData? client)
+    {
+        var methods = new List<PasswordlessMethod>(2);
+
+        if (client is not null)
+        {
+
+            if (client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.EmailCode)
+                && client.Login.AllowedIdentifiers.Contains(IdentifierType.Email))
+            {
+                methods.Add(new PasswordlessMethod("email_code", "Login.Passwordless.Email"));
+            }
+
+            if (client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.PhoneCode)
+                && client.Login.AllowedIdentifiers.Contains(IdentifierType.Phone))
+            {
+                methods.Add(new PasswordlessMethod("phone_code", "Login.Passwordless.Phone"));
+            }
+        }
+
+        ViewData["PasswordlessMethods"] = methods;
+    }
+
     protected void SetIdentifierField(ClientData? client)
         => ViewData["IdentifierField"] = client is null
             ? IdentifierField.From([IdentifierType.Email])

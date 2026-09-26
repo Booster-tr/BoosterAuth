@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Database\Booster.Auth.Database.csproj" />
+
+    <!-- Parolasiz saglayicilarin ortak iskeleti tek kullanimlik kodu onbellekte
+         tutar (ISecureCacheStore) ve ozetini alir (ISimpleHasher). -->
+    <ProjectReference Include="..\..\Common\Caching\Booster.Caching.Abstraction\Booster.Caching.Abstraction.csproj" />
+    <ProjectReference Include="..\..\Common\Booster.Hashing\Booster.Hashing.csproj" />
   </ItemGroup>
 
 </Project>

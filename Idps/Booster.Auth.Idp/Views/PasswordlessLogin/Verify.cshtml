@@ -1,0 +1,70 @@
+@model VerifyPasswordlessLoginCommand
+@{
+    Layout = "_AuthLayout";
+
+    var errorCount = ViewData.ModelState.AllErrors().Count;
+    var methodKey = ViewData["ProviderLabelKey"] as string ?? "Passwordless.Method.Email";
+
+    ViewData["Title"] = errorCount > 0
+        ? T["PasswordlessVerify.PageTitleWithErrors", errorCount].Value
+        : T["PasswordlessVerify.PageTitle"].Value;
+
+    ViewData["MainModifier"] = "auth-main--passwordless";
+    ViewData["BrandHeadline"] = T["PasswordlessVerify.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["PasswordlessVerify.BrandLead"].Value;
+
+    var codeInvalid = ViewData.ModelState.HasError(nameof(Model.Code));
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["PasswordlessVerify.Heading"]</h1>
+        @* Hesabın var olup olmadığı SÖYLENMEZ: "böyle bir kullanıcı yok" demek,
+           adres listesiyle kayıtlı hesapları taramayı mümkün kılardı. *@
+        <p class="auth-card__subtitle">@T["PasswordlessVerify.Subtitle", T[methodKey]]</p>
+    </header>
+
+    <partial name="_ValidationSummary" />
+
+    @* Gerçek route [HttpPost("/ui/passwordless/verify")]'dir. *@
+    <form method="post" action="@Url.Idp("/ui/passwordless/verify")" class="auth-form"
+          data-auth-form asp-antiforgery="false">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="InteractionKey" />
+        <input type="hidden" asp-for="ProviderType" />
+
+        <div class="auth-field auth-field--icon @(codeInvalid ? "auth-field--invalid" : null)">
+            <label class="auth-field__label" for="Code">@T["PasswordlessVerify.CodeLabel"]</label>
+            <div class="auth-field__control">
+                <span class="auth-field__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" focusable="false">
+                        <rect x="2.75" y="5.25" width="14.5" height="9.5" rx="2" stroke="currentColor" stroke-width="1.6" />
+                        <path d="M6 10h1.5M9.25 10h1.5M12.5 10H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </span>
+                <input class="auth-field__input" asp-for="Code" type="text"
+                       inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+                       autocapitalize="none" spellcheck="false" enterkeyhint="go"
+                       required data-initial-focus
+                       aria-describedby="Code-error Code-hint"
+                       aria-invalid="@(codeInvalid ? "true" : null)" />
+            </div>
+            <p class="auth-field__hint" id="Code-hint">@T["PasswordlessVerify.CodeHint"]</p>
+            <partial name="_FieldError" model="@nameof(Model.Code)" />
+        </div>
+
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-btn auth-btn--primary auth-btn--block"
+                    data-submit-guard data-label-busy="@T["Login.Busy"]">
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["PasswordlessVerify.Submit"]</span>
+            </button>
+        </div>
+    </form>
+
+    <footer class="auth-card__footer">
+        @T["PasswordlessVerify.NoCode"]
+        <a class="auth-link auth-link--standalone"
+           href="@Url.Idp($"/ui/passwordless?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}&provider={Uri.EscapeDataString(Model.ProviderType ?? string.Empty)}")">@T["PasswordlessVerify.TryAgain"]</a>
+    </footer>
+</section>

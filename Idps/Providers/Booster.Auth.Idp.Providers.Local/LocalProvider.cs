@@ -17,6 +17,8 @@ public sealed class LocalProvider(
 
     public ProviderKind Kind => ProviderKind.Credential;
 
+    public LoginProviderType LoginProvider => LoginProviderType.Local;
+
     public async Task<IdentityResult> AuthenticateAsync(
         CredentialRequest request,
         ProviderConfig config,

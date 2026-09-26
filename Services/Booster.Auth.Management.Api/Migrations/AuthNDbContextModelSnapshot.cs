@@ -584,10 +584,12 @@ namespace Booster.Auth.Management.Api.Migrations
                                 {
                                     b2.Property<Guid>("UserPoolPolicyUserPoolId");
 
-                                    b2.Property<int>("AllowedCredentialProviders");
-
                                     b2.PrimitiveCollection<string>("AllowedIdentifiers")
                                         .IsRequired();
+
+                                    b2.Property<int>("AllowedLoginProviders");
+
+                                    b2.Property<string>("DefaultCountryCode");
 
                                     b2.Property<int>("LockoutSeconds");
 

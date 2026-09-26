@@ -11,7 +11,10 @@ using Booster.Auth.Idp.Managers.KeyManagers;
 using Booster.Auth.Idp.Managers.TokenManagers;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Providers.Abstractions;
+using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.PasswordlessBased.Stores;
+using Booster.Auth.Idp.Providers.EmailCode;
 using Booster.Auth.Idp.Providers.Local;
+using Booster.Auth.Idp.Providers.PhoneCode;
 using Booster.Auth.Idp.Providers.Local.Stores;
 using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
@@ -63,11 +66,15 @@ public static class ServiceExtensions
 
         services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();
         services.AddScoped<IClientDataStore, ClientDataStore>();
-        services.AddScoped<ILocalUserStore, PrincipalStore>();
+        services.AddScoped<PrincipalStore>();
+        services.AddScoped<ILocalUserStore>(sp => sp.GetRequiredService<PrincipalStore>());
+        services.AddScoped<IProviderPrincipalStore>(sp => sp.GetRequiredService<PrincipalStore>());
         services.AddScoped<ISessionStore, SessionStore>();
         services.AddScoped<ISessionCookieManager, SessionCookieManager>();
 
         services.AddScoped<IIdentityProvider, LocalProvider>();
+        services.AddScoped<IIdentityProvider, EmailCodeProvider>();
+        services.AddScoped<IIdentityProvider, PhoneCodeProvider>();
         services.AddScoped<IProviderFactory, ProviderFactory>();
 
         services.AddScoped<AdminBootstrapper>();

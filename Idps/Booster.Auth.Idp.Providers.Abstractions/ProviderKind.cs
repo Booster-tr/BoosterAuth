@@ -1,7 +1,8 @@
-﻿namespace Booster.Auth.Idp.Providers.Abstractions;
+namespace Booster.Auth.Idp.Providers.Abstractions;
 
 public enum ProviderKind
 {
     Credential,
-    Federation
+    Federation,
+    Passwordless
 }

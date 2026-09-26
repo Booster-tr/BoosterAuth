@@ -17,9 +17,10 @@ public static class ClientDataMapper
             RequireConsent = source.RequireConsent,
             Login = new LoginPolicyMessage
             {
-                AllowedCredentialProviders = (int)source.Login.AllowedCredentialProviders,
+                AllowedLoginProviders = (int)source.Login.AllowedLoginProviders,
                 MaxFailedAttempts = source.Login.MaxFailedAttempts,
-                LockoutSeconds = source.Login.LockoutSeconds
+                LockoutSeconds = source.Login.LockoutSeconds,
+                DefaultCountryCode = source.Login.DefaultCountryCode ?? string.Empty
             },
             Registration = new RegistrationPolicyMessage
             {
@@ -79,10 +80,13 @@ public static class ClientDataMapper
             DefaultScopes = [.. message.DefaultScopes],
             Login = new LoginPolicyData
             {
-                AllowedCredentialProviders = (CredentialProviderType)message.Login.AllowedCredentialProviders,
+                AllowedLoginProviders = (LoginProviderType)message.Login.AllowedLoginProviders,
                 AllowedIdentifiers = [.. message.Login.AllowedIdentifiers.Select(i => (IdentifierType)i)],
                 MaxFailedAttempts = message.Login.MaxFailedAttempts,
-                LockoutSeconds = message.Login.LockoutSeconds
+                LockoutSeconds = message.Login.LockoutSeconds,
+                DefaultCountryCode = string.IsNullOrWhiteSpace(message.Login.DefaultCountryCode)
+                    ? null
+                    : message.Login.DefaultCountryCode
             },
             Registration = new RegistrationPolicyData
             {

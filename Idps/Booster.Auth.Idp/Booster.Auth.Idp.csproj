@@ -29,6 +29,8 @@
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Common.Internal\Booster.Auth.Common.Internal.csproj" />
     <ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Local\Booster.Auth.Idp.Providers.Local.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.EmailCode\Booster.Auth.Idp.Providers.EmailCode.csproj" />
+    <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.PhoneCode\Booster.Auth.Idp.Providers.PhoneCode.csproj" />
   </ItemGroup>
 
 </Project>

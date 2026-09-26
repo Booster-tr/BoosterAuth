@@ -40,10 +40,11 @@ message ClientDataMessage {
 }
 
 message LoginPolicyMessage {
-  int32 allowed_credential_providers = 1;   // CredentialProviderType (flags)
+  int32 allowed_login_providers = 1;   // LoginProviderType (flags)
   repeated int32 allowed_identifiers = 2;   // IdentifierType
   int32 max_failed_attempts = 4;
   int32 lockout_seconds = 5;
+  string default_country_code = 6;   // bos = ulke kodsuz numara reddedilir
 }
 
 message RegistrationPolicyMessage {

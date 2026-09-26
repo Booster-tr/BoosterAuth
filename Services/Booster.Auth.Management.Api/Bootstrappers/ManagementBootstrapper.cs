@@ -105,10 +105,11 @@ public sealed class ManagementBootstrapper(
         {
             Login = new LoginPolicy
             {
-                AllowedCredentialProviders = CredentialProviderType.Local | CredentialProviderType.Federation,
+                AllowedLoginProviders = LoginProviderType.Local | LoginProviderType.Federation,
                 AllowedIdentifiers = [IdentifierType.Email, IdentifierType.Username],
                 MaxFailedAttempts = 5,
-                LockoutSeconds = 900
+                LockoutSeconds = 900,
+                DefaultCountryCode = "90"
             },
             Password = new PasswordPolicy
             {

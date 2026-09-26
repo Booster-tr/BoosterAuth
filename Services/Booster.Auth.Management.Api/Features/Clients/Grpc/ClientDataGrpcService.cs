@@ -78,10 +78,11 @@ public sealed class ClientDataGrpcService(
 
             Login = new LoginPolicyData
             {
-                AllowedCredentialProviders = policy.Login.AllowedCredentialProviders,
+                AllowedLoginProviders = policy.Login.AllowedLoginProviders,
                 AllowedIdentifiers = [.. policy.Login.AllowedIdentifiers],
                 MaxFailedAttempts = policy.Login.MaxFailedAttempts,
-                LockoutSeconds = policy.Login.LockoutSeconds
+                LockoutSeconds = policy.Login.LockoutSeconds,
+                DefaultCountryCode = policy.Login.DefaultCountryCode
             },
             Registration = new RegistrationPolicyData
             {

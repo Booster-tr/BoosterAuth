@@ -188,6 +188,28 @@
         </div>
     }
 
+    @{
+        var passwordlessMethods = ViewData["PasswordlessMethods"] as List<PasswordlessMethod> ?? [];
+        var interactionKey = Uri.EscapeDataString(Model.InteractionKey ?? string.Empty);
+    }
+
+    @* Yalnizca havuzun izin verdigi yontemler gorunur; izinsiz bir dugme
+       kullaniciyi sebebi anlasilmayan bir hata ekranina gotururdu. *@
+    @if (passwordlessMethods.Count > 0)
+    {
+        <div class="auth-alt">
+            <h2 class="auth-divider"><span>@T["Login.OtherMethods"]</span></h2>
+
+            @foreach (var method in passwordlessMethods)
+            {
+                <a class="auth-btn auth-btn--secondary auth-btn--block"
+                   href="@Url.Idp($"/ui/passwordless?interaction_key={interactionKey}&provider={Uri.EscapeDataString(method.ProviderType)}")">
+                    <span class="auth-btn__label">@T[method.LabelKey]</span>
+                </a>
+            }
+        </div>
+    }
+
     <p class="auth-card__footnote">
         <a class="auth-link auth-link--standalone"
            href="@Url.Idp($"/ui/forgot-password?interaction_key={Uri.EscapeDataString(Model.InteractionKey ?? string.Empty)}")">@T["Login.ForgotPassword"]</a>

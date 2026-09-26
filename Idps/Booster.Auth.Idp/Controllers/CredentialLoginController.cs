@@ -29,7 +29,9 @@ public class CredentialLoginController(IdpUiOptions uiOptions,
         if (string.IsNullOrEmpty(interactionKey))
             return Redirect(uiOptions.GetErrorUrl(IdpMessageKeys.InvalidInteraction));
 
-        SetIdentifierField(await ResolveClientAsync(interactionStore, clientDataStore, interactionKey, ct));
+        var client = await ResolveClientAsync(interactionStore, clientDataStore, interactionKey, ct);
+        SetIdentifierField(client);
+        SetPasswordlessMethods(client);
 
         return View(new CredentialLoginCommand { InteractionKey = interactionKey });
     }
@@ -57,7 +59,9 @@ public class CredentialLoginController(IdpUiOptions uiOptions,
                 var msg = await translationManager.GetAsync(err.ErrorMessage, lang, ct);
                 ModelState.AddModelError(err.PropertyName, msg);
             }
-            SetIdentifierField(await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct));
+            var errorClient = await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct);
+            SetIdentifierField(errorClient);
+            SetPasswordlessMethods(errorClient);
             return View("Index", command);
         }
     }

@@ -44,6 +44,8 @@
   </Folder>
   <Folder Name="/Idps/Providers/">
     <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.Local/Booster.Auth.Idp.Providers.Local.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.EmailCode/Booster.Auth.Idp.Providers.EmailCode.csproj" />
+    <Project Path="Idps/Providers/Booster.Auth.Idp.Providers.PhoneCode/Booster.Auth.Idp.Providers.PhoneCode.csproj" />
   </Folder>
   <Folder Name="/Services/">
     <Project Path="Services/Booster.Auth.Management.Api/Booster.Auth.Management.Api.csproj" Id="01832b74-2452-407a-a9ca-218203cd078b" />

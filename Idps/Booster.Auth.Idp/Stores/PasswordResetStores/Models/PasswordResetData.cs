@@ -11,5 +11,7 @@ public sealed record PasswordResetData
 
     public required string CodeHash { get; init; }
 
+    public required DateTimeOffset ExpiresAt { get; init; }
+
     public int AttemptCount { get; init; }
 }

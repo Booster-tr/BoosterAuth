@@ -45,15 +45,17 @@ public sealed class CredentialLoginHandler(
         var client = await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
 
-        if (!Enum.TryParse<CredentialProviderType>(cmd.ProviderType, ignoreCase: true, out var providerType)
-            || providerType == CredentialProviderType.None
-            || !client.Login.AllowedCredentialProviders.HasFlag(providerType))
-        {
-            throw new AuthorizeException(IdpMessageKeys.ProviderNotAllowed);
-        }
-
+        // Önce sağlayıcı çözülür, sonra politika sorulur.
+        //
+        // Ad üzerinden Enum.TryParse YAPILMAZ: "email_code" gibi adlar
+        // "EmailCode" üyesine eşleşmez, kontrol sessizce reddetme tarafına düşer
+        // ve sağlayıcı hiçbir zaman çalışmazdı. Hangi bayrağa karşılık geldiğini
+        // sağlayıcının kendisi söyler.
         var provider = providerFactory.GetCredentialProvider(cmd.ProviderType)
             ?? throw new AuthorizeException(IdpMessageKeys.ProviderNotAvailable);
+
+        if (!client.Login.AllowedLoginProviders.HasFlag(provider.LoginProvider))
+            throw new AuthorizeException(IdpMessageKeys.ProviderNotAllowed);
 
         using var scope = requestContextAccessor.BeginSystemContext(client.IsolationId);
 

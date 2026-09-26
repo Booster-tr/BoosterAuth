@@ -355,4 +355,76 @@
   <data name="Layout.SecureNote" xml:space="preserve">
     <value>Booster Auth will never ask for your password by email or phone.</value>
   </data>
+  <data name="Passwordless.Method.Email" xml:space="preserve">
+    <value>your email address</value>
+  </data>
+  <data name="Passwordless.Method.Phone" xml:space="preserve">
+    <value>your phone</value>
+  </data>
+  <data name="Passwordless.PageTitle" xml:space="preserve">
+    <value>Passwordless sign-in</value>
+  </data>
+  <data name="Passwordless.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} errors – Passwordless sign-in</value>
+  </data>
+  <data name="Passwordless.Heading" xml:space="preserve">
+    <value>Sign in without a password</value>
+  </data>
+  <data name="Passwordless.Subtitle" xml:space="preserve">
+    <value>Enter your details and we will send a one-time code to {0}.</value>
+  </data>
+  <data name="Passwordless.Submit" xml:space="preserve">
+    <value>Send code</value>
+  </data>
+  <data name="Passwordless.UsePassword" xml:space="preserve">
+    <value>Prefer to use your password?</value>
+  </data>
+  <data name="Passwordless.SignInWithPassword" xml:space="preserve">
+    <value>Sign in with password</value>
+  </data>
+  <data name="Passwordless.BrandHeadline" xml:space="preserve">
+    <value>No password to remember.</value>
+  </data>
+  <data name="Passwordless.BrandLead" xml:space="preserve">
+    <value>We send you a one-time code; entering it is all you need.</value>
+  </data>
+  <data name="PasswordlessVerify.PageTitle" xml:space="preserve">
+    <value>Sign-in code</value>
+  </data>
+  <data name="PasswordlessVerify.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} errors – Sign-in code</value>
+  </data>
+  <data name="PasswordlessVerify.Heading" xml:space="preserve">
+    <value>Enter the code</value>
+  </data>
+  <data name="PasswordlessVerify.Subtitle" xml:space="preserve">
+    <value>If your details are registered, we sent a six-digit code to {0}.</value>
+  </data>
+  <data name="PasswordlessVerify.CodeLabel" xml:space="preserve">
+    <value>Sign-in code</value>
+  </data>
+  <data name="PasswordlessVerify.CodeHint" xml:space="preserve">
+    <value>The six-digit code is valid for 5 minutes.</value>
+  </data>
+  <data name="PasswordlessVerify.Submit" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="PasswordlessVerify.NoCode" xml:space="preserve">
+    <value>Did not get a code?</value>
+  </data>
+  <data name="PasswordlessVerify.TryAgain" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="PasswordlessVerify.BrandHeadline" xml:space="preserve">
+    <value>Waiting for your code.</value>
+  </data>
+  <data name="PasswordlessVerify.BrandLead" xml:space="preserve">
+    <value>The code only works in this browser and for 5 minutes.</value>
+  </data>
+  <data name="Login.Passwordless.Email" xml:space="preserve">
+    <value>Sign in with an email code</value>
+  </data>
+  <data name="Login.Passwordless.Phone" xml:space="preserve">
+    <value>Sign in with an SMS code</value>
+  </data>
 </root>

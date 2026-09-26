@@ -62,7 +62,8 @@ public sealed class ForgotPasswordHandler(
             PrincipalId = principal.Id,
             IsolationId = client.IsolationId,
             ClientKey = client.ClientKey,
-            CodeHash = simpleHasher.Hash(code)
+            CodeHash = simpleHasher.Hash(code),
+            ExpiresAt = DateTimeOffset.UtcNow.Add(ResetCodeTtl)
         };
 
         await resetStore.StoreAsync(PasswordResetKeys.ForInteraction(cmd.InteractionKey), reset, ResetCodeTtl, ct);
