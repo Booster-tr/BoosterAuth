@@ -51,12 +51,6 @@ public sealed class ForgotPasswordHandler(
         if (target is null)
             return;
 
-        // Suresi dolmamis bir talep varsa YENISI URETILMEZ.
-        //
-        // Uretilseydi her tiklama yeni bir kod dogurur, kullanicinin kutusuna
-        // dusen kodlardan hangisinin gecerli oldugu belirsizlesir ve ayni
-        // pencerede sinirsiz kod uretmek mumkun olurdu. Sessizce donulur:
-        // "zaten talep ettiniz" demek, hesabin var oldugunu ele verirdi.
         var pendingKey = PasswordResetKeys.Pending(client.IsolationId, principal.Id);
         if (await resetStore.GetAsync(pendingKey, ct) is not null)
             return;
@@ -73,8 +67,6 @@ public sealed class ForgotPasswordHandler(
 
         await resetStore.StoreAsync(PasswordResetKeys.ForInteraction(cmd.InteractionKey), reset, ResetCodeTtl, ct);
 
-        // Ayni omurlu ikinci kayit: bu kullanicinin beklemede talebi oldugunu
-        // etkilesimden bagimsiz olarak isaretler.
         await resetStore.StoreAsync(pendingKey, reset, ResetCodeTtl, ct);
 
         await eventBus.PublishAsync(new NotificationRequestedEvent
