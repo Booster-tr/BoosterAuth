@@ -15,6 +15,7 @@ public sealed class AdminBootstrapper(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
     IAsyncRepository<PasswordHistory, IdpDbContext> passwordHistoryRepository,
+    IAsyncRepository<PrincipalRole, IdpDbContext> principalRoleRepository,
     IPasswordHasher passwordHasher,
     IRequestContextAccessor requestContextAccessor,
     BootstrapOptions bootstrapOptions)
@@ -64,6 +65,15 @@ public sealed class AdminBootstrapper(
             Id = EntityId.New(),
             PrincipalId = admin.Id,
             PasswordHash = credential.PasswordHash,
+            CreatedTime = now
+        }, ct);
+
+        await principalRoleRepository.AddAsync(new PrincipalRole
+        {
+            Id = EntityId.New(),
+            PrincipalId = admin.Id,
+            RoleId = AuthConstants.AdminRoleId,
+            RoleName = AuthConstants.AdminRoleName,
             CreatedTime = now
         }, ct);
 

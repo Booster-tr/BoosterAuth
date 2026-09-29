@@ -6,7 +6,9 @@ using Booster.Auth.Manager.RequestContexts;
 using Booster.Authorization.Fga.Extensions;
 using Booster.Authorization.Fga.Options;
 using Booster.Caching.Redis;
+using Booster.Auth.Common.Internal.Models;
 using FastEndpoints;
+using FluentValidation;
 using Booster.Caching.Redis.Extensions;
 using Booster.Common.Extensions.ServiceExtensions;
 using Booster.Auth.Database.Interceptors;
@@ -18,6 +20,7 @@ using Booster.ExceptionManager.Abstraction.Extensions;
 using Booster.Logging.BoosterAmqp.Extensions;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -78,7 +81,7 @@ public static class ServiceExtensions
         return services;
     }
 
-    public static WebApplication UseBoosterApi(this WebApplication app)
+    public static WebApplication UseBoosterApi(this WebApplication app, bool wrapResponses = false)
     {
         app.UseSwagger();
         app.UseSwaggerUI();
@@ -86,7 +89,19 @@ public static class ServiceExtensions
         app.UseBoosterAuthentication();
         app.UseBoosterAuthorization();
 
-        app.UseFastEndpoints();
+        app.UseFastEndpoints(c =>
+        {
+            if (!wrapResponses) return;
+
+            c.Errors.ResponseBuilder = (failures, _, _) => throw new ValidationException(failures);
+
+            c.Serializer.ResponseSerializer = (rsp, dto, contentType, jsonContext, ct) =>
+            {
+                rsp.ContentType = contentType;
+                var envelope = ApiResponse.Ok(dto);
+                return rsp.WriteAsJsonAsync(envelope, cancellationToken: ct);
+            };
+        });
 
         return app;
     }
