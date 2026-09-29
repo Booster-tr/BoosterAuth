@@ -7,7 +7,8 @@ public readonly record struct AccessPage(IReadOnlyList<AccessEntry> Items, strin
 public interface IAccessManager
 {
     Task<AccessPage> ListAsync(
-        string objectType, Guid objectId, int pageSize, string? continuationToken, CancellationToken ct);
+        string objectType, Guid objectId, IReadOnlyList<string> relations,
+        int pageSize, string? continuationToken, CancellationToken ct);
 
     Task GrantAsync(string objectType, Guid objectId, Guid principalId, string relation, CancellationToken ct);
 

@@ -20,6 +20,8 @@ public class ServiceAccount : IsolatedEntity
     public string Name { get; set; } = default!;
 
     public DateTimeOffset? ExpiresAt { get; set; }
+
+    public Guid? OwnerPoolId { get; set; }
 }
 
 public class ServiceAccountConfiguration : IEntityTypeConfiguration<ServiceAccount>
@@ -40,6 +42,9 @@ public class ServiceAccountConfiguration : IEntityTypeConfiguration<ServiceAccou
         builder.Property(x => x.SecretHash).HasMaxLength(500).IsRequired();
         builder.Property(x => x.Name).HasMaxLength(300).IsRequired();
         builder.Property(x => x.ExpiresAt);
+        builder.Property(x => x.OwnerPoolId);
+
+        builder.HasIndex(x => x.OwnerPoolId).IsUnique(false);
 
         builder.HasIndex(x => new { x.IsolationId, x.Key }).IsUnique().HasFilter("\"DeletedTime\" IS NULL");
 

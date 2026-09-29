@@ -1,11 +1,10 @@
 using Booster.Auth.Common.Internal.Constants;
-using Booster.Auth.Common.Internal.Constants.Messages;
 using Booster.ExceptionManager.Abstraction.Constants;
 using FluentValidation;
 
-namespace Booster.Auth.Management.Api.Features.Tenants.Access;
+namespace Booster.Auth.Management.Api.Features._base;
 
-public static class TenantAccessRules
+public static class AccessRules
 {
     public static readonly string[] Assignable =
     [
@@ -15,9 +14,15 @@ public static class TenantAccessRules
         AuthConstants.GrantManagerRelation
     ];
 
-    public static IRuleBuilderOptions<T, string> TenantRelation<T>(this IRuleBuilder<T, string> rule)
+    public static IRuleBuilderOptions<T, string> AssignableRelation<T>(this IRuleBuilder<T, string> rule)
         => rule
             .NotEmpty().WithMessage(ValidationErrors.NotEmptyError)
             .Must(relation => Assignable.Contains(relation, StringComparer.OrdinalIgnoreCase))
             .WithMessage(AuthNMessageKeys.InvalidRelation);
 }
+
+public readonly record struct AccessChangeResponse(Guid PrincipalId, string Relation);
+
+public record AccessListResponse(IReadOnlyList<AccessItemResponse> Items, string? ContinuationToken);
+
+public readonly record struct AccessItemResponse(Guid PrincipalId, string Relation);

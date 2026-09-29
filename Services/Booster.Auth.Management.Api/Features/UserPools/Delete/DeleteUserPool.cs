@@ -7,6 +7,7 @@ using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Database.Repositories;
 using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.UserPools.Delete;
 

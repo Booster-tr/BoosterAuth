@@ -15,28 +15,67 @@ public sealed class AccessManager(
     private const int MaxBatchSize = 100;
 
     public async Task<AccessPage> ListAsync(
-        string objectType, Guid objectId, int pageSize, string? continuationToken, CancellationToken ct)
+        string objectType, Guid objectId, IReadOnlyList<string> relations,
+        int pageSize, string? continuationToken, CancellationToken ct)
     {
-        var response = await authorizationClient.ReadRelationsAsync(
-            new ReadRelationsRequest
+        var size = Math.Clamp(pageSize, 1, MaxBatchSize);
+        var (index, fgaToken) = ParseToken(continuationToken);
+        var items = new List<AccessEntry>();
+
+        while (index < relations.Count && items.Count < size)
+        {
+            var response = await authorizationClient.ReadRelationsAsync(
+                new ReadRelationsRequest
+                {
+                    IsolationId = Isolation(),
+                    Object = Target(objectType, objectId),
+                    Relation = relations[index],
+                    PageSize = size - items.Count,
+                    ContinuationToken = fgaToken ?? string.Empty
+                },
+                cancellationToken: ct);
+
+            items.AddRange(response.Results
+                .Where(r => r.User.StartsWith(UserPrefix, StringComparison.Ordinal))
+                .Select(r => (Id: Guid.TryParse(r.User[UserPrefix.Length..], out var id) ? id : Guid.Empty, r.Relation))
+                .Where(r => r.Id != Guid.Empty)
+                .Select(r => new AccessEntry(r.Id, r.Relation)));
+
+            if (string.IsNullOrEmpty(response.ContinuationToken))
             {
-                IsolationId = Isolation(),
-                Object = Target(objectType, objectId),
-                PageSize = Math.Clamp(pageSize, 1, MaxBatchSize),
-                ContinuationToken = continuationToken ?? string.Empty
-            },
-            cancellationToken: ct);
+                index++;
+                fgaToken = null;
+            }
+            else
+            {
+                fgaToken = response.ContinuationToken;
+            }
+        }
 
-        var items = response.Results
-            .Where(r => r.User.StartsWith(UserPrefix, StringComparison.Ordinal))
-            .Select(r => (Id: Guid.TryParse(r.User[UserPrefix.Length..], out var id) ? id : Guid.Empty, r.Relation))
-            .Where(r => r.Id != Guid.Empty)
-            .Select(r => new AccessEntry(r.Id, r.Relation))
-            .ToList();
+        return new AccessPage(items, index < relations.Count ? FormatToken(index, fgaToken) : null);
+    }
 
-        return new AccessPage(
-            items,
-            string.IsNullOrEmpty(response.ContinuationToken) ? null : response.ContinuationToken);
+    private static string FormatToken(int index, string? fgaToken)
+        => Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{index}|{fgaToken}"));
+
+    private static (int Index, string? FgaToken) ParseToken(string? token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return (0, null);
+
+        try
+        {
+            var raw = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
+            var separator = raw.IndexOf('|');
+
+            return separator > 0 && int.TryParse(raw[..separator], out var index) && index >= 0
+                ? (index, raw[(separator + 1)..] is { Length: > 0 } fga ? fga : null)
+                : (0, null);
+        }
+        catch (FormatException)
+        {
+            return (0, null);
+        }
     }
 
     public async Task GrantAsync(

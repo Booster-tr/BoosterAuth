@@ -8,8 +8,11 @@ using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using Booster.Hashing.TwoWays.Aes;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.IdentityProviders.Create;
 
@@ -19,6 +22,10 @@ public class CreateIdentityProviderEndpoint : Endpoint<CreateIdentityProviderCom
     {
         Post("");
         Group<IdentityProvidersEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Havuza dış kimlik sağlayıcısı ekler";

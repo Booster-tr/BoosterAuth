@@ -1,6 +1,6 @@
 using Booster.Auth.Common.Internal.Constants;
 
-namespace Booster.Auth.Management.Api.Features._base;
+namespace Booster.Auth.Management.Api.Constants;
 
 public static class ManagementPolicies
 {

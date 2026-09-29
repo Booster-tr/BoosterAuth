@@ -4,8 +4,11 @@ using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.SetTokenScopePolicy;
 
@@ -13,8 +16,12 @@ public class SetClientTokenScopePolicyEndpoint : Endpoint<SetClientTokenScopePol
 {
     public override void Configure()
     {
-        Put("{Id:guid}/token-scope-policy");
+        Put("token-scope-policy");
         Group<ClientsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.ClientType, ManagementPolicies.ClientTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Client token scope policy listesini değiştirir";
@@ -28,7 +35,7 @@ public class SetClientTokenScopePolicyEndpoint : Endpoint<SetClientTokenScopePol
 }
 
 public record SetClientTokenScopePolicyCommand(
-    Guid Id,
+    Guid ClientId,
     List<TokenScopePolicyItem> TokenScopePolicy) : ICommand<SetClientTokenScopePolicyResponse>;
 
 public readonly record struct SetClientTokenScopePolicyResponse(Guid Id);
@@ -40,7 +47,7 @@ public class SetClientTokenScopePolicyCommandHandler(
     public async Task<SetClientTokenScopePolicyResponse> ExecuteAsync(
         SetClientTokenScopePolicyCommand command, CancellationToken ct)
     {
-        var client = await clientRepository.GetAsync(c => c.Id == command.Id, cancellationToken: ct);
+        var client = await clientRepository.GetAsync(c => c.Id == command.ClientId, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
         client!.TokenScopePolicy = command.TokenScopePolicy;
@@ -55,7 +62,7 @@ public class SetClientTokenScopePolicyValidator : Validator<SetClientTokenScopeP
 {
     public SetClientTokenScopePolicyValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.ClientId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
 
         RuleFor(x => x.TokenScopePolicy)
             .NotNull().WithMessage(ValidationErrors.NotNullOrEmptyError)

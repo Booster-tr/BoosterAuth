@@ -6,8 +6,11 @@ using Booster.Database.Repositories;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.ChangeStatus;
 
@@ -15,8 +18,12 @@ public class ChangeClientStatusEndpoint : Endpoint<ChangeClientStatusCommand, Ch
 {
     public override void Configure()
     {
-        Put("{Id:guid}/status");
+        Put("status");
         Group<ClientsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.ClientType, ManagementPolicies.ClientTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Client durumunu değiştirir";
@@ -28,7 +35,7 @@ public class ChangeClientStatusEndpoint : Endpoint<ChangeClientStatusCommand, Ch
         => await Send.OkAsync(await req.ExecuteAsync(ct), ct);
 }
 
-public record ChangeClientStatusCommand(Guid Id, EntityStatus Status) : ICommand<ChangeClientStatusResponse>;
+public record ChangeClientStatusCommand(Guid ClientId, EntityStatus Status) : ICommand<ChangeClientStatusResponse>;
 
 public readonly record struct ChangeClientStatusResponse(Guid Id);
 
@@ -41,7 +48,7 @@ public class ChangeClientStatusCommandHandler(
     public async Task<ChangeClientStatusResponse> ExecuteAsync(
         ChangeClientStatusCommand command, CancellationToken ct)
     {
-        var client = await clientRepository.GetAsync(c => c.Id == command.Id, cancellationToken: ct);
+        var client = await clientRepository.GetAsync(c => c.Id == command.ClientId, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
         if (command.Status == EntityStatus.Active)
@@ -68,7 +75,7 @@ public class ChangeClientStatusValidator : Validator<ChangeClientStatusCommand>
 {
     public ChangeClientStatusValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.ClientId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
         RuleFor(x => x.Status).IsInEnum();
     }
 }

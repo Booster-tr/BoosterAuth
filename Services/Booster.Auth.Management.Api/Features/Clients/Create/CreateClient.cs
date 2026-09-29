@@ -8,9 +8,11 @@ using Booster.Database.Repositories;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 using Mapster;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.Create;
 
@@ -20,6 +22,10 @@ public class CreateClientEndpoint : Endpoint<CreateClientCommand, CreateClientRe
     {
         Post("");
         Group<ClientsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Yeni OAuth client oluşturur";

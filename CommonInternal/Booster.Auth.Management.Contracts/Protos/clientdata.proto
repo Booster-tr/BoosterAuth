@@ -12,6 +12,10 @@ service ClientDataService {
   // Ayri cagri olmasinin sebebi: bu yanit onbellege ALINMAZ. ClientData ile
   // birlikte tasinsaydi sirlar Redis'te 30 dakika duz metin beklerdi.
   rpc GetFederationProvider (GetFederationProviderRequest) returns (GetFederationProviderResponse);
+
+  // Havuzda tanimli roller ve kapsamlar. IdP, kullaniciya rol/kapsam atarken
+  // yalnizca bunlarin secilebildigini dogrular.
+  rpc GetPoolDefinitions (GetPoolDefinitionsRequest) returns (GetPoolDefinitionsResponse);
 }
 
 message GetClientDataRequest {
@@ -112,4 +116,19 @@ message FederationProviderConfigMessage {
   string display_name = 4;
   bool is_active = 5;
   map<string, string> settings = 6;
+}
+
+message GetPoolDefinitionsRequest {
+  string user_pool_id = 1;       // Guid
+}
+
+message GetPoolDefinitionsResponse {
+  bool found = 1;
+  repeated PoolRoleMessage roles = 2;
+  repeated string scopes = 3;
+}
+
+message PoolRoleMessage {
+  string id = 1;                 // Guid
+  string key = 2;
 }

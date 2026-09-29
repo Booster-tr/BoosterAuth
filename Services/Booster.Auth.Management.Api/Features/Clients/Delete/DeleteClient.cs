@@ -6,7 +6,9 @@ using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Database.Repositories;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.Delete;
 
@@ -14,8 +16,12 @@ public class DeleteClientEndpoint : EndpointWithoutRequest<DeleteClientResponse>
 {
     public override void Configure()
     {
-        Delete("{id:guid}");
+        Delete("");
         Group<ClientsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.ClientType, ManagementPolicies.ClientTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Client siler";
@@ -24,10 +30,10 @@ public class DeleteClientEndpoint : EndpointWithoutRequest<DeleteClientResponse>
     }
 
     public override async Task HandleAsync(CancellationToken ct)
-        => await Send.OkAsync(await new DeleteClientCommand(Route<Guid>("id")).ExecuteAsync(ct), ct);
+        => await Send.OkAsync(await new DeleteClientCommand(Query<Guid>("ClientId")).ExecuteAsync(ct), ct);
 }
 
-public record DeleteClientCommand(Guid Id) : ICommand<DeleteClientResponse>;
+public record DeleteClientCommand(Guid ClientId) : ICommand<DeleteClientResponse>;
 
 public readonly record struct DeleteClientResponse(Guid Id);
 
@@ -39,7 +45,7 @@ public class DeleteClientCommandHandler(
 {
     public async Task<DeleteClientResponse> ExecuteAsync(DeleteClientCommand command, CancellationToken ct)
     {
-        var client = await clientRepository.GetAsync(c => c.Id == command.Id, cancellationToken: ct);
+        var client = await clientRepository.GetAsync(c => c.Id == command.ClientId, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
         clientRepository.Delete(client!);

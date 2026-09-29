@@ -6,9 +6,12 @@ using Booster.Database.Repositories;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 using Mapster;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.Update;
 
@@ -16,8 +19,12 @@ public class UpdateClientEndpoint : Endpoint<UpdateClientCommand, UpdateClientRe
 {
     public override void Configure()
     {
-        Put("{Id:guid}");
+        Put("");
         Group<ClientsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.ClientType, ManagementPolicies.ClientTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Client bilgilerini günceller";
@@ -31,7 +38,7 @@ public class UpdateClientEndpoint : Endpoint<UpdateClientCommand, UpdateClientRe
 }
 
 public record UpdateClientCommand(
-    Guid Id,
+    Guid ClientId,
     string DisplayName,
     string? LogoUri,
     OAuthGrantType AllowedGrantTypes,
@@ -49,7 +56,7 @@ public class UpdateClientCommandHandler(
 {
     public async Task<UpdateClientResponse> ExecuteAsync(UpdateClientCommand command, CancellationToken ct)
     {
-        var client = await clientRepository.GetAsync(c => c.Id == command.Id, cancellationToken: ct);
+        var client = await clientRepository.GetAsync(c => c.Id == command.ClientId, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
         command.Adapt(client);
@@ -66,7 +73,7 @@ public class UpdateClientValidator : Validator<UpdateClientCommand>
 {
     public UpdateClientValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.ClientId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
 
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage(ValidationErrors.NotEmptyError)

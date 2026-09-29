@@ -1,8 +1,8 @@
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
+using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
-using Booster.Auth.Management.Api.Features.Tenants.Access.Grant;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Auth.Z.Grpc;
@@ -15,7 +15,7 @@ using FluentValidation;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Access.Revoke;
 
-public class RevokeTenantAccessEndpoint : EndpointWithoutRequest<TenantAccessChangeResponse>
+public class RevokeTenantAccessEndpoint : EndpointWithoutRequest<AccessChangeResponse>
 {
     public override void Configure()
     {
@@ -47,16 +47,16 @@ public class RevokeTenantAccessEndpoint : EndpointWithoutRequest<TenantAccessCha
 }
 
 public record RevokeTenantAccessCommand(Guid TenantId, Guid PrincipalId, string Relation)
-    : ICommand<TenantAccessChangeResponse>;
+    : ICommand<AccessChangeResponse>;
 
 public class RevokeTenantAccessCommandHandler(
     IAsyncRepository<Tenant, AuthNDbContext> tenantRepository,
     IAccessManager accessManager,
     AuthorizationService.AuthorizationServiceClient authorizationClient,
     IRequestContextAccessor requestContextAccessor)
-    : ICommandHandler<RevokeTenantAccessCommand, TenantAccessChangeResponse>
+    : ICommandHandler<RevokeTenantAccessCommand, AccessChangeResponse>
 {
-    public async Task<TenantAccessChangeResponse> ExecuteAsync(
+    public async Task<AccessChangeResponse> ExecuteAsync(
         RevokeTenantAccessCommand command, CancellationToken ct)
     {
         var tenant = await tenantRepository.GetAsync(
@@ -85,7 +85,7 @@ public class RevokeTenantAccessCommandHandler(
         await accessManager.RevokeAsync(
             AuthConstants.TenantType, command.TenantId, command.PrincipalId, command.Relation, ct);
 
-        return new TenantAccessChangeResponse(command.PrincipalId, command.Relation);
+        return new AccessChangeResponse(command.PrincipalId, command.Relation);
     }
 }
 
@@ -96,6 +96,6 @@ public class RevokeTenantAccessValidator : Validator<RevokeTenantAccessCommand>
         RuleFor(x => x.TenantId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
         RuleFor(x => x.PrincipalId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
 
-        RuleFor(x => x.Relation).TenantRelation();
+        RuleFor(x => x.Relation).AssignableRelation();
     }
 }

@@ -1,4 +1,5 @@
 using Booster.Auth.Common.Internal.Constants;
+using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Authorization.Fga.Attributes;
@@ -7,7 +8,7 @@ using Mapster;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Access.GetList;
 
-public class GetListTenantAccessEndpoint : EndpointWithoutRequest<GetListTenantAccessResponse>
+public class GetListTenantAccessEndpoint : EndpointWithoutRequest<AccessListResponse>
 {
     public override void Configure()
     {
@@ -38,23 +39,18 @@ public class GetListTenantAccessEndpoint : EndpointWithoutRequest<GetListTenantA
 }
 
 public record GetListTenantAccessQuery(Guid TenantId, int PageSize, string? ContinuationToken)
-    : ICommand<GetListTenantAccessResponse>;
-
-public record GetListTenantAccessResponse(
-    IReadOnlyList<TenantAccessResponse> Items,
-    string? ContinuationToken);
-
-public readonly record struct TenantAccessResponse(Guid PrincipalId, string Relation);
+    : ICommand<AccessListResponse>;
 
 public class GetListTenantAccessQueryHandler(IAccessManager accessManager)
-    : ICommandHandler<GetListTenantAccessQuery, GetListTenantAccessResponse>
+    : ICommandHandler<GetListTenantAccessQuery, AccessListResponse>
 {
-    public async Task<GetListTenantAccessResponse> ExecuteAsync(
+    public async Task<AccessListResponse> ExecuteAsync(
         GetListTenantAccessQuery command, CancellationToken ct)
     {
         var page = await accessManager.ListAsync(
-            AuthConstants.TenantType, command.TenantId, command.PageSize, command.ContinuationToken, ct);
+            AuthConstants.TenantType, command.TenantId, AccessRules.Assignable,
+            command.PageSize, command.ContinuationToken, ct);
 
-        return page.Adapt<GetListTenantAccessResponse>();
+        return page.Adapt<AccessListResponse>();
     }
 }

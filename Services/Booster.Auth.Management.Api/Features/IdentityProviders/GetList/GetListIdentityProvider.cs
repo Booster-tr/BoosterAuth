@@ -7,7 +7,10 @@ using Booster.Database.DynamicFilter.Models;
 using Booster.Database.Helpers;
 using Booster.Database.NameValueCollectionHelpers;
 using Booster.Database.Repositories;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.IdentityProviders.GetList;
 
@@ -17,6 +20,10 @@ public class GetListIdentityProviderEndpoint : EndpointWithoutRequest<ListModel<
     {
         Get("");
         Group<IdentityProvidersEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.ViewerRelation)));
         Summary(s =>
         {
             s.Summary = "Dış kimlik sağlayıcılarını listeler";
@@ -29,7 +36,7 @@ public class GetListIdentityProviderEndpoint : EndpointWithoutRequest<ListModel<
     public override async Task HandleAsync(CancellationToken ct)
     {
         var nvc = HttpContext.Request.ToNvc();
-        var query = new GetListIdentityProviderQuery
+        var query = new GetListIdentityProviderQuery(Query<Guid>("UserPoolId"))
         {
             DynamicQuery = nvc.ToDynamicFilter<GetListIdentityProviderResponse>(),
             PageRequest = nvc.ToPageRequest()
@@ -39,7 +46,7 @@ public class GetListIdentityProviderEndpoint : EndpointWithoutRequest<ListModel<
     }
 }
 
-public record GetListIdentityProviderQuery : BaseDynamicRequest, ICommand<ListModel<GetListIdentityProviderResponse>>;
+public record GetListIdentityProviderQuery(Guid UserPoolId) : BaseDynamicRequest, ICommand<ListModel<GetListIdentityProviderResponse>>;
 
 /// <summary>
 /// <c>ClientSecretEncrypted</c> BU MODELDE YOK. Şifreli hâlini bile dışa
@@ -65,6 +72,7 @@ public class GetListIdentityProviderQueryHandler(
     {
         var data = await providerRepository.ListDynamicAsync(
             command.DynamicQuery,
+            predicate: p => p.UserPoolId == command.UserPoolId,
             index: command.PageRequest.PageIndex,
             size: command.PageRequest.PageSize,
             cancellationToken: ct);

@@ -16,9 +16,41 @@ public sealed class ClientDataGrpcService(
     IAsyncRepository<Client, AuthNDbContext> clientRepository,
     IAsyncRepository<Role, AuthNDbContext> roleRepository,
     IAsyncRepository<IdentityProvider, AuthNDbContext> identityProviderRepository,
+    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
+    IAsyncRepository<ScopeDefinition, AuthNDbContext> scopeDefinitionRepository,
     ISecretProtector secretProtector)
     : ClientDataService.ClientDataServiceBase
 {
+    public override async Task<GetPoolDefinitionsResponse> GetPoolDefinitions(
+        GetPoolDefinitionsRequest request, ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.UserPoolId, out var poolId))
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "user_pool_id geçersiz."));
+
+        var ct = context.CancellationToken;
+
+        if (!await userPoolRepository.AnyAsync(p => p.Id == poolId, cancellationToken: ct))
+            return new GetPoolDefinitionsResponse { Found = false };
+
+        var roles = await roleRepository.Query()
+            .AsNoTracking()
+            .Where(r => r.UserPoolId == poolId)
+            .Select(r => new PoolRoleMessage { Id = r.Id.ToString(), Key = r.Key })
+            .ToListAsync(ct);
+
+        var scopes = await scopeDefinitionRepository.Query()
+            .AsNoTracking()
+            .Where(s => s.UserPoolId == poolId)
+            .Select(s => s.Scope)
+            .ToListAsync(ct);
+
+        var response = new GetPoolDefinitionsResponse { Found = true };
+        response.Roles.AddRange(roles);
+        response.Scopes.AddRange(scopes);
+
+        return response;
+    }
+
     public override async Task<GetClientDataResponse> GetByClientKey(
         GetClientDataRequest request, ServerCallContext context)
     {

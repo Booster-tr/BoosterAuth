@@ -4,8 +4,11 @@ using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using Mapster;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.GetById;
 
@@ -13,8 +16,12 @@ public class GetByIdClientEndpoint : EndpointWithoutRequest<GetByIdClientRespons
 {
     public override void Configure()
     {
-        Get("{id:guid}");
+        Get("detail");
         Group<ClientsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.ClientType, ManagementPolicies.ClientTarget, AuthConstants.ViewerRelation)));
         Summary(s =>
         {
             s.Summary = "Client getirir";
@@ -23,10 +30,10 @@ public class GetByIdClientEndpoint : EndpointWithoutRequest<GetByIdClientRespons
     }
 
     public override async Task HandleAsync(CancellationToken ct)
-        => await Send.OkAsync(await new GetByIdClientQuery(Route<Guid>("id")).ExecuteAsync(ct), ct);
+        => await Send.OkAsync(await new GetByIdClientQuery(Query<Guid>("ClientId")).ExecuteAsync(ct), ct);
 }
 
-public record GetByIdClientQuery(Guid Id) : ICommand<GetByIdClientResponse>;
+public record GetByIdClientQuery(Guid ClientId) : ICommand<GetByIdClientResponse>;
 
 public record GetByIdClientResponse(
     Guid Id,
@@ -49,7 +56,7 @@ public class GetByIdClientQueryHandler(
     public async Task<GetByIdClientResponse> ExecuteAsync(GetByIdClientQuery command, CancellationToken ct)
     {
         var client = await clientRepository.GetAsync(
-            c => c.Id == command.Id, enableTracking: false, cancellationToken: ct);
+            c => c.Id == command.ClientId, enableTracking: false, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
         return client.Adapt<GetByIdClientResponse>();

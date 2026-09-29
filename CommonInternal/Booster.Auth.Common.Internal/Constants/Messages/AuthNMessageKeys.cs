@@ -14,6 +14,7 @@ public class AuthNMessageKeys
     // --- Firma yetkileri ---
     public const string TenantOwnerAccessCannotBeRevoked = "authn.tenant_owner_access_cannot_be_revoked";
     public const string TenantOwnerRelationRequiresOwner = "authn.tenant_owner_relation_requires_owner";
+    public const string PoolOwnerRelationRequiresOwner = "authn.pool_owner_relation_requires_owner";
     public const string PrincipalIdentifierInvalid = "authn.principal_identifier_invalid";
     public const string PrincipalNotFound = "authn.principal_not_found";
     public const string PrincipalLookupLimitExceeded = "authn.principal_lookup_limit_exceeded";

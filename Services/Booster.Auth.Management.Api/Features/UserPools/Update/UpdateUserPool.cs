@@ -9,6 +9,7 @@ using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 using Mapster;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.UserPools.Update;
 

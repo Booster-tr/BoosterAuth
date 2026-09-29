@@ -6,8 +6,11 @@ using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.Hashing.TwoWays.Aes;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.IdentityProviders.Update;
 
@@ -15,8 +18,12 @@ public class UpdateIdentityProviderEndpoint : Endpoint<UpdateIdentityProviderCom
 {
     public override void Configure()
     {
-        Put("{id}");
+        Put("");
         Group<IdentityProvidersEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Sağlayıcı ayarlarını güncelller";
@@ -34,7 +41,8 @@ public class UpdateIdentityProviderEndpoint : Endpoint<UpdateIdentityProviderCom
 }
 
 public record UpdateIdentityProviderCommand(
-    Guid Id,
+    Guid UserPoolId,
+    Guid IdentityProviderId,
     string DisplayName,
     string? ClientSecret,
     Dictionary<string, string> Settings) : ICommand;
@@ -46,7 +54,8 @@ public class UpdateIdentityProviderCommandHandler(
 {
     public async Task ExecuteAsync(UpdateIdentityProviderCommand command, CancellationToken ct)
     {
-        var provider = await providerRepository.GetAsync(p => p.Id == command.Id, cancellationToken: ct);
+        var provider = await providerRepository.GetAsync(
+            p => p.Id == command.IdentityProviderId && p.UserPoolId == command.UserPoolId, cancellationToken: ct);
         provider.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.IdentityProviderNotFound);
 
         provider!.DisplayName = command.DisplayName.Trim();
@@ -76,7 +85,8 @@ public class UpdateIdentityProviderValidator : Validator<UpdateIdentityProviderC
 {
     public UpdateIdentityProviderValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.UserPoolId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.IdentityProviderId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
 
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage(ValidationErrors.NotEmptyError)

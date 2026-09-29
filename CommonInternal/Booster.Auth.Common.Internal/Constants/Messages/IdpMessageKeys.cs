@@ -67,4 +67,13 @@ public class IdpMessageKeys
     public const string FederationJitDisabled = "idp.federation_jit_disabled";
     public const string FederationAccountInactive = "idp.federation_account_inactive";
     public const string FederationLocalAccountExists = "idp.federation_local_account_exists";
+
+    // --- Havuz kullanıcıları ve servis hesapları ---------------------------
+    public const string PoolNotFound = "idp.pool_not_found";
+    public const string RoleNotInPool = "idp.role_not_in_pool";
+    public const string ScopeNotInPool = "idp.scope_not_in_pool";
+    public const string ServiceAccountNotFound = "idp.service_account_not_found";
+    public const string InvalidServiceAccountRelation = "idp.invalid_service_account_relation";
+    public const string RoleNotHeldByCaller = "idp.role_not_held_by_caller";
+    public const string ScopeNotHeldByCaller = "idp.scope_not_held_by_caller";
 }

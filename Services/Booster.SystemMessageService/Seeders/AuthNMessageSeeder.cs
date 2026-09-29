@@ -18,6 +18,7 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.ClientNotFound, "Uygulama", "Uygulama bulunamadı.", "Client", "Client not found."),
 
         // --- Firma yetkileri ---
+        new(AuthNMessageKeys.PoolOwnerRelationRequiresOwner, "Yetkilendirme", "Sahip yetkisini yalnızca havuz sahipleri verebilir veya geri alabilir.", "Authorization", "Only pool owners can grant or revoke the owner permission."),
         new(AuthNMessageKeys.TenantOwnerRelationRequiresOwner, "Yetkilendirme", "Sahip yetkisini yalnızca firma sahipleri verebilir veya geri alabilir.", "Authorization", "Only tenant owners can grant or revoke the owner permission."),
         new(AuthNMessageKeys.TenantOwnerAccessCannotBeRevoked, "Yetkilendirme", "Firma sahibinin yetkileri geri alınamaz.", "Authorization", "The tenant owner's permissions cannot be revoked."),
         new(AuthNMessageKeys.PrincipalIdentifierInvalid, "Kullanıcı", "Geçerli bir e-posta adresi, kullanıcı adı veya telefon numarası girin.", "User", "Enter a valid email address, username or phone number."),

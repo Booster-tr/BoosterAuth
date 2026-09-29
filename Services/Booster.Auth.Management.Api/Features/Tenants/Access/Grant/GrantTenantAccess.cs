@@ -1,4 +1,5 @@
 using Booster.Auth.Common.Internal.Constants;
+using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Auth.Management.Api.Managers.PrincipalLookupManagers;
@@ -12,7 +13,7 @@ using FluentValidation;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Access.Grant;
 
-public class GrantTenantAccessEndpoint : Endpoint<GrantTenantAccessCommand, TenantAccessChangeResponse>
+public class GrantTenantAccessEndpoint : Endpoint<GrantTenantAccessCommand, AccessChangeResponse>
 {
     public override void Configure()
     {
@@ -36,18 +37,16 @@ public class GrantTenantAccessEndpoint : Endpoint<GrantTenantAccessCommand, Tena
 }
 
 public record GrantTenantAccessCommand(Guid TenantId, string Identifier, string Relation)
-    : ICommand<TenantAccessChangeResponse>;
-
-public readonly record struct TenantAccessChangeResponse(Guid PrincipalId, string Relation);
+    : ICommand<AccessChangeResponse>;
 
 public class GrantTenantAccessCommandHandler(
     IPrincipalLookupManager principalLookupManager,
     IAccessManager accessManager,
     AuthorizationService.AuthorizationServiceClient authorizationClient,
     IRequestContextAccessor requestContextAccessor)
-    : ICommandHandler<GrantTenantAccessCommand, TenantAccessChangeResponse>
+    : ICommandHandler<GrantTenantAccessCommand, AccessChangeResponse>
 {
-    public async Task<TenantAccessChangeResponse> ExecuteAsync(
+    public async Task<AccessChangeResponse> ExecuteAsync(
         GrantTenantAccessCommand command, CancellationToken ct)
     {
 
@@ -72,7 +71,7 @@ public class GrantTenantAccessCommandHandler(
         await accessManager.GrantAsync(
             AuthConstants.TenantType, command.TenantId, principalId, command.Relation, ct);
 
-        return new TenantAccessChangeResponse(principalId, command.Relation);
+        return new AccessChangeResponse(principalId, command.Relation);
     }
 }
 
@@ -86,6 +85,6 @@ public class GrantTenantAccessValidator : Validator<GrantTenantAccessCommand>
             .NotEmpty().WithMessage(ValidationErrors.NotEmptyError)
             .MaximumLength(320).WithMessage(ValidationErrors.MaxLengthError);
 
-        RuleFor(x => x.Relation).TenantRelation();
+        RuleFor(x => x.Relation).AssignableRelation();
     }
 }

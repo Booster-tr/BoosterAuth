@@ -11,6 +11,7 @@ using Booster.Database.DynamicFilter.Models;
 using Booster.Database.NameValueCollectionHelpers;
 using Booster.Database.Repositories;
 using FastEndpoints;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.GetList;
 

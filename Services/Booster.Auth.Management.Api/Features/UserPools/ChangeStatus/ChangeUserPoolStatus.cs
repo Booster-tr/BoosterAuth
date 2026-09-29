@@ -10,6 +10,7 @@ using Booster.Auth.Common.Internal.Constants;
 using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.UserPools.ChangeStatus;
 

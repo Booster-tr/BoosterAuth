@@ -9,6 +9,7 @@ using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.UserPools.GetById;
 

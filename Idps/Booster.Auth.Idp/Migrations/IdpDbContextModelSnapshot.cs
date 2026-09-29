@@ -463,6 +463,9 @@ namespace Booster.Auth.Idp.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
+                    b.Property<Guid?>("OwnerPoolId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("PrincipalId")
                         .HasColumnType("uuid");
 
@@ -478,6 +481,8 @@ namespace Booster.Auth.Idp.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerPoolId");
 
                     b.HasIndex("PrincipalId")
                         .IsUnique();
