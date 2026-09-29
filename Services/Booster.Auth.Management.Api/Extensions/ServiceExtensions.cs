@@ -4,6 +4,7 @@ using Booster.Hashing.Options;
 using Booster.Auth.Common.Internal.Options;
 using Booster.Auth.Management.Api.Bootstrappers;
 using Booster.Auth.Management.Api.Features._base;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Common.Extensions.ServiceExtensions;
 using Booster.ExceptionManager.Abstraction.Extensions;
@@ -24,6 +25,7 @@ public static class ServiceExtensions
 
         services.AddScoped<ManagementBootstrapper>();
         services.AddScoped<IClientDataCacheStore, ClientDataCacheStore>();
+        services.AddScoped<IAccessManager, AccessManager>();
 
         services.AddBoosterCacheLanguageTranslator();
         services.AddBoosterExceptionHandler();

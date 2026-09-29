@@ -10,6 +10,7 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
     [
         // --- Bulunamadı ---
         new(AuthNMessageKeys.TenantNotFound, "Firma", "Firma bulunamadı.", "Tenant", "Tenant not found."),
+        new(AuthNMessageKeys.InvalidRelation, "Yetkilendirme", "Geçersiz yetki. Verilebilecek yetkiler: owner, manager, viewer.", "Authorization", "Invalid permission. Assignable permissions are: owner, manager, viewer."),
         new(AuthNMessageKeys.UserPoolNotFound, "Havuz", "Kullanıcı havuzu bulunamadı.", "Pool", "User pool not found."),
         new(AuthNMessageKeys.RoleNotFound, "Rol", "Rol bulunamadı.", "Role", "Role not found."),
         new(AuthNMessageKeys.RoleScopeNotFound, "Rol yetkisi", "Role bağlı yetki bulunamadı.", "Role scope", "Role scope not found."),

@@ -4,6 +4,7 @@ public class AuthNMessageKeys
 {
     // --- Bulunamadı ---
     public const string TenantNotFound = "authn.tenant_not_found";
+    public const string InvalidRelation = "authn.invalid_relation";
     public const string UserPoolNotFound = "authn.user_pool_not_found";
     public const string RoleNotFound = "authn.role_not_found";
     public const string RoleScopeNotFound = "authn.role_scope_not_found";

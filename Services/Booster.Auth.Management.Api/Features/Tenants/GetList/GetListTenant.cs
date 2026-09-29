@@ -6,16 +6,24 @@ using Booster.Database.Helpers;
 using Booster.Database.DynamicFilter.Models;
 using Booster.Database.NameValueCollectionHelpers;
 using Booster.Database.Repositories;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.GetList;
 
+// Hedef bir firma YOK; liste ucu tek bir kabı işaret etmiyor, bu yüzden
+// yetki değil kapsam koşulu var. Hangi satırların görüneceğini panel,
+// yetki grafiğinden aldığı kümeyle belirler.
 public class GetListTenantEndpoint : EndpointWithoutRequest<ListModel<GetListTenantResponse>>
 {
     public override void Configure()
     {
         Get("");
         Group<TenantsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope)));
+
         Summary(s =>
         {
             s.Summary = "Tenant listeler";

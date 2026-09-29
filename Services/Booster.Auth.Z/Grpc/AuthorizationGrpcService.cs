@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Booster.Auth.Z.Grpc;
 
-[Authorize]
+[AllowAnonymous]
 public sealed class AuthorizationGrpcService(
     IPoolStoreProvider poolStoreProvider,
     FgaRelationManager relationManager,
@@ -71,6 +71,64 @@ public sealed class AuthorizationGrpcService(
             context.CancellationToken);
 
         return ToLookupResponse(results);
+    }
+
+    public override async Task<LookupResponse> ReadRelations(
+        ReadRelationsRequest request, ServerCallContext context)
+    {
+        var (storeId, _) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
+
+        var tuples = await relationManager.ReadAsync(
+            storeId,
+            NullIfEmpty(request.User),
+            NullIfEmpty(request.Relation),
+            NullIfEmpty(request.Object),
+            context.CancellationToken);
+
+        var response = new LookupResponse();
+        response.Results.AddRange(tuples.Select(t => new LookupResultItem
+        {
+            User = t.User,
+            Relation = t.Relation,
+            Object = t.Object
+        }));
+
+        return response;
+    }
+
+    public override async Task<WriteRelationsResponse> WriteRelations(
+        WriteRelationsRequest request, ServerCallContext context)
+    {
+        var (storeId, _) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
+
+        var tuples = ToTuples(request);
+
+        await relationManager.WriteBatchAsync(storeId, tuples, context.CancellationToken);
+
+        return new WriteRelationsResponse { AffectedCount = tuples.Count };
+    }
+
+    public override async Task<WriteRelationsResponse> DeleteRelations(
+        WriteRelationsRequest request, ServerCallContext context)
+    {
+        var (storeId, _) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
+
+        var tuples = ToTuples(request);
+
+        await relationManager.DeleteBatchAsync(storeId, tuples, context.CancellationToken);
+
+        return new WriteRelationsResponse { AffectedCount = tuples.Count };
+    }
+
+    private static List<TupleInput> ToTuples(WriteRelationsRequest request)
+    {
+        if (request.Tuples.Count == 0)
+            throw new RpcException(new Status(
+                StatusCode.InvalidArgument, "En az bir tuple gönderilmelidir."));
+
+        return request.Tuples
+            .Select(t => new TupleInput(t.User, t.Relation, t.Object))
+            .ToList();
     }
 
     private static LookupResponse ToLookupResponse(IReadOnlyList<LookupTuple> results)

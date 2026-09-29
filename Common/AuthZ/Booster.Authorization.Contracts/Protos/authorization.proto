@@ -9,6 +9,18 @@ service AuthorizationService {
   // Lookup: grafiğe iki yönden bakma. Sonuç her iki yönde de aynı üçlüdür.
   rpc LookupByUser (LookupByUserRequest) returns (LookupResponse);
   rpc LookupByObject (LookupByObjectRequest) returns (LookupResponse);
+
+  // Yazma: yetki VERME ve ALMA. Panelin dogrudan AuthZ HTTP ucuna gitmesi
+  // yerine bu yol secildi, cunku "bu firmada yetki verebilir miyim" kontrolu
+  // Management ucundaki FGA politikasinda yapiliyor. Iki kapi olsaydi biri
+  // kontrolsuz kalirdi.
+  // Okuma: YAZILMIS tuple lar. LookupByObject turetilmis yetkileri de dondurur
+  // (owner olan viewer da sayilir); silinebilen ise yalnizca yazilmis olandir.
+  // Iki ayri soru oldugu icin iki ayri cagri var.
+  rpc ReadRelations (ReadRelationsRequest) returns (LookupResponse);
+
+  rpc WriteRelations (WriteRelationsRequest) returns (WriteRelationsResponse);
+  rpc DeleteRelations (WriteRelationsRequest) returns (WriteRelationsResponse);
 }
 
 message CheckRequest {
@@ -54,3 +66,23 @@ message LookupResultItem {
   string object = 3;
 }
 message LookupResponse { repeated LookupResultItem results = 1; }
+
+message ReadRelationsRequest {
+  string isolation_id = 1;
+  string user = 2;          // opsiyonel
+  string relation = 3;      // opsiyonel
+  string object = 4;        // opsiyonel
+}
+
+message RelationTuple {
+  string user = 1;          // "user:{id}"
+  string relation = 2;
+  string object = 3;        // "tenant:{id}"
+}
+
+message WriteRelationsRequest {
+  string isolation_id = 1;
+  repeated RelationTuple tuples = 2;
+}
+
+message WriteRelationsResponse { int32 affected_count = 1; }

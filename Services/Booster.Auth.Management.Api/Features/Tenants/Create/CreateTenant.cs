@@ -1,6 +1,10 @@
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
+using Booster.Auth.Manager.RequestContexts;
+using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using FastEndpoints;
@@ -9,16 +13,22 @@ using Mapster;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Create;
 
+// Hedef firma YOK, henüz açılmadı: izin oturumun havuzunda aranır.
 public class CreateTenantEndpoint : Endpoint<CreateTenantCommand, CreateTenantResponse>
 {
     public override void Configure()
     {
         Post("");
         Group<TenantsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.IsolationTarget, AuthConstants.ManagerRelation)));
+
         Summary(s =>
         {
             s.Summary = "Yeni tenant oluşturur";
-            s.Description = "Kiracı kaydı açar.";
+            s.Description = "Kiracı kaydını açar ve oluşturana o kiracı üzerinde owner yetkisi yazar.";
         });
     }
 
@@ -31,7 +41,9 @@ public record CreateTenantCommand(string Name) : ICommand<CreateTenantResponse>;
 public readonly record struct CreateTenantResponse(Guid Id);
 
 public class CreateTenantCommandHandler(
-    IAsyncRepository<Tenant, AuthNDbContext> tenantRepository)
+    IAsyncRepository<Tenant, AuthNDbContext> tenantRepository,
+    IAccessManager accessManager,
+    IRequestContextAccessor requestContextAccessor)
     : ICommandHandler<CreateTenantCommand, CreateTenantResponse>
 {
     public async Task<CreateTenantResponse> ExecuteAsync(CreateTenantCommand command, CancellationToken ct)
@@ -41,6 +53,17 @@ public class CreateTenantCommandHandler(
 
         await tenantRepository.AddAsync(tenant, ct);
         await tenantRepository.SaveChangesAsync(ct);
+
+        // Oluşturana owner YAZILIR. Yazılmasaydı firma veritabanında var olur
+        // ama yetki grafiğinde hiç kimseye bağlı olmazdı: açan kişi bile onu
+        // listesinde göremez, kimse de yetki veremezdi — doğuştan erişilemez
+        // bir kayıt.
+        await accessManager.GrantAsync(
+            AuthConstants.TenantType,
+            tenant.Id,
+            requestContextAccessor.Context().PrincipalId,
+            AuthConstants.OwnerRelation,
+            ct);
 
         return new CreateTenantResponse(tenant.Id);
     }

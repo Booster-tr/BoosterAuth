@@ -1,12 +1,13 @@
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
-using Mapster;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Update;
 
@@ -14,12 +15,17 @@ public class UpdateTenantEndpoint : Endpoint<UpdateTenantCommand, UpdateTenantRe
 {
     public override void Configure()
     {
-        Put("{Id:guid}");
+        Put("");
         Group<TenantsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.ManagerRelation)));
+
         Summary(s =>
         {
             s.Summary = "Tenant bilgisini günceller";
-            s.Description = "Kiracının görünen adını günceller.";
+            s.Description = "TenantId sorgudan, güncellenecek alanlar gövdeden gelir.";
         });
     }
 
@@ -27,7 +33,7 @@ public class UpdateTenantEndpoint : Endpoint<UpdateTenantCommand, UpdateTenantRe
         => await Send.OkAsync(await req.ExecuteAsync(ct), ct);
 }
 
-public record UpdateTenantCommand(Guid Id, string Name) : ICommand<UpdateTenantResponse>;
+public record UpdateTenantCommand(Guid TenantId, string Name) : ICommand<UpdateTenantResponse>;
 
 public readonly record struct UpdateTenantResponse(Guid Id);
 
@@ -37,14 +43,17 @@ public class UpdateTenantCommandHandler(
 {
     public async Task<UpdateTenantResponse> ExecuteAsync(UpdateTenantCommand command, CancellationToken ct)
     {
-        var tenant = await tenantRepository.GetAsync(t => t.Id == command.Id, cancellationToken: ct);
+        var tenant = await tenantRepository.GetAsync(t => t.Id == command.TenantId, cancellationToken: ct);
         tenant.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.TenantNotFound);
 
-        command.Adapt(tenant);
+        // Adapt KULLANILMIYOR: komutta TenantId de var ve eşleme onu entity'nin
+        // Id alanına yazardı. Kimliği istekten gelen bir değerle ezmek,
+        // güncellenen kaydın hangisi olduğunu isteğe bırakmak demekti.
+        tenant!.Name = command.Name;
 
         await tenantRepository.SaveChangesAsync(ct);
 
-        return new UpdateTenantResponse(tenant!.Id);
+        return new UpdateTenantResponse(tenant.Id);
     }
 }
 
@@ -52,7 +61,8 @@ public class UpdateTenantValidator : Validator<UpdateTenantCommand>
 {
     public UpdateTenantValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.TenantId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage(ValidationErrors.NotEmptyError)
             .MaximumLength(300).WithMessage(ValidationErrors.MaxLengthError);

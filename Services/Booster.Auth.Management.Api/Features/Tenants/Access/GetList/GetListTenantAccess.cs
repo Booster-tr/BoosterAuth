@@ -1,0 +1,84 @@
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Auth.Management.Api.Features._base;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
+using Booster.Authorization.Fga.Attributes;
+using Booster.Database.DynamicFilter.Models;
+using Booster.Database.Helpers;
+using Booster.Database.NameValueCollectionHelpers;
+using FastEndpoints;
+
+namespace Booster.Auth.Management.Api.Features.Tenants.Access.GetList;
+
+public class GetListTenantAccessEndpoint : EndpointWithoutRequest<ListModel<TenantAccessResponse>>
+{
+    public override void Configure()
+    {
+        Get("access");
+        Group<TenantsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.ViewerRelation)));
+
+        Summary(s =>
+        {
+            s.Summary = "Firma üzerindeki yetkileri listeler";
+            s.Description = "granted: yazılmış yetkiler (geri alınabilir). " +
+                            "effective: modelin türettiği etkin yetkiler (owner aynı zamanda viewer'dır).";
+        });
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var pageRequest = HttpContext.Request.ToNvc().ToPageRequest();
+
+        var query = new GetListTenantAccessQuery(Query<Guid>("TenantId"), pageRequest);
+
+        await Send.OkAsync(await query.ExecuteAsync(ct), ct);
+    }
+}
+
+public record GetListTenantAccessQuery(Guid TenantId, PageRequest PageRequest)
+    : ICommand<ListModel<TenantAccessResponse>>;
+
+public readonly record struct TenantAccessResponse(
+    Guid PrincipalId,
+    IReadOnlyList<string> Granted,
+    IReadOnlyList<string> Effective);
+
+public class GetListTenantAccessQueryHandler(IAccessManager accessManager)
+    : ICommandHandler<GetListTenantAccessQuery, ListModel<TenantAccessResponse>>
+{
+    public async Task<ListModel<TenantAccessResponse>> ExecuteAsync(
+        GetListTenantAccessQuery command, CancellationToken ct)
+    {
+        var entries = await accessManager.ListAsync(
+            AuthConstants.TenantType, command.TenantId, ct);
+
+        // Sayfalama BELLEKTE yapılır: yetki grafiği sayfalı sorguyu satır
+        // sayısına göre değil sayfa işaretçisine göre veriyor ve sonuçlar
+        // özne bazında toplanmadan önce ilişki başına geliyor. Bir kabın
+        // yetkili sayısı yüzler mertebesinde kaldığı sürece bu doğru olan;
+        // binlere çıkarsa okuma tarafının sayfalı hâle gelmesi gerekir.
+        var index = command.PageRequest.PageIndex;
+        var size = command.PageRequest.PageSize;
+
+        var items = entries
+            .Skip((index - 1) * size)
+            .Take(size)
+            .Select(entry => new TenantAccessResponse(entry.PrincipalId, entry.Granted, entry.Effective))
+            .ToList();
+
+        return new ListModel<TenantAccessResponse>
+        {
+            Items = items,
+            Count = entries.Count,
+            Index = index,
+            Size = size,
+            Pages = size > 0 ? (int)Math.Ceiling(entries.Count / (double)size) : 0,
+            HasPrevious = index > 1,
+            HasNext = index * size < entries.Count,
+            PageRequest = command.PageRequest
+        };
+    }
+}

@@ -7,16 +7,27 @@ using Booster.Database.Helpers;
 using Booster.Database.DynamicFilter.Models;
 using Booster.Database.NameValueCollectionHelpers;
 using Booster.Database.Repositories;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 
 namespace Booster.Auth.Management.Api.Features.UserPools.GetList;
 
+// Havuz listesi DAİMA bir firmanın altında istenir; TenantId sorgudan
+// gelir ve yetki o firma üzerinde aranır. Firmasız çağrı, seçici hedefi
+// bulamadığı için reddedilir — tüm havuzları listeleyen açık bir kapı
+// bırakmamak için bilinçli.
 public class GetListUserPoolEndpoint : EndpointWithoutRequest<ListModel<GetListUserPoolResponse>>
 {
     public override void Configure()
     {
         Get("");
         Group<UserPoolsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.ViewerRelation)));
+
         Summary(s =>
         {
             s.Summary = "Kullanıcı havuzlarını listeler";

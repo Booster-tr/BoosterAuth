@@ -117,25 +117,14 @@ public static class IQueryableDynamicFilterExtensions
 
         if (!string.IsNullOrEmpty(filter.Value))
         {
-            //Bu kod SaaS projemiz için zavadak diye eklendi.Ef propları Dışarıdan almak gerek.
-            if (filter.Field.Equals("TenantId", StringComparison.OrdinalIgnoreCase) || filter.Field.Equals("ApplicationId", StringComparison.OrdinalIgnoreCase))
-            {
-                // C# sınıfında olmadıkları için np() kullanılamaz, EF.Property kullanılmalıdır!
-                where.Append($"EF.Property(it, \"{filter.Field}\") {comparison} @{index}");
-            }
+            if (filter.Operator == FilterOperator.NotContains)
+                where.Append($"(!np({filter.Field}).Contains(@{index}))");
+            else if (filter.Operator == FilterOperator.ContainsIgnoreCase)
+                where.Append($"(np({filter.Field}).ToLower().Contains(@{index}))");
+            else if (comparison is "StartsWith" or "EndsWith" or "Contains")
+                where.Append($"(np({filter.Field}).{comparison}(@{index}))");
             else
-            {
-                if (filter.Operator == FilterOperator.NotContains)
-                    where.Append($"(!np({filter.Field}).Contains(@{index}))");
-                else if (filter.Operator == FilterOperator.ContainsIgnoreCase)
-                    where.Append($"(np({filter.Field}).ToLower().Contains(@{index}))");
-                else if (comparison is "StartsWith" or "EndsWith" or "Contains")
-                    where.Append($"(np({filter.Field}).{comparison}(@{index}))");
-                else
-                    where.Append($"np({filter.Field}) {comparison} @{index}");
-            }
-
-
+                where.Append($"np({filter.Field}) {comparison} @{index}");
         }
         else if (filter.Operator is FilterOperator.IsEmpty or FilterOperator.IsNotEmpty)
         {
