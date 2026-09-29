@@ -14,7 +14,7 @@
     // Dönüş adresi SUNUCUDA üretilir. İstemciden alınsaydı doğrulanması gereken
     // bir girdi olurdu; controller yine Url.IsLocalUrl ile kontrol ediyor.
     //
-    // Url.Idp ŞART: gateway /authn önekini soyarak iletiyor, bu yüzden
+    // Url.Idp ŞART: gateway /idp önekini soyarak iletiyor, bu yüzden
     // Request.Path uygulamanın İÇ yolunu (/ui/login) veriyor. Önek eklenmeseydi
     // tarayıcı gateway kökündeki /ui/login adresine gider ve 404 alırdı.
     var returnUrl = Url.Idp($"{Context.Request.Path}{Context.Request.QueryString}");
