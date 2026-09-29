@@ -8,6 +8,7 @@ using Booster.Auth.Common.Internal.Constants;
 using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 using Booster.Auth.Management.Api.Constants;
 
 namespace Booster.Auth.Management.Api.Features.Clients.GetById;
@@ -47,7 +48,19 @@ public record GetByIdClientResponse(
     List<string> PostLogoutRedirectUris,
     List<string> AllowedAudiences,
     bool RequireConsent,
-    List<TokenScopePolicyItem> TokenScopePolicy);
+    List<TokenScopePolicyItem> TokenScopePolicy,
+    string UserPoolName,
+    IReadOnlyList<ClientScopeResponse> AllowedScopes,
+    DateTimeOffset CreatedTime,
+    DateTimeOffset? UpdatedTime)
+{
+    /// <summary>Havuzda tanımlı kapsamlar: izin verilen kapsamlar bunlar arasından seçilir.</summary>
+    public IReadOnlyList<ClientPoolScopeResponse> PoolScopes { get; init; } = [];
+}
+
+public record ClientScopeResponse(string Scope);
+
+public record ClientPoolScopeResponse(string Scope, string DisplayName);
 
 public class GetByIdClientQueryHandler(
     IAsyncRepository<Client, AuthNDbContext> clientRepository)
@@ -56,9 +69,18 @@ public class GetByIdClientQueryHandler(
     public async Task<GetByIdClientResponse> ExecuteAsync(GetByIdClientQuery command, CancellationToken ct)
     {
         var client = await clientRepository.GetAsync(
-            c => c.Id == command.ClientId, enableTracking: false, cancellationToken: ct);
+            c => c.Id == command.ClientId,
+            include: q => q
+                .Include(c => c.AllowedScopes.OrderBy(s => s.Scope))
+                .Include(c => c.UserPool)
+                .ThenInclude(p => p.ScopeDefinitions.OrderBy(s => s.Scope)),
+            enableTracking: false,
+            cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
-        return client.Adapt<GetByIdClientResponse>();
+        return client!.Adapt<GetByIdClientResponse>() with
+        {
+            PoolScopes = client.UserPool.ScopeDefinitions.Adapt<List<ClientPoolScopeResponse>>()
+        };
     }
 }

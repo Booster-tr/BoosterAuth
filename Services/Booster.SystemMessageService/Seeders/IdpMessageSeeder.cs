@@ -53,6 +53,8 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.PoolNotFound, "Havuz", "Kullanıcı havuzu bulunamadı.", "Pool", "The user pool was not found."),
         new(IdpMessageKeys.RoleNotInPool, "Rol", "Seçilen rollerden biri bu havuzda tanımlı değil.", "Role", "One of the selected roles is not defined in this pool."),
         new(IdpMessageKeys.ScopeNotInPool, "Kapsam", "Seçilen kapsamlardan biri bu havuzda tanımlı değil.", "Scope", "One of the selected scopes is not defined in this pool."),
+        new(IdpMessageKeys.ConsentNotFound, "Onay", "Onay kaydı bulunamadı.", "Consent", "The consent was not found."),
+        new(IdpMessageKeys.SessionNotFound, "Oturum", "Oturum bulunamadı.", "Session", "The session was not found."),
         new(IdpMessageKeys.ServiceAccountNotFound, "Servis hesabı", "Servis hesabı bulunamadı.", "Service account", "The service account was not found."),
         new(IdpMessageKeys.InvalidServiceAccountRelation, "Servis hesabı", "Servis hesabına verilebilecek yetkiler: viewer, manager, grant_manager.", "Service account", "A service account can be given: viewer, manager, grant_manager."),
         new(IdpMessageKeys.RoleNotHeldByCaller, "Rol", "Yalnızca kendinizde olan rolleri servis hesabına verebilirsiniz.", "Role", "You can only give a service account roles you have yourself."),

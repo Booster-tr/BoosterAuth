@@ -15,6 +15,7 @@ public class AuthNMessageKeys
     public const string TenantOwnerAccessCannotBeRevoked = "authn.tenant_owner_access_cannot_be_revoked";
     public const string TenantOwnerRelationRequiresOwner = "authn.tenant_owner_relation_requires_owner";
     public const string PoolOwnerRelationRequiresOwner = "authn.pool_owner_relation_requires_owner";
+    public const string ClientOwnerRelationRequiresOwner = "authn.client_owner_relation_requires_owner";
     public const string PrincipalIdentifierInvalid = "authn.principal_identifier_invalid";
     public const string PrincipalNotFound = "authn.principal_not_found";
     public const string PrincipalLookupLimitExceeded = "authn.principal_lookup_limit_exceeded";
@@ -51,6 +52,8 @@ public class AuthNMessageKeys
     // --- Token scope policy ---
     public const string TokenScopePolicyMax = "authn.token_scope_policy_max";
     public const string TokenScopePolicyKeyRequired = "authn.token_scope_policy_key_required";
+    public const string TokenScopePolicyKeyDuplicate = "authn.token_scope_policy_key_duplicate";
+    public const string TokenScopePolicyKeyInvalid = "authn.token_scope_policy_key_invalid";
     public const string TokenScopePolicyRequiredPermissionsRequired = "authn.token_scope_policy_required_permissions_required";
     public const string TokenScopePolicyPermissionEmpty = "authn.token_scope_policy_permission_empty";
     public const string TokenScopePolicyPermissionDuplicate = "authn.token_scope_policy_permission_duplicate";

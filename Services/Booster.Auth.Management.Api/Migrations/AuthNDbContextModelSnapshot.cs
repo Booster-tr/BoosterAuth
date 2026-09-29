@@ -401,7 +401,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                     b.HasIndex("Delivered");
 
-                    b.ToTable("InboxState", (string)null);
+                    b.ToTable("InboxState");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
@@ -492,7 +492,7 @@ namespace Booster.Auth.Management.Api.Migrations
                     b.HasIndex("InboxMessageId", "InboxConsumerId", "SequenceNumber")
                         .IsUnique();
 
-                    b.ToTable("OutboxMessage", (string)null);
+                    b.ToTable("OutboxMessage");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxState", b =>
@@ -522,7 +522,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                     b.HasIndex("Created");
 
-                    b.ToTable("OutboxState", (string)null);
+                    b.ToTable("OutboxState");
                 });
 
             modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.Client", b =>
@@ -548,14 +548,14 @@ namespace Booster.Auth.Management.Api.Migrations
                             b1.Property<string>("Key")
                                 .IsRequired();
 
+                            b1.Property<bool>("PermissionCheckRequired");
+
                             b1.PrimitiveCollection<string>("RequiredPermissions")
                                 .IsRequired();
 
-                            b1.Property<bool>("SpiceDbCheckRequired");
-
                             b1.HasKey("ClientId", "__synthesizedOrdinal");
 
-                            b1.ToTable("Clients", (string)null);
+                            b1.ToTable("Clients");
 
                             b1
                                 .ToJson("TokenScopePolicy")
@@ -639,7 +639,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                             b1.HasKey("UserPoolId");
 
-                            b1.ToTable("UserPools", (string)null);
+                            b1.ToTable("UserPools");
 
                             b1
                                 .ToJson("Policy")
@@ -665,7 +665,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                                     b2.HasKey("UserPoolPolicyUserPoolId");
 
-                                    b2.ToTable("UserPools", (string)null);
+                                    b2.ToTable("UserPools");
 
                                     b2.WithOwner()
                                         .HasForeignKey("UserPoolPolicyUserPoolId");
@@ -681,7 +681,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                                     b2.HasKey("UserPoolPolicyUserPoolId");
 
-                                    b2.ToTable("UserPools", (string)null);
+                                    b2.ToTable("UserPools");
 
                                     b2.WithOwner()
                                         .HasForeignKey("UserPoolPolicyUserPoolId");
@@ -707,7 +707,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                                     b2.HasKey("UserPoolPolicyUserPoolId");
 
-                                    b2.ToTable("UserPools", (string)null);
+                                    b2.ToTable("UserPools");
 
                                     b2.WithOwner()
                                         .HasForeignKey("UserPoolPolicyUserPoolId");
@@ -727,7 +727,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                                     b2.HasKey("UserPoolPolicyUserPoolId");
 
-                                    b2.ToTable("UserPools", (string)null);
+                                    b2.ToTable("UserPools");
 
                                     b2.WithOwner()
                                         .HasForeignKey("UserPoolPolicyUserPoolId");
@@ -745,7 +745,7 @@ namespace Booster.Auth.Management.Api.Migrations
 
                                     b2.HasKey("UserPoolPolicyUserPoolId");
 
-                                    b2.ToTable("UserPools", (string)null);
+                                    b2.ToTable("UserPools");
 
                                     b2.WithOwner()
                                         .HasForeignKey("UserPoolPolicyUserPoolId");

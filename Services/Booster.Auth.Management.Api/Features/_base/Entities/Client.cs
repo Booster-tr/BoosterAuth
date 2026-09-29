@@ -40,7 +40,8 @@ public class TokenScopePolicyItem
 {
     public string Key { get; set; } = default!;
 
-    public bool SpiceDbCheckRequired { get; set; }
+    /// <summary>Açıksa, token verilirken bu anahtarın değeri üzerinde yetki grafiği kontrol edilir.</summary>
+    public bool PermissionCheckRequired { get; set; }
 
     public bool IsRequired { get; set; }
 

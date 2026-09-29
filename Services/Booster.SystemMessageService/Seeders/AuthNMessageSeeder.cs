@@ -18,6 +18,7 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.ClientNotFound, "Uygulama", "Uygulama bulunamadı.", "Client", "Client not found."),
 
         // --- Firma yetkileri ---
+        new(AuthNMessageKeys.ClientOwnerRelationRequiresOwner, "Yetkilendirme", "Sahip yetkisini yalnızca uygulama sahipleri verebilir veya geri alabilir.", "Authorization", "Only application owners can grant or revoke the owner permission."),
         new(AuthNMessageKeys.PoolOwnerRelationRequiresOwner, "Yetkilendirme", "Sahip yetkisini yalnızca havuz sahipleri verebilir veya geri alabilir.", "Authorization", "Only pool owners can grant or revoke the owner permission."),
         new(AuthNMessageKeys.TenantOwnerRelationRequiresOwner, "Yetkilendirme", "Sahip yetkisini yalnızca firma sahipleri verebilir veya geri alabilir.", "Authorization", "Only tenant owners can grant or revoke the owner permission."),
         new(AuthNMessageKeys.TenantOwnerAccessCannotBeRevoked, "Yetkilendirme", "Firma sahibinin yetkileri geri alınamaz.", "Authorization", "The tenant owner's permissions cannot be revoked."),
@@ -56,6 +57,8 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
 
         // --- Token scope politikası ---
         new(AuthNMessageKeys.TokenScopePolicyMax, "Token politikası", "İzin verilen politika sayısı aşıldı.", "Token policy", "The maximum number of policies has been exceeded."),
+        new(AuthNMessageKeys.TokenScopePolicyKeyDuplicate, "Token politikası", "Aynı anahtar birden fazla kez kullanılamaz.", "Token policy", "The same key cannot be used more than once."),
+        new(AuthNMessageKeys.TokenScopePolicyKeyInvalid, "Token politikası", "Anahtar küçük harfle başlamalı; yalnızca küçük harf, rakam ve alt çizgi içerebilir.", "Token policy", "The key must start with a lowercase letter and contain only lowercase letters, digits and underscores."),
         new(AuthNMessageKeys.TokenScopePolicyKeyRequired, "Token politikası", "Politika anahtarı zorunludur.", "Token policy", "The policy key is required."),
         new(AuthNMessageKeys.TokenScopePolicyRequiredPermissionsRequired, "Token politikası", "Zorunlu politika için en az bir izin belirtmelisiniz.", "Token policy", "A required policy must list at least one permission."),
         new(AuthNMessageKeys.TokenScopePolicyPermissionEmpty, "Token politikası", "İzin adı boş olamaz.", "Token policy", "A permission name cannot be empty."),

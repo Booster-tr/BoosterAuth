@@ -9,6 +9,7 @@ using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 using Booster.Auth.Management.Api.Constants;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
 
 namespace Booster.Auth.Management.Api.Features.Clients.SetTokenScopePolicy;
 
@@ -41,7 +42,8 @@ public record SetClientTokenScopePolicyCommand(
 public readonly record struct SetClientTokenScopePolicyResponse(Guid Id);
 
 public class SetClientTokenScopePolicyCommandHandler(
-    IAsyncRepository<Client, AuthNDbContext> clientRepository)
+    IAsyncRepository<Client, AuthNDbContext> clientRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<SetClientTokenScopePolicyCommand, SetClientTokenScopePolicyResponse>
 {
     public async Task<SetClientTokenScopePolicyResponse> ExecuteAsync(
@@ -53,6 +55,7 @@ public class SetClientTokenScopePolicyCommandHandler(
         client!.TokenScopePolicy = command.TokenScopePolicy;
 
         await clientRepository.SaveChangesAsync(ct);
+        await clientDataCacheStore.InvalidateClientAsync(client.ClientKey, ct);
 
         return new SetClientTokenScopePolicyResponse(client.Id);
     }
@@ -66,17 +69,20 @@ public class SetClientTokenScopePolicyValidator : Validator<SetClientTokenScopeP
 
         RuleFor(x => x.TokenScopePolicy)
             .NotNull().WithMessage(ValidationErrors.NotNullOrEmptyError)
-            .Must(p => p.Count <= 5).WithMessage(AuthNMessageKeys.TokenScopePolicyMax);
+            .Must(p => p.Count <= 5).WithMessage(AuthNMessageKeys.TokenScopePolicyMax)
+            .Must(p => p.Select(i => i.Key?.Trim().ToLowerInvariant()).Distinct().Count() == p.Count)
+            .WithMessage(AuthNMessageKeys.TokenScopePolicyKeyDuplicate);
 
         RuleForEach(x => x.TokenScopePolicy).ChildRules(item =>
         {
             item.RuleFor(i => i.Key)
-                .NotEmpty().WithMessage(AuthNMessageKeys.TokenScopePolicyKeyRequired);
+                .NotEmpty().WithMessage(AuthNMessageKeys.TokenScopePolicyKeyRequired)
+                .Matches("^[a-z][a-z0-9_]{0,49}$").WithMessage(AuthNMessageKeys.TokenScopePolicyKeyInvalid);
 
             // Kontrol isteniyorsa neyin aranacağı belirtilmek zorundadır.
             item.RuleFor(i => i.RequiredPermissions)
                 .Must(list => list is { Count: > 0 })
-                .When(i => i.SpiceDbCheckRequired)
+                .When(i => i.PermissionCheckRequired)
                 .WithMessage(AuthNMessageKeys.TokenScopePolicyRequiredPermissionsRequired);
 
             item.RuleFor(i => i.RequiredPermissions)
@@ -92,7 +98,7 @@ public class SetClientTokenScopePolicyValidator : Validator<SetClientTokenScopeP
             item.RuleFor(i => i)
                 .Must(i => (i.RequiredPermissions is null || i.RequiredPermissions.Count == 0)
                            && (i.GrantedPermissions is null || i.GrantedPermissions.Count == 0))
-                .When(i => !i.SpiceDbCheckRequired)
+                .When(i => !i.PermissionCheckRequired)
                 .WithMessage(AuthNMessageKeys.TokenScopePolicyPermissionsNotAllowed);
         });
     }

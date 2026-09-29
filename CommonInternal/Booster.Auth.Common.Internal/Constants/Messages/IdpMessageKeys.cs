@@ -73,6 +73,8 @@ public class IdpMessageKeys
     public const string RoleNotInPool = "idp.role_not_in_pool";
     public const string ScopeNotInPool = "idp.scope_not_in_pool";
     public const string ServiceAccountNotFound = "idp.service_account_not_found";
+    public const string ConsentNotFound = "idp.consent_not_found";
+    public const string SessionNotFound = "idp.session_not_found";
     public const string InvalidServiceAccountRelation = "idp.invalid_service_account_relation";
     public const string RoleNotHeldByCaller = "idp.role_not_held_by_caller";
     public const string ScopeNotHeldByCaller = "idp.scope_not_held_by_caller";
