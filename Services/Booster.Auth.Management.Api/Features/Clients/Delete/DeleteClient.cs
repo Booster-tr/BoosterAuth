@@ -47,9 +47,7 @@ public class DeleteClientCommandHandler(
 
         await clientDataCacheStore.InvalidateClientAsync(client!.ClientKey, ct);
 
-        await accessManager.RevokeAllAsync(AuthConstants.ClientType, client.Id, ct);
-        await accessManager.UnlinkParentAsync(
-            AuthConstants.ClientType, client.Id, AuthConstants.PoolType, client.UserPoolId, ct);
+        accessManager.RevokeAllInBackground(AuthConstants.ClientType, client.Id);
 
         return new DeleteClientResponse(client!.Id);
     }

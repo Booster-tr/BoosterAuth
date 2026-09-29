@@ -6,19 +6,38 @@ namespace Booster.Auth.Management.Api.Managers.AccessManagers;
 
 public sealed class AccessManager(
     AuthorizationService.AuthorizationServiceClient authorizationClient,
-    IRequestContextAccessor requestContextAccessor) : IAccessManager
+    IRequestContextAccessor requestContextAccessor,
+    IServiceScopeFactory scopeFactory,
+    ILogger<AccessManager> logger) : IAccessManager
 {
     private static readonly string UserPrefix = $"{AuthConstants.UserPrefix}:";
 
-    public async Task<IReadOnlyList<AccessEntry>> ListAsync(
-        string objectType, Guid objectId, CancellationToken ct)
-    {
-        var granted = await ReadGrantedAsync(Target(objectType, objectId), ct);
+    // OpenFGA tek okuma/yazma isteğinde en fazla 100 tuple işler.
+    private const int MaxBatchSize = 100;
 
-        return granted
-            .OrderBy(pair => pair.Key)
-            .Select(pair => new AccessEntry(pair.Key, pair.Value))
+    public async Task<AccessPage> ListAsync(
+        string objectType, Guid objectId, int pageSize, string? continuationToken, CancellationToken ct)
+    {
+        var response = await authorizationClient.ReadRelationsAsync(
+            new ReadRelationsRequest
+            {
+                IsolationId = Isolation(),
+                Object = Target(objectType, objectId),
+                PageSize = Math.Clamp(pageSize, 1, MaxBatchSize),
+                ContinuationToken = continuationToken ?? string.Empty
+            },
+            cancellationToken: ct);
+
+        var items = response.Results
+            .Where(r => r.User.StartsWith(UserPrefix, StringComparison.Ordinal))
+            .Select(r => (Id: Guid.TryParse(r.User[UserPrefix.Length..], out var id) ? id : Guid.Empty, r.Relation))
+            .Where(r => r.Id != Guid.Empty)
+            .Select(r => new AccessEntry(r.Id, r.Relation))
             .ToList();
+
+        return new AccessPage(
+            items,
+            string.IsNullOrEmpty(response.ContinuationToken) ? null : response.ContinuationToken);
     }
 
     public async Task GrantAsync(
@@ -31,31 +50,50 @@ public sealed class AccessManager(
         => await authorizationClient.DeleteRelationsAsync(
             Request(objectType, objectId, principalId, relation), cancellationToken: ct);
 
-    public async Task RevokeAllAsync(string objectType, Guid objectId, CancellationToken ct)
+    public void RevokeAllInBackground(string objectType, Guid objectId)
     {
         var target = Target(objectType, objectId);
+        var isolation = Isolation();
 
-        var granted = await ReadGrantedAsync(target, ct);
-
-        var request = new WriteRelationsRequest { IsolationId = Isolation() };
-
-        foreach (var (principalId, relations) in granted)
+        // Kullanıcı yanıtı beklemez; iş kendi kapsamında, istekten bağımsız sürer.
+        _ = Task.Run(async () =>
         {
-            foreach (var relation in relations)
+            try
             {
-                request.Tuples.Add(new RelationTuple
+                using var scope = scopeFactory.CreateScope();
+                var client = scope.ServiceProvider
+                    .GetRequiredService<AuthorizationService.AuthorizationServiceClient>();
+
+                // Silinen kayıtlar okunmadığı için her seferinde İLK sayfa okunur;
+                // devam anahtarı silme sırasında geçersizleşebilirdi.
+                while (true)
                 {
-                    User = AuthConstants.User(principalId),
-                    Relation = relation,
-                    Object = target
-                });
+                    var page = await client.ReadRelationsAsync(new ReadRelationsRequest
+                    {
+                        IsolationId = isolation,
+                        Object = target,
+                        PageSize = MaxBatchSize
+                    });
+
+                    if (page.Results.Count == 0)
+                        return;
+
+                    var request = new WriteRelationsRequest { IsolationId = isolation };
+                    request.Tuples.AddRange(page.Results.Select(r => new RelationTuple
+                    {
+                        User = r.User,
+                        Relation = r.Relation,
+                        Object = r.Object
+                    }));
+
+                    await client.DeleteRelationsAsync(request);
+                }
             }
-        }
-
-        if (request.Tuples.Count == 0)
-            return;
-
-        await authorizationClient.DeleteRelationsAsync(request, cancellationToken: ct);
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "{Target} üzerindeki yetkiler temizlenemedi.", target);
+            }
+        });
     }
 
     public async Task<IReadOnlyList<Guid>> ListAccessibleIdsAsync(string objectType, CancellationToken ct)
@@ -86,11 +124,6 @@ public sealed class AccessManager(
         => await authorizationClient.WriteRelationsAsync(
             ParentRequest(objectType, objectId, parentType, parentId), cancellationToken: ct);
 
-    public async Task UnlinkParentAsync(
-        string objectType, Guid objectId, string parentType, Guid parentId, CancellationToken ct)
-        => await authorizationClient.DeleteRelationsAsync(
-            ParentRequest(objectType, objectId, parentType, parentId), cancellationToken: ct);
-
     private WriteRelationsRequest ParentRequest(
         string objectType, Guid objectId, string parentType, Guid parentId)
     {
@@ -105,37 +138,6 @@ public sealed class AccessManager(
 
         return request;
     }
-
-    private async Task<Dictionary<Guid, IReadOnlyList<string>>> ReadGrantedAsync(
-        string target, CancellationToken ct)
-    {
-        var response = await authorizationClient.ReadRelationsAsync(
-            new ReadRelationsRequest
-            {
-                IsolationId = Isolation(),
-                User = string.Empty,
-                Relation = string.Empty,
-                Object = target
-            },
-            cancellationToken: ct);
-
-        return Group(response.Results.Select(r => (r.User, r.Relation)));
-    }
-
-    private static Dictionary<Guid, IReadOnlyList<string>> Group(
-        IEnumerable<(string User, string Relation)> tuples)
-        => tuples
-            .Where(t => t.User.StartsWith(UserPrefix, StringComparison.Ordinal))
-            .Select(t => (Id: t.User[UserPrefix.Length..], t.Relation))
-            .Where(t => Guid.TryParse(t.Id, out _))
-            .GroupBy(t => Guid.Parse(t.Id))
-            .ToDictionary(
-                group => group.Key,
-                IReadOnlyList<string> (group) => group
-                    .Select(t => t.Relation)
-                    .Distinct(StringComparer.Ordinal)
-                    .Order(StringComparer.Ordinal)
-                    .ToList());
 
     private WriteRelationsRequest Request(
         string objectType, Guid objectId, Guid principalId, string relation)

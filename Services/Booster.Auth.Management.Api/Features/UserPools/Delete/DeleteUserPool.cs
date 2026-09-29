@@ -46,9 +46,7 @@ public class DeleteUserPoolCommandHandler(
 
         await clientDataCacheStore.InvalidatePoolAsync(pool!.Id, ct);
 
-        await accessManager.RevokeAllAsync(AuthConstants.PoolType, pool.Id, ct);
-        await accessManager.UnlinkParentAsync(
-            AuthConstants.PoolType, pool.Id, AuthConstants.TenantType, pool.TenantId, ct);
+        accessManager.RevokeAllInBackground(AuthConstants.PoolType, pool.Id);
 
         return new DeleteUserPoolResponse(pool!.Id);
     }

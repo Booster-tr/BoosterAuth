@@ -2,14 +2,12 @@ using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Authorization.Fga.Attributes;
-using Booster.Database.DynamicFilter.Models;
-using Booster.Database.Helpers;
-using Booster.Database.NameValueCollectionHelpers;
 using FastEndpoints;
+using Mapster;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Access.GetList;
 
-public class GetListTenantAccessEndpoint : EndpointWithoutRequest<ListModel<TenantAccessResponse>>
+public class GetListTenantAccessEndpoint : EndpointWithoutRequest<GetListTenantAccessResponse>
 {
     public override void Configure()
     {
@@ -23,55 +21,40 @@ public class GetListTenantAccessEndpoint : EndpointWithoutRequest<ListModel<Tena
         Summary(s =>
         {
             s.Summary = "Firma üzerindeki yetkileri listeler";
-            s.Description = "Yalnızca doğrudan verilmiş yetkiler döner; türetilmiş yetkiler listelenmez.";
+            s.Description = "Yalnızca doğrudan verilmiş yetkiler döner. Sayfalama devam anahtarıyla yapılır: " +
+                            "yanıttaki ContinuationToken bir sonraki isteğe verilir; boşsa son sayfadır.";
         });
     }
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        var pageRequest = HttpContext.Request.ToNvc().ToPageRequest();
-
-        var query = new GetListTenantAccessQuery(Query<Guid>("TenantId"), pageRequest);
+        var query = new GetListTenantAccessQuery(
+            Query<Guid>("TenantId"),
+            Query<int?>("PageSize", isRequired: false) ?? 20,
+            Query<string>("ContinuationToken", isRequired: false));
 
         await Send.OkAsync(await query.ExecuteAsync(ct), ct);
     }
 }
 
-public record GetListTenantAccessQuery(Guid TenantId, PageRequest PageRequest)
-    : ICommand<ListModel<TenantAccessResponse>>;
+public record GetListTenantAccessQuery(Guid TenantId, int PageSize, string? ContinuationToken)
+    : ICommand<GetListTenantAccessResponse>;
 
-public readonly record struct TenantAccessResponse(
-    Guid PrincipalId,
-    IReadOnlyList<string> Relations);
+public record GetListTenantAccessResponse(
+    IReadOnlyList<TenantAccessResponse> Items,
+    string? ContinuationToken);
+
+public readonly record struct TenantAccessResponse(Guid PrincipalId, string Relation);
 
 public class GetListTenantAccessQueryHandler(IAccessManager accessManager)
-    : ICommandHandler<GetListTenantAccessQuery, ListModel<TenantAccessResponse>>
+    : ICommandHandler<GetListTenantAccessQuery, GetListTenantAccessResponse>
 {
-    public async Task<ListModel<TenantAccessResponse>> ExecuteAsync(
+    public async Task<GetListTenantAccessResponse> ExecuteAsync(
         GetListTenantAccessQuery command, CancellationToken ct)
     {
-        var entries = await accessManager.ListAsync(
-            AuthConstants.TenantType, command.TenantId, ct);
+        var page = await accessManager.ListAsync(
+            AuthConstants.TenantType, command.TenantId, command.PageSize, command.ContinuationToken, ct);
 
-        var index = command.PageRequest.PageIndex;
-        var size = command.PageRequest.PageSize;
-
-        var items = entries
-            .Skip((index - 1) * size)
-            .Take(size)
-            .Select(entry => new TenantAccessResponse(entry.PrincipalId, entry.Relations))
-            .ToList();
-
-        return new ListModel<TenantAccessResponse>
-        {
-            Items = items,
-            Count = entries.Count,
-            Index = index,
-            Size = size,
-            Pages = size > 0 ? (int)Math.Ceiling(entries.Count / (double)size) : 0,
-            HasPrevious = index > 1,
-            HasNext = index * size < entries.Count,
-            PageRequest = command.PageRequest
-        };
+        return page.Adapt<GetListTenantAccessResponse>();
     }
 }

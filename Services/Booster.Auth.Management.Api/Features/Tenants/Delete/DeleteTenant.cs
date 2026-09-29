@@ -49,7 +49,7 @@ public class DeleteTenantCommandHandler(
         tenantRepository.Delete(tenant!);
         await tenantRepository.SaveChangesAsync(ct);
 
-        await accessManager.RevokeAllAsync(AuthConstants.TenantType, command.TenantId, ct);
+        accessManager.RevokeAllInBackground(AuthConstants.TenantType, command.TenantId);
 
         return new DeleteTenantResponse(tenant!.Id);
     }

@@ -72,6 +72,29 @@ public sealed class FgaRelationManager(IFgaClientProvider clientProvider)
             .ToList() ?? [];
     }
 
+    public async Task<ReadPage> ReadPageAsync(
+        string storeId, string? user, string? relation, string? @object,
+        int pageSize, string? continuationToken, CancellationToken ct = default)
+    {
+        var client = clientProvider.GetClientForStore(storeId);
+        var response = await client.Read(
+            new ClientReadRequest { User = user, Relation = relation, Object = @object },
+            new ClientReadOptions
+            {
+                PageSize = pageSize > 0 ? pageSize : null,
+                ContinuationToken = string.IsNullOrEmpty(continuationToken) ? null : continuationToken
+            },
+            cancellationToken: ct);
+
+        var tuples = response.Tuples?
+            .Select(t => new StoredTuple(t.Key.User, t.Key.Relation, t.Key.Object))
+            .ToList() ?? [];
+
+        return new ReadPage(
+            tuples,
+            string.IsNullOrEmpty(response.ContinuationToken) ? null : response.ContinuationToken);
+    }
+
     public async Task<bool> CheckAsync(
         string storeId, string user, string relation, string @object,
         string? modelId = null, CancellationToken ct = default)
@@ -157,4 +180,5 @@ public sealed class FgaRelationManager(IFgaClientProvider clientProvider)
 public readonly record struct TupleInput(string User, string Relation, string Object);
 public readonly record struct CheckInput(string User, string Relation, string Object, string? CorrelationId = null);
 public readonly record struct StoredTuple(string User, string Relation, string Object);
+public readonly record struct ReadPage(IReadOnlyList<StoredTuple> Tuples, string? ContinuationToken);
 public readonly record struct BatchCheckResult(string CorrelationId, bool Allowed);

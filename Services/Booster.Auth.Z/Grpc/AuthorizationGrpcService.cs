@@ -78,15 +78,17 @@ public sealed class AuthorizationGrpcService(
     {
         var (storeId, _) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
 
-        var tuples = await relationManager.ReadAsync(
+        var page = await relationManager.ReadPageAsync(
             storeId,
             NullIfEmpty(request.User),
             NullIfEmpty(request.Relation),
             NullIfEmpty(request.Object),
+            request.PageSize,
+            NullIfEmpty(request.ContinuationToken),
             context.CancellationToken);
 
-        var response = new LookupResponse();
-        response.Results.AddRange(tuples.Select(t => new LookupResultItem
+        var response = new LookupResponse { ContinuationToken = page.ContinuationToken ?? string.Empty };
+        response.Results.AddRange(page.Tuples.Select(t => new LookupResultItem
         {
             User = t.User,
             Relation = t.Relation,

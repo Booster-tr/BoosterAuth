@@ -65,13 +65,18 @@ message LookupResultItem {
   string relation = 2;
   string object = 3;
 }
-message LookupResponse { repeated LookupResultItem results = 1; }
+message LookupResponse {
+  repeated LookupResultItem results = 1;
+  string continuation_token = 2; // yalnızca ReadRelations; boşsa son sayfa
+}
 
 message ReadRelationsRequest {
   string isolation_id = 1;
   string user = 2;          // opsiyonel
   string relation = 3;      // opsiyonel
   string object = 4;        // opsiyonel
+  int32 page_size = 5;      // opsiyonel; 0 = OpenFGA varsayılanı, en fazla 100
+  string continuation_token = 6; // opsiyonel; önceki yanıttan gelen
 }
 
 message RelationTuple {
