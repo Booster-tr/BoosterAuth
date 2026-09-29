@@ -11,7 +11,8 @@ public static class TenantAccessRules
     [
         AuthConstants.OwnerRelation,
         AuthConstants.ManagerRelation,
-        AuthConstants.ViewerRelation
+        AuthConstants.ViewerRelation,
+        AuthConstants.GrantManagerRelation
     ];
 
     public static IRuleBuilderOptions<T, string> TenantRelation<T>(this IRuleBuilder<T, string> rule)

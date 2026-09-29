@@ -64,7 +64,7 @@ public class GetListClientQueryHandler(
     public async Task<ListModel<GetListClientResponse>> ExecuteAsync(
         GetListClientQuery command, CancellationToken ct)
     {
-        var accessible = await accessManager.ListAccessibleIdsAsync(AuthConstants.ClientType, ct);
+        var accessible = await accessManager.ListAccessibleIdsAsync(AuthConstants.ClientType, AuthConstants.ViewerRelation, ct);
 
         var data = await clientRepository.ListDynamicAsync(
             command.DynamicQuery,

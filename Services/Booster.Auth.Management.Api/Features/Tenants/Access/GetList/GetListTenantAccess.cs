@@ -16,7 +16,7 @@ public class GetListTenantAccessEndpoint : EndpointWithoutRequest<GetListTenantA
 
         Options(x => x.RequireAuthorization(
             new RequireScopeAttribute(ManagementPolicies.PanelScope),
-            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.ViewerRelation)));
+            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.GrantManagerRelation)));
 
         Summary(s =>
         {

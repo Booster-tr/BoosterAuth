@@ -4,6 +4,8 @@ using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Auth.Management.Api.Features.Tenants.Access.Grant;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
+using Booster.Auth.Manager.RequestContexts;
+using Booster.Auth.Z.Grpc;
 using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
@@ -22,7 +24,7 @@ public class RevokeTenantAccessEndpoint : EndpointWithoutRequest<TenantAccessCha
 
         Options(x => x.RequireAuthorization(
             new RequireScopeAttribute(ManagementPolicies.PanelScope),
-            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.OwnerRelation)));
+            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.GrantManagerRelation)));
 
         Summary(s =>
         {
@@ -49,7 +51,9 @@ public record RevokeTenantAccessCommand(Guid TenantId, Guid PrincipalId, string 
 
 public class RevokeTenantAccessCommandHandler(
     IAsyncRepository<Tenant, AuthNDbContext> tenantRepository,
-    IAccessManager accessManager)
+    IAccessManager accessManager,
+    AuthorizationService.AuthorizationServiceClient authorizationClient,
+    IRequestContextAccessor requestContextAccessor)
     : ICommandHandler<RevokeTenantAccessCommand, TenantAccessChangeResponse>
 {
     public async Task<TenantAccessChangeResponse> ExecuteAsync(
@@ -61,6 +65,22 @@ public class RevokeTenantAccessCommandHandler(
 
         if (tenant!.OwnerId == command.PrincipalId)
             throw new ForbiddenException(AuthNMessageKeys.TenantOwnerAccessCannotBeRevoked);
+
+        if (string.Equals(command.Relation, AuthConstants.OwnerRelation, StringComparison.OrdinalIgnoreCase))
+        {
+            var check = await authorizationClient.CheckAsync(
+                new CheckRequest
+                {
+                    IsolationId = requestContextAccessor.Context().Isolation.ToString(),
+                    User = AuthConstants.User(requestContextAccessor.Context().PrincipalId),
+                    Relation = AuthConstants.OwnerRelation,
+                    Object = AuthConstants.Tenant(command.TenantId)
+                },
+                cancellationToken: ct);
+
+            if (!check.Allowed)
+                throw new ForbiddenException(AuthNMessageKeys.TenantOwnerRelationRequiresOwner);
+        }
 
         await accessManager.RevokeAsync(
             AuthConstants.TenantType, command.TenantId, command.PrincipalId, command.Relation, ct);

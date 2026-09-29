@@ -50,6 +50,9 @@ public static class AuthConstants
     public const string OwnerRelation = "owner";
     public const string ManagerRelation = "manager";
     public const string ViewerRelation = "viewer";
+
+    /// <summary>Yetki verme / geri alma. Owner'a otomatik geçer; grant manager aynı zamanda viewer'dır.</summary>
+    public const string GrantManagerRelation = "grant_manager";
     public const string ParentRelation = "parent";
 
     public const string EndUserRelation = "end_user";

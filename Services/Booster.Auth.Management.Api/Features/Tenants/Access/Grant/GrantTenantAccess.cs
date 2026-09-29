@@ -2,8 +2,11 @@ using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Auth.Management.Api.Managers.PrincipalLookupManagers;
+using Booster.Auth.Manager.RequestContexts;
+using Booster.Auth.Z.Grpc;
 using Booster.Authorization.Fga.Attributes;
 using Booster.ExceptionManager.Abstraction.Constants;
+using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
 
@@ -18,7 +21,7 @@ public class GrantTenantAccessEndpoint : Endpoint<GrantTenantAccessCommand, Tena
 
         Options(x => x.RequireAuthorization(
             new RequireScopeAttribute(ManagementPolicies.PanelScope),
-            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.OwnerRelation)));
+            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.GrantManagerRelation)));
 
         Summary(s =>
         {
@@ -39,12 +42,31 @@ public readonly record struct TenantAccessChangeResponse(Guid PrincipalId, strin
 
 public class GrantTenantAccessCommandHandler(
     IPrincipalLookupManager principalLookupManager,
-    IAccessManager accessManager)
+    IAccessManager accessManager,
+    AuthorizationService.AuthorizationServiceClient authorizationClient,
+    IRequestContextAccessor requestContextAccessor)
     : ICommandHandler<GrantTenantAccessCommand, TenantAccessChangeResponse>
 {
     public async Task<TenantAccessChangeResponse> ExecuteAsync(
         GrantTenantAccessCommand command, CancellationToken ct)
     {
+
+        if (string.Equals(command.Relation, AuthConstants.OwnerRelation, StringComparison.OrdinalIgnoreCase))
+        {
+            var check = await authorizationClient.CheckAsync(
+                new CheckRequest
+                {
+                    IsolationId = requestContextAccessor.Context().Isolation.ToString(),
+                    User = AuthConstants.User(requestContextAccessor.Context().PrincipalId),
+                    Relation = AuthConstants.OwnerRelation,
+                    Object = AuthConstants.Tenant(command.TenantId)
+                },
+                cancellationToken: ct);
+
+            if (!check.Allowed)
+                throw new ForbiddenException(AuthNMessageKeys.TenantOwnerRelationRequiresOwner);
+        }
+
         var principalId = await principalLookupManager.FindAsync(command.Identifier, ct);
 
         await accessManager.GrantAsync(

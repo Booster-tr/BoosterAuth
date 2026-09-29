@@ -54,7 +54,8 @@ public class GetListTenantQueryHandler(
 {
     public async Task<ListModel<GetListTenantResponse>> ExecuteAsync(GetListTenantQuery command, CancellationToken ct)
     {
-        var accessible = await accessManager.ListAccessibleIdsAsync(AuthConstants.TenantType, ct);
+        var accessible = await accessManager.ListAccessibleIdsAsync(
+            AuthConstants.TenantType, AuthConstants.ViewerRelation, ct);
 
         var data = await tenantRepository.ListDynamicAsync(
             command.DynamicQuery,

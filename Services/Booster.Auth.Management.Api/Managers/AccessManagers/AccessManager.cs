@@ -12,7 +12,6 @@ public sealed class AccessManager(
 {
     private static readonly string UserPrefix = $"{AuthConstants.UserPrefix}:";
 
-    // OpenFGA tek okuma/yazma isteğinde en fazla 100 tuple işler.
     private const int MaxBatchSize = 100;
 
     public async Task<AccessPage> ListAsync(
@@ -55,7 +54,6 @@ public sealed class AccessManager(
         var target = Target(objectType, objectId);
         var isolation = Isolation();
 
-        // Kullanıcı yanıtı beklemez; iş kendi kapsamında, istekten bağımsız sürer.
         _ = Task.Run(async () =>
         {
             try
@@ -64,8 +62,6 @@ public sealed class AccessManager(
                 var client = scope.ServiceProvider
                     .GetRequiredService<AuthorizationService.AuthorizationServiceClient>();
 
-                // Silinen kayıtlar okunmadığı için her seferinde İLK sayfa okunur;
-                // devam anahtarı silme sırasında geçersizleşebilirdi.
                 while (true)
                 {
                     var page = await client.ReadRelationsAsync(new ReadRelationsRequest
@@ -96,7 +92,8 @@ public sealed class AccessManager(
         });
     }
 
-    public async Task<IReadOnlyList<Guid>> ListAccessibleIdsAsync(string objectType, CancellationToken ct)
+    public async Task<IReadOnlyList<Guid>> ListAccessibleIdsAsync(
+        string objectType, string relation, CancellationToken ct)
     {
         var response = await authorizationClient.LookupByUserAsync(
             new LookupByUserRequest
@@ -104,7 +101,7 @@ public sealed class AccessManager(
                 IsolationId = Isolation(),
                 User = AuthConstants.User(requestContextAccessor.Context().PrincipalId),
                 ObjectType = objectType,
-                Relation = AuthConstants.ViewerRelation
+                Relation = relation
             },
             cancellationToken: ct);
 

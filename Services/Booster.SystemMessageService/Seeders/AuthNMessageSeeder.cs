@@ -10,7 +10,7 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
     [
         // --- Bulunamadı ---
         new(AuthNMessageKeys.TenantNotFound, "Firma", "Firma bulunamadı.", "Tenant", "Tenant not found."),
-        new(AuthNMessageKeys.InvalidRelation, "Yetkilendirme", "Geçersiz yetki. Verilebilecek yetkiler: owner, manager, viewer.", "Authorization", "Invalid permission. Assignable permissions are: owner, manager, viewer."),
+        new(AuthNMessageKeys.InvalidRelation, "Yetkilendirme", "Geçersiz yetki. Verilebilecek yetkiler: owner, manager, viewer, grant_manager.", "Authorization", "Invalid permission. Assignable permissions are: owner, manager, viewer, grant_manager."),
         new(AuthNMessageKeys.UserPoolNotFound, "Havuz", "Kullanıcı havuzu bulunamadı.", "Pool", "User pool not found."),
         new(AuthNMessageKeys.RoleNotFound, "Rol", "Rol bulunamadı.", "Role", "Role not found."),
         new(AuthNMessageKeys.RoleScopeNotFound, "Rol yetkisi", "Role bağlı yetki bulunamadı.", "Role scope", "Role scope not found."),
@@ -18,6 +18,7 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.ClientNotFound, "Uygulama", "Uygulama bulunamadı.", "Client", "Client not found."),
 
         // --- Firma yetkileri ---
+        new(AuthNMessageKeys.TenantOwnerRelationRequiresOwner, "Yetkilendirme", "Sahip yetkisini yalnızca firma sahipleri verebilir veya geri alabilir.", "Authorization", "Only tenant owners can grant or revoke the owner permission."),
         new(AuthNMessageKeys.TenantOwnerAccessCannotBeRevoked, "Yetkilendirme", "Firma sahibinin yetkileri geri alınamaz.", "Authorization", "The tenant owner's permissions cannot be revoked."),
         new(AuthNMessageKeys.PrincipalIdentifierInvalid, "Kullanıcı", "Geçerli bir e-posta adresi, kullanıcı adı veya telefon numarası girin.", "User", "Enter a valid email address, username or phone number."),
         new(AuthNMessageKeys.PrincipalNotFound, "Kullanıcı", "Bu bilgilere sahip bir kullanıcı bulunamadı.", "User", "No user was found with this information."),

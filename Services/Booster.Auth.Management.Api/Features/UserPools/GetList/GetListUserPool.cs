@@ -62,7 +62,7 @@ public class GetListUserPoolQueryHandler(
 {
     public async Task<ListModel<GetListUserPoolResponse>> ExecuteAsync(GetListUserPoolQuery command, CancellationToken ct)
     {
-        var accessible = await accessManager.ListAccessibleIdsAsync(AuthConstants.PoolType, ct);
+        var accessible = await accessManager.ListAccessibleIdsAsync(AuthConstants.PoolType, AuthConstants.ViewerRelation, ct);
 
         var data = await userPoolRepository.ListDynamicAsync(
             command.DynamicQuery,
