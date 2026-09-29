@@ -1,6 +1,8 @@
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
 using Booster.ExceptionManager.Abstraction.Constants;
+using Booster.Auth.Common.Internal.Constants.Messages;
+using Booster.Auth.Z.Features._base;
 using FastEndpoints;
 using FluentValidation;
 
@@ -64,9 +66,22 @@ public class BatchCheckPermissionsValidator : Validator<BatchCheckPermissionsCom
 
         RuleForEach(x => x.Checks).ChildRules(check =>
         {
-            check.RuleFor(c => c.User).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+            check.RuleFor(c => c.User).UserFormat();
             check.RuleFor(c => c.Relation).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-            check.RuleFor(c => c.Object).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+            check.RuleFor(c => c.Object).ObjectFormat();
+            check.RuleFor(c => c.CorrelationId).CorrelationIdFormat();
         });
+
+        RuleFor(x => x.Checks)
+            .Must(checks =>
+            {
+                var provided = checks
+                    .Select(c => c.CorrelationId)
+                    .Where(id => !string.IsNullOrEmpty(id))
+                    .ToList();
+
+                return provided.Count == provided.Distinct().Count();
+            })
+            .WithMessage(AuthZMessageKeys.DuplicateCorrelationId);
     }
 }

@@ -1,6 +1,7 @@
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
 using Booster.ExceptionManager.Abstraction.Constants;
+using Booster.Auth.Z.Features._base;
 using FastEndpoints;
 using FluentValidation;
 
@@ -57,8 +58,8 @@ public class CheckPermissionValidator : Validator<CheckPermissionCommand>
     public CheckPermissionValidator()
     {
         RuleFor(x => x.IsolationId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-        RuleFor(x => x.User).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.User).UserFormat();
         RuleFor(x => x.Relation).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-        RuleFor(x => x.Object).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.Object).ObjectFormat();
     }
 }

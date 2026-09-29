@@ -1,6 +1,7 @@
 using Booster.Auth.Z.Features.Lookup.LookupByUser;
 using Booster.Auth.Z.Managers.LookupManagers;
 using Booster.ExceptionManager.Abstraction.Constants;
+using Booster.Auth.Z.Features._base;
 using FastEndpoints;
 using FluentValidation;
 
@@ -47,8 +48,6 @@ public class LookupByObjectValidator : Validator<LookupByObjectCommand>
     {
         RuleFor(x => x.IsolationId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
 
-        RuleFor(x => x.Object)
-            .NotEmpty().WithMessage(ValidationErrors.NotEmptyError)
-            .Matches("^[^:]+:.+$"); // "tip:id"
+        RuleFor(x => x.Object).ObjectFormat();
     }
 }

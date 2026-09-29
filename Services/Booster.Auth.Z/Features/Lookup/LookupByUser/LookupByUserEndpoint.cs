@@ -1,5 +1,6 @@
 using Booster.Auth.Z.Managers.LookupManagers;
 using Booster.ExceptionManager.Abstraction.Constants;
+using Booster.Auth.Z.Features._base;
 using FastEndpoints;
 using FluentValidation;
 
@@ -50,7 +51,7 @@ public class LookupByUserValidator : Validator<LookupByUserCommand>
     public LookupByUserValidator()
     {
         RuleFor(x => x.IsolationId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-        RuleFor(x => x.User).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.User).UserFormat();
         RuleFor(x => x.ObjectType).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
     }
 }

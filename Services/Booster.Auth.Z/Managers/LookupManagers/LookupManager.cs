@@ -58,6 +58,70 @@ public sealed class LookupManager(
         return results;
     }
 
+    public async Task<IReadOnlyList<ObjectAccess>> LookupMyAccessAsync(
+        Guid poolId, string user, IReadOnlyList<string> objectTypes, CancellationToken ct)
+    {
+        var mapping = await poolStoreProvider.GetRequiredByPoolIdAsync(poolId, ct);
+
+        var byObject = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+
+        foreach (var objectType in objectTypes.Distinct(StringComparer.Ordinal))
+        {
+            var relations = await ResolveRelationsAsync(mapping, objectType, relation: null, ct);
+
+            foreach (var current in relations)
+            {
+                var objects = await relationManager.ListObjectsAsync(
+                    mapping.StoreId, user, current, objectType, mapping.ActiveModelId, ct);
+
+                foreach (var @object in objects)
+                {
+                    if (!byObject.TryGetValue(@object, out var list))
+                        byObject[@object] = list = [];
+
+                    list.Add(current);
+                }
+            }
+        }
+
+        return byObject
+            .Select(pair => ToAccess(pair.Key, pair.Value))
+            .ToList();
+    }
+
+    public async Task<ObjectAccess> LookupObjectAccessAsync(
+        Guid poolId, string user, string @object, CancellationToken ct)
+    {
+        var mapping = await poolStoreProvider.GetRequiredByPoolIdAsync(poolId, ct);
+
+        var objectType = ObjectTypeOf(@object);
+        var relations = await ResolveRelationsAsync(mapping, objectType, relation: null, ct);
+
+        var checks = relations
+            .Select((current, index) => new CheckInput(user, current, @object, index.ToString()))
+            .ToList();
+
+        var results = await relationManager.BatchCheckAsync(
+            mapping.StoreId, checks, mapping.ActiveModelId, ct);
+
+        var allowed = results
+            .Where(r => r.Allowed)
+            .Select(r => relations[int.Parse(r.CorrelationId)])
+            .ToList();
+
+        return ToAccess(@object, allowed);
+    }
+
+    private static ObjectAccess ToAccess(string @object, List<string> relations)
+    {
+        var separator = @object.IndexOf(':');
+
+        return new ObjectAccess(
+            @object[..separator],
+            @object[(separator + 1)..],
+            relations.Distinct(StringComparer.Ordinal).OrderBy(r => r, StringComparer.Ordinal).ToList());
+    }
+
     private async Task<IReadOnlyList<string>> ResolveRelationsAsync(
         PoolStoreData mapping, string objectType, string? relation, CancellationToken ct)
     {

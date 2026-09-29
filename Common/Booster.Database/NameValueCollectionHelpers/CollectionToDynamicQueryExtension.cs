@@ -90,6 +90,7 @@ public static class CollectionToDynamicQueryExtension
 
         List<string> allKeys = nvc.AllKeys
             .Where(w => !ExtractFilters.Contains(w) && !string.IsNullOrWhiteSpace(w) && !string.IsNullOrWhiteSpace(nvc[w]))
+            .Where(w => IsKnownProperty(properties, w!))
             .ToList()!;
 
         Filter? rootFilter = null;
@@ -117,6 +118,15 @@ public static class CollectionToDynamicQueryExtension
         return rootFilter;
     }
 
+
+    private static bool IsKnownProperty(PropertyInfo[] properties, string key)
+    {
+        var (cleanKey, _) = ParseKeyWithOperator(key);
+
+        var root = cleanKey.Split('.')[0];
+
+        return properties.Any(p => string.Equals(p.Name, root, StringComparison.OrdinalIgnoreCase));
+    }
 
     private static Filter CreateSubFilters(Filter filter)
     {
