@@ -1,6 +1,7 @@
 using Booster.Auth.Common.Internal.Extensions;
 using Booster.Auth.Idp.Bootstrappers;
 using Booster.Auth.Idp.Extensions;
+using Booster.Auth.Idp.Features.Principals.Grpc;
 using Booster.Auth.Idp.Localization;
 using Microsoft.AspNetCore.Localization;
 
@@ -36,6 +37,8 @@ builder.Services.AddIdpServices(builder.Configuration);
 
 builder.Services.AddBoosterApi(builder.Configuration);
 
+builder.Services.AddGrpc();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -51,6 +54,8 @@ app.UseBoosterMessaging();
 app.UseBoosterApi();
 
 app.MapStaticAssets().AllowAnonymous();
+
+app.MapGrpcService<PrincipalLookupGrpcService>();
 
 app.MapControllerRoute(
     name: "default",

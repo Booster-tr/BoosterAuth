@@ -20,7 +20,9 @@ public sealed class ManagementBootstrapper(
     {
         var existing = await poolStoreProvider.GetByPoolIdAsync(AuthConstants.ManagementPoolId, ct);
         if (existing is not null)
+        {
             return;
+        }
 
         var storeId = await schemaWriter.CreateStoreAsync(AuthConstants.ManagementStoreName, ct);
 

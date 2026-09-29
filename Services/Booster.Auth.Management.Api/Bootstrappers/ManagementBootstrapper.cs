@@ -31,7 +31,8 @@ public sealed class ManagementBootstrapper(
         var tenant = new Tenant
         {
             Id = AuthConstants.ManagementTenantId,
-            Name = AuthConstants.ManagementTenantName
+            Name = AuthConstants.ManagementTenantName,
+            OwnerId = AuthConstants.AdminUserId
         };
 
         var pool = new UserPool

@@ -1,0 +1,23 @@
+syntax = "proto3";
+option csharp_namespace = "Booster.Auth.Idp.Grpc";
+package idp;
+
+// Management'in, bir kullaniciya yetki verirken e-posta / kullanici adi /
+// telefon ile kisiyi bulmasi icin. Yalnizca KIMLIK doner: ad, e-posta gibi
+// profil bilgisi tasinmaz; arayan zaten tanimlayiciyi biliyor, fazlasini
+// ogrenmesine gerek yok.
+service PrincipalLookupService {
+  rpc FindByIdentifier (FindByIdentifierRequest) returns (FindByIdentifierResponse);
+}
+
+message FindByIdentifierRequest {
+  string isolation_id = 1;     // Guid — aramanin yapilacagi havuz
+  int32 identifier_type = 2;   // IdentifierType
+  string identifier = 3;       // NORMALIZE edilmis deger; IdP tam eslesme arar
+}
+
+// found=false hata degildir: "boyle bir kullanici yok" demektir.
+message FindByIdentifierResponse {
+  bool found = 1;
+  string principal_id = 2;     // Guid
+}

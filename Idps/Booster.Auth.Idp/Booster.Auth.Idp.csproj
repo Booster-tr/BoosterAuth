@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.84.0" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.84.0" />
     <PackageReference Include="FastEndpoints" Version="8.3.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.24.1-preview.1" />
@@ -26,6 +27,8 @@
   <ItemGroup>
     <!-- Management gRPC sözleşmesi: istemci stub -->
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Management.Contracts\Booster.Auth.Management.Contracts.csproj" />
+    <!-- Kullanıcı arama gRPC sözleşmesi: sunucu stub -->
+    <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Idp.Contracts\Booster.Auth.Idp.Contracts.csproj" />
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Common.Internal\Booster.Auth.Common.Internal.csproj" />
     <ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Local\Booster.Auth.Idp.Providers.Local.csproj" />

@@ -17,6 +17,12 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.ScopeDefinitionNotFound, "Yetki", "Yetki tanımı bulunamadı.", "Scope", "Scope definition not found."),
         new(AuthNMessageKeys.ClientNotFound, "Uygulama", "Uygulama bulunamadı.", "Client", "Client not found."),
 
+        // --- Firma yetkileri ---
+        new(AuthNMessageKeys.TenantOwnerAccessCannotBeRevoked, "Yetkilendirme", "Firma sahibinin yetkileri geri alınamaz.", "Authorization", "The tenant owner's permissions cannot be revoked."),
+        new(AuthNMessageKeys.PrincipalIdentifierInvalid, "Kullanıcı", "Geçerli bir e-posta adresi, kullanıcı adı veya telefon numarası girin.", "User", "Enter a valid email address, username or phone number."),
+        new(AuthNMessageKeys.PrincipalNotFound, "Kullanıcı", "Bu bilgilere sahip bir kullanıcı bulunamadı.", "User", "No user was found with this information."),
+        new(AuthNMessageKeys.PrincipalLookupLimitExceeded, "Kullanıcı", "Çok fazla deneme yaptınız. Lütfen bir süre sonra tekrar deneyin.", "User", "Too many attempts. Please try again later."),
+
         // --- Benzersizlik ---
         new(AuthNMessageKeys.RoleKeyAlreadyExists, "Rol", "Bu rol anahtarı zaten kullanımda.", "Role", "This role key is already in use."),
         new(AuthNMessageKeys.ScopeAlreadyDefined, "Yetki", "Bu yetki zaten tanımlı.", "Scope", "This scope is already defined."),

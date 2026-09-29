@@ -71,6 +71,11 @@ public class GlobalExceptionHandler : IExceptionHandler
             statusCode = StatusCodes.Status403Forbidden;
             errorMessage = await translationService.GetAsync(fEx.Message, langHeader, cancellationToken);
         }
+        else if (exception is TooManyRequestsException tEx)
+        {
+            statusCode = StatusCodes.Status429TooManyRequests;
+            errorMessage = await translationService.GetAsync(tEx.Message, langHeader, cancellationToken);
+        }
         else if (exception is BusinessException bEx)
         {
             statusCode = StatusCodes.Status400BadRequest;

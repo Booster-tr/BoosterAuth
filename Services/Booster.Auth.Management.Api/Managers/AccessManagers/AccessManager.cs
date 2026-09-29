@@ -13,28 +13,11 @@ public sealed class AccessManager(
     public async Task<IReadOnlyList<AccessEntry>> ListAsync(
         string objectType, Guid objectId, CancellationToken ct)
     {
-        var target = Target(objectType, objectId);
+        var granted = await ReadGrantedAsync(Target(objectType, objectId), ct);
 
-        var granted = await ReadGrantedAsync(target, ct);
-
-        var effective = await authorizationClient.LookupByObjectAsync(
-            new LookupByObjectRequest
-            {
-                IsolationId = Isolation(),
-                Object = target,
-                Relation = string.Empty
-            },
-            cancellationToken: ct);
-
-        var effectiveByPrincipal = Group(effective.Results.Select(r => (r.User, r.Relation)));
-
-        var principals = effectiveByPrincipal.Keys.Union(granted.Keys).OrderBy(id => id);
-
-        return principals
-            .Select(id => new AccessEntry(
-                id,
-                granted.GetValueOrDefault(id, []),
-                effectiveByPrincipal.GetValueOrDefault(id, [])))
+        return granted
+            .OrderBy(pair => pair.Key)
+            .Select(pair => new AccessEntry(pair.Key, pair.Value))
             .ToList();
     }
 

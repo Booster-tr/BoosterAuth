@@ -8,6 +8,8 @@ public class Tenant : Entity
 {
     public string Name { get; set; } = default!;
 
+    public Guid OwnerId { get; set; }
+
     public virtual ICollection<UserPool> UserPools { get; set; } = [];
 }
 
@@ -23,6 +25,9 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.Property(x => x.DeletedTime);
 
         builder.Property(x => x.Name).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.OwnerId).IsRequired();
+
+        builder.HasIndex(x => x.OwnerId).IsUnique(false);
 
         builder.HasMany(x => x.UserPools)
                .WithOne(x => x.Tenant)

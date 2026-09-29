@@ -1,9 +1,13 @@
 using Booster.Auth.Common.Internal.Constants;
+using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Features._base;
+using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Auth.Management.Api.Features.Tenants.Access.Grant;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Authorization.Fga.Attributes;
+using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
+using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
 
@@ -43,12 +47,24 @@ public class RevokeTenantAccessEndpoint : EndpointWithoutRequest<TenantAccessCha
 public record RevokeTenantAccessCommand(Guid TenantId, Guid PrincipalId, string Relation)
     : ICommand<TenantAccessChangeResponse>;
 
-public class RevokeTenantAccessCommandHandler(IAccessManager accessManager)
+public class RevokeTenantAccessCommandHandler(
+    IAsyncRepository<Tenant, AuthNDbContext> tenantRepository,
+    IAccessManager accessManager)
     : ICommandHandler<RevokeTenantAccessCommand, TenantAccessChangeResponse>
 {
     public async Task<TenantAccessChangeResponse> ExecuteAsync(
         RevokeTenantAccessCommand command, CancellationToken ct)
     {
+        var tenant = await tenantRepository.GetAsync(
+            t => t.Id == command.TenantId, enableTracking: false, cancellationToken: ct);
+        tenant.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.TenantNotFound);
+
+        // Firma sahibinin HİÇBİR yetkisi geri alınamaz. Alınabilseydi, başka
+        // bir owner sahibi dışarıda bırakabilir ya da sahip yanlışlıkla
+        // kendini firmadan düşürüp kurtarılamaz bir durum yaratabilirdi.
+        if (tenant!.OwnerId == command.PrincipalId)
+            throw new ForbiddenException(AuthNMessageKeys.TenantOwnerAccessCannotBeRevoked);
+
         await accessManager.RevokeAsync(
             AuthConstants.TenantType, command.TenantId, command.PrincipalId, command.Relation, ct);
 

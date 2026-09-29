@@ -41,6 +41,7 @@ public record GetByIdTenantQuery(Guid TenantId) : ICommand<GetByIdTenantResponse
 public readonly record struct GetByIdTenantResponse(
     Guid Id,
     string Name,
+    Guid OwnerId,
     DateTimeOffset CreatedTime,
     DateTimeOffset? UpdatedTime,
     int UserPoolCount);

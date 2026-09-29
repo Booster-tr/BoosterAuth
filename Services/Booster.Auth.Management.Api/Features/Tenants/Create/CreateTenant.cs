@@ -48,8 +48,11 @@ public class CreateTenantCommandHandler(
 {
     public async Task<CreateTenantResponse> ExecuteAsync(CreateTenantCommand command, CancellationToken ct)
     {
+        var ownerId = requestContextAccessor.Context().PrincipalId;
+
         var tenant = command.Adapt<Tenant>();
         tenant.SetId();
+        tenant.OwnerId = ownerId;
 
         await tenantRepository.AddAsync(tenant, ct);
         await tenantRepository.SaveChangesAsync(ct);
@@ -61,7 +64,7 @@ public class CreateTenantCommandHandler(
         await accessManager.GrantAsync(
             AuthConstants.TenantType,
             tenant.Id,
-            requestContextAccessor.Context().PrincipalId,
+            ownerId,
             AuthConstants.OwnerRelation,
             ct);
 

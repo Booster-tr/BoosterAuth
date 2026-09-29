@@ -23,6 +23,8 @@
 	<ItemGroup>
 		<!-- Management gRPC sözleşmesi: sunucu stub -->
 		<ProjectReference Include="..\..\CommonInternal\Booster.Auth.Management.Contracts\Booster.Auth.Management.Contracts.csproj" />
+		<!-- IdP kullanıcı arama sözleşmesi: istemci stub -->
+		<ProjectReference Include="..\..\CommonInternal\Booster.Auth.Idp.Contracts\Booster.Auth.Idp.Contracts.csproj" />
 		<ProjectReference Include="..\..\CommonInternal\Booster.Auth.Common.Internal\Booster.Auth.Common.Internal.csproj" />
 		<ProjectReference Include="..\..\Common\AuthZ\Booster.Authorization.Relational\Booster.Authorization.Relational.csproj" />
 		<ProjectReference Include="..\..\Common\Booster.Common.Extensions\Booster.Common.Extensions.csproj" />

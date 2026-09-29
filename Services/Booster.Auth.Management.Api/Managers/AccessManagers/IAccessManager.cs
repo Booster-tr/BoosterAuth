@@ -2,8 +2,7 @@ namespace Booster.Auth.Management.Api.Managers.AccessManagers;
 
 public readonly record struct AccessEntry(
     Guid PrincipalId,
-    IReadOnlyList<string> Granted,
-    IReadOnlyList<string> Effective);
+    IReadOnlyList<string> Relations);
 
 public interface IAccessManager
 {

@@ -23,8 +23,7 @@ public class GetListTenantAccessEndpoint : EndpointWithoutRequest<ListModel<Tena
         Summary(s =>
         {
             s.Summary = "Firma üzerindeki yetkileri listeler";
-            s.Description = "granted: yazılmış yetkiler (geri alınabilir). " +
-                            "effective: modelin türettiği etkin yetkiler (owner aynı zamanda viewer'dır).";
+            s.Description = "Yalnızca doğrudan verilmiş yetkiler döner; türetilmiş yetkiler listelenmez.";
         });
     }
 
@@ -43,8 +42,7 @@ public record GetListTenantAccessQuery(Guid TenantId, PageRequest PageRequest)
 
 public readonly record struct TenantAccessResponse(
     Guid PrincipalId,
-    IReadOnlyList<string> Granted,
-    IReadOnlyList<string> Effective);
+    IReadOnlyList<string> Relations);
 
 public class GetListTenantAccessQueryHandler(IAccessManager accessManager)
     : ICommandHandler<GetListTenantAccessQuery, ListModel<TenantAccessResponse>>
@@ -66,7 +64,7 @@ public class GetListTenantAccessQueryHandler(IAccessManager accessManager)
         var items = entries
             .Skip((index - 1) * size)
             .Take(size)
-            .Select(entry => new TenantAccessResponse(entry.PrincipalId, entry.Granted, entry.Effective))
+            .Select(entry => new TenantAccessResponse(entry.PrincipalId, entry.Relations))
             .ToList();
 
         return new ListModel<TenantAccessResponse>

@@ -11,6 +11,12 @@ public class AuthNMessageKeys
     public const string ScopeDefinitionNotFound = "authn.scope_definition_not_found";
     public const string ClientNotFound = "authn.client_not_found";
 
+    // --- Firma yetkileri ---
+    public const string TenantOwnerAccessCannotBeRevoked = "authn.tenant_owner_access_cannot_be_revoked";
+    public const string PrincipalIdentifierInvalid = "authn.principal_identifier_invalid";
+    public const string PrincipalNotFound = "authn.principal_not_found";
+    public const string PrincipalLookupLimitExceeded = "authn.principal_lookup_limit_exceeded";
+
     // --- Benzersizlik ---
     public const string RoleKeyAlreadyExists = "authn.role_key_already_exists";
     public const string ScopeAlreadyDefined = "authn.scope_already_defined";
