@@ -18,6 +18,14 @@ public class AuthNMessageKeys
     public const string PrincipalNotFound = "authn.principal_not_found";
     public const string PrincipalLookupLimitExceeded = "authn.principal_lookup_limit_exceeded";
 
+    // --- Havuz politikası ---
+    public const string ValueOutOfRange = "authn.value_out_of_range";
+    public const string LoginProviderRequired = "authn.login_provider_required";
+    public const string LoginIdentifierRequired = "authn.login_identifier_required";
+    public const string CountryCodeInvalid = "authn.country_code_invalid";
+    public const string MfaMethodRequired = "authn.mfa_method_required";
+    public const string RefreshTtlShorterThanAccess = "authn.refresh_ttl_shorter_than_access";
+
     // --- Benzersizlik ---
     public const string RoleKeyAlreadyExists = "authn.role_key_already_exists";
     public const string ScopeAlreadyDefined = "authn.scope_already_defined";

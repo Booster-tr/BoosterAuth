@@ -5,6 +5,8 @@ using Booster.Database.Repositories;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 
@@ -14,8 +16,12 @@ public class UpdateUserPoolDefaultScopesEndpoint : Endpoint<UpdateUserPoolDefaul
 {
     public override void Configure()
     {
-        Put("{Id:guid}/default-scopes");
+        Put("default-scopes");
         Group<UserPoolsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Havuzun varsayılan scope listesini günceller";
@@ -28,7 +34,7 @@ public class UpdateUserPoolDefaultScopesEndpoint : Endpoint<UpdateUserPoolDefaul
         => await Send.OkAsync(await req.ExecuteAsync(ct), ct);
 }
 
-public record UpdateUserPoolDefaultScopesCommand(Guid Id, List<string> Scopes) : ICommand<UpdateUserPoolDefaultScopesResponse>;
+public record UpdateUserPoolDefaultScopesCommand(Guid UserPoolId, List<string> Scopes) : ICommand<UpdateUserPoolDefaultScopesResponse>;
 
 public readonly record struct UpdateUserPoolDefaultScopesResponse(Guid Id);
 
@@ -41,7 +47,7 @@ public class UpdateUserPoolDefaultScopesCommandHandler(
     public async Task<UpdateUserPoolDefaultScopesResponse> ExecuteAsync(
         UpdateUserPoolDefaultScopesCommand command, CancellationToken ct)
     {
-        var pool = await userPoolRepository.GetAsync(p => p.Id == command.Id, cancellationToken: ct);
+        var pool = await userPoolRepository.GetAsync(p => p.Id == command.UserPoolId, cancellationToken: ct);
         pool.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.UserPoolNotFound);
 
         var distinctScopes = command.Scopes
@@ -52,7 +58,7 @@ public class UpdateUserPoolDefaultScopesCommandHandler(
         if (distinctScopes.Count > 0)
         {
             var definedCount = await scopeDefinitionRepository.CountAsync(
-                s => s.UserPoolId == command.Id && distinctScopes.Contains(s.Scope),
+                s => s.UserPoolId == command.UserPoolId && distinctScopes.Contains(s.Scope),
                 cancellationToken: ct);
 
             if (definedCount != distinctScopes.Count)
@@ -73,7 +79,7 @@ public class UpdateUserPoolDefaultScopesValidator : Validator<UpdateUserPoolDefa
 {
     public UpdateUserPoolDefaultScopesValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.UserPoolId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
         RuleFor(x => x.Scopes).NotNull().WithMessage(ValidationErrors.NotNullOrEmptyError);
     }
 }

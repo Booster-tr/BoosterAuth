@@ -24,6 +24,14 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.PrincipalNotFound, "Kullanıcı", "Bu bilgilere sahip bir kullanıcı bulunamadı.", "User", "No user was found with this information."),
         new(AuthNMessageKeys.PrincipalLookupLimitExceeded, "Kullanıcı", "Çok fazla deneme yaptınız. Lütfen bir süre sonra tekrar deneyin.", "User", "Too many attempts. Please try again later."),
 
+        // --- Havuz politikası ---
+        new(AuthNMessageKeys.ValueOutOfRange, "Politika", "Değer {From} ile {To} arasında olmalıdır.", "Policy", "The value must be between {From} and {To}."),
+        new(AuthNMessageKeys.LoginProviderRequired, "Politika", "En az bir giriş yöntemi seçmelisiniz.", "Policy", "Select at least one sign-in method."),
+        new(AuthNMessageKeys.LoginIdentifierRequired, "Politika", "En az bir kullanıcı tanımlayıcısı seçmelisiniz.", "Policy", "Select at least one user identifier."),
+        new(AuthNMessageKeys.CountryCodeInvalid, "Politika", "Ülke kodu 1-4 haneli bir sayı olmalıdır.", "Policy", "The country code must be a 1-4 digit number."),
+        new(AuthNMessageKeys.MfaMethodRequired, "Politika", "Çok faktörlü doğrulama zorunluysa en az bir yöntem seçmelisiniz.", "Policy", "Select at least one method when multi-factor authentication is required."),
+        new(AuthNMessageKeys.RefreshTtlShorterThanAccess, "Politika", "Yenileme token süresi erişim token süresinden kısa olamaz.", "Policy", "The refresh token lifetime cannot be shorter than the access token lifetime."),
+
         // --- Benzersizlik ---
         new(AuthNMessageKeys.RoleKeyAlreadyExists, "Rol", "Bu rol anahtarı zaten kullanımda.", "Role", "This role key is already in use."),
         new(AuthNMessageKeys.ScopeAlreadyDefined, "Yetki", "Bu yetki zaten tanımlı.", "Scope", "This scope is already defined."),

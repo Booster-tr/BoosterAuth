@@ -7,6 +7,7 @@ using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 using Mapster;
@@ -19,6 +20,10 @@ public class CreateUserPoolEndpoint : Endpoint<CreateUserPoolCommand, CreateUser
     {
         Post("");
         Group<UserPoolsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Yeni kullanıcı havuzu (UserPool) oluşturur";
@@ -57,7 +62,6 @@ public class CreateUserPoolCommandHandler(
         await userPoolRepository.AddAsync(pool, ct);
         await userPoolRepository.SaveChangesAsync(ct);
 
-        // Firmadaki yetkiler havuza bu bağ sayesinde akar.
         await accessManager.LinkParentAsync(
             AuthConstants.PoolType, pool.Id, AuthConstants.TenantType, pool.TenantId, ct);
 

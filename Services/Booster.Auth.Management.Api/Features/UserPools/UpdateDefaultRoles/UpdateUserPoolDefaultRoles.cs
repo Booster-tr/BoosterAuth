@@ -5,6 +5,8 @@ using Booster.Database.Repositories;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 
@@ -14,8 +16,12 @@ public class UpdateUserPoolDefaultRolesEndpoint : Endpoint<UpdateUserPoolDefault
 {
     public override void Configure()
     {
-        Put("{Id:guid}/default-roles");
+        Put("default-roles");
         Group<UserPoolsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.ManagerRelation)));
         Summary(s =>
         {
             s.Summary = "Havuzun varsayılan rol listesini günceller";
@@ -28,7 +34,7 @@ public class UpdateUserPoolDefaultRolesEndpoint : Endpoint<UpdateUserPoolDefault
         => await Send.OkAsync(await req.ExecuteAsync(ct), ct);
 }
 
-public record UpdateUserPoolDefaultRolesCommand(Guid Id, List<Guid> RoleIds) : ICommand<UpdateUserPoolDefaultRolesResponse>;
+public record UpdateUserPoolDefaultRolesCommand(Guid UserPoolId, List<Guid> RoleIds) : ICommand<UpdateUserPoolDefaultRolesResponse>;
 
 public readonly record struct UpdateUserPoolDefaultRolesResponse(Guid Id);
 
@@ -41,7 +47,7 @@ public class UpdateUserPoolDefaultRolesCommandHandler(
     public async Task<UpdateUserPoolDefaultRolesResponse> ExecuteAsync(
         UpdateUserPoolDefaultRolesCommand command, CancellationToken ct)
     {
-        var pool = await userPoolRepository.GetAsync(p => p.Id == command.Id, cancellationToken: ct);
+        var pool = await userPoolRepository.GetAsync(p => p.Id == command.UserPoolId, cancellationToken: ct);
         pool.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.UserPoolNotFound);
 
         var distinctRoleIds = command.RoleIds.Distinct().ToList();
@@ -49,7 +55,7 @@ public class UpdateUserPoolDefaultRolesCommandHandler(
         if (distinctRoleIds.Count > 0)
         {
             var poolRoleCount = await roleRepository.CountAsync(
-                r => r.UserPoolId == command.Id && distinctRoleIds.Contains(r.Id),
+                r => r.UserPoolId == command.UserPoolId && distinctRoleIds.Contains(r.Id),
                 cancellationToken: ct);
 
             if (poolRoleCount != distinctRoleIds.Count)
@@ -70,7 +76,7 @@ public class UpdateUserPoolDefaultRolesValidator : Validator<UpdateUserPoolDefau
 {
     public UpdateUserPoolDefaultRolesValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.UserPoolId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
         RuleFor(x => x.RoleIds).NotNull().WithMessage(ValidationErrors.NotNullOrEmptyError);
     }
 }

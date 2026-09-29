@@ -5,6 +5,7 @@ using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Database.Repositories;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 
 namespace Booster.Auth.Management.Api.Features.UserPools.Delete;
@@ -13,8 +14,12 @@ public class DeleteUserPoolEndpoint : EndpointWithoutRequest<DeleteUserPoolRespo
 {
     public override void Configure()
     {
-        Delete("{id:guid}");
+        Delete("");
         Group<UserPoolsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.OwnerRelation)));
         Summary(s =>
         {
             s.Summary = "Kullanıcı havuzunu siler";
@@ -23,10 +28,10 @@ public class DeleteUserPoolEndpoint : EndpointWithoutRequest<DeleteUserPoolRespo
     }
 
     public override async Task HandleAsync(CancellationToken ct)
-        => await Send.OkAsync(await new DeleteUserPoolCommand(Route<Guid>("id")).ExecuteAsync(ct), ct);
+        => await Send.OkAsync(await new DeleteUserPoolCommand(Query<Guid>("UserPoolId")).ExecuteAsync(ct), ct);
 }
 
-public record DeleteUserPoolCommand(Guid Id) : ICommand<DeleteUserPoolResponse>;
+public record DeleteUserPoolCommand(Guid UserPoolId) : ICommand<DeleteUserPoolResponse>;
 
 public readonly record struct DeleteUserPoolResponse(Guid Id);
 
@@ -38,7 +43,7 @@ public class DeleteUserPoolCommandHandler(
 {
     public async Task<DeleteUserPoolResponse> ExecuteAsync(DeleteUserPoolCommand command, CancellationToken ct)
     {
-        var pool = await userPoolRepository.GetAsync(p => p.Id == command.Id, cancellationToken: ct);
+        var pool = await userPoolRepository.GetAsync(p => p.Id == command.UserPoolId, cancellationToken: ct);
         pool.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.UserPoolNotFound);
 
         userPoolRepository.Delete(pool!);
