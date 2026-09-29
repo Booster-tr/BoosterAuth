@@ -20,12 +20,6 @@ public class RolesEndpointGroup : Group
         => Configure("roles", ep => ep.Description(b => b.WithTags("Roles")));
 }
 
-public class RoleScopesEndpointGroup : Group
-{
-    public RoleScopesEndpointGroup()
-        => Configure("role-scopes", ep => ep.Description(b => b.WithTags("RoleScopes")));
-}
-
 public class ScopeDefinitionsEndpointGroup : Group
 {
     public ScopeDefinitionsEndpointGroup()

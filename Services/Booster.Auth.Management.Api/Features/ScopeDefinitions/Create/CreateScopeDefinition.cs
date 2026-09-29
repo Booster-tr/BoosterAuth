@@ -1,6 +1,10 @@
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
+using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Auth.Management.Api.Stores.ClientDataStores;
+using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
@@ -16,10 +20,15 @@ public class CreateScopeDefinitionEndpoint : Endpoint<CreateScopeDefinitionComma
     {
         Post("");
         Group<ScopeDefinitionsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.PoolTarget, AuthConstants.GrantManagerRelation)));
+
         Summary(s =>
         {
-            s.Summary = "Yeni scope tanımı oluşturur";
-            s.Description = "Bir havuz altında API erişim izni tanımlar. Tanım havuz içinde benzersizdir.";
+            s.Summary = "Yeni kapsam tanımı oluşturur";
+            s.Description = "Havuz altında API erişim izni tanımlar. Tanım havuz içinde benzersizdir.";
         });
     }
 
@@ -37,14 +46,14 @@ public readonly record struct CreateScopeDefinitionResponse(Guid Id);
 
 public class CreateScopeDefinitionCommandHandler(
     IAsyncRepository<ScopeDefinition, AuthNDbContext> scopeRepository,
-    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository)
+    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
+    IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<CreateScopeDefinitionCommand, CreateScopeDefinitionResponse>
 {
     public async Task<CreateScopeDefinitionResponse> ExecuteAsync(
         CreateScopeDefinitionCommand command, CancellationToken ct)
     {
-        var poolExists = await userPoolRepository.AnyAsync(
-            p => p.Id == command.UserPoolId, cancellationToken: ct);
+        var poolExists = await userPoolRepository.AnyAsync(p => p.Id == command.UserPoolId, cancellationToken: ct);
 
         if (!poolExists)
             throw new BusinessException(AuthNMessageKeys.UserPoolNotFound);
@@ -62,6 +71,8 @@ public class CreateScopeDefinitionCommandHandler(
 
         await scopeRepository.AddAsync(scope, ct);
         await scopeRepository.SaveChangesAsync(ct);
+
+        await clientDataCacheStore.InvalidatePoolAsync(command.UserPoolId, ct);
 
         return new CreateScopeDefinitionResponse(scope.Id);
     }

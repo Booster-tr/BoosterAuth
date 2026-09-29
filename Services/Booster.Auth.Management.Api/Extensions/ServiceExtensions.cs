@@ -33,11 +33,7 @@ public static class ServiceExtensions
 
         var idpSettings = services.AddSettings<IdpSettings>(configuration);
 
-        services.AddGrpcClient<PrincipalLookupService.PrincipalLookupServiceClient>(options =>
-        {
-            options.Address = new Uri(idpSettings.GrpcAddress);
-        })
-        .ConfigureChannel(channel =>
+        void ConfigureIdpChannel(IHttpClientBuilder builder) => builder.ConfigureChannel(channel =>
         {
             channel.HttpHandler = new SocketsHttpHandler
             {
@@ -45,6 +41,12 @@ public static class ServiceExtensions
                 EnableMultipleHttp2Connections = true
             };
         });
+
+        ConfigureIdpChannel(services.AddGrpcClient<PrincipalLookupService.PrincipalLookupServiceClient>(
+            options => options.Address = new Uri(idpSettings.GrpcAddress)));
+
+        ConfigureIdpChannel(services.AddGrpcClient<PrincipalAccessService.PrincipalAccessServiceClient>(
+            options => options.Address = new Uri(idpSettings.GrpcAddress)));
 
         services.AddBoosterCacheLanguageTranslator();
         services.AddBoosterExceptionHandler();

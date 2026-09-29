@@ -56,6 +56,7 @@ app.UseBoosterApi();
 app.MapStaticAssets().AllowAnonymous();
 
 app.MapGrpcService<PrincipalLookupGrpcService>();
+app.MapGrpcService<PrincipalAccessGrpcService>();
 
 app.MapControllerRoute(
     name: "default",
