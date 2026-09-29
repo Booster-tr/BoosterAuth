@@ -1,6 +1,8 @@
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Features._base;
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Database.Repositories;
 using FastEndpoints;
@@ -30,7 +32,8 @@ public readonly record struct DeleteUserPoolResponse(Guid Id);
 
 public class DeleteUserPoolCommandHandler(
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IClientDataCacheStore clientDataCacheStore)
+    IClientDataCacheStore clientDataCacheStore,
+    IAccessManager accessManager)
     : ICommandHandler<DeleteUserPoolCommand, DeleteUserPoolResponse>
 {
     public async Task<DeleteUserPoolResponse> ExecuteAsync(DeleteUserPoolCommand command, CancellationToken ct)
@@ -42,6 +45,10 @@ public class DeleteUserPoolCommandHandler(
         await userPoolRepository.SaveChangesAsync(ct);
 
         await clientDataCacheStore.InvalidatePoolAsync(pool!.Id, ct);
+
+        await accessManager.RevokeAllAsync(AuthConstants.PoolType, pool.Id, ct);
+        await accessManager.UnlinkParentAsync(
+            AuthConstants.PoolType, pool.Id, AuthConstants.TenantType, pool.TenantId, ct);
 
         return new DeleteUserPoolResponse(pool!.Id);
     }

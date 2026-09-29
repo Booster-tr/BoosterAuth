@@ -1,8 +1,11 @@
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
+using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Helpers;
 using Booster.Database.DynamicFilter.Models;
 using Booster.Database.NameValueCollectionHelpers;
@@ -17,6 +20,10 @@ public class GetListClientEndpoint : EndpointWithoutRequest<ListModel<GetListCli
     {
         Get("");
         Group<ClientsEndpointGroup>();
+
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(ManagementPolicies.PanelScope)));
+
         Summary(s =>
         {
             s.Summary = "Clientları listeler";
@@ -50,14 +57,18 @@ public record GetListClientResponse(
     bool RequireConsent);
 
 public class GetListClientQueryHandler(
-    IAsyncRepository<Client, AuthNDbContext> clientRepository)
+    IAsyncRepository<Client, AuthNDbContext> clientRepository,
+    IAccessManager accessManager)
     : ICommandHandler<GetListClientQuery, ListModel<GetListClientResponse>>
 {
     public async Task<ListModel<GetListClientResponse>> ExecuteAsync(
         GetListClientQuery command, CancellationToken ct)
     {
+        var accessible = await accessManager.ListAccessibleIdsAsync(AuthConstants.ClientType, ct);
+
         var data = await clientRepository.ListDynamicAsync(
             command.DynamicQuery,
+            predicate: c => accessible.Contains(c.Id),
             index: command.PageRequest.PageIndex,
             size: command.PageRequest.PageSize,
             cancellationToken: ct);

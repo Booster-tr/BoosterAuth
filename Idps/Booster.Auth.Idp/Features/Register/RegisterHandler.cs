@@ -3,6 +3,8 @@ using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Auth.Z.Grpc;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
@@ -28,6 +30,7 @@ public sealed class RegisterHandler(
     IAsyncRepository<PrincipalRole, IdpDbContext> principalRoleRepository,
     IPasswordHasher passwordHasher,
     IPasswordPolicyManager passwordPolicyManager,
+    AuthorizationService.AuthorizationServiceClient authorizationClient,
     IRequestContextAccessor requestContextAccessor) : ICommandHandler<RegisterCommand, RegisterResult>
 {
     public async Task<RegisterResult> ExecuteAsync(RegisterCommand cmd, CancellationToken ct)
@@ -82,6 +85,16 @@ public sealed class RegisterHandler(
             await credentialRepository.AddAsync(credential, ct);
             await passwordPolicyManager.RecordAsync(principal.Id, credential.PasswordHash, client.Password, ct);
             await AssignDefaultsAsync(principal.Id, client, ct);
+
+            var endUser = new WriteRelationsRequest { IsolationId = AuthConstants.ManagementPoolId.ToString() };
+            endUser.Tuples.Add(new RelationTuple
+            {
+                User = AuthConstants.User(principal.Id),
+                Relation = AuthConstants.EndUserRelation,
+                Object = AuthConstants.Pool(client.IsolationId)
+            });
+            await authorizationClient.WriteRelationsAsync(endUser, cancellationToken: ct);
+
             await principalRepository.SaveChangesAsync(ct);
 
             principalId = principal.Id;

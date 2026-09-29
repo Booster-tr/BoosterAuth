@@ -10,8 +10,6 @@ using FastEndpoints;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Delete;
 
-// Silmek owner işidir: yönetici içeriği değiştirebilir ama kabı
-// ortadan kaldırmak geri alınamayan bir karardır.
 public class DeleteTenantEndpoint : EndpointWithoutRequest<DeleteTenantResponse>
 {
     public override void Configure()
@@ -51,9 +49,6 @@ public class DeleteTenantCommandHandler(
         tenantRepository.Delete(tenant!);
         await tenantRepository.SaveChangesAsync(ct);
 
-        // Yetkiler kayıttan SONRA temizlenir: silme başarısız olursa
-        // grafiği bozmuş olmayız. Tersi sırada, silme hata verdiğinde
-        // kimsenin erişemediği bir firma kalırdı.
         await accessManager.RevokeAllAsync(AuthConstants.TenantType, command.TenantId, ct);
 
         return new DeleteTenantResponse(tenant!.Id);

@@ -3,6 +3,8 @@ using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Auth.Z.Grpc;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.FederationBased.Models;
@@ -29,6 +31,7 @@ public sealed class CompleteFederationLoginHandler(
     IAsyncRepository<PrincipalScope, IdpDbContext> principalScopeRepository,
     IAsyncRepository<PrincipalRole, IdpDbContext> principalRoleRepository,
     ISessionStore sessionStore,
+    AuthorizationService.AuthorizationServiceClient authorizationClient,
     IRequestContextAccessor requestContextAccessor)
     : ICommandHandler<CompleteFederationLoginCommand, CompleteFederationLoginResult>
 {
@@ -158,6 +161,16 @@ public sealed class CompleteFederationLoginHandler(
         await principalRepository.AddAsync(principal, ct);
         await identityRepository.AddAsync(identity, ct);
         await AssignDefaultsAsync(principal.Id, client, ct);
+
+        var endUser = new WriteRelationsRequest { IsolationId = AuthConstants.ManagementPoolId.ToString() };
+        endUser.Tuples.Add(new RelationTuple
+        {
+            User = AuthConstants.User(principal.Id),
+            Relation = AuthConstants.EndUserRelation,
+            Object = AuthConstants.Pool(state.IsolationId)
+        });
+        await authorizationClient.WriteRelationsAsync(endUser, cancellationToken: ct);
+
         await principalRepository.SaveChangesAsync(ct);
 
         return await OpenSessionAsync(principal.Id, state, client, cmd, ct);

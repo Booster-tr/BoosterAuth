@@ -1,7 +1,9 @@
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
@@ -35,7 +37,8 @@ public readonly record struct CreateUserPoolResponse(Guid Id);
 
 public class CreateUserPoolCommandHandler(
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IAsyncRepository<Tenant, AuthNDbContext> tenantRepository)
+    IAsyncRepository<Tenant, AuthNDbContext> tenantRepository,
+    IAccessManager accessManager)
     : ICommandHandler<CreateUserPoolCommand, CreateUserPoolResponse>
 {
     public async Task<CreateUserPoolResponse> ExecuteAsync(CreateUserPoolCommand command, CancellationToken ct)
@@ -53,6 +56,10 @@ public class CreateUserPoolCommandHandler(
 
         await userPoolRepository.AddAsync(pool, ct);
         await userPoolRepository.SaveChangesAsync(ct);
+
+        // Firmadaki yetkiler havuza bu bağ sayesinde akar.
+        await accessManager.LinkParentAsync(
+            AuthConstants.PoolType, pool.Id, AuthConstants.TenantType, pool.TenantId, ct);
 
         return new CreateUserPoolResponse(pool.Id);
     }

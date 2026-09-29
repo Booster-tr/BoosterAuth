@@ -46,9 +46,6 @@ public class UpdateTenantCommandHandler(
         var tenant = await tenantRepository.GetAsync(t => t.Id == command.TenantId, cancellationToken: ct);
         tenant.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.TenantNotFound);
 
-        // Adapt KULLANILMIYOR: komutta TenantId de var ve eşleme onu entity'nin
-        // Id alanına yazardı. Kimliği istekten gelen bir değerle ezmek,
-        // güncellenen kaydın hangisi olduğunu isteğe bırakmak demekti.
         tenant!.Name = command.Name;
 
         await tenantRepository.SaveChangesAsync(ct);

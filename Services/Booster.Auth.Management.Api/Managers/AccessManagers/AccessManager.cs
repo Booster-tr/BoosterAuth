@@ -58,6 +58,54 @@ public sealed class AccessManager(
         await authorizationClient.DeleteRelationsAsync(request, cancellationToken: ct);
     }
 
+    public async Task<IReadOnlyList<Guid>> ListAccessibleIdsAsync(string objectType, CancellationToken ct)
+    {
+        var response = await authorizationClient.LookupByUserAsync(
+            new LookupByUserRequest
+            {
+                IsolationId = Isolation(),
+                User = AuthConstants.User(requestContextAccessor.Context().PrincipalId),
+                ObjectType = objectType,
+                Relation = AuthConstants.ViewerRelation
+            },
+            cancellationToken: ct);
+
+        var prefix = $"{objectType}:";
+
+        return response.Results
+            .Select(r => r.Object)
+            .Where(o => o.StartsWith(prefix, StringComparison.Ordinal))
+            .Select(o => Guid.TryParse(o[prefix.Length..], out var id) ? id : Guid.Empty)
+            .Where(id => id != Guid.Empty)
+            .Distinct()
+            .ToList();
+    }
+
+    public async Task LinkParentAsync(
+        string objectType, Guid objectId, string parentType, Guid parentId, CancellationToken ct)
+        => await authorizationClient.WriteRelationsAsync(
+            ParentRequest(objectType, objectId, parentType, parentId), cancellationToken: ct);
+
+    public async Task UnlinkParentAsync(
+        string objectType, Guid objectId, string parentType, Guid parentId, CancellationToken ct)
+        => await authorizationClient.DeleteRelationsAsync(
+            ParentRequest(objectType, objectId, parentType, parentId), cancellationToken: ct);
+
+    private WriteRelationsRequest ParentRequest(
+        string objectType, Guid objectId, string parentType, Guid parentId)
+    {
+        var request = new WriteRelationsRequest { IsolationId = Isolation() };
+
+        request.Tuples.Add(new RelationTuple
+        {
+            User = Target(parentType, parentId),
+            Relation = AuthConstants.ParentRelation,
+            Object = Target(objectType, objectId)
+        });
+
+        return request;
+    }
+
     private async Task<Dictionary<Guid, IReadOnlyList<string>>> ReadGrantedAsync(
         string target, CancellationToken ct)
     {

@@ -9,8 +9,6 @@ using FluentValidation;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Access.Grant;
 
-// Yetki vermek owner işidir. Manager'a açsaydık, yönetici kendine
-// owner yazıp sahibi devre dışı bırakabilirdi.
 public class GrantTenantAccessEndpoint : Endpoint<GrantTenantAccessCommand, TenantAccessChangeResponse>
 {
     public override void Configure()

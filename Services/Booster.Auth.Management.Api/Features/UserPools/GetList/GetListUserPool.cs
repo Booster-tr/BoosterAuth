@@ -3,6 +3,7 @@ using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Database.Helpers;
 using Booster.Database.DynamicFilter.Models;
 using Booster.Database.NameValueCollectionHelpers;
@@ -13,10 +14,8 @@ using FastEndpoints;
 
 namespace Booster.Auth.Management.Api.Features.UserPools.GetList;
 
-// Havuz listesi DAİMA bir firmanın altında istenir; TenantId sorgudan
-// gelir ve yetki o firma üzerinde aranır. Firmasız çağrı, seçici hedefi
-// bulamadığı için reddedilir — tüm havuzları listeleyen açık bir kapı
-// bırakmamak için bilinçli.
+// Yalnızca çağıranın en az viewer olduğu havuzlar döner. Firma yetkisi
+// ŞART DEĞİL: yalnızca havuza yetkisi olan biri de havuzunu görebilmeli.
 public class GetListUserPoolEndpoint : EndpointWithoutRequest<ListModel<GetListUserPoolResponse>>
 {
     public override void Configure()
@@ -25,8 +24,7 @@ public class GetListUserPoolEndpoint : EndpointWithoutRequest<ListModel<GetListU
         Group<UserPoolsEndpointGroup>();
 
         Options(x => x.RequireAuthorization(
-            new RequireScopeAttribute(ManagementPolicies.PanelScope),
-            new RequireFgaAttribute(AuthConstants.TenantType, ManagementPolicies.TenantTarget, AuthConstants.ViewerRelation)));
+            new RequireScopeAttribute(ManagementPolicies.PanelScope)));
 
         Summary(s =>
         {
@@ -58,13 +56,17 @@ public record GetListUserPoolResponse(
     EntityStatus Status);
 
 public class GetListUserPoolQueryHandler(
-    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository)
+    IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
+    IAccessManager accessManager)
     : ICommandHandler<GetListUserPoolQuery, ListModel<GetListUserPoolResponse>>
 {
     public async Task<ListModel<GetListUserPoolResponse>> ExecuteAsync(GetListUserPoolQuery command, CancellationToken ct)
     {
+        var accessible = await accessManager.ListAccessibleIdsAsync(AuthConstants.PoolType, ct);
+
         var data = await userPoolRepository.ListDynamicAsync(
             command.DynamicQuery,
+            predicate: p => accessible.Contains(p.Id),
             index: command.PageRequest.PageIndex,
             size: command.PageRequest.PageSize,
             cancellationToken: ct);

@@ -7,13 +7,6 @@ namespace Booster.Auth.Management.Api.Features.Tenants.Access;
 
 public static class TenantAccessRules
 {
-    /// <summary>
-    /// Firma üzerinde ATANABİLİR ilişkiler. <c>parent</c> gibi yapısal
-    /// ilişkiler burada yoktur: onlar kayıtlar arasındaki bağı anlatır,
-    /// bir kullanıcıya verilmez. Şemadan okumak yerine sabit liste
-    /// tutuluyor çünkü bu üçü firma tipinin sözleşmesi; şema değişirse
-    /// derleme değil, bu liste bilerek güncellenmeli.
-    /// </summary>
     public static readonly string[] Assignable =
     [
         AuthConstants.OwnerRelation,

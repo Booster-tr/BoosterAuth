@@ -53,11 +53,6 @@ public class GetListTenantAccessQueryHandler(IAccessManager accessManager)
         var entries = await accessManager.ListAsync(
             AuthConstants.TenantType, command.TenantId, ct);
 
-        // Sayfalama BELLEKTE yapılır: yetki grafiği sayfalı sorguyu satır
-        // sayısına göre değil sayfa işaretçisine göre veriyor ve sonuçlar
-        // özne bazında toplanmadan önce ilişki başına geliyor. Bir kabın
-        // yetkili sayısı yüzler mertebesinde kaldığı sürece bu doğru olan;
-        // binlere çıkarsa okuma tarafının sayfalı hâle gelmesi gerekir.
         var index = command.PageRequest.PageIndex;
         var size = command.PageRequest.PageSize;
 

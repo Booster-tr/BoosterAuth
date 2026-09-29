@@ -13,4 +13,10 @@ public interface IAccessManager
     Task RevokeAsync(string objectType, Guid objectId, Guid principalId, string relation, CancellationToken ct);
 
     Task RevokeAllAsync(string objectType, Guid objectId, CancellationToken ct);
+
+    Task<IReadOnlyList<Guid>> ListAccessibleIdsAsync(string objectType, CancellationToken ct);
+
+    Task LinkParentAsync(string objectType, Guid objectId, string parentType, Guid parentId, CancellationToken ct);
+
+    Task UnlinkParentAsync(string objectType, Guid objectId, string parentType, Guid parentId, CancellationToken ct);
 }

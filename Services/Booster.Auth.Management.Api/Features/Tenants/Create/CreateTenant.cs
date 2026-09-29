@@ -13,7 +13,6 @@ using Mapster;
 
 namespace Booster.Auth.Management.Api.Features.Tenants.Create;
 
-// Hedef firma YOK, henüz açılmadı: izin oturumun havuzunda aranır.
 public class CreateTenantEndpoint : Endpoint<CreateTenantCommand, CreateTenantResponse>
 {
     public override void Configure()
@@ -23,7 +22,7 @@ public class CreateTenantEndpoint : Endpoint<CreateTenantCommand, CreateTenantRe
 
         Options(x => x.RequireAuthorization(
             new RequireScopeAttribute(ManagementPolicies.PanelScope),
-            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.IsolationTarget, AuthConstants.ManagerRelation)));
+            new RequireFgaAttribute(AuthConstants.PoolType, ManagementPolicies.IsolationTarget, AuthConstants.EndUserRelation)));
 
         Summary(s =>
         {
@@ -57,10 +56,6 @@ public class CreateTenantCommandHandler(
         await tenantRepository.AddAsync(tenant, ct);
         await tenantRepository.SaveChangesAsync(ct);
 
-        // Oluşturana owner YAZILIR. Yazılmasaydı firma veritabanında var olur
-        // ama yetki grafiğinde hiç kimseye bağlı olmazdı: açan kişi bile onu
-        // listesinde göremez, kimse de yetki veremezdi — doğuştan erişilemez
-        // bir kayıt.
         await accessManager.GrantAsync(
             AuthConstants.TenantType,
             tenant.Id,

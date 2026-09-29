@@ -1,7 +1,9 @@
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Management.Api.Features._base.Entities;
+using Booster.Auth.Management.Api.Managers.AccessManagers;
 using Booster.Database.Repositories;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.ExceptionManager.Abstraction.Constants;
@@ -45,7 +47,8 @@ public readonly record struct CreateClientResponse(Guid Id, string ClientKey);
 public class CreateClientCommandHandler(
     IAsyncRepository<Client, AuthNDbContext> clientRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IClientDataCacheStore clientDataCacheStore)
+    IClientDataCacheStore clientDataCacheStore,
+    IAccessManager accessManager)
     : ICommandHandler<CreateClientCommand, CreateClientResponse>
 {
     public async Task<CreateClientResponse> ExecuteAsync(CreateClientCommand command, CancellationToken ct)
@@ -71,6 +74,9 @@ public class CreateClientCommandHandler(
 
         await clientRepository.AddAsync(client, ct);
         await clientRepository.SaveChangesAsync(ct);
+
+        await accessManager.LinkParentAsync(
+            AuthConstants.ClientType, client.Id, AuthConstants.PoolType, client.UserPoolId, ct);
 
         await clientDataCacheStore.InvalidateClientAsync(client.ClientKey, ct);
 

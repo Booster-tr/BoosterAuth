@@ -59,9 +59,6 @@ public class RevokeTenantAccessCommandHandler(
             t => t.Id == command.TenantId, enableTracking: false, cancellationToken: ct);
         tenant.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.TenantNotFound);
 
-        // Firma sahibinin HİÇBİR yetkisi geri alınamaz. Alınabilseydi, başka
-        // bir owner sahibi dışarıda bırakabilir ya da sahip yanlışlıkla
-        // kendini firmadan düşürüp kurtarılamaz bir durum yaratabilirdi.
         if (tenant!.OwnerId == command.PrincipalId)
             throw new ForbiddenException(AuthNMessageKeys.TenantOwnerAccessCannotBeRevoked);
 
