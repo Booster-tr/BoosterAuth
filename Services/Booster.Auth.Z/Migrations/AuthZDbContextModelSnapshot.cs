@@ -22,15 +22,16 @@ namespace Booster.Auth.Z.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Booster.Auth.Z.Features._base.Entities.PoolStore", b =>
+            modelBuilder.Entity("Booster.Auth.Z.Features._base.Entities.PoolSchema", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ActiveModelId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                    b.Property<Guid?>("ActivatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ActivatedTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
@@ -38,8 +39,24 @@ namespace Booster.Auth.Z.Migrations
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ModelId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<Guid>("PoolId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<string>("StoreId")
                         .IsRequired()
@@ -53,9 +70,14 @@ namespace Booster.Auth.Z.Migrations
 
                     b.HasIndex("PoolId")
                         .IsUnique()
+                        .HasDatabaseName("IX_PoolSchemas_PoolId_Active")
+                        .HasFilter("\"Status\" = 2 AND \"DeletedTime\" IS NULL");
+
+                    b.HasIndex("PoolId", "Name")
+                        .IsUnique()
                         .HasFilter("\"DeletedTime\" IS NULL");
 
-                    b.ToTable("PoolStores", (string)null);
+                    b.ToTable("PoolSchemas", (string)null);
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
@@ -224,6 +246,117 @@ namespace Booster.Auth.Z.Migrations
                     b.HasIndex("Created");
 
                     b.ToTable("OutboxState");
+                });
+
+            modelBuilder.Entity("Booster.Auth.Z.Features._base.Entities.PoolSchema", b =>
+                {
+                    b.OwnsOne("Booster.Auth.Z.Features._base.Entities.SchemaDefinition", "Definition", b1 =>
+                        {
+                            b1.Property<Guid>("PoolSchemaId");
+
+                            b1.HasKey("PoolSchemaId");
+
+                            b1.ToTable("PoolSchemas");
+
+                            b1
+                                .ToJson("Definition")
+                                .HasColumnType("jsonb");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PoolSchemaId");
+
+                            b1.OwnsMany("Booster.Auth.Z.Features._base.Entities.SchemaType", "Types", b2 =>
+                                {
+                                    b2.Property<Guid>("SchemaDefinitionPoolSchemaId");
+
+                                    b2.Property<int>("__synthesizedOrdinal")
+                                        .ValueGeneratedOnAdd();
+
+                                    b2.Property<string>("Description");
+
+                                    b2.Property<string>("DisplayName")
+                                        .IsRequired();
+
+                                    b2.Property<string>("Name")
+                                        .IsRequired();
+
+                                    b2.Property<double>("X");
+
+                                    b2.Property<double>("Y");
+
+                                    b2.HasKey("SchemaDefinitionPoolSchemaId", "__synthesizedOrdinal");
+
+                                    b2.ToTable("PoolSchemas");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("SchemaDefinitionPoolSchemaId");
+
+                                    b2.OwnsMany("Booster.Auth.Z.Features._base.Entities.SchemaRelation", "Relations", b3 =>
+                                        {
+                                            b3.Property<Guid>("SchemaTypeSchemaDefinitionPoolSchemaId");
+
+                                            b3.Property<int>("SchemaType__synthesizedOrdinal");
+
+                                            b3.Property<int>("__synthesizedOrdinal")
+                                                .ValueGeneratedOnAdd();
+
+                                            b3.PrimitiveCollection<string>("AssignableTypes")
+                                                .IsRequired();
+
+                                            b3.Property<string>("Description");
+
+                                            b3.Property<string>("DisplayName")
+                                                .IsRequired();
+
+                                            b3.PrimitiveCollection<string>("Includes")
+                                                .IsRequired();
+
+                                            b3.Property<string>("Name")
+                                                .IsRequired();
+
+                                            b3.HasKey("SchemaTypeSchemaDefinitionPoolSchemaId", "SchemaType__synthesizedOrdinal", "__synthesizedOrdinal");
+
+                                            b3.ToTable("PoolSchemas");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("SchemaTypeSchemaDefinitionPoolSchemaId", "SchemaType__synthesizedOrdinal");
+
+                                            b3.OwnsMany("Booster.Auth.Z.Features._base.Entities.SchemaInherit", "Inherits", b4 =>
+                                                {
+                                                    b4.Property<Guid>("SchemaRelationSchemaTypeSchemaDefinitionPoolSchemaId");
+
+                                                    b4.Property<int>("SchemaRelationSchemaType__synthesizedOrdinal");
+
+                                                    b4.Property<int>("SchemaRelation__synthesizedOrdinal");
+
+                                                    b4.Property<int>("__synthesizedOrdinal")
+                                                        .ValueGeneratedOnAdd();
+
+                                                    b4.Property<string>("Relation")
+                                                        .IsRequired();
+
+                                                    b4.Property<string>("Via")
+                                                        .IsRequired();
+
+                                                    b4.HasKey("SchemaRelationSchemaTypeSchemaDefinitionPoolSchemaId", "SchemaRelationSchemaType__synthesizedOrdinal", "SchemaRelation__synthesizedOrdinal", "__synthesizedOrdinal");
+
+                                                    b4.ToTable("PoolSchemas");
+
+                                                    b4.WithOwner()
+                                                        .HasForeignKey("SchemaRelationSchemaTypeSchemaDefinitionPoolSchemaId", "SchemaRelationSchemaType__synthesizedOrdinal", "SchemaRelation__synthesizedOrdinal");
+                                                });
+
+                                            b3.Navigation("Inherits");
+                                        });
+
+                                    b2.Navigation("Relations");
+                                });
+
+                            b1.Navigation("Types");
+                        });
+
+                    b.Navigation("Definition")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>

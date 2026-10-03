@@ -12,7 +12,7 @@ public class AuthZDbContext(
     IRequestContextAccessor requestContextAccessor)
     : PostgresDbContext(options, requestContextAccessor)
 {
-    public DbSet<PoolStore> PoolStores => Set<PoolStore>();
+    public DbSet<PoolSchema> PoolSchemas => Set<PoolSchema>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

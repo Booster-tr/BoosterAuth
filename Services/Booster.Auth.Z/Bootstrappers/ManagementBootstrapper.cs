@@ -2,36 +2,42 @@ using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Z.Features._base;
 using Booster.Auth.Z.Features._base.Entities;
+using Booster.Auth.Z.Features.Schemas._base;
 using Booster.Auth.Z.Stores.PoolStores;
-using Booster.Authorization.Relational.Builders;
 using Booster.Authorization.Relational.Fga;
 using Booster.Database.Repositories;
-using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Model;
 using System.Text.Json.Nodes;
 
 namespace Booster.Auth.Z.Bootstrappers;
 
+/// <summary>
+/// Booster yönetim store'unu ilk kez kurar. Sonrasında şema arayüzden yönetilir;
+/// bootstrapper yayındaki sürümün üzerine yazmaz.
+/// </summary>
 public sealed class ManagementBootstrapper(
     FgaSchemaWriter schemaWriter,
     FgaRelationManager relationManager,
     IPoolStoreProvider poolStoreProvider,
-    IAsyncRepository<PoolStore, AuthZDbContext> poolStoreRepository)
+    IAsyncRepository<PoolSchema, AuthZDbContext> schemaRepository)
 {
+    private const string SystemSchemaName = "Booster";
+
     public async Task InitializeAsync(CancellationToken ct)
     {
-        var existing = await poolStoreRepository.GetAsync(
-            p => p.PoolId == AuthConstants.ManagementPoolId, cancellationToken: ct);
+        var existing = await schemaRepository.GetAsync(
+            p => p.PoolId == AuthConstants.ManagementPoolId && p.Status == SchemaVersionStatus.Active,
+            cancellationToken: ct);
 
         if (existing is not null)
         {
-            await SyncSchemaAsync(existing, ct);
+            await FillLegacyDefinitionAsync(existing, ct);
             return;
         }
 
+        var definition = SystemSchema.Definition;
         var storeId = await schemaWriter.CreateStoreAsync(AuthConstants.ManagementStoreName, ct);
-
-        var modelId = await schemaWriter.WriteModelAsync(storeId, BuildManagementSchema(), ct);
+        var modelId = await schemaWriter.WriteModelAsync(storeId, definition.ToFgaModel(), ct);
 
         await relationManager.WriteBatchAsync(
             storeId,
@@ -53,32 +59,45 @@ public sealed class ManagementBootstrapper(
             ],
             ct);
 
-        var mapping = new PoolStore
+        var schema = new PoolSchema
         {
             PoolId = AuthConstants.ManagementPoolId,
             StoreId = storeId,
-            ActiveModelId = modelId,
-            CreatedTime = DateTimeOffset.UtcNow
+            Name = SystemSchemaName,
+            Status = SchemaVersionStatus.Active,
+            Definition = definition,
+            ModelId = modelId,
+            Revision = 1,
+            ActivatedTime = DateTimeOffset.UtcNow
         };
-        mapping.SetId();
+        schema.SetId();
 
-        await poolStoreRepository.AddAsync(mapping, ct);
-        await poolStoreRepository.SaveChangesAsync(ct);
+        await schemaRepository.AddAsync(schema, ct);
+        await schemaRepository.SaveChangesAsync(ct);
 
         await poolStoreProvider.RemoveCacheAsync(AuthConstants.ManagementPoolId, ct);
     }
 
-    private async Task SyncSchemaAsync(PoolStore mapping, CancellationToken ct)
+    /// <summary>
+    /// Arayüz öncesinden kalan sürümün tanımı boştur (model yalnızca koddaydı); bir kez sistem tanımıyla doldurulur.
+    /// Model aynıysa OpenFGA'ya yazılmaz.
+    /// </summary>
+    private async Task FillLegacyDefinitionAsync(PoolSchema schema, CancellationToken ct)
     {
-        var desired = BuildManagementSchema();
-        var active = await schemaWriter.GetModelAsync(mapping.StoreId, mapping.ActiveModelId, ct);
-
-        if (active is not null && Fingerprint(active.TypeDefinitions) == Fingerprint(desired.TypeDefinitions))
+        if (schema.Definition.Types.Count > 0)
             return;
 
-        mapping.ActiveModelId = await schemaWriter.WriteModelAsync(mapping.StoreId, desired, ct);
-        await poolStoreRepository.SaveChangesAsync(ct);
+        var definition = SystemSchema.Definition;
+        var desired = definition.ToFgaModel();
+        var active = schema.ModelId is null ? null : await schemaWriter.GetModelAsync(schema.StoreId, schema.ModelId, ct);
 
+        if (active is null || Fingerprint(active.TypeDefinitions) != Fingerprint(desired.TypeDefinitions))
+            schema.ModelId = await schemaWriter.WriteModelAsync(schema.StoreId, desired, ct);
+
+        schema.Definition = definition;
+        schema.Revision++;
+
+        await schemaRepository.SaveChangesAsync(ct);
         await poolStoreProvider.RemoveCacheAsync(AuthConstants.ManagementPoolId, ct);
     }
 
@@ -119,57 +138,4 @@ public sealed class ManagementBootstrapper(
 
         return node;
     }
-
-    private static ClientWriteAuthorizationModelRequest BuildManagementSchema()
-        => new FgaSchemaBuilder()
-            .Type(AuthConstants.TenantType, t => t
-                .Relation(AuthConstants.OwnerRelation, AuthConstants.UserPrefix)
-                .Relation(AuthConstants.ManagerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.OwnerRelation))
-                .Relation(AuthConstants.ViewerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.ManagerRelation)
-                    .Includes(AuthConstants.GrantManagerRelation))
-                .Relation(AuthConstants.GrantManagerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.OwnerRelation)))
-            .Type(AuthConstants.PoolType, t => t
-                .Relation(AuthConstants.ParentRelation, AuthConstants.TenantType)
-                .Relation(AuthConstants.EndUserRelation, AuthConstants.UserPrefix)
-                .Relation(AuthConstants.OwnerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .InheritsFrom(AuthConstants.OwnerRelation, AuthConstants.ParentRelation))
-                .Relation(AuthConstants.ManagerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.OwnerRelation)
-                    .InheritsFrom(AuthConstants.ManagerRelation, AuthConstants.ParentRelation))
-                .Relation(AuthConstants.ViewerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.ManagerRelation)
-                    .Includes(AuthConstants.GrantManagerRelation)
-                    .InheritsFrom(AuthConstants.ViewerRelation, AuthConstants.ParentRelation))
-                .Relation(AuthConstants.GrantManagerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.OwnerRelation)
-                    .InheritsFrom(AuthConstants.GrantManagerRelation, AuthConstants.ParentRelation)))
-            .Type(AuthConstants.ClientType, t => t
-                .Relation(AuthConstants.ParentRelation, AuthConstants.PoolType)
-                .Relation(AuthConstants.OwnerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .InheritsFrom(AuthConstants.OwnerRelation, AuthConstants.ParentRelation))
-                .Relation(AuthConstants.ManagerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.OwnerRelation)
-                    .InheritsFrom(AuthConstants.ManagerRelation, AuthConstants.ParentRelation))
-                .Relation(AuthConstants.ViewerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.ManagerRelation)
-                    .Includes(AuthConstants.GrantManagerRelation)
-                    .InheritsFrom(AuthConstants.ViewerRelation, AuthConstants.ParentRelation))
-                .Relation(AuthConstants.GrantManagerRelation, r => r
-                    .Assignable(AuthConstants.UserPrefix)
-                    .Includes(AuthConstants.OwnerRelation)
-                    .InheritsFrom(AuthConstants.GrantManagerRelation, AuthConstants.ParentRelation)))
-            .Build();
 }
