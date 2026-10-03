@@ -9,7 +9,6 @@
   <!-- Sunucu (IdP) ve istemci (Management) stub'ları tek kaynaktan üretilir. -->
   <ItemGroup>
     <Protobuf Include="Protos\principallookup.proto" GrpcServices="Both" />
-    <Protobuf Include="Protos\principalaccess.proto" GrpcServices="Both" />
   </ItemGroup>
 
   <ItemGroup>

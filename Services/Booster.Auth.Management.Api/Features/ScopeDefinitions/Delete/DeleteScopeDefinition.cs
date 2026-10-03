@@ -1,15 +1,12 @@
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
-using Booster.Auth.Idp.Grpc;
 using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
-using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
-using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Auth.Management.Api.Features.ScopeDefinitions.Delete;
@@ -47,7 +44,6 @@ public class DeleteScopeDefinitionCommandHandler(
     IAsyncRepository<ClientAllowedScope, AuthNDbContext> clientAllowedScopeRepository,
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    PrincipalAccessService.PrincipalAccessServiceClient principalAccessClient,
     IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<DeleteScopeDefinitionCommand, DeleteScopeDefinitionResponse>
 {
@@ -58,21 +54,7 @@ public class DeleteScopeDefinitionCommandHandler(
             s => s.Id == command.ScopeDefinitionId && s.UserPoolId == command.UserPoolId, cancellationToken: ct);
         scope.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ScopeDefinitionNotFound);
 
-        // Önce IdP: atamalar temizlenemezse tanım silinmez.
-        try
-        {
-            await principalAccessClient.RemoveScopeAsync(new RemoveScopeRequest
-            {
-                IsolationId = command.UserPoolId.ToString(),
-                Scope = scope!.Scope
-            }, cancellationToken: ct);
-        }
-        catch (RpcException)
-        {
-            throw new BusinessException(AuthNMessageKeys.IdpSyncFailed);
-        }
-
-        scopeRepository.Delete(scope);
+        scopeRepository.Delete(scope!);
 
         var poolId = scope!.UserPoolId;
         var scopeKey = scope.Scope;

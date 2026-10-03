@@ -1,15 +1,12 @@
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
-using Booster.Auth.Idp.Grpc;
 using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
-using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
-using Grpc.Core;
 
 namespace Booster.Auth.Management.Api.Features.Roles.Delete;
 
@@ -43,7 +40,6 @@ public readonly record struct DeleteRoleResponse(Guid Id);
 public class DeleteRoleCommandHandler(
     IAsyncRepository<Role, AuthNDbContext> roleRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    PrincipalAccessService.PrincipalAccessServiceClient principalAccessClient,
     IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<DeleteRoleCommand, DeleteRoleResponse>
 {
@@ -53,22 +49,7 @@ public class DeleteRoleCommandHandler(
             r => r.Id == command.RoleId && r.UserPoolId == command.UserPoolId, cancellationToken: ct);
         role.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.RoleNotFound);
 
-        // Önce IdP: atamalar temizlenemezse rol silinmez; aksi hâlde silinen rol token'lara yazılmaya devam ederdi.
-        try
-        {
-            await principalAccessClient.RemoveRoleAsync(new RemoveRoleRequest
-            {
-                IsolationId = command.UserPoolId.ToString(),
-                RoleId = role!.Id.ToString(),
-                Key = role.Key
-            }, cancellationToken: ct);
-        }
-        catch (RpcException)
-        {
-            throw new BusinessException(AuthNMessageKeys.IdpSyncFailed);
-        }
-
-        roleRepository.Delete(role);
+        roleRepository.Delete(role!);
 
         var pool = await userPoolRepository.GetAsync(p => p.Id == command.UserPoolId, cancellationToken: ct);
 

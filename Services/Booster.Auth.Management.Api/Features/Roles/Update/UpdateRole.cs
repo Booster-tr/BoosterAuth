@@ -1,6 +1,5 @@
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
-using Booster.Auth.Idp.Grpc;
 using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
@@ -11,7 +10,6 @@ using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
-using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Auth.Management.Api.Features.Roles.Update;
@@ -30,8 +28,8 @@ public class UpdateRoleEndpoint : Endpoint<UpdateRoleCommand, UpdateRoleResponse
         Summary(s =>
         {
             s.Summary = "Rolü günceller";
-            s.Description = "Anahtar, görünen ad, açıklama ve kapsamları günceller. Anahtar değişirse " +
-                            "IdP'deki kullanıcı atamaları ve aktif refresh token'lar yeni anahtara taşınır.";
+            s.Description = "Anahtar, görünen ad, açıklama ve kapsamları günceller. Kullanıcılara daha önce " +
+                            "atanmış rol adı IdP'de güncellenmez.";
         });
     }
 
@@ -53,7 +51,6 @@ public class UpdateRoleCommandHandler(
     IAsyncRepository<Role, AuthNDbContext> roleRepository,
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<ScopeDefinition, AuthNDbContext> scopeDefinitionRepository,
-    PrincipalAccessService.PrincipalAccessServiceClient principalAccessClient,
     IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<UpdateRoleCommand, UpdateRoleResponse>
 {
@@ -83,25 +80,6 @@ public class UpdateRoleCommandHandler(
 
             if (defined != scopes.Count)
                 throw new BusinessException(AuthNMessageKeys.ScopeNotDefinedInPool);
-        }
-
-        // Tüm doğrulamalardan sonra ve kayıttan önce: IdP başarısız olursa hiçbir şey yazılmaz.
-        if (key != role.Key)
-        {
-            try
-            {
-                await principalAccessClient.RenameRoleAsync(new RenameRoleRequest
-                {
-                    IsolationId = command.UserPoolId.ToString(),
-                    RoleId = role.Id.ToString(),
-                    OldKey = role.Key,
-                    NewKey = key
-                }, cancellationToken: ct);
-            }
-            catch (RpcException)
-            {
-                throw new BusinessException(AuthNMessageKeys.IdpSyncFailed);
-            }
         }
 
         role.Key = key;

@@ -1,6 +1,5 @@
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
-using Booster.Auth.Idp.Grpc;
 using Booster.Auth.Management.Api.Constants;
 using Booster.Auth.Management.Api.Features._base;
 using Booster.Auth.Management.Api.Features._base.Entities;
@@ -11,7 +10,6 @@ using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
-using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Auth.Management.Api.Features.ScopeDefinitions.Update;
@@ -30,8 +28,8 @@ public class UpdateScopeDefinitionEndpoint : Endpoint<UpdateScopeDefinitionComma
         Summary(s =>
         {
             s.Summary = "Kapsam tanımını günceller";
-            s.Description = "Kapsam adı, görünen ad ve açıklamayı günceller. Ad değişirse rol, uygulama ve " +
-                            "havuz atamaları ile IdP'deki kullanıcı atamaları, onaylar ve aktif refresh token'lar taşınır.";
+            s.Description = "Kapsam adı, görünen ad ve açıklamayı günceller. Ad değişirse rol, uygulama ve havuz atamaları " +
+                            "yeni ada taşınır; kullanıcılara daha önce atanmış kapsam IdP'de güncellenmez.";
         });
     }
 
@@ -53,7 +51,6 @@ public class UpdateScopeDefinitionCommandHandler(
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<ClientAllowedScope, AuthNDbContext> clientAllowedScopeRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    PrincipalAccessService.PrincipalAccessServiceClient principalAccessClient,
     IClientDataCacheStore clientDataCacheStore)
     : ICommandHandler<UpdateScopeDefinitionCommand, UpdateScopeDefinitionResponse>
 {
@@ -75,21 +72,6 @@ public class UpdateScopeDefinitionCommandHandler(
 
             if (nameExists)
                 throw new BusinessException(AuthNMessageKeys.ScopeAlreadyDefined);
-
-            // Önce IdP: taşınamazsa hiçbir şey yazılmaz.
-            try
-            {
-                await principalAccessClient.RenameScopeAsync(new RenameScopeRequest
-                {
-                    IsolationId = poolId.ToString(),
-                    OldScope = oldName,
-                    NewScope = newName
-                }, cancellationToken: ct);
-            }
-            catch (RpcException)
-            {
-                throw new BusinessException(AuthNMessageKeys.IdpSyncFailed);
-            }
 
             // Ad havuz içinde benzersiz olduğu için yeni adı taşıyan başka atama yoktur; doğrudan yeniden adlandırılır.
             var roleScopes = await roleScopeRepository.Query()

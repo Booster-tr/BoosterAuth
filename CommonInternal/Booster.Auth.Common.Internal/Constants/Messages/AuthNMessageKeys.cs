@@ -54,7 +54,6 @@ public class AuthNMessageKeys
     public const string TokenScopePolicyKeyRequired = "authn.token_scope_policy_key_required";
     public const string TokenScopePolicyKeyDuplicate = "authn.token_scope_policy_key_duplicate";
     public const string TokenScopePolicyKeyInvalid = "authn.token_scope_policy_key_invalid";
-    public const string IdpSyncFailed = "authn.idp_sync_failed";
     public const string TokenScopePolicyRequiredPermissionsRequired = "authn.token_scope_policy_required_permissions_required";
     public const string TokenScopePolicyPermissionEmpty = "authn.token_scope_policy_permission_empty";
     public const string TokenScopePolicyPermissionDuplicate = "authn.token_scope_policy_permission_duplicate";
