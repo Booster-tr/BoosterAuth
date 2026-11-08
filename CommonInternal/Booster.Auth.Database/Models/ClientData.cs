@@ -29,8 +29,9 @@ public sealed record ClientData
 
     public IReadOnlyList<FederationProviderData> FederationProviders { get; init; } = [];
 
-    // required DEGIL: bu alan eklenmeden once onbellege yazilmis ClientData
-    // kayitlari da okunabilsin (eksikse MFA kapali sayilir).
+    // required DEGIL: eski bir Management surumu alani gondermezse MFA kapali
+    // sayilir. Onbellekteki eski kayitlar ise anahtar surumuyle ayrilir
+    // (bkz. ClientDataCache.Key).
     public MfaPolicyData Mfa { get; init; } = new();
 }
 

@@ -78,14 +78,10 @@ public sealed class LoginChallengeManager(
             ? ResolveMfaChannels(client.Mfa.AllowedMethods, user)
             : [];
 
-        // Bu girişte e-posta/telefon doğrulama kodu zaten girildiyse, aynı kanala
-        // ikinci bir MFA kodu göndermek kullanıcıya hiçbir güvenlik katmadan iki
-        // kod girdirir: doğrulama adımı sahipliği kanıtlamıştır.
-        var mfaSatisfied =
-            (steps.Contains(LoginStep.VerifyEmail) && mfaChannels.Contains(ChallengeChannel.Email)) ||
-            (steps.Contains(LoginStep.VerifyPhone) && mfaChannels.Contains(ChallengeChannel.Sms));
-
-        if (mfaChannels.Count > 0 && !mfaSatisfied)
+        // MFA, doğrulama adımı aynı girişte yapılmış olsa bile AYRI bir adımdır:
+        // politika "her parolalı girişte ikinci adım" der; doğrulama yapılan
+        // ilk girişte atlanması, MFA açıkken MFA'sız oturum açılması demekti.
+        if (mfaChannels.Count > 0)
             steps.Add(LoginStep.Mfa);
 
         var challenge = new LoginChallengeData
@@ -96,8 +92,7 @@ public sealed class LoginChallengeManager(
             UserAgent = userAgent,
             IpAddress = ipAddress,
             Steps = steps,
-            MfaChannels = mfaChannels,
-            MfaCompleted = mfaSatisfied
+            MfaChannels = mfaChannels
         };
 
         if (steps.Count == 0)
