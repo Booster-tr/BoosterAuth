@@ -78,4 +78,9 @@ public class IdpMessageKeys
     public const string InvalidServiceAccountRelation = "idp.invalid_service_account_relation";
     public const string RoleNotHeldByCaller = "idp.role_not_held_by_caller";
     public const string ScopeNotHeldByCaller = "idp.scope_not_held_by_caller";
+
+    // --- Uygulama logosu ----------------------------------------------------
+    public const string ClientLogoRequired = "idp.client_logo_required";
+    public const string ClientLogoTooLarge = "idp.client_logo_too_large";
+    public const string ClientLogoInvalidFormat = "idp.client_logo_invalid_format";
 }

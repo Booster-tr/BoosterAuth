@@ -19,7 +19,8 @@
         <div class="auth-appmark">
             @if (Model.ClientLogoUri is not null)
             {
-                <img class="auth-appmark__img" src="@Model.ClientLogoUri" alt=""
+                <img class="auth-appmark__img" alt=""
+                     src="@(ConsentViewModel.IsLocalPath(Model.ClientLogoUri) ? Url.Idp(Model.ClientLogoUri) : Model.ClientLogoUri)"
                      width="48" height="48" referrerpolicy="no-referrer" data-logo-fallback />
                 <span class="auth-appmark__mono" aria-hidden="true" hidden>@Model.Monogram</span>
             }

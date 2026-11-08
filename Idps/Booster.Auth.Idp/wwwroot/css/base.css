@@ -544,6 +544,33 @@ textarea {
     margin-bottom: var(--space-6);
 }
 
+/* Istemci logosu Booster logosunun yerine gecer (_AppLogo.cshtml).
+   Yukseklik SABIT DEGIL, yalnizca ust sinirdir: sabit yukseklik kucuk bir
+   dosyayi dogal boyutunun ustune buyutup bulaniklastiriyordu. Buyuk dosya
+   kutuya kucultulur, kucuk dosya kendi boyutunda keskin kalir. */
+.auth-applogo {
+    display: inline-flex;
+    align-items: center;
+}
+
+.auth-applogo__img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 14rem;
+    max-height: 3rem;
+    object-fit: contain;
+}
+
+/* Koyu marka panelinde koyu renkli logolar kaybolmasin: acik bir zemin. */
+.auth-applogo--inverse .auth-applogo__img {
+    max-height: 3.5rem;
+    padding: var(--space-2) var(--space-3);
+    background-color: #fff;
+    border-radius: var(--radius-lg);
+    box-sizing: content-box;
+}
+
 /* --- Form sutunu ---------------------------------------------------------- */
 
 .auth-main {
@@ -564,6 +591,8 @@ textarea {
 .auth-main--register { --form-column-width: 480px; }
 .auth-main--consent { --form-column-width: 520px; }
 .auth-main--error { --form-column-width: 420px; }
+/* Uzun metin: ~75 karakterlik satir olcusu okunabilirlik siniridir. */
+.auth-main--legal { --form-column-width: 720px; }
 
 /* --- Kart ----------------------------------------------------------------- */
 

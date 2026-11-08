@@ -26,6 +26,7 @@
      userNameInput   kullanici adi normalizasyonu
      initialFocus    sayfa acilis odagi
      logoFallback    bozuk istemci logosu -> monogram
+     cookieConsent   cerez bari karari sayfada (gezinmeden) yazilir
    ========================================================================== */
 
 (function () {
@@ -329,12 +330,80 @@
         $$("[data-logo-fallback]").forEach(function (img) {
             function fail() {
                 img.hidden = true;
+                // Marka alanindaki istemci logosu: yerine Booster logosu acilir.
+                var swap = img.closest("[data-logo-swap]");
+                var fallback = swap && swap.querySelector(".auth-applogo__default");
+                if (fallback) fallback.hidden = false;
                 var mono = img.parentNode.querySelector(".auth-appmark__mono");
                 if (mono) mono.hidden = false;
             }
             img.addEventListener("error", fail);
             // Onbellekten gelen bozuk gorsel: dinleyici gec baglanmis olabilir.
             if (img.complete && img.naturalWidth === 0) fail();
+        });
+    }
+
+    /* ======================================================================
+       cookieConsent
+       Bar JS olmadan da calisir (form /ui/cookie-consent'e gonderir ve ayni
+       ekrana doner). JS'in tek katkisi gezinmeyi onlemektir: giris formuna
+       yazilmis e-posta, bar yuzunden sayfa yenilenip kaybolmasin.
+
+       Deger bicimi sunucudakiyle AYNIDIR (Models/CookieConsent.cs):
+       "v1.f{0|1}.a{0|1}". Biri degisirse digeri de degismelidir.
+       ====================================================================== */
+
+    var CONSENT_COOKIE = "booster_cookie_consent";
+    var CONSENT_MAX_AGE = 60 * 60 * 24 * 365; // 1 yil, sunucuyla ayni
+
+    function writeConsent(all) {
+        var flag = all ? "1" : "0";
+        var cookie = CONSENT_COOKIE + "=v1.f" + flag + ".a" + flag
+            + "; Max-Age=" + CONSENT_MAX_AGE
+            + "; Path=/; SameSite=Lax";
+        // Secure yalnizca HTTPS'te: HTTP'de Secure cerez sessizce reddedilir
+        // ve bar her sayfada geri gelirdi (yerel gelistirme).
+        if (location.protocol === "https:") cookie += "; Secure";
+        document.cookie = cookie;
+
+        // Cerez engelliyse yazim tutmaz; o durumda sunucuya gidilir ki en
+        // azindan bu sayfada bar kapanmis gibi davranip kullaniciyi yaniltmayalim.
+        return document.cookie.indexOf(CONSENT_COOKIE + "=v1.") !== -1;
+    }
+
+    function cookieConsent() {
+        var bar = $("[data-cookie-bar]");
+        var form = bar && $("form[data-cookie-consent]", bar);
+        if (!form) return;
+
+        // Serit sabit durur; sayfanin alt boslugu gercek yuksekligine esitlenir
+        // ki son alan/footer seridin arkasinda kalmasin (CSS'teki tahmin yerine).
+        function syncHeight() {
+            document.documentElement.style.setProperty("--cookiebar-height", bar.offsetHeight + "px");
+        }
+        syncHeight();
+        if (window.ResizeObserver) new ResizeObserver(syncHeight).observe(bar);
+        else window.addEventListener("resize", syncHeight);
+
+        form.addEventListener("submit", function (e) {
+            var pressed = e.submitter || document.activeElement;
+            var choice = pressed && pressed.value;
+            if (choice !== "accept" && choice !== "reject") return;
+
+            if (!writeConsent(choice === "accept")) return; // sunucu yoluna dus
+
+            e.preventDefault();
+            bar.hidden = true;
+
+            // Odaklanan dugme gizlendi; odak <body>'ye dusup kaybolmasin.
+            // main programatik olarak odaklanir, sekme sirasina girmez.
+            var main = document.getElementById("main");
+            if (main) {
+                main.setAttribute("tabindex", "-1");
+                main.focus({ preventScroll: true });
+            }
+
+            announce("form-live", form.dataset.labelSaved || "");
         });
     }
 
@@ -349,5 +418,6 @@
     phoneInput();
     userNameInput();
     logoFallback();
+    cookieConsent();
     initialFocus();
 })();

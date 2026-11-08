@@ -40,7 +40,6 @@ public class UpdateClientEndpoint : Endpoint<UpdateClientCommand, UpdateClientRe
 public record UpdateClientCommand(
     Guid ClientId,
     string DisplayName,
-    string? LogoUri,
     OAuthGrantType AllowedGrantTypes,
     List<string> RedirectUris,
     List<string> PostLogoutRedirectUris,
@@ -78,8 +77,6 @@ public class UpdateClientValidator : Validator<UpdateClientCommand>
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage(ValidationErrors.NotEmptyError)
             .MaximumLength(300).WithMessage(ValidationErrors.MaxLengthError);
-
-        RuleFor(x => x.LogoUri).MaximumLength(2000).WithMessage(ValidationErrors.MaxLengthError);
 
         RuleFor(x => x.AllowedGrantTypes)
             .NotEqual(OAuthGrantType.None).WithMessage(AuthNMessageKeys.ClientGrantTypeRequired);

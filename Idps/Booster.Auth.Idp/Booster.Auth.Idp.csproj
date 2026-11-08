@@ -25,9 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Management gRPC sözleşmesi: istemci stub -->
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Management.Contracts\Booster.Auth.Management.Contracts.csproj" />
-    <!-- Kullanıcı arama gRPC sözleşmesi: sunucu stub -->
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Idp.Contracts\Booster.Auth.Idp.Contracts.csproj" />
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Common.Internal\Booster.Auth.Common.Internal.csproj" />
     <ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />

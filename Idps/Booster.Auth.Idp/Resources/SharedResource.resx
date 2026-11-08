@@ -334,6 +334,9 @@
   <data name="Layout.Terms" xml:space="preserve">
     <value>Kullanım Koşulları</value>
   </data>
+  <data name="Layout.ClientLogoAlt" xml:space="preserve">
+    <value>Uygulama logosu</value>
+  </data>
   <data name="Layout.BrandAria" xml:space="preserve">
     <value>Booster Auth tanıtımı</value>
   </data>
@@ -477,5 +480,368 @@
   </data>
   <data name="Register.UserNameHint" xml:space="preserve">
     <value>3-100 karakter. Harf, rakam, nokta, alt çizgi ve tire kullanabilirsiniz.</value>
+  </data>
+  <data name="Layout.LegalNavAria" xml:space="preserve">
+    <value>Yasal bilgiler</value>
+  </data>
+  <data name="Layout.Kvkk" xml:space="preserve">
+    <value>KVKK Aydınlatma Metni</value>
+  </data>
+  <data name="Layout.ExplicitConsent" xml:space="preserve">
+    <value>Açık Rıza Metni</value>
+  </data>
+  <data name="Layout.Cookies" xml:space="preserve">
+    <value>Çerez Politikası</value>
+  </data>
+  <data name="Layout.CookiePreferences" xml:space="preserve">
+    <value>Çerez tercihleri</value>
+  </data>
+  <data name="CookieBar.Title" xml:space="preserve">
+    <value>Çerez tercihiniz</value>
+  </data>
+  <data name="CookieBar.Text" xml:space="preserve">
+    <value>Oturumunuzu güvenle açabilmeniz için zorunlu çerezler kullanıyoruz. İzin verirseniz deneyiminizi iyileştirmek için işlevsel ve analitik çerezler de kullanırız. Kararınızı dilediğiniz zaman değiştirebilirsiniz.</value>
+  </data>
+  <data name="CookieBar.PolicyLink" xml:space="preserve">
+    <value>Çerez Politikası</value>
+  </data>
+  <data name="CookieBar.Accept" xml:space="preserve">
+    <value>Tümünü kabul et</value>
+  </data>
+  <data name="CookieBar.Reject" xml:space="preserve">
+    <value>Tümünü reddet</value>
+  </data>
+  <data name="CookieBar.Customize" xml:space="preserve">
+    <value>Tercihleri yönet</value>
+  </data>
+  <data name="CookieBar.Saved" xml:space="preserve">
+    <value>Çerez tercihiniz kaydedildi.</value>
+  </data>
+  <data name="CookiePrefs.Title" xml:space="preserve">
+    <value>Çerez tercihleri</value>
+  </data>
+  <data name="CookiePrefs.Intro" xml:space="preserve">
+    <value>Hangi çerez kategorilerine izin verdiğinizi seçin. Zorunlu çerezler hizmetin çalışması için gereklidir ve kapatılamaz.</value>
+  </data>
+  <data name="CookiePrefs.PolicyLink" xml:space="preserve">
+    <value>Çerez Politikası'nı inceleyin</value>
+  </data>
+  <data name="CookiePrefs.Legend" xml:space="preserve">
+    <value>Çerez kategorileri</value>
+  </data>
+  <data name="CookiePrefs.Necessary.Title" xml:space="preserve">
+    <value>Zorunlu çerezler</value>
+  </data>
+  <data name="CookiePrefs.Necessary.Desc" xml:space="preserve">
+    <value>Oturum açma, güvenlik (sahte istek koruması), dil seçimi ve bu tercihin kendisinin saklanması için kullanılır. Bu çerezler olmadan hizmet çalışmaz.</value>
+  </data>
+  <data name="CookiePrefs.AlwaysOn" xml:space="preserve">
+    <value>Her zaman etkin</value>
+  </data>
+  <data name="CookiePrefs.Functional.Title" xml:space="preserve">
+    <value>İşlevsel çerezler</value>
+  </data>
+  <data name="CookiePrefs.Functional.Desc" xml:space="preserve">
+    <value>Son kullandığınız giriş yöntemi gibi tercihlerinizi hatırlayarak deneyiminizi kolaylaştırır.</value>
+  </data>
+  <data name="CookiePrefs.Analytics.Title" xml:space="preserve">
+    <value>Analitik çerezler</value>
+  </data>
+  <data name="CookiePrefs.Analytics.Desc" xml:space="preserve">
+    <value>Ekranların nasıl kullanıldığını toplu olarak ölçmemize ve hizmeti iyileştirmemize yardımcı olur.</value>
+  </data>
+  <data name="CookiePrefs.Save" xml:space="preserve">
+    <value>Tercihleri kaydet</value>
+  </data>
+  <data name="CookiePrefs.AcceptAll" xml:space="preserve">
+    <value>Tümünü kabul et</value>
+  </data>
+  <data name="CookiePrefs.RejectAll" xml:space="preserve">
+    <value>Tümünü reddet</value>
+  </data>
+  <data name="CookiePrefs.Saved" xml:space="preserve">
+    <value>Çerez tercihleriniz kaydedildi. Dilediğiniz zaman bu sayfadan değiştirebilirsiniz.</value>
+  </data>
+  <data name="CookiePrefs.NoDecision" xml:space="preserve">
+    <value>Henüz bir tercih yapmadınız. Karar verene kadar yalnızca zorunlu çerezler kullanılır.</value>
+  </data>
+  <data name="Legal.Back" xml:space="preserve">
+    <value>Geri dön</value>
+  </data>
+  <data name="Legal.UpdatedLabel" xml:space="preserve">
+    <value>Son güncelleme: {0}</value>
+  </data>
+  <data name="Legal.TocTitle" xml:space="preserve">
+    <value>Bu sayfada</value>
+  </data>
+  <data name="Legal.BrandHeadline" xml:space="preserve">
+    <value>Verileriniz, sizin kontrolünüzde.</value>
+  </data>
+  <data name="Legal.BrandLead" xml:space="preserve">
+    <value>Hangi bilgiyi neden işlediğimizi açıkça anlatır, tercihlerinizi her zaman değiştirebilmenizi sağlarız.</value>
+  </data>
+  <data name="Legal.Cookies.ManageCta" xml:space="preserve">
+    <value>Çerez tercihlerini yönet</value>
+  </data>
+  <data name="Legal.Privacy.Title" xml:space="preserve">
+    <value>Gizlilik Politikası</value>
+  </data>
+  <data name="Legal.Privacy.Intro" xml:space="preserve">
+    <value>Bu politika, Booster kimlik doğrulama hizmetini kullandığınızda kişisel verilerinizi nasıl topladığımızı, kullandığımızı ve koruduğumuzu açıklar.</value>
+  </data>
+  <data name="Legal.Privacy.Updated" xml:space="preserve">
+    <value>8 Kasım 2026</value>
+  </data>
+  <data name="Legal.Privacy.S1.Title" xml:space="preserve">
+    <value>Kapsam</value>
+  </data>
+  <data name="Legal.Privacy.S1.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bu Gizlilik Politikası, Booster tarafından sunulan oturum açma, kayıt, parola sıfırlama ve bağlı uygulamalara yetkilendirme ekranlarını (birlikte “Hizmet”) kapsar. Hizmet üzerinden eriştiğiniz uygulamaların kendi gizlilik politikaları ayrıca geçerlidir.&lt;/p&gt;&lt;p&gt;Kişisel verilerinizin işlenmesine ilişkin yasal bilgilendirme için KVKK Aydınlatma Metni'ni de inceleyebilirsiniz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Privacy.S2.Title" xml:space="preserve">
+    <value>Topladığımız bilgiler</value>
+  </data>
+  <data name="Legal.Privacy.S2.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Hesap bilgileri:&lt;/strong&gt; ad, soyad, e-posta adresi, telefon numarası ve kullanıcı adı.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Kimlik doğrulama bilgileri:&lt;/strong&gt; parolanızın geri döndürülemez biçimde şifrelenmiş özeti, tek kullanımlık doğrulama kodları ve bağladığınız harici kimlik sağlayıcıdan (ör. kurumsal hesabınız) gelen tanımlayıcılar.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Teknik bilgiler:&lt;/strong&gt; IP adresi, tarayıcı ve cihaz bilgisi, oturum açma zamanı ve sonucu.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Çerezler:&lt;/strong&gt; oturumunuzu ve tercihlerinizi saklayan çerezler; ayrıntılar Çerez Politikası'ndadır.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.Privacy.S3.Title" xml:space="preserve">
+    <value>Bilgilerinizi nasıl kullanırız</value>
+  </data>
+  <data name="Legal.Privacy.S3.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bilgilerinizi yalnızca aşağıdaki amaçlarla kullanırız:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;kimliğinizi doğrulamak ve hesabınıza güvenli erişim sağlamak,&lt;/li&gt;&lt;li&gt;yetki verdiğiniz uygulamalara yalnızca onayladığınız bilgileri iletmek,&lt;/li&gt;&lt;li&gt;yetkisiz erişim girişimlerini, dolandırıcılığı ve kötüye kullanımı tespit edip önlemek,&lt;/li&gt;&lt;li&gt;hesabınızla ilgili zorunlu bildirimleri (doğrulama kodu, parola sıfırlama bağlantısı) göndermek,&lt;/li&gt;&lt;li&gt;yasal yükümlülüklerimizi yerine getirmek.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Bilgilerinizi reklam amacıyla kullanmaz ve satmayız.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Privacy.S4.Title" xml:space="preserve">
+    <value>Bilgilerin paylaşılması</value>
+  </data>
+  <data name="Legal.Privacy.S4.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bilgilerinizi yalnızca şu durumlarda paylaşırız:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Yetki verdiğiniz uygulamalar:&lt;/strong&gt; onay ekranında açıkça gösterilen ve sizin onayladığınız bilgiler.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Hizmet sağlayıcılarımız:&lt;/strong&gt; barındırma, e-posta ve SMS gönderimi gibi hizmetleri bizim adımıza ve talimatlarımız doğrultusunda yürüten, gizlilik yükümlülüğü altındaki iş ortakları.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Yasal zorunluluk:&lt;/strong&gt; yetkili kurum ve kuruluşların hukuka uygun talepleri.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.Privacy.S5.Title" xml:space="preserve">
+    <value>Saklama süresi</value>
+  </data>
+  <data name="Legal.Privacy.S5.Body" xml:space="preserve">
+    <value>&lt;p&gt;Hesap bilgilerinizi hesabınız açık olduğu sürece saklarız. Hesabınızı kapattığınızda bilgileriniz, yasal saklama yükümlülükleri saklı kalmak kaydıyla silinir veya anonim hâle getirilir.&lt;/p&gt;&lt;p&gt;Oturum açma geçmişi gibi güvenlik kayıtları ilgili mevzuatta öngörülen süre boyunca tutulur.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Privacy.S6.Title" xml:space="preserve">
+    <value>Güvenlik</value>
+  </data>
+  <data name="Legal.Privacy.S6.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bilgilerinizi korumak için endüstri standardı teknik ve idari önlemler uygularız: tüm bağlantılar şifrelidir, parolalar geri döndürülemez biçimde saklanır, oturum çerezleri yalnızca güvenli bağlantı üzerinden gönderilir ve sistemlere erişim yetki esaslı olarak sınırlandırılır.&lt;/p&gt;&lt;p&gt;Hiçbir sistem tamamen risksiz değildir. Hesabınızda şüpheli bir hareket fark ederseniz parolanızı değiştirip bizimle iletişime geçmenizi rica ederiz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Privacy.S7.Title" xml:space="preserve">
+    <value>Haklarınız</value>
+  </data>
+  <data name="Legal.Privacy.S7.Body" xml:space="preserve">
+    <value>&lt;p&gt;Kişisel verilerinize erişme, bunların düzeltilmesini, silinmesini veya işlenmesinin kısıtlanmasını isteme ve verdiğiniz rızayı geri alma hakkına sahipsiniz. Haklarınızın ayrıntısı ve başvuru yöntemi KVKK Aydınlatma Metni'nde açıklanmıştır.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Privacy.S8.Title" xml:space="preserve">
+    <value>Değişiklikler ve iletişim</value>
+  </data>
+  <data name="Legal.Privacy.S8.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bu politikayı zaman zaman güncelleyebiliriz. Esaslı değişiklikleri yürürlüğe girmeden önce Hizmet üzerinden duyururuz; güncel sürüm her zaman bu sayfadadır.&lt;/p&gt;&lt;p&gt;Sorularınız için &lt;strong&gt;privacy@booster.example&lt;/strong&gt; adresinden bize ulaşabilirsiniz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Terms.Title" xml:space="preserve">
+    <value>Kullanım Koşulları</value>
+  </data>
+  <data name="Legal.Terms.Intro" xml:space="preserve">
+    <value>Booster kimlik doğrulama hizmetini kullanarak aşağıdaki koşulları kabul etmiş olursunuz. Lütfen dikkatlice okuyun.</value>
+  </data>
+  <data name="Legal.Terms.Updated" xml:space="preserve">
+    <value>8 Kasım 2026</value>
+  </data>
+  <data name="Legal.Terms.S1.Title" xml:space="preserve">
+    <value>Koşulların kabulü</value>
+  </data>
+  <data name="Legal.Terms.S1.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bu Kullanım Koşulları, Booster tarafından sunulan kimlik doğrulama hizmetinin (“Hizmet”) kullanımını düzenler. Hizmet'e kaydolarak veya oturum açarak bu koşulları okuduğunuzu, anladığınızı ve kabul ettiğinizi beyan edersiniz.&lt;/p&gt;&lt;p&gt;Koşulları kabul etmiyorsanız lütfen Hizmet'i kullanmayın.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Terms.S2.Title" xml:space="preserve">
+    <value>Hesap oluşturma</value>
+  </data>
+  <data name="Legal.Terms.S2.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;Kayıt sırasında verdiğiniz bilgilerin doğru, güncel ve eksiksiz olmasından siz sorumlusunuz.&lt;/li&gt;&lt;li&gt;Hesabınız kişiseldir; başkasına devredilemez veya başkasıyla paylaşılamaz.&lt;/li&gt;&lt;li&gt;Hizmet'i kullanabilmek için yürürlükteki mevzuata göre gerekli ehliyete sahip olmanız gerekir.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.Terms.S3.Title" xml:space="preserve">
+    <value>Hesap güvenliği</value>
+  </data>
+  <data name="Legal.Terms.S3.Body" xml:space="preserve">
+    <value>&lt;p&gt;Parolanızın ve size gönderilen doğrulama kodlarının gizliliğini korumak sizin sorumluluğunuzdadır. Güçlü ve başka bir yerde kullanmadığınız bir parola seçmenizi öneririz. Hesabınızın yetkisiz kullanıldığından şüphelenirseniz derhâl parolanızı değiştirmeli ve bize bildirmelisiniz.&lt;/p&gt;&lt;p&gt;Booster sizden parolanızı veya doğrulama kodunuzu e-posta, telefon ya da mesaj yoluyla &lt;strong&gt;asla&lt;/strong&gt; istemez.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Terms.S4.Title" xml:space="preserve">
+    <value>Kabul edilebilir kullanım</value>
+  </data>
+  <data name="Legal.Terms.S4.Body" xml:space="preserve">
+    <value>&lt;p&gt;Hizmet'i kullanırken aşağıdakileri yapmamayı kabul edersiniz:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;başka bir kişinin hesabına izinsiz erişmeye çalışmak veya başkasının kimliğine bürünmek,&lt;/li&gt;&lt;li&gt;otomatik araçlarla toplu hesap oluşturmak ya da parola denemesi yapmak,&lt;/li&gt;&lt;li&gt;Hizmet'in güvenlik önlemlerini aşmaya veya devre dışı bırakmaya çalışmak (yazılı izinle yapılan güvenlik testleri hariç),&lt;/li&gt;&lt;li&gt;Hizmet'in işleyişini aksatacak yük oluşturmak veya zararlı yazılım yaymak,&lt;/li&gt;&lt;li&gt;Hizmet'i yürürlükteki mevzuata aykırı herhangi bir amaçla kullanmak.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.Terms.S5.Title" xml:space="preserve">
+    <value>Bağlı uygulamalar</value>
+  </data>
+  <data name="Legal.Terms.S5.Body" xml:space="preserve">
+    <value>&lt;p&gt;Hizmet, Booster hesabınızla üçüncü taraf uygulamalara giriş yapmanızı sağlar. Bu uygulamalara hangi bilgilerin iletileceğini onay ekranında görür ve onaylarsınız.&lt;/p&gt;&lt;p&gt;Bağlı uygulamaların içeriğinden ve kendi veri işleme faaliyetlerinden ilgili uygulama sağlayıcısı sorumludur.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Terms.S6.Title" xml:space="preserve">
+    <value>Hizmetin sürekliliği ve askıya alma</value>
+  </data>
+  <data name="Legal.Terms.S6.Body" xml:space="preserve">
+    <value>&lt;p&gt;Hizmet'i kesintisiz ve hatasız sunmak için makul çabayı gösteririz; ancak bakım, güncelleme veya öngörülemeyen teknik sebeplerle geçici kesintiler yaşanabilir.&lt;/p&gt;&lt;p&gt;Bu koşulların ihlali, güvenlik riski veya yasal zorunluluk hâlinde hesabınızı geçici olarak askıya alabilir veya kapatabiliriz. Mümkün olduğunda sizi önceden bilgilendiririz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Terms.S7.Title" xml:space="preserve">
+    <value>Fikri mülkiyet</value>
+  </data>
+  <data name="Legal.Terms.S7.Body" xml:space="preserve">
+    <value>&lt;p&gt;Hizmet'e ait yazılım, tasarım, logo ve diğer tüm içeriklerin fikri mülkiyet hakları Booster'a veya lisans verenlerine aittir. Bu koşullar size Hizmet'i amacına uygun kullanma hakkı dışında herhangi bir hak tanımaz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Terms.S8.Title" xml:space="preserve">
+    <value>Sorumluluğun sınırlandırılması</value>
+  </data>
+  <data name="Legal.Terms.S8.Body" xml:space="preserve">
+    <value>&lt;p&gt;Yürürlükteki mevzuatın izin verdiği ölçüde Booster, Hizmet'in kullanımından veya kullanılamamasından doğan dolaylı zararlardan sorumlu tutulamaz. Kast ve ağır ihmal hâlleri ile kanunen sınırlandırılamayan sorumluluklar bu sınırlamanın dışındadır.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Terms.S9.Title" xml:space="preserve">
+    <value>Değişiklikler ve uygulanacak hukuk</value>
+  </data>
+  <data name="Legal.Terms.S9.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bu koşulları gerektiğinde güncelleyebiliriz. Esaslı değişiklikleri Hizmet üzerinden duyururuz; değişiklikten sonra Hizmet'i kullanmaya devam etmeniz güncel koşulları kabul ettiğiniz anlamına gelir.&lt;/p&gt;&lt;p&gt;Bu koşullar Türkiye Cumhuriyeti hukukuna tabidir. Uyuşmazlıklarda İstanbul mahkemeleri ve icra daireleri yetkilidir; tüketici sıfatıyla sahip olduğunuz yasal haklar saklıdır.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.ExplicitConsent.Title" xml:space="preserve">
+    <value>Açık Rıza Metni</value>
+  </data>
+  <data name="Legal.ExplicitConsent.Intro" xml:space="preserve">
+    <value>6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında, aşağıda açıklanan işlemler için özgür iradenizle verebileceğiniz açık rızaya ilişkin bilgilendirmedir.</value>
+  </data>
+  <data name="Legal.ExplicitConsent.Updated" xml:space="preserve">
+    <value>8 Kasım 2026</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S1.Title" xml:space="preserve">
+    <value>Açık rızanın kapsamı</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S1.Body" xml:space="preserve">
+    <value>&lt;p&gt;Hizmet'in temel işleyişi için gerekli olan veri işleme faaliyetleri, KVKK Aydınlatma Metni'nde belirtilen hukuki sebeplere dayanır ve açık rızanızı gerektirmez. Bu metin yalnızca açık rızanıza bağlı olan ek işlemleri kapsar.&lt;/p&gt;&lt;p&gt;Açık rıza vermek isteğe bağlıdır. Rıza vermemeniz, Hizmet'in temel özelliklerini kullanmanıza engel olmaz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S2.Title" xml:space="preserve">
+    <value>İşlenecek kişisel veriler</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S2.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;kimlik ve iletişim bilgileri (ad, soyad, e-posta adresi, telefon numarası),&lt;/li&gt;&lt;li&gt;Hizmet'in kullanımına ilişkin işlem ve cihaz bilgileri,&lt;/li&gt;&lt;li&gt;işlevsel ve analitik çerezler aracılığıyla elde edilen kullanım bilgileri.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S3.Title" xml:space="preserve">
+    <value>İşleme amaçları</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S3.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;kullanım deneyiminizi kişiselleştirmek ve tercihlerinizi hatırlamak,&lt;/li&gt;&lt;li&gt;Hizmet'in kullanımını analiz ederek geliştirmek,&lt;/li&gt;&lt;li&gt;talep etmeniz hâlinde ürün ve hizmetlerimize ilişkin bilgilendirme yapmak.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S4.Title" xml:space="preserve">
+    <value>Yurt dışına aktarım</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S4.Body" xml:space="preserve">
+    <value>&lt;p&gt;Analitik ve altyapı hizmeti aldığımız bazı sağlayıcıların sunucuları yurt dışında bulunabilir. Açık rızanız hâlinde kişisel verileriniz, yukarıdaki amaçlarla sınırlı olarak ve KVKK'nın 9. maddesine uygun şekilde bu sağlayıcılara aktarılabilir.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S5.Title" xml:space="preserve">
+    <value>Rızanın geri alınması</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S5.Body" xml:space="preserve">
+    <value>&lt;p&gt;Açık rızanızı dilediğiniz zaman, herhangi bir gerekçe göstermeden geri alabilirsiniz. Çerezlere ilişkin rızanızı sayfa altındaki “Çerez tercihleri” bağlantısından, diğer rızalarınızı &lt;strong&gt;kvkk@booster.example&lt;/strong&gt; adresine başvurarak geri alabilirsiniz.&lt;/p&gt;&lt;p&gt;Geri alma, yalnızca geri alındığı andan sonrası için hüküm doğurur; önceki işlemlerin hukuka uygunluğunu etkilemez.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S6.Title" xml:space="preserve">
+    <value>Beyan</value>
+  </data>
+  <data name="Legal.ExplicitConsent.S6.Body" xml:space="preserve">
+    <value>&lt;p&gt;Bu metni okuduğumu ve anladığımı; yukarıda belirtilen kişisel verilerimin, belirtilen amaçlarla işlenmesine ve aktarılmasına özgür irademle açık rıza verdiğimi kabul ederim.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Kvkk.Title" xml:space="preserve">
+    <value>KVKK Aydınlatma Metni</value>
+  </data>
+  <data name="Legal.Kvkk.Intro" xml:space="preserve">
+    <value>6698 sayılı Kişisel Verilerin Korunması Kanunu'nun (“KVKK”) 10. maddesi uyarınca, veri sorumlusu sıfatıyla kişisel verilerinizin işlenmesine ilişkin sizi bilgilendiririz.</value>
+  </data>
+  <data name="Legal.Kvkk.Updated" xml:space="preserve">
+    <value>8 Kasım 2026</value>
+  </data>
+  <data name="Legal.Kvkk.S1.Title" xml:space="preserve">
+    <value>Veri sorumlusu</value>
+  </data>
+  <data name="Legal.Kvkk.S1.Body" xml:space="preserve">
+    <value>&lt;p&gt;Kişisel verileriniz, veri sorumlusu sıfatıyla &lt;strong&gt;Booster&lt;/strong&gt; (“Şirket”) tarafından bu metinde açıklanan kapsamda işlenmektedir.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Kvkk.S2.Title" xml:space="preserve">
+    <value>İşlenen kişisel veriler</value>
+  </data>
+  <data name="Legal.Kvkk.S2.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Kimlik:&lt;/strong&gt; ad, soyad, kullanıcı adı.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;İletişim:&lt;/strong&gt; e-posta adresi, telefon numarası.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Müşteri işlem:&lt;/strong&gt; oturum açma geçmişi, uygulamalara verilen yetkiler ve onaylar.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;İşlem güvenliği:&lt;/strong&gt; parola özeti, doğrulama kodları, IP adresi, cihaz ve tarayıcı bilgileri, oturum çerezleri.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.Kvkk.S3.Title" xml:space="preserve">
+    <value>İşleme amaçları</value>
+  </data>
+  <data name="Legal.Kvkk.S3.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;üyelik ve hesap işlemlerinin yürütülmesi,&lt;/li&gt;&lt;li&gt;kimlik doğrulama ve bağlı uygulamalara yetkilendirme süreçlerinin yürütülmesi,&lt;/li&gt;&lt;li&gt;bilgi güvenliği süreçlerinin yürütülmesi, yetkisiz erişimin ve kötüye kullanımın önlenmesi,&lt;/li&gt;&lt;li&gt;talep ve şikâyetlerin takibi,&lt;/li&gt;&lt;li&gt;yetkili kişi, kurum ve kuruluşlara bilgi verilmesi ve mevzuattan doğan yükümlülüklerin yerine getirilmesi.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.Kvkk.S4.Title" xml:space="preserve">
+    <value>Toplama yöntemi ve hukuki sebepler</value>
+  </data>
+  <data name="Legal.Kvkk.S4.Body" xml:space="preserve">
+    <value>&lt;p&gt;Kişisel verileriniz; kayıt, oturum açma ve onay ekranları, çerezler ve bağladığınız harici kimlik sağlayıcılar aracılığıyla elektronik ortamda toplanır.&lt;/p&gt;&lt;p&gt;Bu veriler KVKK'nın 5. maddesinde yer alan &lt;strong&gt;bir sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması&lt;/strong&gt;, &lt;strong&gt;veri sorumlusunun hukuki yükümlülüğünü yerine getirebilmesi&lt;/strong&gt; ve &lt;strong&gt;ilgili kişinin temel hak ve özgürlüklerine zarar vermemek kaydıyla veri sorumlusunun meşru menfaati&lt;/strong&gt; hukuki sebeplerine dayanılarak işlenir. Açık rızaya dayanan işlemler Açık Rıza Metni'nde ayrıca açıklanmıştır.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Kvkk.S5.Title" xml:space="preserve">
+    <value>Kişisel verilerin aktarılması</value>
+  </data>
+  <data name="Legal.Kvkk.S5.Body" xml:space="preserve">
+    <value>&lt;p&gt;Kişisel verileriniz, yukarıdaki amaçlarla sınırlı olarak; onayladığınız kapsamda yetki verdiğiniz uygulamalara, barındırma ve ileti gönderimi hizmeti aldığımız tedarikçilerimize ve talep hâlinde yetkili kamu kurum ve kuruluşlarına KVKK'nın 8. ve 9. maddelerine uygun olarak aktarılabilir.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Kvkk.S6.Title" xml:space="preserve">
+    <value>Haklarınız</value>
+  </data>
+  <data name="Legal.Kvkk.S6.Body" xml:space="preserve">
+    <value>&lt;p&gt;KVKK'nın 11. maddesi uyarınca veri sahibi olarak;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;kişisel verilerinizin işlenip işlenmediğini öğrenme ve işlenmişse buna ilişkin bilgi talep etme,&lt;/li&gt;&lt;li&gt;işlenme amacını ve bunların amacına uygun kullanılıp kullanılmadığını öğrenme,&lt;/li&gt;&lt;li&gt;yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme,&lt;/li&gt;&lt;li&gt;eksik veya yanlış işlenmişse düzeltilmesini, kanunda öngörülen şartlar çerçevesinde silinmesini veya yok edilmesini isteme ve bu işlemlerin aktarıldığı üçüncü kişilere bildirilmesini talep etme,&lt;/li&gt;&lt;li&gt;münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme,&lt;/li&gt;&lt;li&gt;kanuna aykırı işleme sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;haklarına sahipsiniz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Kvkk.S7.Title" xml:space="preserve">
+    <value>Başvuru</value>
+  </data>
+  <data name="Legal.Kvkk.S7.Body" xml:space="preserve">
+    <value>&lt;p&gt;Haklarınıza ilişkin taleplerinizi, Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ'e uygun olarak yazılı şekilde veya sistemimizde kayıtlı e-posta adresinizden &lt;strong&gt;kvkk@booster.example&lt;/strong&gt; adresine iletebilirsiniz.&lt;/p&gt;&lt;p&gt;Başvurunuz, talebin niteliğine göre en geç otuz gün içinde ücretsiz olarak sonuçlandırılır.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Cookies.Title" xml:space="preserve">
+    <value>Çerez Politikası</value>
+  </data>
+  <data name="Legal.Cookies.Intro" xml:space="preserve">
+    <value>Bu politika, Booster kimlik doğrulama ekranlarında hangi çerezleri neden kullandığımızı ve tercihlerinizi nasıl yönetebileceğinizi açıklar.</value>
+  </data>
+  <data name="Legal.Cookies.Updated" xml:space="preserve">
+    <value>8 Kasım 2026</value>
+  </data>
+  <data name="Legal.Cookies.S1.Title" xml:space="preserve">
+    <value>Çerez nedir?</value>
+  </data>
+  <data name="Legal.Cookies.S1.Body" xml:space="preserve">
+    <value>&lt;p&gt;Çerezler, ziyaret ettiğiniz web sitesinin tarayıcınıza kaydettiği küçük metin dosyalarıdır. Oturumunuzun açık kalması, güvenlik denetimleri ve tercihlerinizin hatırlanması gibi işlevler için kullanılırlar.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Cookies.S2.Title" xml:space="preserve">
+    <value>Kullandığımız çerez kategorileri</value>
+  </data>
+  <data name="Legal.Cookies.S2.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Zorunlu çerezler:&lt;/strong&gt; Hizmet'in çalışması için gereklidir; oturumunuzu, güvenlik doğrulamalarını, dil seçiminizi ve çerez tercihinizi saklar. Bu çerezler için rıza aranmaz ve kapatılamaz.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;İşlevsel çerezler:&lt;/strong&gt; son kullandığınız giriş yöntemi gibi tercihlerinizi hatırlayarak deneyiminizi kolaylaştırır. Yalnızca izin verirseniz kullanılır.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Analitik çerezler:&lt;/strong&gt; ekranların nasıl kullanıldığını toplu olarak ölçmemize ve iyileştirmemize yardımcı olur. Yalnızca izin verirseniz kullanılır.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Reklam veya hedefleme amaçlı çerez kullanmayız.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Cookies.S3.Title" xml:space="preserve">
+    <value>Zorunlu çerezlerimiz</value>
+  </data>
+  <data name="Legal.Cookies.S3.Body" xml:space="preserve">
+    <value>&lt;ul&gt;&lt;li&gt;&lt;strong&gt;booster_idp_session&lt;/strong&gt;: oturum açtığınızı hatırlar; oturumunuz sona erene kadar saklanır.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;.AspNetCore.Antiforgery.*&lt;/strong&gt;: formların sizin tarafınızdan gönderildiğini doğrulayarak sahte istekleri engeller; tarayıcı oturumu boyunca saklanır.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;accept-language&lt;/strong&gt;: seçtiğiniz dili hatırlar; 1 yıl saklanır.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;booster_cookie_consent&lt;/strong&gt;: çerez tercihinizi hatırlar; 1 yıl saklanır.&lt;/li&gt;&lt;/ul&gt;</value>
+  </data>
+  <data name="Legal.Cookies.S4.Title" xml:space="preserve">
+    <value>Tercihlerinizi yönetme</value>
+  </data>
+  <data name="Legal.Cookies.S4.Body" xml:space="preserve">
+    <value>&lt;p&gt;İlk ziyaretinizde gösterilen çerez barından tümünü kabul edebilir, tümünü reddedebilir veya tercihlerinizi kategori bazında belirleyebilirsiniz. Kararınızı dilediğiniz zaman sayfa altındaki “Çerez tercihleri” bağlantısından değiştirebilirsiniz.&lt;/p&gt;&lt;p&gt;Tarayıcı ayarlarınızdan da çerezleri silebilir veya engelleyebilirsiniz; ancak zorunlu çerezleri engellerseniz oturum açamayabilirsiniz.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Cookies.S5.Title" xml:space="preserve">
+    <value>Saklama süresi</value>
+  </data>
+  <data name="Legal.Cookies.S5.Body" xml:space="preserve">
+    <value>&lt;p&gt;Oturum çerezleri tarayıcınızı kapattığınızda veya oturumunuz sona erdiğinde silinir. Kalıcı çerezler yukarıda belirtilen süre boyunca saklanır.&lt;/p&gt;&lt;p&gt;Çerez politikamız esaslı biçimde değiştiğinde tercihiniz yeniden sorulur.&lt;/p&gt;</value>
+  </data>
+  <data name="Legal.Cookies.S6.Title" xml:space="preserve">
+    <value>İletişim</value>
+  </data>
+  <data name="Legal.Cookies.S6.Body" xml:space="preserve">
+    <value>&lt;p&gt;Çerezlerle ilgili sorularınız için &lt;strong&gt;privacy@booster.example&lt;/strong&gt; adresinden bize ulaşabilirsiniz. Kişisel verilerinizin işlenmesine ilişkin ayrıntılar Gizlilik Politikası ve KVKK Aydınlatma Metni'nde yer almaktadır.&lt;/p&gt;</value>
   </data>
 </root>

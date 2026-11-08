@@ -1,0 +1,127 @@
+@model CookiePreferencesViewModel
+@{
+    Layout = "_AuthLayout";
+
+    ViewData["Title"] = $"{T["CookiePrefs.Title"]} · Booster Auth";
+    ViewData["MainModifier"] = "auth-main--legal";
+    ViewData["BrandHeadline"] = T["Legal.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["Legal.BrandLead"].Value;
+    ViewData["IsLegalPage"] = true;
+    ViewData["LegalReturnUrl"] = Model.ReturnUrl;
+    ViewData["HideCookieBar"] = true;
+
+    var policyHref = Url.Idp("/cookies")
+        + (Model.ReturnUrl is null ? "" : "?returnUrl=" + Uri.EscapeDataString(Model.ReturnUrl));
+}
+
+<section class="auth-card auth-legal" aria-labelledby="prefs-title">
+    <header class="auth-card__header">
+        @if (Model.ReturnUrl is not null)
+        {
+            <a class="auth-link auth-link--standalone auth-link--sm auth-legal__back" href="@Model.ReturnUrl">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                @T["Legal.Back"]
+            </a>
+        }
+
+        <h1 class="auth-card__title" id="prefs-title">@T["CookiePrefs.Title"]</h1>
+        <p class="auth-card__subtitle">
+            @T["CookiePrefs.Intro"]
+            <a class="auth-link" href="@policyHref">@T["CookiePrefs.PolicyLink"]</a>
+        </p>
+    </header>
+
+    @if (Model.Saved)
+    {
+        @* Yonlendirme sonrasi yeni sayfa yuklenir; canli bolge ilk yuklemede
+           duyurulmayabilir. Bu yuzden bildirim odak alir (tabindex=-1) ve
+           auth.js'in hata ozeti icin kullandigi ayni yoldan odaklanir. *@
+        <div class="auth-alert auth-alert--success auth-cookieprefs__saved" role="status"
+             tabindex="-1" data-autofocus-summary>
+            <svg class="auth-alert__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+                <path d="M8 12.5l2.75 2.75L16 10" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <p class="auth-alert__text">@T["CookiePrefs.Saved"]</p>
+        </div>
+    }
+    else if (!Model.HasDecision)
+    {
+        <p class="auth-hint auth-cookieprefs__nodecision">@T["CookiePrefs.NoDecision"]</p>
+    }
+
+    <form class="auth-form" method="post" action="@Url.Idp("/ui/cookie-consent")"
+          data-auth-form asp-antiforgery="false">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="source" value="preferences" />
+        @if (Model.ReturnUrl is not null)
+        {
+            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+        }
+
+        @* Kategoriler tek bir fieldset: ekran okuyucu her kutuyu "Cerez
+           kategorileri" grubu icinde duyurur. Her kutunun aciklamasi
+           aria-describedby ile kutuya baglidir; yalnizca gorsel yakinlik
+           yeterli degildir (SC 1.3.1). *@
+        <fieldset class="auth-cookieprefs">
+            <legend class="auth-cookieprefs__legend">@T["CookiePrefs.Legend"]</legend>
+
+            <div class="auth-cookieprefs__item">
+                @* Zorunlu cerezler secilemez. Kutu devre disidir ve isaretlidir;
+                   devre disi kutu gonderilmez, sunucu bu kategoriyi zaten her
+                   zaman acik kabul eder. "Her zaman etkin" metni durumu renkten
+                   bagimsiz olarak SOYLER (SC 1.4.1). *@
+                <input class="auth-cookieprefs__check" type="checkbox" id="cookie-necessary"
+                       checked disabled aria-describedby="cookie-necessary-desc" />
+                <div class="auth-cookieprefs__label-wrap">
+                    <label class="auth-cookieprefs__label" for="cookie-necessary">
+                        @T["CookiePrefs.Necessary.Title"]
+                        <span class="auth-cookieprefs__tag">@T["CookiePrefs.AlwaysOn"]</span>
+                    </label>
+                    <p class="auth-cookieprefs__desc" id="cookie-necessary-desc">@T["CookiePrefs.Necessary.Desc"]</p>
+                </div>
+            </div>
+
+            <div class="auth-cookieprefs__item">
+                <input class="auth-cookieprefs__check" type="checkbox" id="cookie-functional"
+                       name="functional" value="true" checked="@Model.Functional"
+                       aria-describedby="cookie-functional-desc" />
+                <div class="auth-cookieprefs__label-wrap">
+                    <label class="auth-cookieprefs__label" for="cookie-functional">@T["CookiePrefs.Functional.Title"]</label>
+                    <p class="auth-cookieprefs__desc" id="cookie-functional-desc">@T["CookiePrefs.Functional.Desc"]</p>
+                </div>
+            </div>
+
+            <div class="auth-cookieprefs__item">
+                <input class="auth-cookieprefs__check" type="checkbox" id="cookie-analytics"
+                       name="analytics" value="true" checked="@Model.Analytics"
+                       aria-describedby="cookie-analytics-desc" />
+                <div class="auth-cookieprefs__label-wrap">
+                    <label class="auth-cookieprefs__label" for="cookie-analytics">@T["CookiePrefs.Analytics.Title"]</label>
+                    <p class="auth-cookieprefs__desc" id="cookie-analytics-desc">@T["CookiePrefs.Analytics.Desc"]</p>
+                </div>
+            </div>
+        </fieldset>
+
+        @* Uc aksiyon da ayni formdadir ve ayni agirliktadir; "Kaydet" yalnizca
+           isaretlenen kategorileri acar. Gorsel sira DOM sirasidir (SC 2.4.3). *@
+        <div class="auth-form__actions">
+            <button type="submit" name="choice" value="save" class="auth-btn auth-btn--primary auth-btn--block" data-submit-guard>
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["CookiePrefs.Save"]</span>
+            </button>
+            <div class="auth-actions auth-actions--pair">
+                <button type="submit" name="choice" value="accept" class="auth-btn auth-btn--secondary" data-submit-guard>
+                    <span class="auth-btn__label">@T["CookiePrefs.AcceptAll"]</span>
+                </button>
+                <button type="submit" name="choice" value="reject" class="auth-btn auth-btn--secondary" data-submit-guard>
+                    <span class="auth-btn__label">@T["CookiePrefs.RejectAll"]</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</section>

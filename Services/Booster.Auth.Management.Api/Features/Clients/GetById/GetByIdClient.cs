@@ -41,7 +41,6 @@ public record GetByIdClientResponse(
     Guid UserPoolId,
     string ClientKey,
     string DisplayName,
-    string? LogoUri,
     EntityStatus Status,
     OAuthGrantType AllowedGrantTypes,
     List<string> RedirectUris,

@@ -3,7 +3,9 @@ using Booster.Auth.Idp.Bootstrappers;
 using Booster.Auth.Idp.Extensions;
 using Booster.Auth.Idp.Features.Principals.Grpc;
 using Booster.Auth.Idp.Localization;
+using Booster.Auth.Idp.Stores.ClientLogoStores;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,21 @@ if (!app.Environment.IsDevelopment())
 app.UseBoosterServices();
 
 app.UseRequestLocalization();
+
+// Uygulama logoları çalışma anında yüklenir; MapStaticAssets yalnızca derleme
+// anında bilinen dosyaları servis ettiği için bu klasör ayrıca açılır.
+var logoStore = app.Services.GetRequiredService<IClientLogoStore>();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(logoStore.Directory),
+    RequestPath = $"/{ClientLogoStore.FolderName}",
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.XContentTypeOptions = "nosniff";
+        // Adres sürüm damgası taşır (?v=); logo değişince adres de değişir.
+        ctx.Context.Response.Headers.CacheControl = "public, max-age=86400";
+    }
+});
 
 app.UseRouting();
 

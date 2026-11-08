@@ -27,6 +27,7 @@ using Booster.Auth.Idp.Providers.PhoneCode;
 using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
+using Booster.Auth.Idp.Stores.ClientLogoStores;
 using Booster.Auth.Idp.Stores.FederationStores;
 using Booster.Auth.Management.Grpc;
 using Booster.Auth.Idp.Stores.PrincipalStores;
@@ -75,6 +76,7 @@ public static class ServiceExtensions
         });
 
         services.AddScoped<IClientDataStore, ClientDataStore>();
+        services.AddSingleton<IClientLogoStore, ClientLogoStore>();
         services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();
         services.AddScoped<ILocalUserStore, LocalPrincipalStore>();
         services.AddScoped<ISessionStore, SessionStore>();

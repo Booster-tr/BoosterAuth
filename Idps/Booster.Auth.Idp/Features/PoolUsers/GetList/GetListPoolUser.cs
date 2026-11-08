@@ -59,7 +59,7 @@ public class GetListPoolUserQueryHandler(
 {
     public async Task<ListModel<PoolUserResponse>> ExecuteAsync(GetListPoolUserQuery command, CancellationToken ct)
     {
-        using var _ = requestContextAccessor.BeginSystemContext(command.UserPoolId);
+      using var _ = requestContextAccessor.BeginSystemContext(command.UserPoolId);
 
         var data = await principalRepository.ListDynamicAsync(
             command.DynamicQuery,

@@ -1,0 +1,72 @@
+@model LegalDocumentViewModel
+@{
+    Layout = "_AuthLayout";
+
+    var p = Model.Prefix;
+    var title = T[$"{p}.Title"].Value;
+
+    ViewData["Title"] = $"{title} · Booster Auth";
+    ViewData["MainModifier"] = "auth-main--legal";
+    ViewData["BrandHeadline"] = T["Legal.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["Legal.BrandLead"].Value;
+    ViewData["IsLegalPage"] = true;
+    ViewData["LegalReturnUrl"] = Model.ReturnUrl;
+}
+
+<article class="auth-card auth-legal" aria-labelledby="legal-title">
+    <header class="auth-card__header">
+        @if (Model.ReturnUrl is not null)
+        {
+            @* Yasal metne giris akisinin ortasindan gelinir; geri donus
+               tarayici gecmisine birakilmaz, acik bir baglanti olarak sunulur. *@
+            <a class="auth-link auth-link--standalone auth-link--sm auth-legal__back" href="@Model.ReturnUrl">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5"
+                          stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                @T["Legal.Back"]
+            </a>
+        }
+
+        <h1 class="auth-card__title" id="legal-title">@title</h1>
+        <p class="auth-card__subtitle">@T[$"{p}.Intro"]</p>
+        <p class="auth-legal__updated">@T["Legal.UpdatedLabel", T[$"{p}.Updated"].Value]</p>
+    </header>
+
+    @* Icindekiler: uzun metinde bolume dogrudan atlama (SC 2.4.5 birden
+       fazla yol). Liste numarali; basliklar numarasizdir, numara burada
+       gorsel ve sesli olarak bir kez verilir. *@
+    <nav class="auth-legal__toc" aria-labelledby="legal-toc-title">
+        <h2 class="auth-legal__toc-title" id="legal-toc-title">@T["Legal.TocTitle"]</h2>
+        <ol class="auth-legal__toc-list">
+            @for (var i = 1; i <= Model.SectionCount; i++)
+            {
+                <li><a href="#section-@i">@T[$"{p}.S{i}.Title"]</a></li>
+            }
+        </ol>
+    </nav>
+
+    @for (var i = 1; i <= Model.SectionCount; i++)
+    {
+        <section class="auth-legal__section" aria-labelledby="section-@i">
+            @* tabindex=-1: icindekilerden gelinen baslik odak alir; aksi halde
+               bazi tarayicilarda bir sonraki Tab sayfanin basindan devam eder. *@
+            <h2 class="auth-legal__heading" id="section-@i" tabindex="-1">@T[$"{p}.S{i}.Title"]</h2>
+            <div class="auth-legal__body">
+                @* Html.Raw YALNIZCA kendi kaynak dosyamizdaki metin icindir;
+                   bu anahtarlara kullanici girdisi asla yazilmaz. *@
+                @Html.Raw(T[$"{p}.S{i}.Body"].Value)
+            </div>
+        </section>
+    }
+
+    @if (Model.Key == "Cookies")
+    {
+        <div class="auth-legal__cta">
+            <a class="auth-btn auth-btn--primary"
+               href="@Url.Idp(Booster.Auth.Idp.Controllers.PrivacyController.PreferencesPath)@(Model.ReturnUrl is null ? "" : "?returnUrl=" + Uri.EscapeDataString(Model.ReturnUrl))">
+                @T["Legal.Cookies.ManageCta"]
+            </a>
+        </div>
+    }
+</article>

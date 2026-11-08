@@ -1,10 +1,12 @@
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Models;
+using Booster.Auth.Idp.Stores.ClientLogoStores;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
 using Booster.Caching.Abstraction;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Booster.Auth.Idp.Controllers.Base;
 
@@ -16,7 +18,26 @@ public class IdpBaseController : Controller
         return lang.Length > 5 ? lang[..5].ToLowerInvariant() : lang.ToLowerInvariant();
     }
 
+    public const string ClientLogoUrlKey = "ClientLogoUrl";
+
     protected async Task<ClientData?> ResolveClientAsync(
+        ISecureCacheStore<InteractionStateData> interactionStore,
+        IClientDataStore clientDataStore,
+        string interactionKey,
+        CancellationToken ct)
+    {
+        var client = await FindClientAsync(interactionStore, clientDataStore, interactionKey, ct);
+        SetClientLogo(client);
+        return client;
+    }
+
+    protected void SetClientLogo(ClientData? client)
+        => ViewData[ClientLogoUrlKey] = client is null
+            ? null
+            : HttpContext.RequestServices.GetRequiredService<IClientLogoStore>().Find(client.ClientId)?.RelativeUrl;
+
+   
+    private static async Task<ClientData?> FindClientAsync(
         ISecureCacheStore<InteractionStateData> interactionStore,
         IClientDataStore clientDataStore,
         string interactionKey,

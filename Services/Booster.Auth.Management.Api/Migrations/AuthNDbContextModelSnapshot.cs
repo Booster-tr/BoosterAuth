@@ -51,10 +51,6 @@ namespace Booster.Auth.Management.Api.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
-                    b.Property<string>("LogoUri")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
                     b.PrimitiveCollection<List<string>>("PostLogoutRedirectUris")
                         .IsRequired()
                         .HasColumnType("text[]");

@@ -15,8 +15,6 @@ public class Client : Entity
 
     public string DisplayName { get; set; } = default!;
 
-    public string? LogoUri { get; set; }
-
     public EntityStatus Status { get; set; } = EntityStatus.Active;
 
     public OAuthGrantType AllowedGrantTypes { get; set; } = OAuthGrantType.AuthorizationCode | OAuthGrantType.RefreshToken | OAuthGrantType.TokenExchange;
@@ -65,7 +63,6 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(x => x.UserPoolId).IsRequired();
         builder.Property(x => x.ClientKey).HasMaxLength(200).IsRequired();
         builder.Property(x => x.DisplayName).HasMaxLength(300).IsRequired();
-        builder.Property(x => x.LogoUri).HasMaxLength(2000).IsRequired(false);
         builder.Property(x => x.Status).HasConversion<int>().HasDefaultValue(EntityStatus.Active);
         builder.Property(x => x.AllowedGrantTypes).HasConversion<int>();
         builder.Property(x => x.RequireConsent).HasDefaultValue(true);

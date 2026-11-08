@@ -22,7 +22,10 @@ public sealed class ConsentViewModel
     /// <summary>Kullanıcıya gösterilecek uygulama adı. Boşsa <see cref="ClientKey"/> kullanılır.</summary>
     public required string ClientName { get; init; }
 
-    /// <summary>Uygulama logosu. Yalnızca https şeması kabul edilir; geçersizse null bırakın.</summary>
+    /// <summary>
+    /// Uygulama logosu: <c>IClientLogoStore.Find(..).RelativeUrl</c> (uygulama köküne göreli)
+    /// ya da mutlak bir https adresi. Geçersizse null bırakılır.
+    /// </summary>
     public string? ClientLogoUri { get; init; }
 
     /// <summary>Oturumu açık olan kullanıcının görünen adı (varsa).</summary>
@@ -135,13 +138,20 @@ public sealed class ConsentViewModel
     }
 
     /// <summary>
-    /// Logo adresi istemciden gelir; yalnızca mutlak https adreslerine izin verilir.
+    /// Kök-göreli bir yol mu ("/client-logos/.."). "//" ve "/\" başka bir
+    /// sunucuya işaret eder; yerel sayılmaz.
+    /// </summary>
+    public static bool IsLocalPath(string value)
+        => value.StartsWith('/') && !value.StartsWith("//") && !value.StartsWith("/\\");
+
+    /// <summary>
+    /// Yalnızca kök-göreli yollara ve mutlak https adreslerine izin verilir.
     /// Doğrulanamayan adres hiç render edilmez, monogram gösterilir.
     /// </summary>
     private static bool IsSafeLogoUri(string? value)
         => !string.IsNullOrWhiteSpace(value)
-           && Uri.TryCreate(value, UriKind.Absolute, out var uri)
-           && uri.Scheme == Uri.UriSchemeHttps;
+           && (IsLocalPath(value)
+               || (Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps));
 }
 
 /// <param name="Name">Ham scope adı (protokol değeri, İngilizce).</param>

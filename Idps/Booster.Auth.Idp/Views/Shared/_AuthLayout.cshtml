@@ -4,6 +4,23 @@
     var brandHeadline = ViewData["BrandHeadline"] as string ?? T["Layout.BrandHeadline"].Value;
     var brandLead = ViewData["BrandLead"] as string
         ?? T["Layout.BrandLead"].Value;
+
+    // Bulunulan adres: cerez kararindan sonra kullanici AYNI ekrana doner
+    // (giris akisi interaction_key ile surer). Url.Idp sart; bkz. _LanguageSwitcher.
+    var currentUrl = Url.Idp($"{Context.Request.Path}{Context.Request.QueryString}");
+
+    // Yasal sayfalar kendi aralarinda gezinirken "geri" hedefi ilk gelinen
+    // ekran olarak kalir; yasal sayfanin kendisi geri hedefi olmaz.
+    var isLegalPage = ViewData["IsLegalPage"] is true;
+    var legalReturnUrl = isLegalPage ? ViewData["LegalReturnUrl"] as string : currentUrl;
+    string LegalHref(string path) => legalReturnUrl is null
+        ? Url.Idp(path)
+        : $"{Url.Idp(path)}?returnUrl={Uri.EscapeDataString(legalReturnUrl)}";
+
+    // Karar verilene kadar her ekranda. Tercih ekraninin kendisinde gosterilmez:
+    // ayni soruyu ayni sayfada iki kez sormak olurdu.
+    var showCookieBar = CookieConsent.Read(Context.Request) is null
+        && ViewData["HideCookieBar"] is not true;
 }
 <!DOCTYPE html>
 <html lang="tr" dir="ltr">
@@ -12,7 +29,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>@ViewData["Title"]</title>
-    <link rel="icon" href="@Url.Idp("/favicon.ico")" />
+    @* Istemcinin logosu varsa sekme ikonu da o olur; yoksa Booster ikonu.
+       Kabul edilen bicimlerin (PNG/JPEG/GIF/WebP) hepsini tarayicilar ikon
+       olarak gosterir; type verilmez, tarayici dosyadan anlar. *@
+    @if (ViewData[Booster.Auth.Idp.Controllers.Base.IdpBaseController.ClientLogoUrlKey] is string faviconLogoUrl)
+    {
+        <link rel="icon" href="@Url.Idp(faviconLogoUrl)" />
+        <link rel="apple-touch-icon" href="@Url.Idp(faviconLogoUrl)" />
+    }
+    else
+    {
+        <link rel="icon" href="@Url.Idp("/favicon.ico")" />
+    }
     <link rel="stylesheet" href="@Url.IdpAsset("/css/base.css")" />
     <link rel="stylesheet" href="@Url.IdpAsset("/css/auth.css")" />
     <script src="@Url.IdpAsset("/scripts/auth.js")" defer></script>
@@ -21,10 +49,11 @@
     <div class="auth-shell">
 
         <main id="main" class="auth-main @mainModifier">
+
             <div class="auth-container">
                
                 <div class="auth-brandline">
-                    @await Html.PartialAsync("_BrandLogo", string.Empty)
+                    @await Html.PartialAsync("_AppLogo", string.Empty)
                 </div>
 
                 @RenderBody()
@@ -36,11 +65,21 @@
 
                 <partial name="_LanguageSwitcher" />
 
-                <div class="auth-footer__links">
-                    <a href="@Url.Idp("/privacy")">@T["Layout.Privacy"]</a>
+                @* nav + ad: yasal baglantilar landmark listesinden dogrudan bulunur.
+                   Ayraclar dekoratiftir; ekran okuyucu her birini "nokta" diye okumasin. *@
+                <nav class="auth-footer__links" aria-label="@T["Layout.LegalNavAria"]">
+                    <a href="@LegalHref("/privacy")">@T["Layout.Privacy"]</a>
                     <span class="auth-footer__sep" aria-hidden="true">·</span>
-                    <a href="@Url.Idp("/terms")">@T["Layout.Terms"]</a>
-                </div>
+                    <a href="@LegalHref("/terms")">@T["Layout.Terms"]</a>
+                    <span class="auth-footer__sep" aria-hidden="true">·</span>
+                    <a href="@LegalHref("/kvkk")">@T["Layout.Kvkk"]</a>
+                    <span class="auth-footer__sep" aria-hidden="true">·</span>
+                    <a href="@LegalHref("/explicit-consent")">@T["Layout.ExplicitConsent"]</a>
+                    <span class="auth-footer__sep" aria-hidden="true">·</span>
+                    <a href="@LegalHref("/cookies")">@T["Layout.Cookies"]</a>
+                    <span class="auth-footer__sep" aria-hidden="true">·</span>
+                    <a href="@LegalHref(Booster.Auth.Idp.Controllers.PrivacyController.PreferencesPath)">@T["Layout.CookiePreferences"]</a>
+                </nav>
                 <p class="auth-footer__secure">
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
                         <rect x="3" y="7" width="10" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.5" />
@@ -53,7 +92,7 @@
 
         <aside class="auth-brand" aria-label="@T["Layout.BrandAria"]">
             <div class="auth-brand__top">
-                @await Html.PartialAsync("_BrandLogo", "inverse")
+                @await Html.PartialAsync("_AppLogo", "inverse")
             </div>
 
             <div class="auth-brand__body">
@@ -68,5 +107,52 @@
         </aside>
 
     </div>
+
+    @if (showCookieBar)
+    {
+        @* Cerez bari ekranin altinda sabit bir seritir. DOM'da da en sondadir:
+           gorsel sira ile odak sirasi ayni kalir (SC 2.4.3). Seridin altinda
+           kalan icerik icin sayfaya serit yuksekligi kadar bosluk ve
+           scroll-padding verilir; odaklanan alan seridin arkasinda kalmaz
+           (SC 2.4.11). Diyalog DEGILDIR: karar vermeden giris yapmak mesrudur,
+           sayfa kilitlenmez, yalnizca zorunlu cerezler kullanilir.
+           Ad verilmis section, bolge isareti olarak landmark listesinde bulunur. *@
+        <section class="auth-cookiebar" aria-labelledby="cookiebar-title"
+                 aria-describedby="cookiebar-text" data-cookie-bar>
+            <div class="auth-cookiebar__inner">
+                <div class="auth-cookiebar__body">
+                    <p class="auth-cookiebar__title" id="cookiebar-title">@T["CookieBar.Title"]</p>
+                    <p class="auth-cookiebar__text" id="cookiebar-text">
+                        @T["CookieBar.Text"]
+                        <a class="auth-link" href="@LegalHref("/cookies")">@T["CookieBar.PolicyLink"]</a>
+                    </p>
+                </div>
+
+                @* JS olmadan calisir: her secim kendi submit butonudur.
+                   JS varsa auth.js karari sayfada yazar; gezinme olmadigi
+                   icin forma yazilmis bilgiler kaybolmaz. *@
+                <form class="auth-cookiebar__actions" method="post" action="@Url.Idp("/ui/cookie-consent")"
+                      asp-antiforgery="false" data-cookie-consent
+                      data-label-saved="@T["CookieBar.Saved"]">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="@currentUrl" />
+
+                    @* Kabul ve red AYNI agirliktadir: reddi geri planda birakmak
+                       (soluk baglanti, kucuk dugme) rizayi yonlendiren karanlik
+                       desendir; KVKK ve GDPR rehberleri acikca yasaklar. *@
+                    <a class="auth-link auth-link--standalone auth-cookiebar__customize"
+                       href="@LegalHref(Booster.Auth.Idp.Controllers.PrivacyController.PreferencesPath)">
+                        @T["CookieBar.Customize"]
+                    </a>
+                    <button type="submit" name="choice" value="reject" class="auth-btn auth-btn--secondary">
+                        @T["CookieBar.Reject"]
+                    </button>
+                    <button type="submit" name="choice" value="accept" class="auth-btn auth-btn--secondary">
+                        @T["CookieBar.Accept"]
+                    </button>
+                </form>
+            </div>
+        </section>
+    }
 </body>
 </html>

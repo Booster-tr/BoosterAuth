@@ -1,0 +1,29 @@
+@*
+    Ekrandaki marka alanı: istemcinin logosu varsa o, yoksa Booster Auth logosu.
+    Model: "inverse" (koyu zemin) veya "" (açık zemin) — _BrandLogo ile aynı.
+
+    Logo yüklenemezse (silinmiş, bozuk dosya) auth.js görseli gizler ve
+    yanındaki Booster logosunu açar; marka alanı hiçbir zaman boş kalmaz.
+*@
+@model string
+@{
+    var clientLogoUrl = ViewData[Booster.Auth.Idp.Controllers.Base.IdpBaseController.ClientLogoUrlKey] as string;
+    var inverse = Model == "inverse";
+}
+
+@if (clientLogoUrl is null)
+{
+    @await Html.PartialAsync("_BrandLogo", Model)
+}
+else
+{
+    <span class="auth-applogo @(inverse ? "auth-applogo--inverse" : null)" data-logo-swap>
+        @* width/height verilmez: tarayıcı görseli doğal boyutundan büyütmesin
+           (küçük dosyalar bulanıklaşırdı); sınırlar yalnızca CSS'te üst sınırdır. *@
+        <img class="auth-applogo__img" src="@Url.Idp(clientLogoUrl)" alt="@T["Layout.ClientLogoAlt"]"
+             decoding="async" referrerpolicy="no-referrer" data-logo-fallback />
+        <span class="auth-applogo__default" hidden>
+            @await Html.PartialAsync("_BrandLogo", Model)
+        </span>
+    </span>
+}

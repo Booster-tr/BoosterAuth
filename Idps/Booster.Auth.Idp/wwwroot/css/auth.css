@@ -1080,3 +1080,343 @@
 @media (forced-colors: active) {
   .auth-lang__item[aria-pressed="true"] { border-color: Highlight; }
 }
+
+/* ==========================================================================
+  13. CEREZ BARI  (.auth-cookiebar)
+   Ekranin altinda tam genislikte sabit serit. Sabit bir serit odaklanan
+   alanin ustune binebilir (SC 2.4.11); bu yuzden serit gorunurken sayfaya
+   serit yuksekligi kadar alt bosluk ve scroll-padding verilir. Yukseklik
+   auth.js tarafindan olculup --cookiebar-height'a yazilir; JS yoksa
+   asagidaki tahmini deger kullanilir.
+   ========================================================================== */
+
+:root {
+    --cookiebar-height: 5.5rem;
+}
+
+@media (max-width: 639.98px) {
+    :root {
+        --cookiebar-height: 12rem;
+    }
+}
+
+body:has(.auth-cookiebar:not([hidden])) {
+    padding-bottom: var(--cookiebar-height);
+}
+
+html:has(.auth-cookiebar:not([hidden])) {
+    scroll-padding-bottom: calc(var(--cookiebar-height) + var(--space-4));
+}
+
+/* Dar ekranda serit ekranin yarisini gecmesin; uzun metin kendi icinde kayar. */
+.auth-cookiebar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 50;
+    max-height: 50vh;
+    max-height: 50dvh;
+    overflow-y: auto;
+    padding: var(--space-4) var(--space-5);
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+    background-color: var(--color-surface);
+    border-top: var(--border-width-rule) solid var(--color-action);
+    box-shadow: var(--shadow-md);
+    overflow-wrap: anywhere;
+}
+
+/* Tek satir: metin solda ve kalan genisligi alir, secimler sagda sabit
+   durur. Butonlar asla metnin altina sarmaz; yalnizca telefon genisliginde
+   (asagidaki media query) alt alta gecilir. */
+.auth-cookiebar__inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    max-width: 72rem;
+    margin-inline: auto;
+}
+
+.auth-cookiebar__body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.auth-cookiebar__title {
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-heading);
+}
+
+.auth-cookiebar__text {
+    margin-top: var(--space-1);
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+    color: var(--color-text-secondary);
+}
+
+.auth-cookiebar__actions {
+    display: flex;
+    flex: none;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.auth-cookiebar__actions .auth-btn {
+    flex: none;
+    white-space: nowrap;
+}
+
+.auth-cookiebar__customize {
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+/* Telefon: yan yana sigmaz; metin ustte, secimler altta tam genislikte. */
+@media (max-width: 639.98px) {
+    .auth-cookiebar__inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-4);
+    }
+
+    .auth-cookiebar__actions {
+        flex-wrap: wrap;
+    }
+
+    .auth-cookiebar__actions .auth-btn {
+        flex: 1 1 8rem;
+    }
+}
+
+/* JS bari kapattiginda odak main'e tasinir; main bir kontrol degildir,
+   halka cizmek kullaniciya tiklanabilir bir sey varmis gibi gorunurdu. */
+.auth-main:focus {
+    outline: none;
+}
+
+/* ==========================================================================
+  14. YASAL METIN  (.auth-legal)
+   ========================================================================== */
+
+.auth-legal__back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-bottom: var(--space-4);
+}
+
+.auth-legal__back svg {
+    flex: none;
+}
+
+.auth-legal__updated {
+    margin-top: var(--space-3);
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    color: var(--color-text-muted);
+}
+
+.auth-legal__toc {
+    margin-bottom: var(--space-8);
+    padding: var(--space-4) var(--space-5);
+    background-color: var(--color-surface-subtle);
+    border: var(--border-width-hairline) solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.auth-legal__toc-title {
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+/* Reset listeleri numarasiz birakir; icindekilerde numara anlam tasir. */
+.auth-legal__toc-list {
+    margin-top: var(--space-2);
+    padding-inline-start: var(--space-5);
+    list-style: decimal;
+    font-size: 0.875rem;
+    line-height: 1.375rem;
+}
+
+.auth-legal__toc-list li + li {
+    margin-top: var(--space-1);
+}
+
+/* Cumle disi baglantilar da alti cizgilidir: liste icinde tek ayirt edici
+   renk olurdu (SC 1.4.1). */
+.auth-legal__toc-list a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
+
+.auth-legal__section + .auth-legal__section {
+    margin-top: var(--space-8);
+}
+
+.auth-legal__heading {
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-heading);
+    scroll-margin-block: var(--space-8);
+}
+
+/* Icindekilerden gelinen baslik odak alir (tabindex=-1); bir kontrol olmadigi
+   icin halka cizilmez -- okuma konumu zaten basligin kendisidir. */
+.auth-legal__heading:focus {
+    outline: none;
+}
+
+.auth-legal__body {
+    margin-top: var(--space-3);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    max-width: 75ch;
+}
+
+.auth-legal__body > * + * {
+    margin-top: var(--space-3);
+}
+
+.auth-legal__body ul,
+.auth-legal__body ol {
+    padding-inline-start: var(--space-6);
+}
+
+.auth-legal__body ul { list-style: disc; }
+.auth-legal__body ol { list-style: decimal; }
+
+.auth-legal__body li + li {
+    margin-top: var(--space-1);
+}
+
+.auth-legal__body strong {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.auth-legal__body a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
+
+.auth-legal__cta {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: var(--border-width-hairline) solid var(--color-border);
+}
+
+/* ==========================================================================
+  15. CEREZ TERCIHLERI  (.auth-cookieprefs)
+   Yerel onay kutusu kullanilir, ozel "switch" degil: yerel kutu klavye,
+   ekran okuyucu ve forced-colors davranisini bedavaya getirir. Yalnizca
+   boyutu ve vurgu rengi ayarlanir.
+   ========================================================================== */
+
+.auth-cookieprefs__saved,
+.auth-cookieprefs__nodecision {
+    margin-top: 0;
+    margin-bottom: var(--space-6);
+}
+
+.auth-cookieprefs__saved:focus {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: 2px;
+}
+
+.auth-cookieprefs {
+    display: flex;
+    flex-direction: column;
+    border: var(--border-width-hairline) solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.auth-cookieprefs__legend {
+    padding-inline: var(--space-2);
+    margin-inline-start: var(--space-3);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-heading);
+}
+
+.auth-cookieprefs__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+}
+
+.auth-cookieprefs__item + .auth-cookieprefs__item {
+    border-top: var(--border-width-hairline) solid var(--color-border);
+}
+
+/* 20px kutu + etiket tamami tiklanabilir -> 24px hedef siniri asilir (SC 2.5.8). */
+.auth-cookieprefs__check {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 1px 0 0;
+    accent-color: var(--color-action);
+    cursor: pointer;
+}
+
+.auth-cookieprefs__check:disabled {
+    cursor: not-allowed;
+}
+
+.auth-cookieprefs__label-wrap {
+    min-width: 0;
+}
+
+.auth-cookieprefs__label {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.auth-cookieprefs__check:disabled + .auth-cookieprefs__label-wrap .auth-cookieprefs__label {
+    cursor: default;
+}
+
+.auth-cookieprefs__tag {
+    display: inline-block;
+    padding: 0 var(--space-2);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-success-text);
+    background-color: var(--color-success-surface);
+    border: var(--border-width-hairline) solid var(--color-success-border);
+    border-radius: var(--radius-full);
+}
+
+.auth-cookieprefs__desc {
+    margin-top: var(--space-1);
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    color: var(--color-text-muted);
+}
+
+@media (forced-colors: active) {
+    .auth-cookiebar,
+    .auth-legal__toc,
+    .auth-cookieprefs__tag {
+        border: 1px solid CanvasText;
+    }
+}
