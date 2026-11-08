@@ -75,6 +75,10 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.LoginCodeInvalid, "Giriş kodu", "Girdiğiniz kod hatalı. Lütfen kontrol edip tekrar deneyin.", "Sign-in code", "The code you entered is incorrect. Please check it and try again."),
         new(IdpMessageKeys.LoginCodeExpired, "Giriş kodu", "Kodun süresi doldu. Lütfen yeni bir kod isteyin.", "Sign-in code", "The code has expired. Please request a new one."),
 
+        // --- Giriş doğrulaması (e-posta/telefon doğrulama, MFA) ---
+        new(IdpMessageKeys.LoginChallengeExpired, "Doğrulama", "Doğrulama süresi doldu. Lütfen yeniden giriş yapın.", "Verification", "The verification has expired. Please sign in again."),
+        new(IdpMessageKeys.MfaMethodUnavailable, "İki adımlı doğrulama", "Hesabınızda iki adımlı doğrulama kodu gönderilebilecek bir e-posta ya da telefon yok. Lütfen yöneticinize başvurun.", "Two-step verification", "Your account has no email address or phone number to send a two-step verification code to. Please contact your administrator."),
+
         // --- Federasyon (dış sağlayıcıyla giriş) ---
         new(IdpMessageKeys.FederationProviderNotFound, "Sağlayıcı", "Bu giriş yöntemi tanımlı değil ya da kapatılmış.", "Provider", "This sign-in method is not configured or has been disabled."),
         new(IdpMessageKeys.FederationStateInvalid, "Giriş", "Giriş isteğinin süresi dolmuş. Lütfen baştan deneyin.", "Sign-in", "The sign-in request has expired. Please start again."),

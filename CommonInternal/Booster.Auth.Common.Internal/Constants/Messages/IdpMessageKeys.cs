@@ -56,6 +56,10 @@ public class IdpMessageKeys
     public const string LoginCodeInvalid = "idp.login_code_invalid";
     public const string LoginCodeExpired = "idp.login_code_expired";
 
+    // --- Giriş doğrulaması (e-posta/telefon doğrulama, MFA) ------------------
+    public const string LoginChallengeExpired = "idp.login_challenge_expired";
+    public const string MfaMethodUnavailable = "idp.mfa_method_unavailable";
+
 
     // --- Federasyon ---------------------------------------------------------
     public const string FederationProviderNotFound = "idp.federation_provider_not_found";

@@ -956,6 +956,32 @@
     text-decoration-thickness: 1px;
 }
 
+/* POST yapan "bağlantılar" (kodu yeniden gönder vb.) <button>'dır; bağlantı
+   gibi görünmeleri için tarayıcı düğme stili sıfırlanır. */
+button.auth-link {
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-link);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+}
+
+button.auth-link:hover,
+button.auth-link:focus-visible {
+    color: var(--color-link-hover);
+}
+
+/* Doğrulama ekranında alt kısımdaki seçenekler alt alta durur. */
+.auth-card__footer form + form,
+.auth-card__footer form + a {
+    display: block;
+    margin-top: var(--space-2);
+}
+
 /* Cumle icinde olmayan tekil baglantilar 24px dokunma hedefini karsilamali */
 .auth-link--standalone {
     display: inline-block;

@@ -44,6 +44,11 @@ public static class ClientDataMapper
                 AccessTokenTtlSeconds = source.Session.AccessTokenTtlSeconds,
                 RefreshTokenTtlSeconds = source.Session.RefreshTokenTtlSeconds,
                 IdleTimeoutSeconds = source.Session.IdleTimeoutSeconds
+            },
+            Mfa = new MfaPolicyMessage
+            {
+                Required = source.Mfa.Required,
+                AllowedMethods = (int)source.Mfa.AllowedMethods
             }
         };
 
@@ -119,6 +124,14 @@ public static class ClientDataMapper
                 RefreshTokenTtlSeconds = message.Session.RefreshTokenTtlSeconds,
                 IdleTimeoutSeconds = message.Session.IdleTimeoutSeconds
             },
+            // Eski Management sürümü alanı göndermezse null gelir: MFA kapalı sayılır.
+            Mfa = message.Mfa is null
+                ? new MfaPolicyData()
+                : new MfaPolicyData
+                {
+                    Required = message.Mfa.Required,
+                    AllowedMethods = (MfaMethod)message.Mfa.AllowedMethods
+                },
             DefaultRoles = [.. message.DefaultRoles.Select(r => new DefaultRoleData
             {
                 RoleId = Guid.Parse(r.RoleId),

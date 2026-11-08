@@ -1,0 +1,96 @@
+@using Booster.Auth.Idp.Managers.LoginChallengeManagers
+@model LoginChallengeViewModel
+@{
+    Layout = "_AuthLayout";
+
+    var errorCount = ViewData.ModelState.AllErrors().Count;
+    var key = Model.TextKey;
+
+    ViewData["Title"] = errorCount > 0
+        ? T["Challenge.PageTitleWithErrors", T[$"{key}.Heading"], errorCount].Value
+        : T["Challenge.PageTitle", T[$"{key}.Heading"]].Value;
+
+    ViewData["MainModifier"] = "auth-main--passwordless";
+    ViewData["BrandHeadline"] = T[$"{key}.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T[$"{key}.BrandLead"].Value;
+
+    var codeInvalid = ViewData.ModelState.HasError(nameof(Model.Code));
+    var otherChannels = Model.MfaChannels.Where(c => c != Model.Channel).ToList();
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T[$"{key}.Heading"]</h1>
+        @* Hedef MASKELİDİR: parolayı bilen biri bu ekrandan kullanıcının tam
+           e-posta/telefon bilgisini öğrenmemeli. *@
+        <p class="auth-card__subtitle">@T[$"{key}.Subtitle", Model.MaskedTarget]</p>
+    </header>
+
+    @if (Model.Resent)
+    {
+        @* role=status: yeniden gönderim sonrası odak değişmez ama ekran okuyucu duyurur. *@
+        <p class="auth-hint" role="status">@T["Challenge.Resent", Model.MaskedTarget]</p>
+    }
+
+    <partial name="_ValidationSummary" />
+
+    <form method="post" action="@Url.Idp("/ui/login/verify")" class="auth-form"
+          data-auth-form asp-antiforgery="false">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="InteractionKey" />
+
+        <div class="auth-field auth-field--icon @(codeInvalid ? "auth-field--invalid" : null)">
+            <label class="auth-field__label" for="Code">@T["Challenge.CodeLabel"]</label>
+            <div class="auth-field__control">
+                <span class="auth-field__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" focusable="false">
+                        <rect x="2.75" y="5.25" width="14.5" height="9.5" rx="2" stroke="currentColor" stroke-width="1.6" />
+                        <path d="M6 10h1.5M9.25 10h1.5M12.5 10H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </span>
+                <input class="auth-field__input" asp-for="Code" type="text"
+                       inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+                       autocapitalize="none" spellcheck="false" enterkeyhint="go"
+                       required data-initial-focus
+                       aria-describedby="Code-error Code-hint"
+                       aria-invalid="@(codeInvalid ? "true" : null)" />
+            </div>
+            <p class="auth-field__hint" id="Code-hint">@T["Challenge.CodeHint"]</p>
+            <partial name="_FieldError" model="@nameof(Model.Code)" />
+        </div>
+
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-btn auth-btn--primary auth-btn--block"
+                    data-submit-guard data-label-busy="@T["Challenge.Busy"]">
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["Challenge.Submit"]</span>
+            </button>
+        </div>
+    </form>
+
+    @* Yeniden gönderim ve kanal değişimi POST'tur: GET olsaydı bir bağlantı
+       önizleyicisi ya da önbellek ısıtıcı kullanıcı adına kod gönderebilirdi. *@
+    <footer class="auth-card__footer">
+        <form method="post" action="@Url.Idp("/ui/login/verify/resend")" asp-antiforgery="false">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="interactionKey" value="@Model.InteractionKey" />
+            @T["Challenge.NoCode"]
+            <button type="submit" class="auth-link auth-link--standalone">@T["Challenge.Resend"]</button>
+        </form>
+
+        @foreach (var channel in otherChannels)
+        {
+            <form method="post" action="@Url.Idp("/ui/login/verify/method")" asp-antiforgery="false">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="interactionKey" value="@Model.InteractionKey" />
+                <input type="hidden" name="channel" value="@channel" />
+                <button type="submit" class="auth-link auth-link--standalone">
+                    @T[channel == ChallengeChannel.Sms ? "Challenge.UseSms" : "Challenge.UseEmail"]
+                </button>
+            </form>
+        }
+
+        <a class="auth-link auth-link--standalone"
+           href="@Url.Idp($"/ui/login?interaction_key={Uri.EscapeDataString(Model.InteractionKey)}")">@T["Challenge.BackToLogin"]</a>
+    </footer>
+</section>

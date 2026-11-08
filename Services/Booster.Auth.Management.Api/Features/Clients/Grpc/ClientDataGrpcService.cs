@@ -194,6 +194,11 @@ public sealed class ClientDataGrpcService(
                 RefreshTokenTtlSeconds = policy.Session.RefreshTokenTtlSeconds,
                 IdleTimeoutSeconds = policy.Session.IdleTimeoutSeconds
             },
+            Mfa = new MfaPolicyData
+            {
+                Required = policy.Mfa.Required,
+                AllowedMethods = policy.Mfa.AllowedMethods
+            },
             DefaultScopes = [.. pool.DefaultScopes],
             DefaultRoles = defaultRoles,
             FederationProviders = federationProviders

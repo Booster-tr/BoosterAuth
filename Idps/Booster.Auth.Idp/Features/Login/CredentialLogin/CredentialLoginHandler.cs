@@ -2,6 +2,7 @@
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
+using Booster.Auth.Idp.Managers.LoginChallengeManagers;
 using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.CredentialBased.Models;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.Models;
@@ -32,7 +33,7 @@ public sealed class CredentialLoginHandler(
     ILocalUserStore userStore,
     IProviderFactory providerFactory,
     IPasswordHasher passwordHasher,
-    ISessionStore sessionStore,
+    ILoginChallengeManager loginChallengeManager,
     IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
     ICacheService cacheService,
     IRequestContextAccessor requestContextAccessor) : ICommandHandler<CredentialLoginCommand, CredentialLoginResult>
@@ -74,17 +75,15 @@ public sealed class CredentialLoginHandler(
 
         await HandleSuccessfulAuthAsync(user, cmd.Password, ct);
 
-        var (session, token) = await sessionStore.CreateAsync(
-            principalId: user.Id,
-            clientId: client.ClientId,
-            ttl: TimeSpan.FromSeconds(client.Session.RefreshTokenTtlSeconds),
-            deviceName: null,
-            userAgent: cmd.UserAgent,
-            ipAddress: cmd.IpAddress,
+        // Parola doğru; oturum ancak havuzun istediği doğrulama/MFA adımları
+        // bittiğinde açılır. Adım yoksa oturum burada açılır.
+        var outcome = await loginChallengeManager.BeginAsync(
+            cmd.InteractionKey, client, user,
             authMethod: cmd.ProviderType,          // "local" / "ldap" — hangi yöntemle giriş
-            ct: ct);
+            passwordLogin: true,
+            cmd.UserAgent, cmd.IpAddress, ct);
 
-        return new CredentialLoginResult { SessionToken = token, ExpiresAt = session.ExpiresAt };
+        return new CredentialLoginResult { SessionToken = outcome.SessionToken, ExpiresAt = outcome.ExpiresAt };
     }
 
     private async Task HandleFailedAttemptAsync(LocalUser user, LoginPolicyData policy, CancellationToken ct)
@@ -144,8 +143,11 @@ public sealed class CredentialLoginCommand : ICommand<CredentialLoginResult>
 
 public sealed class CredentialLoginResult
 {
-    public required string SessionToken { get; init; }
-    public required DateTimeOffset ExpiresAt { get; init; }
+    /// <summary>Null ise oturum açılmadı; kullanıcı doğrulama adımına yönlendirilir.</summary>
+    public string? SessionToken { get; init; }
+    public DateTimeOffset? ExpiresAt { get; init; }
+
+    public bool RequiresChallenge => SessionToken is null;
 }
 
 public sealed class CredentialLoginValidator : Validator<CredentialLoginCommand>

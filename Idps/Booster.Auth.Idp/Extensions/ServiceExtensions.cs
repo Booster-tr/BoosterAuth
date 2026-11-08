@@ -18,6 +18,7 @@ using Booster.Auth.Idp.Features.Token.Handlers._base;
 using Booster.Auth.Idp.Managers.CookieManagers;
 using Booster.Auth.Idp.Managers.ExceptionManagers;
 using Booster.Auth.Idp.Managers.KeyManagers;
+using Booster.Auth.Idp.Managers.LoginChallengeManagers;
 using Booster.Auth.Idp.Managers.TokenManagers;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Providers.Abstractions;
@@ -83,6 +84,7 @@ public static class ServiceExtensions
 
         services.AddScoped<IFederationProviderConfigStore, FederationProviderConfigStore>();
         services.AddScoped<ISessionCookieManager, SessionCookieManager>();
+        services.AddScoped<ILoginChallengeManager, LoginChallengeManager>();
 
         services.AddScoped<IIdentityProvider, LocalProvider>();
         services.AddScoped<IIdentityProvider, EmailCodeProvider>();

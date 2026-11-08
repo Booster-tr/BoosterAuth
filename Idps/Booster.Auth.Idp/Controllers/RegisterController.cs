@@ -48,10 +48,15 @@ public class RegisterController(
     {
         try
         {
-            await new RegisterValidator().ValidateAndThrowAsync(command, ct);
-            await command.ExecuteAsync(ct);
+            command.UserAgent = Request.Headers.UserAgent;
+            command.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-            return Redirect(uiOptions.GetLoginUrl(command.InteractionKey));
+            await new RegisterValidator().ValidateAndThrowAsync(command, ct);
+            var result = await command.ExecuteAsync(ct);
+
+            return Redirect(result.RequiresChallenge
+                ? uiOptions.GetLoginChallengeUrl(command.InteractionKey)
+                : uiOptions.GetLoginUrl(command.InteractionKey));
         }
         catch (ValidationException ex)
         {

@@ -28,6 +28,17 @@ public sealed record ClientData
     public required IReadOnlyList<DefaultRoleData> DefaultRoles { get; init; }
 
     public IReadOnlyList<FederationProviderData> FederationProviders { get; init; } = [];
+
+    // required DEGIL: bu alan eklenmeden once onbellege yazilmis ClientData
+    // kayitlari da okunabilsin (eksikse MFA kapali sayilir).
+    public MfaPolicyData Mfa { get; init; } = new();
+}
+
+public sealed record MfaPolicyData
+{
+    public bool Required { get; init; }
+
+    public MfaMethod AllowedMethods { get; init; } = MfaMethod.None;
 }
 
 public sealed record DefaultRoleData

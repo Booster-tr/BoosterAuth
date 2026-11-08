@@ -49,7 +49,10 @@ public class CredentialLoginController(IdpUiOptions uiOptions,
             await new CredentialLoginValidator().ValidateAndThrowAsync(command, ct);
             var result = await command.ExecuteAsync(ct);
 
-            cookieManager.Set(Response, result.SessionToken, result.ExpiresAt);
+            if (result.RequiresChallenge)
+                return Redirect(uiOptions.GetLoginChallengeUrl(command.InteractionKey));
+
+            cookieManager.Set(Response, result.SessionToken!, result.ExpiresAt!.Value);
             return Redirect(uiOptions.GetAuthorizeUrl(command.InteractionKey));
         }
         catch (ValidationException ex)

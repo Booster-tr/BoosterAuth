@@ -51,6 +51,13 @@ message ClientDataMessage {
   // olan kadari: ayarlar BURADA TASINMAZ cunku bazi ayarlar sir niteliginde
   // (Apple ozel anahtari gibi) ve ClientData IdP tarafinda onbellege alinir.
   repeated FederationProviderMessage federation_providers = 17;
+
+  MfaPolicyMessage mfa = 18;
+}
+
+message MfaPolicyMessage {
+  bool required = 1;
+  int32 allowed_methods = 2;   // MfaMethod (flags)
 }
 
 message LoginPolicyMessage {

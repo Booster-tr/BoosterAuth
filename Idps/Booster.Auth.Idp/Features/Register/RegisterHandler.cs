@@ -6,6 +6,9 @@ using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Z.Grpc;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
+using Booster.Auth.Idp.Managers.LoginChallengeManagers;
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
+using Booster.Auth.Idp.Providers.Abstractions.Stores.Models;
 using Booster.Auth.Idp.Managers.PasswordManagers;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Database.Models;
@@ -31,6 +34,8 @@ public sealed class RegisterHandler(
     IPasswordHasher passwordHasher,
     IPasswordPolicyManager passwordPolicyManager,
     AuthorizationService.AuthorizationServiceClient authorizationClient,
+    ILocalUserStore userStore,
+    ILoginChallengeManager loginChallengeManager,
     IRequestContextAccessor requestContextAccessor) : ICommandHandler<RegisterCommand, RegisterResult>
 {
     public async Task<RegisterResult> ExecuteAsync(RegisterCommand cmd, CancellationToken ct)
@@ -100,7 +105,25 @@ public sealed class RegisterHandler(
             principalId = principal.Id;
         }
 
-        return new RegisterResult { PrincipalId = principalId };
+        // Havuz doğrulama istiyorsa kullanıcı giriş ekranına değil doğrudan kod
+        // ekranına gider; kodu girince oturumu açılır. Doğrulama istenmiyorsa
+        // davranış eskisi gibidir: kullanıcı giriş ekranına yönlendirilir.
+        var needsVerification =
+            (client.Registration.RequireEmailVerification && email is not null) ||
+            (client.Registration.RequirePhoneVerification && phone is not null);
+
+        if (!needsVerification)
+            return new RegisterResult { PrincipalId = principalId };
+
+        LocalUser? user;
+        using (requestContextAccessor.BeginSystemContext(client.IsolationId))
+            user = await userStore.GetByIdAsync(principalId, ct);
+
+        await loginChallengeManager.BeginAsync(
+            cmd.InteractionKey, client, user!, authMethod: "local", passwordLogin: false,
+            cmd.UserAgent, cmd.IpAddress, ct);
+
+        return new RegisterResult { PrincipalId = principalId, RequiresChallenge = true };
     }
 
     private async Task AssignDefaultsAsync(Guid principalId, ClientData client, CancellationToken ct)
@@ -185,12 +208,17 @@ public sealed class RegisterCommand : ICommand<RegisterResult>
     public string? Phone { get; set; }
     public string Password { get; set; } = default!;
     public string PasswordConfirm { get; set; } = default!;
+    public string? UserAgent { get; set; }
+    public string? IpAddress { get; set; }
 }
 
 
 public sealed class RegisterResult
 {
     public Guid PrincipalId { get; init; }
+
+    /// <summary>Kullanıcı e-posta/telefon doğrulama ekranına yönlendirilmeli.</summary>
+    public bool RequiresChallenge { get; init; }
 }
 
 public sealed class RegisterValidator : Validator<RegisterCommand>

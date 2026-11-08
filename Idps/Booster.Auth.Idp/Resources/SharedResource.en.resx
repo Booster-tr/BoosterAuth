@@ -844,4 +844,76 @@
   <data name="Legal.Cookies.S6.Body" xml:space="preserve">
     <value>&lt;p&gt;If you have questions about cookies, you can reach us at &lt;strong&gt;privacy@booster.example&lt;/strong&gt;. Details on the processing of your personal data are available in the Privacy Policy and the Privacy Notice (KVKK).&lt;/p&gt;</value>
   </data>
+  <data name="Challenge.PageTitle" xml:space="preserve">
+    <value>{0} · Booster Auth</value>
+  </data>
+  <data name="Challenge.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} ({1} errors) · Booster Auth</value>
+  </data>
+  <data name="Challenge.CodeLabel" xml:space="preserve">
+    <value>Verification code</value>
+  </data>
+  <data name="Challenge.CodeHint" xml:space="preserve">
+    <value>Enter the 6-digit code. It is valid for 5 minutes.</value>
+  </data>
+  <data name="Challenge.Submit" xml:space="preserve">
+    <value>Verify</value>
+  </data>
+  <data name="Challenge.Busy" xml:space="preserve">
+    <value>Verifying…</value>
+  </data>
+  <data name="Challenge.NoCode" xml:space="preserve">
+    <value>Didn't get a code?</value>
+  </data>
+  <data name="Challenge.Resend" xml:space="preserve">
+    <value>Resend code</value>
+  </data>
+  <data name="Challenge.Resent" xml:space="preserve">
+    <value>A new code was sent to {0}. If it does not arrive in a few minutes, check your spam folder.</value>
+  </data>
+  <data name="Challenge.UseEmail" xml:space="preserve">
+    <value>Get the code by email</value>
+  </data>
+  <data name="Challenge.UseSms" xml:space="preserve">
+    <value>Get the code by SMS</value>
+  </data>
+  <data name="Challenge.BackToLogin" xml:space="preserve">
+    <value>Back to sign in</value>
+  </data>
+  <data name="Challenge.VerifyEmail.Heading" xml:space="preserve">
+    <value>Verify your email address</value>
+  </data>
+  <data name="Challenge.VerifyEmail.Subtitle" xml:space="preserve">
+    <value>We sent a 6-digit verification code to {0}. Enter it to continue.</value>
+  </data>
+  <data name="Challenge.VerifyEmail.BrandHeadline" xml:space="preserve">
+    <value>Let's make sure this account is yours.</value>
+  </data>
+  <data name="Challenge.VerifyEmail.BrandLead" xml:space="preserve">
+    <value>Once your email address is verified, you won't be asked again.</value>
+  </data>
+  <data name="Challenge.VerifyPhone.Heading" xml:space="preserve">
+    <value>Verify your phone number</value>
+  </data>
+  <data name="Challenge.VerifyPhone.Subtitle" xml:space="preserve">
+    <value>We sent a 6-digit verification code by SMS to {0}. Enter it to continue.</value>
+  </data>
+  <data name="Challenge.VerifyPhone.BrandHeadline" xml:space="preserve">
+    <value>Let's make sure this account is yours.</value>
+  </data>
+  <data name="Challenge.VerifyPhone.BrandLead" xml:space="preserve">
+    <value>Once your phone number is verified, you won't be asked again.</value>
+  </data>
+  <data name="Challenge.Mfa.Heading" xml:space="preserve">
+    <value>Two-step verification</value>
+  </data>
+  <data name="Challenge.Mfa.Subtitle" xml:space="preserve">
+    <value>To finish signing in, enter the 6-digit code we sent to {0}.</value>
+  </data>
+  <data name="Challenge.Mfa.BrandHeadline" xml:space="preserve">
+    <value>Your password alone is not enough.</value>
+  </data>
+  <data name="Challenge.Mfa.BrandLead" xml:space="preserve">
+    <value>Even if someone gets your password, they cannot sign in without this code.</value>
+  </data>
 </root>

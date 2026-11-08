@@ -844,4 +844,76 @@
   <data name="Legal.Cookies.S6.Body" xml:space="preserve">
     <value>&lt;p&gt;Çerezlerle ilgili sorularınız için &lt;strong&gt;privacy@booster.example&lt;/strong&gt; adresinden bize ulaşabilirsiniz. Kişisel verilerinizin işlenmesine ilişkin ayrıntılar Gizlilik Politikası ve KVKK Aydınlatma Metni'nde yer almaktadır.&lt;/p&gt;</value>
   </data>
+  <data name="Challenge.PageTitle" xml:space="preserve">
+    <value>{0} · Booster Auth</value>
+  </data>
+  <data name="Challenge.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} ({1} hata) · Booster Auth</value>
+  </data>
+  <data name="Challenge.CodeLabel" xml:space="preserve">
+    <value>Doğrulama kodu</value>
+  </data>
+  <data name="Challenge.CodeHint" xml:space="preserve">
+    <value>6 haneli kodu girin. Kod 5 dakika geçerlidir.</value>
+  </data>
+  <data name="Challenge.Submit" xml:space="preserve">
+    <value>Doğrula</value>
+  </data>
+  <data name="Challenge.Busy" xml:space="preserve">
+    <value>Doğrulanıyor…</value>
+  </data>
+  <data name="Challenge.NoCode" xml:space="preserve">
+    <value>Kod gelmedi mi?</value>
+  </data>
+  <data name="Challenge.Resend" xml:space="preserve">
+    <value>Kodu yeniden gönder</value>
+  </data>
+  <data name="Challenge.Resent" xml:space="preserve">
+    <value>{0} adresine yeni bir kod gönderildi. Birkaç dakika içinde gelmezse istenmeyen klasörünü kontrol edin.</value>
+  </data>
+  <data name="Challenge.UseEmail" xml:space="preserve">
+    <value>Kodu e-posta ile al</value>
+  </data>
+  <data name="Challenge.UseSms" xml:space="preserve">
+    <value>Kodu SMS ile al</value>
+  </data>
+  <data name="Challenge.BackToLogin" xml:space="preserve">
+    <value>Giriş ekranına dön</value>
+  </data>
+  <data name="Challenge.VerifyEmail.Heading" xml:space="preserve">
+    <value>E-posta adresinizi doğrulayın</value>
+  </data>
+  <data name="Challenge.VerifyEmail.Subtitle" xml:space="preserve">
+    <value>{0} adresine 6 haneli bir doğrulama kodu gönderdik. Devam etmek için kodu girin.</value>
+  </data>
+  <data name="Challenge.VerifyEmail.BrandHeadline" xml:space="preserve">
+    <value>Hesabınızın size ait olduğundan emin olalım.</value>
+  </data>
+  <data name="Challenge.VerifyEmail.BrandLead" xml:space="preserve">
+    <value>E-posta adresinizi bir kez doğruladığınızda bu adım tekrar sorulmaz.</value>
+  </data>
+  <data name="Challenge.VerifyPhone.Heading" xml:space="preserve">
+    <value>Telefon numaranızı doğrulayın</value>
+  </data>
+  <data name="Challenge.VerifyPhone.Subtitle" xml:space="preserve">
+    <value>{0} numarasına SMS ile 6 haneli bir doğrulama kodu gönderdik. Devam etmek için kodu girin.</value>
+  </data>
+  <data name="Challenge.VerifyPhone.BrandHeadline" xml:space="preserve">
+    <value>Hesabınızın size ait olduğundan emin olalım.</value>
+  </data>
+  <data name="Challenge.VerifyPhone.BrandLead" xml:space="preserve">
+    <value>Telefon numaranızı bir kez doğruladığınızda bu adım tekrar sorulmaz.</value>
+  </data>
+  <data name="Challenge.Mfa.Heading" xml:space="preserve">
+    <value>İki adımlı doğrulama</value>
+  </data>
+  <data name="Challenge.Mfa.Subtitle" xml:space="preserve">
+    <value>Girişi tamamlamak için {0} adresine gönderdiğimiz 6 haneli kodu girin.</value>
+  </data>
+  <data name="Challenge.Mfa.BrandHeadline" xml:space="preserve">
+    <value>Parolanız tek başına yetmez.</value>
+  </data>
+  <data name="Challenge.Mfa.BrandLead" xml:space="preserve">
+    <value>Parolanız başkasının eline geçse bile hesabınıza bu kod olmadan girilemez.</value>
+  </data>
 </root>
