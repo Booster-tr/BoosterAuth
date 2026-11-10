@@ -20,6 +20,7 @@ public static class ServiceExtensions
         services.AddScoped<ILookupManager, LookupManager>();
 
         services.AddScoped<ManagementBootstrapper>();
+        services.AddScoped<WalkToWinBootstrapper>();
 
         services.AddBoosterCacheLanguageTranslator();
         services.AddBoosterExceptionHandler();

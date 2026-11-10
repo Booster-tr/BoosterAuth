@@ -33,6 +33,10 @@ using (var scope = app.Services.CreateScope())
 {
     var bootstrapper = scope.ServiceProvider.GetRequiredService<ManagementBootstrapper>();
     await bootstrapper.InitializeAsync(CancellationToken.None);
+
+    // Yönetim store'u yukarıda hazırlanır; Walk to Win ilişkileri o store'a yazılır.
+    var walkToWinBootstrapper = scope.ServiceProvider.GetRequiredService<WalkToWinBootstrapper>();
+    await walkToWinBootstrapper.InitializeAsync(CancellationToken.None);
 }
 
 app.Run();

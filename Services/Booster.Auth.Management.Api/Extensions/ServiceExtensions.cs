@@ -27,6 +27,7 @@ public static class ServiceExtensions
         services.AddHashing(hashingOptions);
 
         services.AddScoped<ManagementBootstrapper>();
+        services.AddScoped<WalkToWinBootstrapper>();
         services.AddScoped<IClientDataCacheStore, ClientDataCacheStore>();
         services.AddScoped<IAccessManager, AccessManager>();
         services.AddScoped<IPrincipalLookupManager, PrincipalLookupManager>();

@@ -23,6 +23,9 @@ using (var scope = app.Services.CreateScope())
 {
     var bootstrapper = scope.ServiceProvider.GetRequiredService<ManagementBootstrapper>();
     await bootstrapper.InitializeAsync(CancellationToken.None);
+
+    var walkToWinBootstrapper = scope.ServiceProvider.GetRequiredService<WalkToWinBootstrapper>();
+    await walkToWinBootstrapper.InitializeAsync(CancellationToken.None);
 }
 
 app.Run();

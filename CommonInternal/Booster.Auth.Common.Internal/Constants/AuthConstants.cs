@@ -38,6 +38,30 @@ public static class AuthConstants
     /// <summary>Yönetim arayüzüne erişim izni. Havuzda tanımlı olmak zorundadır.</summary>
     public const string ManagementPanelScope = "booster:panel";
 
+    // --- WalkToWin mobil uygulaması ------------------------
+    // Yönetim kurulumuyla aynı desen: sabit kimlikler, idempotent bootstrapper'lar.
+
+    public static readonly Guid WalkToWinTenantId = Guid.Parse("00000000-0000-0000-0000-000000000101");
+
+    public static readonly Guid WalkToWinPoolId = Guid.Parse("00000000-0000-0000-0000-000000000102");
+
+    /// <summary>Mobil uygulamanın public OAuth client kaydı (client secret yok, PKCE zorunlu).</summary>
+    public static readonly Guid WalkToWinClientId = Guid.Parse("00000000-0000-0000-0000-000000000103");
+
+    /// <summary>Kendi kendine kayıt olan her oyuncuya varsayılan atanan rol.</summary>
+    public static readonly Guid WalkToWinPlayerRoleId = Guid.Parse("00000000-0000-0000-0000-000000000104");
+
+    public const string WalkToWinTenantName = "WalkToWin";
+    public const string WalkToWinPoolName = "WalkToWin Players";
+    public const string WalkToWinClientKey = "walk-to-win";
+    public const string WalkToWinClientName = "WalkToWin Mobile";
+
+    public const string WalkToWinPlayerRoleName = "player";
+    public const string WalkToWinPlayerRoleDisplayName = "Oyuncu";
+
+    /// <summary>Mobil uygulamada av başlatma / oynama izni.</summary>
+    public const string WalkToWinPlayScope = "walktowin:play";
+
     // --- Resource tipleri --------------------------------------------------
 
     public const string UserPrefix = "user";
