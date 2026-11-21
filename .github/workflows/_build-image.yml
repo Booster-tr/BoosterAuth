@@ -88,7 +88,10 @@ jobs:
           # Katman onbellegi image basina ayri; degismeyen katmanlar (base, NuGet) yeniden
           # build/yuklenmez. Yalnizca yayinlar onbellege yazar.
           cache-from: type=gha,scope=${{ inputs.image }}
-          cache-to: ${{ env.RELEASE == 'true' && format('type=gha,scope={0},mode=max', inputs.image) || '' }}
+          # ignore-error: merge edilen PR'in "closed" olayinda GitHub cache'e yazma izni vermiyor
+          # ("token has no writable scopes"); yazma hatasi yayini dusurmesin. Okuma master'daki
+          # onbellekten (push/workflow_dispatch calismalarinin yazdigi) devam eder.
+          cache-to: ${{ env.RELEASE == 'true' && format('type=gha,scope={0},mode=max,ignore-error=true', inputs.image) || '' }}
 
       # --- CD: GitOps reposunda image etiketini guncelle ---------------------
       # Cluster'a dogrudan dokunmaz; yalnizca booster-gitops'a commit atar,
