@@ -17,7 +17,6 @@ builder.Services.AddAuthZServices(builder.Configuration);
 builder.Services.AddBoosterApi(builder.Configuration);
 
 builder.Services.AddGrpc();
-builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -26,8 +25,6 @@ app.UseBoosterMessaging();
 app.UseBoosterApi(wrapResponses: true);
 
 app.MapGrpcService<AuthorizationGrpcService>();
-
-app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
