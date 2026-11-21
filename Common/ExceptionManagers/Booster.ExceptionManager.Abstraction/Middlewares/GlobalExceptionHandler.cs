@@ -24,7 +24,10 @@ public class GlobalExceptionHandler : IExceptionHandler
         var translationService = scope.GetRequiredService<ITranslationManager>();
 
         var logWriter = scope.GetService<ILogWriter>();
-        var correlationId = httpContext.Request.Headers[HeaderConstants.CorrelationIdHeaderName].ToString() ?? "unknown";
+        // CorrelationMiddleware id'yi bu başlığa yazar; ondan önce patlayan istekte başlık yoktur.
+        var correlationId = httpContext.Request.Headers[HeaderConstants.CorrelationIdHeaderName].ToString();
+        if (string.IsNullOrEmpty(correlationId))
+            correlationId = "unknown";
         
         var langHeader = httpContext.Request.Headers.AcceptLanguage.FirstOrDefault() ?? "tr-tr";
         langHeader = langHeader.Length > 5 ? langHeader[..5].ToLowerInvariant() : langHeader.ToLowerInvariant();

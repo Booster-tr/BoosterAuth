@@ -1,5 +1,4 @@
 ﻿using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
-using Booster.Amqp.Contexts;
 using Booster.Auth.Idp.Options;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
@@ -18,12 +17,19 @@ namespace Booster.Auth.Idp.Managers.ExceptionManagers;
 public sealed class IdpExceptionHandler(
     IdpUiOptions uiOptions) : IExceptionHandler
 {
-    private ITranslationManager translationManager = null!;
-    private ILogWriter? logWriter;
-    private ICorrelationContext? correlationContext;
-
-    /// <summary>WriteProblemAsync log yazarken istisnaya erisebilsin diye tutulur.</summary>
-    private Exception? CurrentException;
+    /// <summary>
+    /// Tek bir hatanin islenmesi icin gereken her sey.
+    /// <para>
+    /// Isleyici SINGLETON'dir; bunlar alanda tutulsaydi ayni anda gelen iki hata
+    /// birbirinin ceviri servisini, log yazicisini ve istisnasini ezerdi (yanlis log).
+    /// </para>
+    /// </summary>
+    private readonly record struct ErrorContext(
+        HttpContext Http,
+        Exception Exception,
+        ITranslationManager Translator,
+        ILogWriter? LogWriter,
+        string Lang);
 
     /// <summary>Log kaydinda hatanin hangi servisten geldigi gorunsun diye.</summary>
     private static readonly string ServiceName =
@@ -33,13 +39,11 @@ public sealed class IdpExceptionHandler(
     {
         var lang = ResolveLang(httpContext);
         var scope = httpContext.RequestServices;
-        translationManager = scope.GetRequiredService<ITranslationManager>();
+        var translationManager = scope.GetRequiredService<ITranslationManager>();
 
         // GetService, GetRequiredService DEGIL: AMQP logger kayitli degilse
         // hata isleyicinin kendisi patlamamali — o an zaten bir hata isleniyor.
-        logWriter = scope.GetService<ILogWriter>();
-        correlationContext = scope.GetService<ICorrelationContext>();
-        CurrentException = exception;
+        var error = new ErrorContext(httpContext, exception, translationManager, scope.GetService<ILogWriter>(), lang);
 
         switch (exception)
         {
@@ -47,7 +51,7 @@ public sealed class IdpExceptionHandler(
                 {
                     // Protokol hatası: istemciye yönlendirmeyle bildirilir, ama
                     // bir arıza olmadığı için uyarı seviyesinde kayda geçer.
-                    await LogAsync(httpContext, exception, LogLevel.Warning, ex.Error, StatusCodes.Status302Found, ct);
+                    await LogAsync(error, LogLevel.Warning, ex.Error, StatusCodes.Status302Found, ct);
 
                     var builder = new UriBuilder(ex.RedirectUri);
                     var query = $"error={Uri.EscapeDataString(ex.Error)}";
@@ -65,7 +69,7 @@ public sealed class IdpExceptionHandler(
                     var msg = string.IsNullOrEmpty(ex.Description)
                         ? await translationManager.GetAsync(ex.ErrorKey, lang, ct)
                         : ex.Description;
-                    await LogAsync(httpContext, exception, LogLevel.Warning, ex.ErrorKey, StatusCodes.Status302Found, ct);
+                    await LogAsync(error, LogLevel.Warning, ex.ErrorKey, StatusCodes.Status302Found, ct);
                     httpContext.Response.Redirect(uiOptions.GetErrorUrl(ex.ErrorKey, msg));
                     return true;
                 }
@@ -78,30 +82,30 @@ public sealed class IdpExceptionHandler(
                         property = e.PropertyName,
                         message = await translationManager.GetAsync(e.ErrorMessage, lang, ct)
                     }));
-                    await WriteProblemAsync(httpContext, StatusCodes.Status400BadRequest,
+                    await WriteProblemAsync(error, StatusCodes.Status400BadRequest,
                         await translationManager.GetAsync(ValidationErrors.ValidationError, lang, ct),
-                        lang, ct, errors);
+                        ct, errors);
                     return true;
                 }
 
             case ForbiddenException fEx:
                 {
-                    await WriteProblemAsync(httpContext, StatusCodes.Status403Forbidden,
-                        await translationManager.GetAsync(fEx.Message, lang, ct), lang, ct);
+                    await WriteProblemAsync(error, StatusCodes.Status403Forbidden,
+                        await translationManager.GetAsync(fEx.Message, lang, ct), ct);
                     return true;
                 }
 
             case BusinessException bEx:
                 {
-                    await WriteProblemAsync(httpContext, StatusCodes.Status400BadRequest,
-                        await translationManager.GetAsync(bEx.Message, lang, ct), lang, ct);
+                    await WriteProblemAsync(error, StatusCodes.Status400BadRequest,
+                        await translationManager.GetAsync(bEx.Message, lang, ct), ct);
                     return true;
                 }
 
             default:
                 {
-                    await WriteProblemAsync(httpContext, StatusCodes.Status500InternalServerError,
-                        await translationManager.GetAsync(ValidationErrors.InternalServerError, lang, ct), lang, ct);
+                    await WriteProblemAsync(error, StatusCodes.Status500InternalServerError,
+                        await translationManager.GetAsync(ValidationErrors.InternalServerError, lang, ct), ct);
                     return true;
                 }
         }
@@ -114,30 +118,35 @@ public sealed class IdpExceptionHandler(
     /// yazılsalardı doğrulama hataları gerçek arızaları gürültüye boğardı.
     /// </para>
     /// </summary>
-    private async Task LogAsync(
-        HttpContext ctx, Exception exception, LogLevel level, string detail, int status, CancellationToken ct)
+    private static async Task LogAsync(
+        ErrorContext e, LogLevel level, string detail, int status, CancellationToken ct)
     {
-        if (logWriter is null)
+        if (e.LogWriter is null)
             return;
+
+        var ctx = e.Http;
 
         var properties = new Dictionary<string, string?>
         {
-            ["CorrelationId"] = correlationContext?.CorrelationId,
+            // CorrelationMiddleware id'yi istek basligina yazar; isleyici o ara katmanin
+            // disinda calistigi icin AsyncLocal degerini goremez, basliktan okur.
+            ["CorrelationId"] = ctx.Request.Headers[HeaderConstants.CorrelationIdHeaderName].ToString(),
             ["IpAddress"] = ctx.Connection.RemoteIpAddress?.ToString(),
             ["ServiceName"] = ServiceName,
             ["Path"] = ctx.Request.Path,
             ["StatusCode"] = status.ToString()
         };
 
-        await logWriter.LogAsync(level, detail, level >= LogLevel.Error ? exception : null, properties, ct);
+        await e.LogWriter.LogAsync(level, detail, level >= LogLevel.Error ? e.Exception : null, properties, ct);
     }
 
-    private async Task WriteProblemAsync(
-        HttpContext ctx, int status, string detail, string lang, CancellationToken ct, object? errors = null)
+    private static async Task WriteProblemAsync(
+        ErrorContext e, int status, string detail, CancellationToken ct, object? errors = null)
     {
+        var ctx = e.Http;
+
         await LogAsync(
-            ctx,
-            CurrentException!,
+            e,
             status == StatusCodes.Status500InternalServerError ? LogLevel.Error : LogLevel.Warning,
             detail,
             status,
@@ -146,7 +155,7 @@ public sealed class IdpExceptionHandler(
         var problem = new ProblemDetails
         {
             Status = status,
-            Title = await translationManager.GetAsync(ValidationErrors.ProblemTitle, lang, ct),
+            Title = await e.Translator.GetAsync(ValidationErrors.ProblemTitle, e.Lang, ct),
             Detail = detail,
             Instance = ctx.Request.Path
         };
