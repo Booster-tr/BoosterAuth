@@ -42,6 +42,7 @@ public static class ServiceExtensions
         services.AddSingleton<IInterceptor, IsolationInterceptor>();
 
         services.AddPostgresDbContext<TContext>(postgresSettings);
+        services.AddScoped<IDatabaseMigrator, DatabaseMigrator<TContext>>();
         services.AddScoped(typeof(IAsyncRepository<,>), typeof(RepositoryBase<,>));
 
         services.TryAddSingleton<IRequestContextAccessor, RequestContextAccessor>();
@@ -57,6 +58,16 @@ public static class ServiceExtensions
     {
         app.UseBoosterExceptionHandler();
         app.UseHttpsRedirection();
+
+        // Bootstrapper'lar Program.cs'te bu çağrıdan SONRA çalışır; şemanın
+        // onlardan önce hazır olması gerekir.
+        if (app.Services.GetService<PostgresSettings>() is { ApplyMigration: true })
+        {
+            using var scope = app.Services.CreateScope();
+            scope.ServiceProvider.GetService<IDatabaseMigrator>()
+                ?.MigrateAsync(app.Lifetime.ApplicationStopping)
+                .GetAwaiter().GetResult();
+        }
 
         return app;
     }

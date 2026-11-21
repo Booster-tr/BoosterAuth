@@ -1,6 +1,7 @@
 **/.classpath
 **/.dockerignore
 **/.env
+**/.env.*
 **/.git
 **/.gitignore
 **/.project
@@ -8,7 +9,9 @@
 **/.toolstarget
 **/.vs
 **/.vscode
+**/.idea
 **/*.*proj.user
+**/*.user
 **/*.dbmdl
 **/*.jfm
 **/azds.yaml
@@ -23,8 +26,20 @@
 **/values.dev.yaml
 LICENSE
 README.md
-!**/.gitignore
-!.git/HEAD
-!.git/config
-!.git/packed-refs
-!.git/refs/heads/**
+
+# --- Secret'lar ve geliştirme ayarları ASLA image'a girmez ---
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/keys
+**/secrets
+**/*.pem
+**/*.key
+**/*.pfx
+**/*.p12
+**/*.crt
+# Çalışma anında yüklenen logolar (volume'dan gelir)
+**/wwwroot/client-logos/*
+
+# docker/ klasöründen yalnızca entrypoint gerekir
+docker/*
+!docker/entrypoint.sh
