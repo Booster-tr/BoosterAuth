@@ -1,6 +1,5 @@
 using Booster.Database.Repositories;
 using Booster.Auth.Common.Internal.EntityExtensions;
-using Booster.Amqp.Contexts;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using Booster.Logging.BoosterAmqp;
 using Booster.LoggingService.Features._base;
@@ -14,8 +13,7 @@ namespace Booster.LoggingService.Amqp.Consumers;
 /// MassTransit kurulumunda <c>AddLogConsumer</c> / <c>AddLogConsumerEndpoint</c> ile yapılır.
 /// </summary>
 public sealed class LogPersistConsumer(
-    IAsyncRepository<Log, LoggerDbContext> repository,
-    ICorrelationContext correlationContext)
+    IAsyncRepository<Log, LoggerDbContext> repository)
     : LogEventConsumer
 {
     protected override async Task HandleAsync(LogCreateEvent log, CancellationToken cancellationToken)
@@ -33,7 +31,9 @@ public sealed class LogPersistConsumer(
             UserId = GetGuid(props, "UserId"),
             IpAddress = GetString(props, "IpAddress") ?? "unknown",
             ServiceName = GetString(props, "ServiceName") ?? string.Empty,
-            CorrelationId = correlationContext.CorrelationId
+            // Id olayın kendisinden okunur: bu servisin correlation context'i logu üreten
+            // isteği bilmez (ayrı süreç); oradan okunsaydı kayıtlar hep boş id ile düşerdi.
+            CorrelationId = GetString(props, "CorrelationId")
         };
         entity.SetId();
 
