@@ -1,4 +1,5 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.7-labs
+# (1.7-labs: "COPY --parents" icin; csproj'lari klasor yapisini koruyarak kopyalar)
 #
 # Booster.Auth içindeki tüm ASP.NET servisleri için ortak, parametrik Dockerfile.
 # Build context: repo kökü (Booster.Auth/).
@@ -19,16 +20,20 @@ FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build
 ARG PROJECT
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-COPY . .
-
 RUN test -n "${PROJECT}" || (echo "PROJECT build-arg zorunlu" >&2; exit 1)
 
-RUN --mount=type=cache,id=booster-nuget,target=/root/.nuget/packages \
-    dotnet restore "${PROJECT}"
+# 1) Yalnizca proje dosyalari -> restore.
+#    Bu katman yalnizca bir .csproj degisince yeniden olusur; kod degisikliklerinde
+#    NuGet paketleri onbellekten gelir (CI'da ~15 sn restore + buyuk cache yuklemesi kazanilir).
+#    Paketler katmanin ICINDE tutulur (cache mount degil): CI onbellegi yalnizca
+#    katmanlari tasir, cache mount'lari tasimaz.
+ENV NUGET_PACKAGES=/nuget/packages
+COPY --parents **/*.csproj ./
+RUN dotnet restore "${PROJECT}"
 
-RUN --mount=type=cache,id=booster-nuget,target=/root/.nuget/packages \
-    dotnet publish "${PROJECT}" \
+# 2) Kodun tamami -> publish (restore tekrarlanmaz).
+COPY . .
+RUN dotnet publish "${PROJECT}" \
       -c "${BUILD_CONFIGURATION}" \
       -o /app/publish \
       --no-restore \
@@ -47,7 +52,9 @@ LABEL org.opencontainers.image.title="${APP_NAME}" \
       org.opencontainers.image.revision="${REVISION}" \
       org.opencontainers.image.vendor="Booster"
 
+# BUILD_REVISION: image'in uretildigi commit; servislerin GET /version cevabinda "build".
 ENV APP_DLL="${APP_NAME}.dll" \
+    BUILD_REVISION="${REVISION}" \
     ASPNETCORE_ENVIRONMENT=Production \
     ASPNETCORE_HTTP_PORTS=8080 \
     DOTNET_NOLOGO=1 \

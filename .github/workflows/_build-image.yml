@@ -2,9 +2,16 @@
 # workflow'lari (gateway.yml, idp.yml, ...) bunu "uses:" ile cagirir.
 #
 #   push (master)  -> build + GHCR push:  ghcr.io/<owner>/<image>:sha-<kisa-sha> ve :latest
-#                     -> deploy: booster-gitops'ta bu image'in etiketini sha-<kisa-sha> yapar;
-#                        ArgoCD degisikligi gorup (~3 dk) yeni surumu canliya alir.
+#                  -> deploy: booster-gitops'ta bu image'in etiketini sha-<kisa-sha> yapar;
+#                     ArgoCD degisikligi gorup (~3 dk) yeni surumu canliya alir.
 #   pull request   -> yalnizca build (push yok, deploy yok)
+#
+# Kota notlari:
+#   - Build ve deploy AYNI job'da: GitHub her job'i dakikaya yukari yuvarlayarak
+#     faturalar; ayri bir deploy job'i her seferinde +1 dakika demekti.
+#   - Dockerfile once yalnizca .csproj'lari kopyalayip restore eder; kod
+#     degisikliklerinde NuGet katmani onbellekten gelir.
+#   - timeout-minutes: takilan bir build varsayilan 6 saat boyunca dakika yemesin.
 name: _build-image
 
 on:
@@ -23,10 +30,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # Ayni servis icin arka arkaya push gelirse eskisi iptal edilir (bosa dakika harcanmaz).
     concurrency:
       group: ${{ inputs.image }}-${{ github.ref }}
       cancel-in-progress: true
+    env:
+      # Deploy yalnizca varsayilan branch'e push'ta
+      DEPLOY: ${{ github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
     steps:
       - uses: actions/checkout@v4
 
@@ -67,36 +78,32 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Katman onbellegi image basina ayri; degismeyen katmanlar yeniden build edilmez.
+          # Katman onbellegi image basina ayri; degismeyen katmanlar (base, NuGet) yeniden
+          # build/yuklenmez. PR'lar onbellegi okur ama yazmaz (master'in onbellegi korunur).
           cache-from: type=gha,scope=${{ inputs.image }}
-          cache-to: type=gha,scope=${{ inputs.image }},mode=max
+          cache-to: ${{ github.event_name != 'pull_request' && format('type=gha,scope={0},mode=max', inputs.image) || '' }}
 
-  # --- CD: GitOps reposunda image etiketini guncelle -------------------------
-  # Yalnizca master'a push'ta ve build basariliysa calisir. Cluster'a dogrudan
-  # dokunmaz; yalnizca booster-gitops'a commit atar, gerisini ArgoCD yapar.
-  deploy:
-    needs: build
-    if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
-    runs-on: ubuntu-latest
-    # Not: "concurrency" grubu KULLANILMIYOR; GitHub grupta yalnizca bir bekleyen
-    # job tutar, fazlasini iptal eder (7 servis ayni anda deploy ederken bazilari
-    # atlanirdi). Her servis farkli dosyaya yazar; ayni anda gelen push'lari
-    # asagidaki "pull --rebase + tekrar dene" dongusu cozer.
-    steps:
-      - uses: actions/checkout@v4
+      # --- CD: GitOps reposunda image etiketini guncelle ---------------------
+      # Cluster'a dogrudan dokunmaz; yalnizca booster-gitops'a commit atar,
+      # gerisini ArgoCD yapar. Her servis farkli dosyaya yazar; ayni anda gelen
+      # push'lari "pull --rebase + tekrar dene" dongusu cozer.
+      - name: GitOps reposunu al
+        if: env.DEPLOY == 'true'
+        uses: actions/checkout@v4
         with:
           repository: Booster-tr/booster-gitops
           ssh-key: ${{ secrets.GITOPS_DEPLOY_KEY }}
-          path: gitops
+          path: .gitops
 
       - name: Etiketi guncelle ve push et
-        working-directory: gitops
+        if: env.DEPLOY == 'true'
+        working-directory: .gitops
         env:
-          IMAGE: ${{ inputs.image }}
+          IMAGE_NAME: ${{ inputs.image }}
           GITOPS_PATH: ${{ inputs.gitops-path }}
         run: |
           set -euo pipefail
-          IMG="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${IMAGE}"
+          IMG="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${IMAGE_NAME}"
           TAG="sha-${GITHUB_SHA::7}"
 
           # Bu image'i kullanan manifestler (ör. idp.yaml: initContainer + container)
@@ -115,11 +122,10 @@ jobs:
 
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "deploy(${GITOPS_PATH#envs/}): ${IMAGE} -> ${TAG}" \
+          git commit -am "deploy(${GITOPS_PATH#envs/}): ${IMAGE_NAME} -> ${TAG}" \
             -m "Kaynak: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}" \
             -m "Calisma: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
-          # Baska bir repo (ör. panel) ayni anda push ettiyse: guncelini al, tekrar dene.
           for i in 1 2 3 4 5; do
             git push && exit 0
             echo "push reddedildi, yeniden deneniyor ($i)"
