@@ -32,6 +32,7 @@ public sealed class ManagementBootstrapper(
         if (existing is not null)
         {
             await FillLegacyDefinitionAsync(existing, ct);
+            await EnsureAdminEndUserAsync(existing.StoreId, ct);
             return;
         }
 
@@ -55,7 +56,9 @@ public sealed class ManagementBootstrapper(
                 new TupleInput(
                     AuthConstants.Pool(AuthConstants.ManagementPoolId),
                     AuthConstants.ParentRelation,
-                    AuthConstants.Client(AuthConstants.ManagementClientId))
+                    AuthConstants.Client(AuthConstants.ManagementClientId)),
+
+                AdminEndUser
             ],
             ct);
 
@@ -76,6 +79,29 @@ public sealed class ManagementBootstrapper(
         await schemaRepository.SaveChangesAsync(ct);
 
         await poolStoreProvider.RemoveCacheAsync(AuthConstants.ManagementPoolId, ct);
+    }
+
+    /// <summary>
+    /// Admin'in yönetim havuzundaki "end_user" ilişkisi.
+    /// <para>
+    /// Kayıt akışı (RegisterHandler) bunu her yeni kullanıcı için yazar; bootstrap ile
+    /// oluşan admin kayıttan geçmediği için yazılmıyordu. Yönetim API'sindeki
+    /// "pool#end_user" kontrolü (ör. tenant oluşturma) bu yüzden admin'e 403 dönüyordu.
+    /// </para>
+    /// </summary>
+    private static TupleInput AdminEndUser => new(
+        AuthConstants.User(AuthConstants.AdminUserId),
+        AuthConstants.EndUserRelation,
+        AuthConstants.Pool(AuthConstants.ManagementPoolId));
+
+    /// <summary>Daha önce kurulmuş store'larda eksikse ekler (her açılışta; varsa dokunmaz).</summary>
+    private async Task EnsureAdminEndUserAsync(string storeId, CancellationToken ct)
+    {
+        var tuple = AdminEndUser;
+        var found = await relationManager.ReadAsync(storeId, tuple.User, tuple.Relation, tuple.Object, ct);
+
+        if (found.Count == 0)
+            await relationManager.WriteAsync(storeId, tuple.User, tuple.Relation, tuple.Object, ct);
     }
 
     /// <summary>
