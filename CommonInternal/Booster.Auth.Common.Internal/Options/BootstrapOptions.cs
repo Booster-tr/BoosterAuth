@@ -5,6 +5,13 @@ public class BootstrapOptions
 {
     public string AdminPassword { get; set; } = default!;
 
+    /// <summary>
+    /// Ilk kurulumda olusan admin'in e-postasi. 2FA (e-posta kodu) acilacaksa GERCEK bir
+    /// posta kutusu olmali; yoksa kod ulasmaz ve admin kilitlenir. Bos: admin@booster.local.
+    /// Yalnizca ilk kurulumda kullanilir; mevcut admin'in e-postasini degistirmez.
+    /// </summary>
+    public string? AdminEmail { get; set; }
+
     public string ManagementClientRedirectUri { get; set; } = default!;
 
     public string ManagementClientPostLogoutRedirectUri { get; set; } = default!;
