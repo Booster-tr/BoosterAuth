@@ -1,17 +1,17 @@
 # Ortak build + deploy adimlari (reusable workflow). Tek basina tetiklenmez; servis
 # workflow'lari (gateway.yml, idp.yml, ...) bunu "uses:" ile cagirir.
 #
-#   push (master)  -> build + GHCR push:  ghcr.io/<owner>/<image>:sha-<kisa-sha> ve :latest
-#                  -> deploy: booster-gitops'ta bu image'in etiketini sha-<kisa-sha> yapar;
-#                     ArgoCD degisikligi gorup (~3 dk) yeni surumu canliya alir.
-#   pull request   -> yalnizca build (push yok, deploy yok)
+# YAYIN YALNIZCA MERGE EDILEN PR ILE OLUR (master'a dogrudan push hicbir sey tetiklemez):
+#   PR acildi / guncellendi  -> yalnizca build (kontrol; push yok, deploy yok)
+#   PR merge edildi          -> build + GHCR push (sha-<merge-commit>, latest)
+#                               + booster-gitops'ta etiket guncellenir -> ArgoCD canliya alir
+#   workflow_dispatch        -> varsayilan branch'ten elle yayin (acil durum)
 #
 # Kota notlari:
-#   - Build ve deploy AYNI job'da: GitHub her job'i dakikaya yukari yuvarlayarak
-#     faturalar; ayri bir deploy job'i her seferinde +1 dakika demekti.
+#   - Build ve deploy AYNI job'da (her job dakikaya yukari yuvarlanarak faturalanir).
 #   - Dockerfile once yalnizca .csproj'lari kopyalayip restore eder; kod
 #     degisikliklerinde NuGet katmani onbellekten gelir.
-#   - timeout-minutes: takilan bir build varsayilan 6 saat boyunca dakika yemesin.
+#   - PR build'leri onbellegi okur ama yazmaz; timeout 15 dk.
 name: _build-image
 
 on:
@@ -31,39 +31,46 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # Ayni servis icin arka arkaya push gelirse eskisi iptal edilir (bosa dakika harcanmaz).
-    concurrency:
-      group: ${{ inputs.image }}-${{ github.ref }}
-      cancel-in-progress: true
     env:
-      # Deploy yalnizca varsayilan branch'e push'ta
-      DEPLOY: ${{ github.event_name == 'push' && github.ref_name == github.event.repository.default_branch }}
+      # Yayin mi? (merge edilen PR veya varsayilan branch'ten elle calistirma)
+      RELEASE: ${{ (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged) || (github.event_name == 'workflow_dispatch' && github.ref_name == github.event.repository.default_branch) }}
+      # Image'a girecek kod: merge edilen PR'da merge commit'i, digerlerinde tetikleyen commit.
+      SOURCE_SHA: ${{ github.event.pull_request.merged && github.event.pull_request.merge_commit_sha || github.sha }}
+    # Ayni PR'a arka arkaya push gelirse eski kontrol iptal edilir. Yayinlar ayri grupta;
+    # art arda iki merge'de eskisi iptal edilir (yenisi her iki degisikligi de icerir).
+    concurrency:
+      group: ${{ inputs.image }}-${{ github.event.pull_request.merged && 'release' || github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
 
       # GHCR image adlari kucuk harf olmak zorunda (Booster-tr -> booster-tr)
       - name: Image adi
-        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ inputs.image }}" >> "$GITHUB_ENV"
+        run: |
+          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${{ inputs.image }}" >> "$GITHUB_ENV"
+          echo "TAG=sha-${SOURCE_SHA::7}" >> "$GITHUB_ENV"
 
       - uses: docker/setup-buildx-action@v3
 
       - name: GHCR girisi
-        if: github.event_name != 'pull_request'
+        if: env.RELEASE == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # sha-<kisa-sha>: degismez, GitOps bunu kullanir. latest: yalnizca master.
+      # sha-<kisa-sha>: degismez, GitOps bunu kullanir. latest: yalnizca yayinda.
       - name: Etiketler
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
           tags: |
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ env.TAG }}
+            type=raw,value=latest,enable=${{ env.RELEASE }}
 
       - name: Build ve push
         uses: docker/build-push-action@v6
@@ -73,22 +80,22 @@ jobs:
           build-args: |
             PROJECT=${{ inputs.project }}
             APP_NAME=${{ inputs.app }}
-            VERSION=sha-${{ github.sha }}
-            REVISION=${{ github.sha }}
-          push: ${{ github.event_name != 'pull_request' }}
+            VERSION=${{ env.TAG }}
+            REVISION=${{ env.SOURCE_SHA }}
+          push: ${{ env.RELEASE == 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # Katman onbellegi image basina ayri; degismeyen katmanlar (base, NuGet) yeniden
-          # build/yuklenmez. PR'lar onbellegi okur ama yazmaz (master'in onbellegi korunur).
+          # build/yuklenmez. Yalnizca yayinlar onbellege yazar.
           cache-from: type=gha,scope=${{ inputs.image }}
-          cache-to: ${{ github.event_name != 'pull_request' && format('type=gha,scope={0},mode=max', inputs.image) || '' }}
+          cache-to: ${{ env.RELEASE == 'true' && format('type=gha,scope={0},mode=max', inputs.image) || '' }}
 
       # --- CD: GitOps reposunda image etiketini guncelle ---------------------
       # Cluster'a dogrudan dokunmaz; yalnizca booster-gitops'a commit atar,
       # gerisini ArgoCD yapar. Her servis farkli dosyaya yazar; ayni anda gelen
       # push'lari "pull --rebase + tekrar dene" dongusu cozer.
       - name: GitOps reposunu al
-        if: env.DEPLOY == 'true'
+        if: env.RELEASE == 'true'
         uses: actions/checkout@v4
         with:
           repository: Booster-tr/booster-gitops
@@ -96,15 +103,15 @@ jobs:
           path: .gitops
 
       - name: Etiketi guncelle ve push et
-        if: env.DEPLOY == 'true'
+        if: env.RELEASE == 'true'
         working-directory: .gitops
         env:
           IMAGE_NAME: ${{ inputs.image }}
           GITOPS_PATH: ${{ inputs.gitops-path }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           IMG="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${IMAGE_NAME}"
-          TAG="sha-${GITHUB_SHA::7}"
 
           # Bu image'i kullanan manifestler (ör. idp.yaml: initContainer + container)
           FILES=$(grep -rlF "image: ${IMG}:" "$GITOPS_PATH" || true)
@@ -123,7 +130,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "deploy(${GITOPS_PATH#envs/}): ${IMAGE_NAME} -> ${TAG}" \
-            -m "Kaynak: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}" \
+            -m "Kaynak: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${SOURCE_SHA}${PR_NUMBER:+ (PR #${PR_NUMBER})}" \
             -m "Calisma: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
 
           for i in 1 2 3 4 5; do

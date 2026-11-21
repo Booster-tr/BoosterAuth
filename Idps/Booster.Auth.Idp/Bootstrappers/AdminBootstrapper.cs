@@ -42,7 +42,9 @@ public sealed class AdminBootstrapper(
             Status = PrincipalStatus.Active,
             DisplayName = AuthConstants.AdminDisplayName,
             UserName = AuthConstants.AdminUserName,
-            Email = AuthConstants.AdminEmail,
+            Email = string.IsNullOrWhiteSpace(bootstrapOptions.AdminEmail)
+                ? AuthConstants.AdminEmail
+                : bootstrapOptions.AdminEmail.Trim(),
             EmailVerified = true,
             CreatedTime = now
         };
