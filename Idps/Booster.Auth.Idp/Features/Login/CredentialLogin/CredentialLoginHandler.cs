@@ -1,6 +1,7 @@
 ﻿using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
+using Booster.Auth.Idp.Features.Password.ForcedChange;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Managers.LoginChallengeManagers;
 using Booster.Auth.Idp.Providers.Abstractions;
@@ -36,6 +37,7 @@ public sealed class CredentialLoginHandler(
     ILoginChallengeManager loginChallengeManager,
     IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
     ICacheService cacheService,
+    ISecureCacheStore<ForcedPasswordChangeData> forcedChangeStore,
     IRequestContextAccessor requestContextAccessor) : ICommandHandler<CredentialLoginCommand, CredentialLoginResult>
 {
     public async Task<CredentialLoginResult> ExecuteAsync(CredentialLoginCommand cmd, CancellationToken ct)
@@ -74,6 +76,22 @@ public sealed class CredentialLoginHandler(
         }
 
         await HandleSuccessfulAuthAsync(user, cmd.Password, ct);
+
+        // Parola dogru ama degistirilmesi zorunlu (ör. ilk kurulumdaki admin): oturum
+        // ACILMAZ. Kullanici yeni parolayi belirleyince giris oradan devam eder.
+        if (user.MustChangePassword)
+        {
+            await forcedChangeStore.StoreAsync(cmd.InteractionKey, new ForcedPasswordChangeData
+            {
+                PrincipalId = user.Id,
+                IsolationId = client.IsolationId,
+                ClientKey = interaction.ClientKey,
+                AuthMethod = cmd.ProviderType,
+                ExpiresAt = DateTimeOffset.UtcNow.Add(ForcedPasswordChangeData.Ttl)
+            }, ForcedPasswordChangeData.Ttl, ct);
+
+            return new CredentialLoginResult { RequiresPasswordChange = true };
+        }
 
         // Parola doğru; oturum ancak havuzun istediği doğrulama/MFA adımları
         // bittiğinde açılır. Adım yoksa oturum burada açılır.
@@ -147,7 +165,10 @@ public sealed class CredentialLoginResult
     public string? SessionToken { get; init; }
     public DateTimeOffset? ExpiresAt { get; init; }
 
-    public bool RequiresChallenge => SessionToken is null;
+    /// <summary>Parola dogru fakat degistirilmesi zorunlu; kullanici parola degistirme ekranina gider.</summary>
+    public bool RequiresPasswordChange { get; init; }
+
+    public bool RequiresChallenge => SessionToken is null && !RequiresPasswordChange;
 }
 
 public sealed class CredentialLoginValidator : Validator<CredentialLoginCommand>

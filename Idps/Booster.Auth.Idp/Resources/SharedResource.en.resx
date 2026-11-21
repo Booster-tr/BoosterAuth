@@ -292,6 +292,36 @@
   <data name="Reset.BrandLead" xml:space="preserve">
     <value>The code only works in this browser. You may not be able to reuse an earlier password; your organisation policy decides.</value>
   </data>
+  <data name="ChangePw.PageTitle" xml:space="preserve">
+    <value>Change your password</value>
+  </data>
+  <data name="ChangePw.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} errors – Change your password</value>
+  </data>
+  <data name="ChangePw.Heading" xml:space="preserve">
+    <value>You need to change your password</value>
+  </data>
+  <data name="ChangePw.Subtitle" xml:space="preserve">
+    <value>Set a new password for your account before you continue.</value>
+  </data>
+  <data name="ChangePw.NewPassword" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="ChangePw.NewPasswordConfirm" xml:space="preserve">
+    <value>New password (again)</value>
+  </data>
+  <data name="ChangePw.Submit" xml:space="preserve">
+    <value>Change password and continue</value>
+  </data>
+  <data name="ChangePw.Busy" xml:space="preserve">
+    <value>Saving…</value>
+  </data>
+  <data name="ChangePw.BrandHeadline" xml:space="preserve">
+    <value>A new password for your security.</value>
+  </data>
+  <data name="ChangePw.BrandLead" xml:space="preserve">
+    <value>Your account password is marked to be changed at first sign-in. You may not be able to reuse previous passwords; your organization's policy decides.</value>
+  </data>
   <data name="Consent.PageTitle" xml:space="preserve">
     <value>Grant access</value>
   </data>

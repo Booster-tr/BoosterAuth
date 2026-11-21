@@ -26,6 +26,10 @@ public class IdpUiOptions
     public string ExternalConflictPath { get; set; } = "/ui/external/conflict";
     public string ResetPasswordPath { get; set; } = "/reset-password";
     public string LoginChallengePath { get; set; } = "/ui/login/verify";
+    public string ChangePasswordPath { get; set; } = "/ui/change-password";
+
+    public string GetChangePasswordUrl(string interactionKey) =>
+        Local($"{ChangePasswordPath}?interaction_key={Uri.EscapeDataString(interactionKey)}");
 
     public string GetLoginChallengeUrl(string interactionKey) =>
         Local($"{LoginChallengePath}?interaction_key={Uri.EscapeDataString(interactionKey)}");

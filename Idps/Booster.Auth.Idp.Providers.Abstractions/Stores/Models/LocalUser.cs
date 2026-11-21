@@ -30,6 +30,9 @@ public sealed record LocalUser
 
     public DateTimeOffset? LockedUntil { get; init; }
 
+    /// <summary>Bir sonraki giriste parolanin degistirilmesi zorunlu (ör. bootstrap admin).</summary>
+    public bool MustChangePassword { get; init; }
+
     public IReadOnlyDictionary<string, string> Claims { get; init; }
         = new Dictionary<string, string>();
 }

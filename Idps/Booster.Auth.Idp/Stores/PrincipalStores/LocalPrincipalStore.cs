@@ -150,6 +150,7 @@ public sealed class LocalPrincipalStore(
             PasswordHash = principal.LocalCredential?.PasswordHash,
             FailedAttemptCount = principal.LocalCredential?.FailedAttemptCount ?? 0,
             LockedUntil = principal.LocalCredential?.LockedUntil,
+            MustChangePassword = principal.LocalCredential?.MustChangePassword ?? false,
             Claims = BuildClaims(principal)
         };
 

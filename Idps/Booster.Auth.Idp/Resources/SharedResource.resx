@@ -292,6 +292,36 @@
   <data name="Reset.BrandLead" xml:space="preserve">
     <value>Kod yalnızca bu tarayıcıda geçerlidir. Daha önce kullandığınız parolaları tekrar seçemeyebilirsiniz; kurumunuzun politikası bunu belirler.</value>
   </data>
+  <data name="ChangePw.PageTitle" xml:space="preserve">
+    <value>Parolanızı değiştirin</value>
+  </data>
+  <data name="ChangePw.PageTitleWithErrors" xml:space="preserve">
+    <value>{0} hata – Parolanızı değiştirin</value>
+  </data>
+  <data name="ChangePw.Heading" xml:space="preserve">
+    <value>Parolanızı değiştirmeniz gerekiyor</value>
+  </data>
+  <data name="ChangePw.Subtitle" xml:space="preserve">
+    <value>Devam etmeden önce hesabınız için yeni bir parola belirleyin.</value>
+  </data>
+  <data name="ChangePw.NewPassword" xml:space="preserve">
+    <value>Yeni parola</value>
+  </data>
+  <data name="ChangePw.NewPasswordConfirm" xml:space="preserve">
+    <value>Yeni parola (tekrar)</value>
+  </data>
+  <data name="ChangePw.Submit" xml:space="preserve">
+    <value>Parolamı değiştir ve devam et</value>
+  </data>
+  <data name="ChangePw.Busy" xml:space="preserve">
+    <value>Kaydediliyor…</value>
+  </data>
+  <data name="ChangePw.BrandHeadline" xml:space="preserve">
+    <value>Güvenliğiniz için yeni bir parola.</value>
+  </data>
+  <data name="ChangePw.BrandLead" xml:space="preserve">
+    <value>Hesabınızın parolası ilk girişte değiştirilmek üzere işaretlenmiş. Daha önce kullandığınız parolaları tekrar seçemeyebilirsiniz; kurumunuzun politikası bunu belirler.</value>
+  </data>
   <data name="Consent.PageTitle" xml:space="preserve">
     <value>İzin verin</value>
   </data>

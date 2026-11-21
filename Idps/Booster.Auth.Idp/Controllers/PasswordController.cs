@@ -1,6 +1,8 @@
 using Booster.Auth.Idp.Controllers.Base;
+using Booster.Auth.Idp.Features.Password.ForcedChange;
 using Booster.Auth.Idp.Features.Password.ForgotPassword;
 using Booster.Auth.Idp.Features.Password.ResetPassword;
+using Booster.Auth.Idp.Managers.CookieManagers;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
@@ -22,6 +24,8 @@ public class PasswordController(
     IdpUiOptions uiOptions,
     ISecureCacheStore<InteractionStateData> interactionStore,
     IClientDataStore clientDataStore,
+    ISecureCacheStore<ForcedPasswordChangeData> forcedChangeStore,
+    ISessionCookieManager cookieManager,
     ITranslationManager translationManager) : IdpBaseController
 {
     [HttpGet("/ui/forgot-password")]
@@ -88,6 +92,52 @@ public class PasswordController(
             await AddErrorsAsync(ex, ct);
             SetPasswordPolicy(await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct));
             return View("ResetPassword", command);
+        }
+    }
+
+    // --- Giriste zorunlu parola degisimi ---------------------------------------
+    // CredentialLoginHandler parolayi dogrulayip MustChangePassword gorurse buraya
+    // yonlendirir. Bekleyen kayit yoksa (sure doldu / dogrudan acildi) giris ekranina donulur.
+
+    [HttpGet("/ui/change-password")]
+    public async Task<IActionResult> ChangePassword(
+        [FromQuery(Name = "interaction_key")] string interactionKey, CancellationToken ct)
+    {
+        if (string.IsNullOrEmpty(interactionKey))
+            return Redirect(uiOptions.GetErrorUrl(IdpMessageKeys.InvalidInteraction));
+
+        if (await forcedChangeStore.GetAsync(interactionKey, ct) is null)
+            return Redirect(uiOptions.GetLoginUrl(interactionKey));
+
+        SetPasswordPolicy(await ResolveClientAsync(interactionStore, clientDataStore, interactionKey, ct));
+
+        return View(new ForcedPasswordChangeCommand { InteractionKey = interactionKey });
+    }
+
+    [HttpPost("/ui/change-password")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChangePasswordSubmit(
+        [FromForm] ForcedPasswordChangeCommand command, CancellationToken ct)
+    {
+        command.UserAgent = Request.Headers.UserAgent;
+        command.IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        try
+        {
+            await new ForcedPasswordChangeValidator().ValidateAndThrowAsync(command, ct);
+            var outcome = await command.ExecuteAsync(ct);
+
+            if (outcome.RequiresChallenge)
+                return Redirect(uiOptions.GetLoginChallengeUrl(command.InteractionKey));
+
+            cookieManager.Set(Response, outcome.SessionToken!, outcome.ExpiresAt!.Value);
+            return Redirect(uiOptions.GetAuthorizeUrl(command.InteractionKey));
+        }
+        catch (ValidationException ex)
+        {
+            await AddErrorsAsync(ex, ct);
+            SetPasswordPolicy(await ResolveClientAsync(interactionStore, clientDataStore, command.InteractionKey, ct));
+            return View("ChangePassword", command);
         }
     }
 

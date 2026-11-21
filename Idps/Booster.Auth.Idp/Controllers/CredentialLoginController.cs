@@ -49,6 +49,9 @@ public class CredentialLoginController(IdpUiOptions uiOptions,
             await new CredentialLoginValidator().ValidateAndThrowAsync(command, ct);
             var result = await command.ExecuteAsync(ct);
 
+            if (result.RequiresPasswordChange)
+                return Redirect(uiOptions.GetChangePasswordUrl(command.InteractionKey));
+
             if (result.RequiresChallenge)
                 return Redirect(uiOptions.GetLoginChallengeUrl(command.InteractionKey));
 
