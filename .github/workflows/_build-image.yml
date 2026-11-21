@@ -1,8 +1,10 @@
-# Ortak build adimlari (reusable workflow). Tek basina tetiklenmez; servis
+# Ortak build + deploy adimlari (reusable workflow). Tek basina tetiklenmez; servis
 # workflow'lari (gateway.yml, idp.yml, ...) bunu "uses:" ile cagirir.
 #
 #   push (master)  -> build + GHCR push:  ghcr.io/<owner>/<image>:sha-<kisa-sha> ve :latest
-#   pull request   -> yalnizca build (push yok)
+#                     -> deploy: booster-gitops'ta bu image'in etiketini sha-<kisa-sha> yapar;
+#                        ArgoCD degisikligi gorup (~3 dk) yeni surumu canliya alir.
+#   pull request   -> yalnizca build (push yok, deploy yok)
 name: _build-image
 
 on:
@@ -11,6 +13,12 @@ on:
       image:   { type: string, required: true }   # ör. booster-auth-idp
       project: { type: string, required: true }   # ör. Idps/Booster.Auth.Idp/Booster.Auth.Idp.csproj
       app:     { type: string, required: true }   # ör. Booster.Auth.Idp  (dll adi)
+      gitops-path:                                 # etiketin guncellenecegi ortam klasoru
+        type: string
+        default: envs/demo/services
+    secrets:
+      GITOPS_DEPLOY_KEY:                           # booster-gitops'a yazma izinli deploy key (SSH)
+        required: false
 
 jobs:
   build:
@@ -62,3 +70,61 @@ jobs:
           # Katman onbellegi image basina ayri; degismeyen katmanlar yeniden build edilmez.
           cache-from: type=gha,scope=${{ inputs.image }}
           cache-to: type=gha,scope=${{ inputs.image }},mode=max
+
+  # --- CD: GitOps reposunda image etiketini guncelle -------------------------
+  # Yalnizca master'a push'ta ve build basariliysa calisir. Cluster'a dogrudan
+  # dokunmaz; yalnizca booster-gitops'a commit atar, gerisini ArgoCD yapar.
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    # Not: "concurrency" grubu KULLANILMIYOR; GitHub grupta yalnizca bir bekleyen
+    # job tutar, fazlasini iptal eder (7 servis ayni anda deploy ederken bazilari
+    # atlanirdi). Her servis farkli dosyaya yazar; ayni anda gelen push'lari
+    # asagidaki "pull --rebase + tekrar dene" dongusu cozer.
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Booster-tr/booster-gitops
+          ssh-key: ${{ secrets.GITOPS_DEPLOY_KEY }}
+          path: gitops
+
+      - name: Etiketi guncelle ve push et
+        working-directory: gitops
+        env:
+          IMAGE: ${{ inputs.image }}
+          GITOPS_PATH: ${{ inputs.gitops-path }}
+        run: |
+          set -euo pipefail
+          IMG="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/${IMAGE}"
+          TAG="sha-${GITHUB_SHA::7}"
+
+          # Bu image'i kullanan manifestler (ör. idp.yaml: initContainer + container)
+          FILES=$(grep -rlF "image: ${IMG}:" "$GITOPS_PATH" || true)
+          if [ -z "$FILES" ]; then
+            echo "::notice::${IMG} ${GITOPS_PATH} altinda kullanilmiyor; deploy atlandi."
+            exit 0
+          fi
+
+          sed -i -E "s#(image: ${IMG}):[A-Za-z0-9._-]+#\1:${TAG}#g" $FILES
+          if git diff --quiet; then
+            echo "Etiket zaten ${TAG}; degisiklik yok."
+            exit 0
+          fi
+          git diff --stat
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "deploy(${GITOPS_PATH#envs/}): ${IMAGE} -> ${TAG}" \
+            -m "Kaynak: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}" \
+            -m "Calisma: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
+          # Baska bir repo (ör. panel) ayni anda push ettiyse: guncelini al, tekrar dene.
+          for i in 1 2 3 4 5; do
+            git push && exit 0
+            echo "push reddedildi, yeniden deneniyor ($i)"
+            sleep $((i * 3))
+            git pull --rebase
+          done
+          echo "::error::GitOps push basarisiz"
+          exit 1

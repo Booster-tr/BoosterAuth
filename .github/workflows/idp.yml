@@ -29,6 +29,7 @@ permissions:
 jobs:
   image:
     uses: ./.github/workflows/_build-image.yml
+    secrets: inherit            # GITOPS_DEPLOY_KEY (CD adimi icin)
     with:
       image: booster-auth-idp
       project: Idps/Booster.Auth.Idp/Booster.Auth.Idp.csproj

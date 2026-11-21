@@ -25,6 +25,7 @@ permissions:
 jobs:
   image:
     uses: ./.github/workflows/_build-image.yml
+    secrets: inherit            # GITOPS_DEPLOY_KEY (CD adimi icin)
     with:
       image: booster-auth-gateway
       project: Gateways/Booster.Auth.YarpGateway/Booster.Auth.YarpGateway.csproj
