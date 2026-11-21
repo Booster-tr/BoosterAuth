@@ -1,6 +1,9 @@
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
 using Booster.ExceptionManager.Abstraction.Constants;
+using Booster.Auth.Common.Internal.Constants;
+using Booster.Auth.Z.Constants;
+using Booster.Authorization.Fga.Attributes;
 using FastEndpoints;
 using FluentValidation;
 
@@ -11,6 +14,13 @@ public class ReadRelationsEndpoint : Endpoint<ReadRelationsCommand, ReadRelation
     public override void Configure()
     {
         Post("authz/relations/read");
+
+        // Hedef havuz QUERY'den (UserPoolId) gelir ve FGA ayni degeri kontrol eder.
+        // Govdeden alinsaydi query'ye yetkili olunan havuz, govdeye baska havuz yazilip
+        // yetki kontrolu atlatilabilirdi. Servisler bu isi gRPC'den yapar (yalniz ic ag).
+        Options(x => x.RequireAuthorization(
+            new RequireScopeAttribute(AuthZPolicies.PanelScope),
+            new RequireFgaAttribute(AuthConstants.PoolType, AuthZPolicies.PoolTarget, AuthConstants.ViewerRelation)));
         Summary(s =>
         {
             s.Summary = "İlişki tuple'larını filtreleyerek listeler";
@@ -19,12 +29,13 @@ public class ReadRelationsEndpoint : Endpoint<ReadRelationsCommand, ReadRelation
         });
     }
 
+    // FGA hangi havuzu kontrol ettiyse handler da ONU kullanir; govdede farkli havuz gelse de yok sayilir.
     public override async Task HandleAsync(ReadRelationsCommand req, CancellationToken ct)
-        => await Send.OkAsync(await req.ExecuteAsync(ct), ct);
+        => await Send.OkAsync(await (req with { UserPoolId = Query<Guid>("UserPoolId") }).ExecuteAsync(ct), ct);
 }
 
 public record ReadRelationsCommand(
-    Guid IsolationId,
+    Guid UserPoolId,
     string? User,
     string? Relation,
     string? Object) : ICommand<ReadRelationsResponse>;
@@ -40,7 +51,7 @@ public class ReadRelationsCommandHandler(
 {
     public async Task<ReadRelationsResponse> ExecuteAsync(ReadRelationsCommand command, CancellationToken ct)
     {
-        var mapping = await poolStoreProvider.GetRequiredByPoolIdAsync(command.IsolationId, ct);
+        var mapping = await poolStoreProvider.GetRequiredByPoolIdAsync(command.UserPoolId, ct);
 
         var tuples = await relationManager.ReadAsync(
             mapping.StoreId,
@@ -58,6 +69,6 @@ public class ReadRelationsValidator : Validator<ReadRelationsCommand>
 {
     public ReadRelationsValidator()
     {
-        RuleFor(x => x.IsolationId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.UserPoolId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
     }
 }
