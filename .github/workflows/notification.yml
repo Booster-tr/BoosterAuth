@@ -1,18 +1,14 @@
-# booster-notification-service image'i. Yalnizca asagidaki yollarda degisiklik olursa calisir
+# booster-notification-service image'i. Yalnizca asagidaki yollara dokunan PR'larda calisir
 # (Actions dakikasi yalnizca etkilenen servis icin harcanir).
+#   PR acildi / guncellendi -> build kontrolu
+#   PR merge edildi         -> yayin (GHCR + GitOps -> canli)
 name: notification
 
 on:
-  push:
-    branches: [master]
-    paths:
-      - "Services/Booster.NotificationService/**"
-      - "Common/**"
-      - "CommonInternal/**"
-      - "docker/**"
-      - ".github/workflows/_build-image.yml"
-      - ".github/workflows/notification.yml"
+  # Yalnizca master hedefli PR'lar; master'a dogrudan push hicbir sey tetiklemez.
   pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened, closed]
     paths:
       - "Services/Booster.NotificationService/**"
       - "Common/**"
@@ -28,6 +24,8 @@ permissions:
 
 jobs:
   image:
+    # Merge edilmeden kapatilan PR: hic calismaz (dakika harcanmaz).
+    if: github.event.action != 'closed' || github.event.pull_request.merged
     uses: ./.github/workflows/_build-image.yml
     secrets: inherit            # GITOPS_DEPLOY_KEY (CD adimi icin)
     with:
