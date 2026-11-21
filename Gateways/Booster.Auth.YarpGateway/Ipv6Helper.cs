@@ -1,27 +1,35 @@
 ﻿using System.Net;
-using System.Net.Sockets;
 
 namespace Booster.Auth.YarpGateway;
 
+/// <summary>
+/// Rate limit icin istemcinin gercek IP adresini bulur (IPv4 ve IPv6).
+/// <para>
+/// Gateway bir proxy (Cloudflare tuneli) arkasinda calisir; baglanti adresi
+/// proxy'nin adresidir. Bu yuzden once proxy'nin ekledigi basliklara bakilir:
+/// CF-Connecting-IP -> X-Forwarded-For (ilk adres) -> Forwarded (for=).
+/// </para>
+/// <para>
+/// Onceki surum yalnizca IPv6 adresleri kabul ediyordu; IPv4 ile gelen tum
+/// istemciler ayni "unknown" anahtarina dusup tek bir kotayi paylasiyordu.
+/// </para>
+/// </summary>
 public static class Ipv6Helper
 {
     public static string Get(HttpContext ctx)
     {
-        if (ctx.Request.Headers.TryGetValue("CF-Connecting-IP", out var cf))
-        {
-            var cfSpan = cf.ToString().AsSpan().Trim();
-            if (IPAddress.TryParse(cfSpan, out var cfIp) && cfIp.AddressFamily == AddressFamily.InterNetworkV6)
-                return cfIp.ToString();
-        }
+        if (ctx.Request.Headers.TryGetValue("CF-Connecting-IP", out var cf)
+            && IPAddress.TryParse(cf.ToString().AsSpan().Trim(), out var cfIp))
+            return cfIp.ToString();
 
         if (ctx.Request.Headers.TryGetValue("X-Forwarded-For", out var xff))
         {
             var xffSpan = xff.ToString().AsSpan();
 
+            // Ilk adres istemcidir; sonrakiler aradaki proxy'ler.
             foreach (Range range in xffSpan.Split(','))
             {
-                var ipSpan = xffSpan[range].Trim();
-                if (IPAddress.TryParse(ipSpan, out var ip) && ip.AddressFamily == AddressFamily.InterNetworkV6)
+                if (IPAddress.TryParse(xffSpan[range].Trim(), out var ip))
                     return ip.ToString();
             }
         }
@@ -41,18 +49,15 @@ public static class Ipv6Helper
 
                 var semiIdx = tokenSpan.IndexOf(';');
                 if (semiIdx >= 0)
-                {
                     tokenSpan = tokenSpan[..semiIdx];
-                }
 
                 tokenSpan = tokenSpan.Trim().Trim('"').Trim('[').Trim(']');
 
-                if (IPAddress.TryParse(tokenSpan, out var ip) && ip.AddressFamily == AddressFamily.InterNetworkV6)
+                if (IPAddress.TryParse(tokenSpan, out var ip))
                     return ip.ToString();
             }
         }
 
-        var rip = ctx.Connection.RemoteIpAddress;
-        return rip?.AddressFamily == AddressFamily.InterNetworkV6 ? rip.ToString() : "unknown";
+        return ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }
 }
