@@ -1,0 +1,35 @@
+# booster-notification-service image'i. Yalnizca asagidaki yollarda degisiklik olursa calisir
+# (Actions dakikasi yalnizca etkilenen servis icin harcanir).
+name: notification
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Services/Booster.NotificationService/**"
+      - "Common/**"
+      - "CommonInternal/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/notification.yml"
+  pull_request:
+    paths:
+      - "Services/Booster.NotificationService/**"
+      - "Common/**"
+      - "CommonInternal/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/notification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write   # GHCR push
+
+jobs:
+  image:
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image: booster-notification-service
+      project: Services/Booster.NotificationService/Booster.NotificationService.csproj
+      app: Booster.NotificationService

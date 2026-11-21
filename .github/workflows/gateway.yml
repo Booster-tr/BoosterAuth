@@ -1,0 +1,31 @@
+# booster-auth-gateway image'i. Yalnizca asagidaki yollarda degisiklik olursa calisir
+# (Actions dakikasi yalnizca etkilenen servis icin harcanir).
+name: gateway
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Gateways/Booster.Auth.YarpGateway/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/gateway.yml"
+  pull_request:
+    paths:
+      - "Gateways/Booster.Auth.YarpGateway/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/gateway.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write   # GHCR push
+
+jobs:
+  image:
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image: booster-auth-gateway
+      project: Gateways/Booster.Auth.YarpGateway/Booster.Auth.YarpGateway.csproj
+      app: Booster.Auth.YarpGateway

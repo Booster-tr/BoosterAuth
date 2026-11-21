@@ -1,0 +1,35 @@
+# booster-auth-idp image'i. Yalnizca asagidaki yollarda degisiklik olursa calisir
+# (Actions dakikasi yalnizca etkilenen servis icin harcanir).
+name: idp
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Idps/**"
+      - "Common/**"
+      - "CommonInternal/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/idp.yml"
+  pull_request:
+    paths:
+      - "Idps/**"
+      - "Common/**"
+      - "CommonInternal/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/idp.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write   # GHCR push
+
+jobs:
+  image:
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image: booster-auth-idp
+      project: Idps/Booster.Auth.Idp/Booster.Auth.Idp.csproj
+      app: Booster.Auth.Idp

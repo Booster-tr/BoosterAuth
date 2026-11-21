@@ -1,0 +1,35 @@
+# booster-auth-management-api image'i. Yalnizca asagidaki yollarda degisiklik olursa calisir
+# (Actions dakikasi yalnizca etkilenen servis icin harcanir).
+name: management-api
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Services/Booster.Auth.Management.Api/**"
+      - "Common/**"
+      - "CommonInternal/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/management-api.yml"
+  pull_request:
+    paths:
+      - "Services/Booster.Auth.Management.Api/**"
+      - "Common/**"
+      - "CommonInternal/**"
+      - "docker/**"
+      - ".github/workflows/_build-image.yml"
+      - ".github/workflows/management-api.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write   # GHCR push
+
+jobs:
+  image:
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      image: booster-auth-management-api
+      project: Services/Booster.Auth.Management.Api/Booster.Auth.Management.Api.csproj
+      app: Booster.Auth.Management.Api
