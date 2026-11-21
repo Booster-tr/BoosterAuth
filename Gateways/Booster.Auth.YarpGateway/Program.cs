@@ -43,6 +43,18 @@ var app = builder.Build();
 
 app.UseRateLimiter();
 
+// Panelin "Servis Durumu" ekrani icin: diger servislerdeki GET /version ile ayni cevap
+// (Common.Internal/VersionEndpointExtensions). Gizli bilgi icermez.
+var startedAt = DateTimeOffset.UtcNow;
+app.MapGet("/version", (IConfiguration configuration, IHostEnvironment environment) =>
+    Results.Ok(new
+    {
+        service = environment.ApplicationName,
+        version = configuration["Version"] ?? "unknown",
+        build = configuration["BUILD_REVISION"],
+        startedAt
+    }));
+
 app.MapReverseProxy(proxyPipeline =>
 {
     proxyPipeline.Use(async (context, next) =>

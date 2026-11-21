@@ -59,6 +59,9 @@ public static class ServiceExtensions
         app.UseBoosterExceptionHandler();
         app.UseHttpsRedirection();
 
+        // Panelin "Servis Durumu" ekrani icin surum / ayakta mi bilgisi.
+        app.MapBoosterVersion();
+
         // Bootstrapper'lar Program.cs'te bu çağrıdan SONRA çalışır; şemanın
         // onlardan önce hazır olması gerekir.
         if (app.Services.GetService<PostgresSettings>() is { ApplyMigration: true })
