@@ -142,6 +142,15 @@ public sealed class AdminController(LicensingDbContext db, SigningKeyStore keys,
         return Redirect("/admin/siparisler?status=Pending");
     }
 
+    /// <summary>Yenileme hatirlatmalarini hemen calistirir (normalde 6 saatte bir). Idempotent: tekrar calistirmak e-posta yinelemez.</summary>
+    [HttpPost("hatirlatmalar/calistir")]
+    public async Task<IActionResult> RunReminders([FromServices] RenewalReminderService reminders, CancellationToken ct)
+    {
+        var sent = await reminders.RunOnceAsync(ct);
+        TempData["Info"] = $"{sent} hatırlatma gönderildi.";
+        return Redirect("/admin/siparisler?status=Pending");
+    }
+
     // ---------------------------------------------------------------- Planlar
 
     [HttpGet("planlar")]

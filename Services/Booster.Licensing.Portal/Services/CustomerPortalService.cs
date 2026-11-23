@@ -41,7 +41,7 @@ public static class SelfServiceErrors
 /// <summary>
 /// Musteri self-servis kurallari: deneme lisansi ve aktarim. Kontroller burada; controller yalnizca cagirir.
 /// </summary>
-public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer issuer, TimeProvider time)
+public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer issuer, TimeProvider time, PortalNotifier notifier)
 {
     /// <summary>
     /// Ucretsiz deneme. Kurallar (sirayla):
@@ -92,6 +92,7 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
 
         request.LicenseId = license.Id;
         await db.SaveChangesAsync(ct);
+        await notifier.TrialIssuedAsync(customer, license, ct);
         return new SelfServiceResult(license, null);
     }
 
@@ -137,6 +138,7 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
             RequestedBy = requestedBy,
         });
         await db.SaveChangesAsync(ct);
+        await notifier.TransferredAsync(customer, license, moved, requestedBy, ct);
         return new SelfServiceResult(moved, null);
     }
 

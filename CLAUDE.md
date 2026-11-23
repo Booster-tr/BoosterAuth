@@ -59,6 +59,14 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - **Yenileme / yukseltme:** kurulumda gecerli ve aktarilmamis ucretli lisans varsa yeni sure onun bitisine eklenir; yoksa bugunden baslar.
   - Planlar admin ekranindan yonetilir; ilk acilista ornek planlar fiyatsiz eklenir.
   - Havale bilgileri `LicensingPortalOptions__Bank__{BankName,AccountName,Iban}` ayarlarindan okunur (gizli degil).
+- **Portal e-postalari (`PortalNotifier`):** Notification servisi gonderir; sablonlar `license_*` anahtarlariyla `NotificationBootstrapper`'da (tr/en).
+  - Akislar: deneme, siparis alindi, lisans hazir, aktarim, yenileme hatirlatmasi. Alici firmanin fatura e-postasi.
+  - Gonderim commit'ten SONRA ve en-iyi-cabadir: Kafka hatasi loglanir, islem bozulmaz.
+  - Baglantilar `LicensingPortalOptions__PublicUrl` ile uretilir.
+- **Yenileme hatirlatmasi (`RenewalReminderService`):** acilista ve 6 saatte bir calisir; admin Siparisler ekranindan elle de tetiklenebilir.
+  - Bitise 30 ve 7 gun kala, lisans ve tur basina BIR KEZ (`LicenseReminders` tekil index'i).
+  - Ayni kurulumda daha gec biten ucretli lisans varsa (yenilenmis) gonderilmez.
+- **Notification sablonlari:** e-posta govdesine yerlestirilen degerler HTML kacislidir (firma adi gibi kullanici girdileri e-postaya HTML enjekte edemez). Konu ve SMS duz metindir.
 - **Razor:** `action` ozniteligi acikca yazilan POST formlarina `asp-antiforgery="true"` EKLE. Tag helper o durumda CSRF token'ini kendiliginden koymaz; form 400 doner.
 
 - **Token:** `BSTR1.<payload>.<imza>`.
@@ -133,9 +141,10 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Yeniden gonderilen davet (`POST pools/users/invite`) eskisini gecersiz kilar.
   - Kabul edilince parola belirlenir ve e-posta dogrulanmis sayilir.
 - Havuz politikasi istemcisiz akislarda `PoolDataReader` (Management `GetPoolData` gRPC) ile okunur.
-- **OUTBOX KURALI:** `IEventBus.PublishAsync` olayi EF outbox'a yazar; olay ancak ayni DbContext'te `SaveChanges` cagrilinca kaydedilir.
-  - Publish'ten sonra SaveChanges yoksa olay (e-posta) HIC gitmez.
-  - Baska bir degisiklik olmasa bile SaveChanges cagir (bkz. `ResendPoolUserInvitation`).
+- **OLAYLAR OUTBOX'A YAZILMAZ (2026-11 yerelde dogrulandi):** `IEventBus.PublishAsync` -> Kafka rider `ITopicProducer`, olayi HEMEN gonderir.
+  - `UseBusOutbox` rider ureticilerini kapsamiyor; `OutboxMessage` tablolarina (IdP, Management, portal) hic satir yazilmiyor.
+  - Sonuc: transaction geri alinsa da olay gitmis olur; Kafka kapaliysa olay kaybolur.
+  - Kural: olayi is islemi KAYDEDILDIKTEN/commit edildikten SONRA yayinla. Yinelenmemesi gereken islerde once DB'de sahiplen (`ON CONFLICT DO NOTHING`), sonra yayinla (bkz. portal `RenewalReminderService`).
 
 ## Komutlar
 ```bash

@@ -37,4 +37,11 @@ public static class NotificationTemplateKeys
     public const string EmailLoginCode = "email_login_code";
 
     public const string PhoneLoginCode = "phone_login_code";
+
+    // --- Lisans portali (licensing.appnuraymind.com) ---
+    public const string LicenseTrialIssued = "license_trial_issued";
+    public const string LicenseOrderReceived = "license_order_received";
+    public const string LicenseIssued = "license_issued";
+    public const string LicenseRenewalReminder = "license_renewal_reminder";
+    public const string LicenseTransferred = "license_transferred";
 }
