@@ -1,0 +1,46 @@
+<h1>Operations and troubleshooting</h1>
+<p class="lead">Day-to-day operations, updates, backups and common problems.</p>
+
+<h2 id="commands">Everyday commands</h2>
+<table>
+    <thead><tr><th>Task</th><th>Command</th></tr></thead>
+    <tbody>
+        <tr><td>Status</td><td><code>docker compose ps</code></td></tr>
+        <tr><td>Logs</td><td><code>docker compose logs -f booster-idp</code></td></tr>
+        <tr><td>Stop (data is kept)</td><td><code>docker compose down</code></td></tr>
+        <tr><td>Apply a settings change</td><td>Edit <code>.env</code>, then <code>docker compose up -d</code></td></tr>
+    </tbody>
+</table>
+
+<h2 id="updates">Updates</h2>
+<div class="code"><pre>docker compose pull
+docker compose up -d</pre></div>
+<p>The database schema is updated automatically on start. To pin a specific version, change <code>BOOSTER_VERSION</code> in <code>.env</code>.</p>
+
+<h2 id="backup">Backups</h2>
+<p>All persistent data lives in the installation folder. For a consistent backup:</p>
+<ol>
+    <li><code>docker compose down</code></li>
+    <li>Back up the <code>data/</code>, <code>pki/</code> and <code>secrets/</code> folders and the <code>.env</code> file.</li>
+    <li><code>docker compose up -d</code></li>
+</ol>
+<div class="callout warn"><p><b>A backup without <code>.env</code> is useless.</b> Passwords and encrypted data are protected with the keys in this file.</p></div>
+
+<h2 id="email">E-mail settings</h2>
+<p>Fill in <code>MAIL_SENDER</code>, <code>MAIL_SMTP_HOST</code>, <code>MAIL_PORT</code>, <code>MAIL_USERNAME</code>, <code>MAIL_PASSWORD</code> and
+    <code>MAIL_ENABLE_SSL</code> in <code>.env</code>, then run <code>docker compose up -d</code>.</p>
+
+<h2 id="problems">Common problems</h2>
+<h3>The browser shows a certificate warning</h3>
+<p>Expected if the locally generated CA has not been trusted. Add <code>pki/trust/ca.crt</code> as a trusted root certificate, or use your own
+    certificate in production (<a href="/en/docs/installation#https">Installation › HTTPS</a>).</p>
+<h3>A "redirect_uri" error after sign-in</h3>
+<p>The <code>redirect_uri</code> your application sends must match a registered URI exactly (scheme, port and trailing <code>/</code> included). If the
+    pool's redirect domain policy is on, the domain must also be allowed.</p>
+<h3>The console is read-only</h3>
+<p>The license is missing, expired or invalid. Check the state on <b>System &gt; License</b> (<a href="/en/docs/licensing#states">License states</a>).</p>
+<h3>Sign-up e-mails do not arrive</h3>
+<p>Without SMTP settings no e-mail is sent. Use <code>docker compose logs booster-notification</code> to see delivery errors.</p>
+<h3>A service does not start</h3>
+<p>Check the status with <code>docker compose ps</code> and the error with <code>docker compose logs &lt;service&gt;</code>. If a value in <code>.env</code>
+    still contains <code>CHANGE_ME</code>, the preparation step names the missing variable: <code>docker compose logs booster-init</code>.</p>

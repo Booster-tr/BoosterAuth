@@ -1,0 +1,27 @@
+<h1>Booster Auth dokümantasyonu</h1>
+<p class="lead">Booster Auth'u kurmak, yapılandırmak ve uygulamalarınıza bağlamak için ihtiyacınız olan her şey. İlk kez okuyorsanız
+    sırayla ilerlemenizi öneririz: önce kavramlar, sonra kurulum, sonra ilk yapılandırma.</p>
+
+<div class="doc-cards">
+    <a href="/tr/docs/concepts"><b>1. Temel kavramlar</b><span>Firma, kullanıcı havuzu, uygulama, rol ve izin nedir; nasıl ilişkilidir?</span></a>
+    <a href="/tr/docs/installation"><b>2. Kurulum</b><span>Paketi indirin, .env dosyasını hazırlayın, <code>docker compose up</code>.</span></a>
+    <a href="/tr/docs/first-steps"><b>3. İlk yapılandırma</b><span>Panele giriş, havuz ve uygulama oluşturma, kullanıcı ekleme.</span></a>
+    <a href="/tr/docs/integration"><b>4. Uygulama entegrasyonu</b><span>OpenID Connect ile web, SPA, mobil ve API bağlantısı; örnek kodlar.</span></a>
+    <a href="/tr/docs/authorization"><b>5. Yetki kontrolü</b><span>Roller, kapsamlar ve AuthZ API ile izin sorgulama.</span></a>
+    <a href="/tr/docs/licensing"><b>6. Lisans</b><span>Deneme, satın alma, panele yükleme, yenileme ve aktarım.</span></a>
+</div>
+
+<h2 id="mimari">Mimari bir bakışta</h2>
+<p>Booster Auth birkaç servisten oluşur ve hepsi tek bir <code>docker compose</code> ile çalışır. Dışarıya yalnızca iki kapı açılır:</p>
+<table>
+    <thead><tr><th>Bileşen</th><th>Görevi</th><th>Adres</th></tr></thead>
+    <tbody>
+        <tr><td><b>Gateway</b></td><td>Tek HTTPS giriş noktası; isteği ilgili servise iletir.</td><td><code>https://auth.firma.com</code></td></tr>
+        <tr><td><b>IdP</b></td><td>OpenID Connect kimlik sağlayıcı: giriş, kayıt, token.</td><td><code>/idp</code></td></tr>
+        <tr><td><b>Management API</b></td><td>Firma, havuz, uygulama, rol yönetimi; lisans.</td><td><code>/management</code></td></tr>
+        <tr><td><b>AuthZ</b></td><td>Yetki şeması ve izin kontrolü (OpenFGA üzerinde).</td><td><code>/authz</code></td></tr>
+        <tr><td><b>Yönetim paneli</b></td><td>Yöneticiler için web arayüzü.</td><td><code>http://localhost:3000</code></td></tr>
+        <tr><td>Altyapı</td><td>PostgreSQL, Redis, Kafka, OpenFGA; dışarıya açılmaz.</td><td>-</td></tr>
+    </tbody>
+</table>
+<div class="callout tip"><p><b>Hızlı başlangıç.</b> Sadece denemek istiyorsanız <a href="/tr/download">paketi indirip</a> <a href="/tr/docs/installation">kurulum</a> sayfasındaki dört adımı izleyin; on dakika içinde panele giriş yapmış olursunuz.</p></div>

@@ -1,0 +1,69 @@
+@using Booster.Licensing.Portal.Services
+@{
+    var c = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+    var featured = Model.Plans.Count > 1 ? Model.Plans[1].Code : null;
+}
+<section class="page-hero">
+    <div class="wrap">
+        <span class="eyebrow" style="color:var(--teal)">Pricing</span>
+        <h1 class="reveal">Simple pricing, every feature included</h1>
+        <p class="reveal" style="--d:.08s">Plans differ only in user, pool and application limits. A license is per installation and annual;
+            there are no monthly per-user fees.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="plans">
+            <article class="plan reveal" data-plan="deneme">
+                <h3>Free trial</h3>
+                <div class="price">Free</div>
+                <p class="muted small">Try the product in your own environment.</p>
+                <ul>
+                    <li>@LicenseIssuer.Defaults.TrialUsers.ToString("N0", c) users</li>
+                    <li>@LicenseIssuer.Defaults.TrialPools user pool</li>
+                    <li>@LicenseIssuer.Defaults.TrialClients applications</li>
+                    <li>@LicenseIssuer.Defaults.TrialDays days</li>
+                </ul>
+                <a class="btn btn-ghost" href="/hesap/satin-al?plan=deneme">Start free trial</a>
+            </article>
+            @foreach (var (p, i) in Model.Plans.Select((p, i) => (p, i)))
+            {
+                <article class="plan reveal @(p.Code == featured ? "featured" : "")" style="--d:@((i + 1) * 0.06)s" data-plan="@p.Code">
+                    @if (p.Code == featured) { <span class="badge">Most popular</span> }
+                    <h3>@p.Name</h3>
+                    <div class="price">@(p.Price > 0 ? $"{p.Price.ToString("N0", c)} {p.Currency}" : "Contact us")@if (p.Price > 0) {<small> / @p.DurationMonths months</small>}</div>
+                    <p class="muted small">Pay by bank transfer; the license is e-mailed to you.</p>
+                    <ul>
+                        <li>@p.MaxUsers.ToString("N0", c) users</li>
+                        <li>@p.MaxPools user pools</li>
+                        <li>@p.MaxClients applications</li>
+                        <li>Every feature</li>
+                    </ul>
+                    <a class="btn @(p.Code == featured ? "btn-primary" : "btn-ghost")" href="/hesap/satin-al?plan=@Uri.EscapeDataString(p.Code)" data-buy="@p.Code">Get a license</a>
+                </article>
+            }
+        </div>
+        <p class="center muted small" style="margin-top:1.5rem">Admin console users and the management pool do not count toward the limits.</p>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="section-head reveal"><h2>Frequently asked questions</h2></div>
+        <div class="faq">
+            <details class="reveal"><summary>Who can get a trial license?</summary>
+                <p>Anyone who signs up with a company e-mail address. The installation's domain must match your e-mail domain, and each domain gets one trial. Free e-mail providers (gmail, outlook, etc.) are not eligible.</p></details>
+            <details class="reveal"><summary>How do I pay?</summary>
+                <p>When you place an order in the license portal you get a reference code and bank transfer details. Once the payment is confirmed, your license is generated automatically and e-mailed to you.</p></details>
+            <details class="reveal"><summary>What happens when a license expires?</summary>
+                <p>Everything keeps working during a grace period: @LicenseIssuer.Defaults.PaidGraceDays days for paid licenses, @LicenseIssuer.Defaults.TrialGraceDays days for trials. After that the admin console becomes read-only; with paid licenses end-user sign-ins never stop. With a trial license, end-user sign-ins also stop after the grace period.</p></details>
+            <details class="reveal"><summary>Do I lose remaining days if I renew early?</summary>
+                <p>No. The new period is added to the end date of your current license.</p></details>
+            <details class="reveal"><summary>What if I move to a new server?</summary>
+                <p>You can transfer your license to the new installation yourself in the portal, up to 3 times a year.</p></details>
+            <details class="reveal"><summary>Does the product need internet access?</summary>
+                <p>No. The license is verified offline inside the product. Internet is only needed to download the images during installation.</p></details>
+        </div>
+    </div>
+</section>

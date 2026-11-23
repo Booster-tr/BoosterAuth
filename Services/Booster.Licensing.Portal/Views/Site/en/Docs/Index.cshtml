@@ -1,0 +1,28 @@
+<h1>Booster Auth documentation</h1>
+<p class="lead">Everything you need to install Booster Auth, configure it and connect your applications. If this is your first time,
+    read in order: concepts first, then installation, then the first configuration.</p>
+
+<div class="doc-cards">
+    <a href="/en/docs/concepts"><b>1. Core concepts</b><span>What tenants, user pools, applications, roles and permissions are and how they relate.</span></a>
+    <a href="/en/docs/installation"><b>2. Installation</b><span>Download the package, prepare the .env file, <code>docker compose up</code>.</span></a>
+    <a href="/en/docs/first-steps"><b>3. First configuration</b><span>Sign in to the console, create a pool and an application, add users.</span></a>
+    <a href="/en/docs/integration"><b>4. Application integration</b><span>Connect web, SPA, mobile and APIs with OpenID Connect; code samples.</span></a>
+    <a href="/en/docs/authorization"><b>5. Authorization checks</b><span>Check permissions with roles, scopes and the AuthZ API.</span></a>
+    <a href="/en/docs/licensing"><b>6. Licensing</b><span>Trials, purchasing, activation, renewal and transfer.</span></a>
+</div>
+
+<h2 id="architecture">Architecture at a glance</h2>
+<p>Booster Auth consists of a few services that all run with a single <code>docker compose</code>. Only two doors are open to the outside:</p>
+<table>
+    <thead><tr><th>Component</th><th>Role</th><th>Address</th></tr></thead>
+    <tbody>
+        <tr><td><b>Gateway</b></td><td>The single HTTPS entry point; forwards requests to the right service.</td><td><code>https://auth.company.com</code></td></tr>
+        <tr><td><b>IdP</b></td><td>OpenID Connect identity provider: sign-in, registration, tokens.</td><td><code>/idp</code></td></tr>
+        <tr><td><b>Management API</b></td><td>Tenants, pools, applications and roles; licensing.</td><td><code>/management</code></td></tr>
+        <tr><td><b>AuthZ</b></td><td>Authorization schema and permission checks (on OpenFGA).</td><td><code>/authz</code></td></tr>
+        <tr><td><b>Admin console</b></td><td>The web UI for administrators.</td><td><code>http://localhost:3000</code></td></tr>
+        <tr><td>Infrastructure</td><td>PostgreSQL, Redis, Kafka, OpenFGA; not exposed.</td><td>-</td></tr>
+    </tbody>
+</table>
+<div class="callout tip"><p><b>Quick start.</b> If you just want to try it, <a href="/en/download">download the package</a> and follow the four steps on the
+    <a href="/en/docs/installation">installation</a> page; you will be signed in to the console within ten minutes.</p></div>

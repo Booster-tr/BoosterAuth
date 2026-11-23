@@ -10,8 +10,9 @@ namespace Booster.Licensing.Portal.Controllers;
 public sealed class HomeController : Controller
 {
     /// <summary>
-    /// Urun tanitim sayfasi. Urun panelindeki "Lisans al" butonu kurulum GUID'ini tasir (?installationId=): o zaman
-    /// sayfa gosterilmez; giris yapilir ve kurulum formu GUID dolu acilir.
+    /// Kok adres: tanitim sitesine tarayici diliyle yonlendirir (/tr ya da /en; dil secimi kalici olmadigi icin 302).
+    /// Urun panelindeki "Lisans al" butonu kurulum GUID'ini tasir (?installationId=): o zaman giris yapilir ve kurulum
+    /// formu GUID dolu acilir.
     /// </summary>
     [HttpGet("/")]
     public IActionResult Index([FromQuery] Guid? installationId)
@@ -23,7 +24,8 @@ public sealed class HomeController : Controller
                 ? Redirect(next)
                 : Redirect($"/giris?returnUrl={Uri.EscapeDataString(next)}");
         }
-        return View();
+        Response.Headers.Vary = "Accept-Language";
+        return Redirect("/" + Site.SiteCatalog.PreferredLanguage(Request.Headers.AcceptLanguage));
     }
 
     /// <summary>Booster Auth giris ekranina yonlendirir. Kayit ("Hesap olustur") da o ekrandadir.</summary>

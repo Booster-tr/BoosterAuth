@@ -1,0 +1,63 @@
+<h1>Authorization checks</h1>
+<p class="lead">You can answer "can this user do this?" in two ways: with the <b>roles and scopes</b> in the token, or at record level with the
+    <b>authorization schema and the AuthZ API</b>.</p>
+
+<h2 id="which">Which one should I use?</h2>
+<table>
+    <thead><tr><th>Need</th><th>Recommendation</th></tr></thead>
+    <tbody>
+        <tr><td>General rules like "managers can delete orders"</td><td>Roles and scopes — reading the token is enough.</td></tr>
+        <tr><td>"Ali can only edit his own team's documents"</td><td>Authorization schema (ReBAC) + AuthZ API.</td></tr>
+        <tr><td>Sharing, folder / project hierarchies, resource ownership</td><td>Authorization schema (ReBAC) + AuthZ API.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="roles">Roles and scopes</h2>
+<p>The roles and scopes you define in a pool are written into the access token. After validating the token, your API looks at the claims:</p>
+<div class="code"><span class="lbl">Access token (excerpt)</span><pre>{
+  "sub": "6f1c…",
+  "aud": "https://api.company.com",
+  "scope": "openid orders:read orders:write",
+  "role": ["manager"]
+}</pre></div>
+
+<h2 id="schema">Authorization schema (ReBAC)</h2>
+<p>On the <b>Authorization Schema</b> screen in the pool menu:</p>
+<ol>
+    <li>Define <b>resource types</b>, e.g. <code>folder</code> and <code>document</code>.</li>
+    <li>Add <b>links</b> between types, e.g. every document has a folder.</li>
+    <li>Define <b>permissions</b>: granted directly (e.g. <code>editor</code>), included from another permission (editors can view) or inherited
+        through a link (a folder's editor is also an editor of its documents).</li>
+    <li><b>Publish</b> the schema. Schemas are versioned: draft, live, inactive. You can start from the built-in Owner / Editor / Viewer template.</li>
+</ol>
+<p>On the <b>Relations</b> screen you grant users permissions on records and link records to each other. On the <b>Access Check</b> screen you
+    can test which permissions a user has on a record.</p>
+
+<h2 id="api">AuthZ API</h2>
+<p>Your application (usually your back end) calls the AuthZ API with a Bearer token. The token's audience must be
+    <code>https://auth.company.com/authz</code>: add the AuthZ address to the application's allowed APIs and pass it as <code>resource</code> when
+    requesting the token. The token only authenticates the <b>caller</b>; the user being checked is in the request body.</p>
+<div class="code"><span class="lbl">Permission check</span><pre>POST https://auth.company.com/authz/check
+Authorization: Bearer &lt;access token&gt;
+Content-Type: application/json
+
+{
+  "isolationId": "&lt;pool id&gt;",
+  "user": "user:&lt;user sub&gt;",
+  "relation": "editor",
+  "object": "document:order-2026-001"
+}</pre></div>
+<div class="code"><span class="lbl">Response</span><pre>{ "data": { "allowed": true } }</pre></div>
+<p>Other endpoints:</p>
+<table>
+    <thead><tr><th>Endpoint</th><th>What it does</th></tr></thead>
+    <tbody>
+        <tr><td><code>POST /authz/batch-check</code></td><td>Several checks in one request (a <code>checks</code> list, each with a <code>correlationId</code>).</td></tr>
+        <tr><td><code>POST /authz/lookup/by-user</code></td><td>Records a user can access.</td></tr>
+        <tr><td><code>POST /authz/lookup/by-object</code></td><td>Users who can access a record.</td></tr>
+        <tr><td><code>POST /authz/lookup/my-access</code></td><td>A user's access across the given types.</td></tr>
+        <tr><td><code>POST / DELETE /authz/relations</code></td><td>Add / remove relations (e.g. link a document to a folder).</td></tr>
+    </tbody>
+</table>
+<div class="callout tip"><p><b>Tip.</b> When a record is created (e.g. a new document), write its owner and folder from your back end with
+    <code>/authz/relations</code>; every later check is computed from these relations.</p></div>

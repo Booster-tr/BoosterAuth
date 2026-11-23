@@ -1,0 +1,81 @@
+<section class="page-hero">
+    <div class="wrap">
+        <span class="eyebrow" style="color:var(--teal)">Features</span>
+        <h1 class="reveal">Enterprise identity management, in a single package</h1>
+        <p class="reveal" style="--d:.08s">Booster Auth delivers authentication, user management and authorization as one product, on your own infrastructure.
+            Every feature is included in every plan.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">Authentication</span><h2>Standard, secure, flexible sign-in</h2></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("key")</div><h3>OpenID Connect / OAuth 2.0</h3>
+                <p>Authorization Code + PKCE (S256 required), refresh tokens, client credentials (service accounts) and token exchange. RS256-signed JWTs, a standard discovery document and JWKS.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("mail")</div><h3>Passwordless sign-in</h3>
+                <p>Users can sign in with a 6-digit code sent by e-mail or SMS. A code is burned after 5 wrong attempts.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("shield")</div><h3>Two-factor authentication</h3>
+                <p>A second step with an e-mail or SMS code on password sign-in, which can be required per pool.</p></article>
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("globe")</div><h3>External providers</h3>
+                <p>Google, Microsoft, Apple, LinkedIn, Facebook, GitHub, X, any OpenID Connect provider and SAML. Accounts can be created on first sign-in.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("lock")</div><h3>Password and lockout policy</h3>
+                <p>Minimum length, upper / lower case, digits, special characters, expiry and history. Temporary lockout after failed attempts.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("clock")</div><h3>Session management</h3>
+                <p>Access and refresh token lifetimes and an idle timeout. Per-application sessions and consents that you can revoke one by one.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">User management</span><h2>A pool for every audience</h2></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("users")</div><h3>Tenants and pools</h3>
+                <p>Several user pools under each tenant. Users, sessions and permissions are fully isolated between pools.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("mail")</div><h3>Registration and invitations</h3>
+                <p>Open sign-up or invitation only. E-mail / phone verification and single-use invitation links valid for 1 day.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("box")</div><h3>CSV bulk import</h3>
+                <p>Up to 1000 users at a time; Turkish and English column names are recognized, with a per-row result report.</p></article>
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("server")</div><h3>Service accounts</h3>
+                <p>A key / secret pair for machine-to-machine access, with an expiry, secret rotation and suspension.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("globe")</div><h3>Redirect policy</h3>
+                <p>Applications in a pool may only register redirect URIs on allowed domains, with options for test addresses and mobile schemes.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("panel")</div><h3>Branded sign-in</h3>
+                <p>Each application shows its own logo on the sign-in screen. Sign-in and registration screens are available in Turkish and English.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">Authorization</span><h2>Roles, scopes and relationship-based permissions</h2>
+            <p>Simple apps can rely on the roles and scopes in the token; for complex cases, an OpenFGA-based authorization schema takes over.</p></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("shield")</div><h3>Roles and scopes</h3>
+                <p>Per-pool roles (<code>role</code>) and scopes (<code>scope</code>) are written into the token. New users can get default roles and scopes.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("graph")</div><h3>Authorization schema (ReBAC)</h3>
+                <p>Resource types, links between them and permissions; versioned (draft / live). An Owner / Editor / Viewer template is included.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("code")</div><h3>Authorization API</h3>
+                <p>Single and batch permission checks and "what can this user access?" lookups, plus an access check screen in the console.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">Operations</span><h2>On your infrastructure, without the hassle</h2></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("box")</div><h3>Docker Compose install</h3>
+                <p>One package including PostgreSQL, Redis, Kafka and OpenFGA. The setup script generates every password and key.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("lock")</div><h3>Hardened services</h3>
+                <p>Read-only file systems, non-root users and dropped Linux capabilities; infrastructure exposes no ports.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("bolt")</div><h3>Offline license</h3>
+                <p>Paste the license key into the console; no service restart. Usage and limits are shown in the console.</p></article>
+        </div>
+        <div class="center" style="margin-top:3rem">
+            <a class="btn btn-primary btn-lg" href="/en/download">Download free <span class="arrow">→</span></a>
+            <a class="btn btn-ghost btn-lg" href="/en/docs/concepts" style="margin-left:.5rem">Learn the concepts</a>
+        </div>
+    </div>
+</section>

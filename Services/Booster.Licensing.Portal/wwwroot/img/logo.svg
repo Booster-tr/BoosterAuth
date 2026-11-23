@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Booster Auth">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14B8A6"/>
+      <stop offset="1" stop-color="#0A8375"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#182D55"/>
+  <path d="M32 10 49 17v13c0 11-7.3 19.6-17 24-9.7-4.4-17-13-17-24V17z" fill="url(#g)"/>
+  <path d="M25 31.5 30.2 37 40 26" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

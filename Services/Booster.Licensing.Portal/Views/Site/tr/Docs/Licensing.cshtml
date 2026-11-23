@@ -1,0 +1,57 @@
+@using Booster.Licensing.Portal.Services
+<h1>Lisans</h1>
+<p class="lead">Booster Auth lisansı kurulum başınadır ve çevrimdışı doğrulanır. Ürün hiçbir zaman lisans sunucusuna bağlanmaz; lisans
+    anahtarını panele yapıştırmanız yeterlidir.</p>
+
+<h2 id="kurulum-kimligi">Kurulum kimliği</h2>
+<p>Her kurulumun benzersiz bir <b>kurulum kimliği</b> vardır (GUID). Panelde <b>Sistem &gt; Lisans</b> ekranında görünür. Lisans bu kimliğe
+    bağlanır; başka bir kurulumda çalışmaz.</p>
+
+<h2 id="almak">Lisans almanın iki yolu</h2>
+<ol>
+    <li><b>Panelden:</b> <b>Sistem &gt; Lisans</b> ekranındaki <b>Lisans al</b> butonu sizi lisans portalına götürür; kurulum kimliğiniz dolu gelir.</li>
+    <li><b>Siteden:</b> <a href="/tr/pricing">Paketler</a> sayfasında bir paket seçin. Portal sizi sırayla firma bilgileri, kurulum ve sipariş adımlarından geçirir.</li>
+</ol>
+<p>Portalda Booster Auth hesabıyla giriş yaparsınız; hesabınız yoksa giriş ekranından oluşturabilirsiniz. Ardından:</p>
+<ol>
+    <li><b>Firma bilgileri:</b> fatura bilgileriniz.</li>
+    <li><b>Kurulum:</b> kurulum kimliği, bir ad (ör. Üretim) ve kurulumun domain'leri (ör. <code>firma.com</code>; alt alanları kapsar).</li>
+    <li><b>Deneme ya da sipariş.</b></li>
+</ol>
+
+<h2 id="deneme">Ücretsiz deneme</h2>
+<ul>
+    <li>@LicenseIssuer.Defaults.TrialDays gün; @LicenseIssuer.Defaults.TrialUsers kullanıcı, @LicenseIssuer.Defaults.TrialPools havuz, @LicenseIssuer.Defaults.TrialClients uygulama.</li>
+    <li>Firma e-postasıyla alınır; e-posta domain'i kurulumun domain'iyle uyuşmalıdır. Ücretsiz e-posta sağlayıcılarıyla alınamaz.</li>
+    <li>Her domain için bir kez verilir.</li>
+</ul>
+
+<h2 id="satin-alma">Satın alma</h2>
+<ol>
+    <li>Portalda paketi seçip siparişi oluşturun; bir <b>referans kodu</b> (ör. <code>BST-2026-000123</code>) ve havale / EFT bilgileri gösterilir.</li>
+    <li>Havale açıklamasına referans kodunu yazın.</li>
+    <li>Ödeme onaylanınca lisans otomatik üretilir, e-postanıza gönderilir ve portalda <b>Kurulumlarım</b> ekranında görünür.</li>
+</ol>
+
+<h2 id="yukleme">Lisansı panele yükleme</h2>
+<p>Lisans anahtarı <code>BSTR1.</code> ile başlayan uzun bir metindir. Panelde <b>Sistem &gt; Lisans</b> ekranına yapıştırıp <b>Etkinleştir</b>'e
+    basın. Servisleri yeniden başlatmanız gerekmez; limitler ve kullanım <b>Kullanım</b> ekranında görünür.</p>
+
+<h2 id="durumlar">Lisans durumları</h2>
+<table>
+    <thead><tr><th>Durum</th><th>Panel</th><th>Son kullanıcı girişleri</th></tr></thead>
+    <tbody>
+        <tr><td>Lisans yok</td><td>Salt okunur</td><td>Çalışır</td></tr>
+        <tr><td>Aktif</td><td>Tam</td><td>Çalışır</td></tr>
+        <tr><td>Uyarı (bitişe 14 gün kala)</td><td>Tam, yenileme uyarısı</td><td>Çalışır</td></tr>
+        <tr><td>Ek süre (ücretli @LicenseIssuer.Defaults.PaidGraceDays gün, deneme @LicenseIssuer.Defaults.TrialGraceDays gün)</td><td>Tam</td><td>Çalışır</td></tr>
+        <tr><td>Kısıtlı (ek süre sonrası)</td><td>Salt okunur</td><td>Ücretli: çalışır · Deneme: durur</td></tr>
+    </tbody>
+</table>
+<p>Limit aşımında (kullanıcı, havuz, uygulama) yeni kayıt eklenemez; mevcut kayıtlar çalışmaya devam eder.</p>
+
+<h2 id="yenileme">Yenileme ve aktarım</h2>
+<ul>
+    <li><b>Yenileme:</b> aynı kurulum için yeni sipariş verin. Yeni süre mevcut bitiş tarihine eklenir; erken yenilemede gün kaybetmezsiniz. Bitişe 30 ve 7 gün kala e-postayla hatırlatılır.</li>
+    <li><b>Aktarım:</b> sunucu değiştirdiğinizde portalda lisansınızı yeni kurulum kimliğine aktarın; yılda en fazla 3 kez.</li>
+</ul>

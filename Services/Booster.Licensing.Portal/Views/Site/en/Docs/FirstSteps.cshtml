@@ -1,0 +1,61 @@
+<h1>First configuration</h1>
+<p class="lead">Installation is done and your license is active. In this guide you will get ready to connect your first application:
+    tenant → pool → application → users.</p>
+<div class="callout info"><p><b>Finding your way.</b> Use the context switcher at the top left to move between <b>Tenant</b>, <b>Pool</b>,
+    <b>Application</b> and <b>System</b>; the left menu changes with the selected context.</p></div>
+
+<h2 id="tenant">1. Create a tenant</h2>
+<ol>
+    <li>Open <b>Tenant &gt; New Tenant</b> from the context switcher.</li>
+    <li>Enter your organization's name (e.g. <i>Acme</i>) and save. You become the tenant's owner.</li>
+    <li>To add other administrators, grant them rights on the <b>Tenant Access</b> screen.</li>
+</ol>
+
+<h2 id="pool">2. Create a user pool</h2>
+<ol>
+    <li>Create a new pool under the tenant (e.g. <i>Customers</i>).</li>
+    <li>Review the policies on the <b>Pool Details</b> screen:
+        <ul>
+            <li><b>Sign-in policy:</b> password, e-mail / SMS code, external identity providers; e-mail, username or phone as the identifier.</li>
+            <li><b>Registration policy:</b> can users sign up themselves or only by invitation? E-mail verification is on by default.</li>
+            <li><b>Password, multi-factor and session</b> settings.</li>
+        </ul>
+    </li>
+    <li>For enterprise use we recommend turning on the <b>Redirect domain policy</b> and allowing only your own domains.</li>
+</ol>
+<div class="callout warn"><p><b>Sending e-mail.</b> Fill in the <code>MAIL_*</code> settings in <code>.env</code> for verification, invitation and
+    password reset e-mails. Without them no e-mail is sent, and sign-ups that require e-mail verification cannot complete.</p></div>
+
+<h2 id="application">3. Register an application</h2>
+<ol>
+    <li>Go to <b>Applications</b> in the pool menu and create a new application.</li>
+    <li>Set the <b>application name</b> and the <b>client key</b> (client_id), e.g. <code>acme-web</code>.</li>
+    <li><b>Grant types:</b> <i>Authorization Code</i> and <i>Refresh Token</i> for applications that sign users in.</li>
+    <li><b>Redirect URIs:</b> your application's sign-in callback, e.g. <code>https://app.company.com/callback</code>. It must match exactly.</li>
+    <li><b>Post-logout redirect URIs:</b> e.g. <code>https://app.company.com/</code>.</li>
+    <li>If your application calls your own API, add <b>Allowed APIs</b> and <b>Allowed Scopes</b>.</li>
+    <li>Optionally upload a <b>logo</b> for the sign-in screen (PNG / JPEG / GIF / WebP, up to 1 MB).</li>
+</ol>
+
+<h2 id="users">4. Add users</h2>
+<p>The <b>Users</b> screen offers three ways:</p>
+<ul>
+    <li><b>One by one:</b> enter an e-mail and a name; with "send invitation" the user gets a link to set a password.</li>
+    <li><b>CSV import:</b> a UTF-8 file with a header row, comma or semicolon separated; up to 1000 rows (1 MB) at a time.
+        Recognized columns: <code>email</code> / <code>e-posta</code>, <code>first_name</code> / <code>ad</code>, <code>last_name</code> / <code>soyad</code>,
+        or a single <code>name</code> / <code>full_name</code> column.</li>
+    <li><b>Self sign-up:</b> if the registration policy allows anyone, users create accounts from the sign-in screen.</li>
+</ul>
+<div class="code"><span class="lbl">users.csv</span><pre>email,first_name,last_name
+ayse@@company.com,Ayşe,Yılmaz
+john@@company.com,John,Smith</pre></div>
+<p>Invitation links are valid for <b>1 day</b> and can be used once; resending an invitation invalidates the previous link. When the invitation
+    is accepted, the user sets a password and the e-mail is marked as verified.</p>
+
+<h2 id="roles">5. Roles and scopes</h2>
+<ol>
+    <li>On the <b>Scopes</b> screen, define your API's permissions, e.g. <code>orders:read</code>, <code>orders:write</code>.</li>
+    <li>On the <b>Roles</b> screen, create a role (e.g. <code>manager</code>) and add scopes to it.</li>
+    <li>Assign roles to users, or set the pool's <b>default roles</b>.</li>
+</ol>
+<p>Roles appear in the token as the <code>role</code> claim and scopes as <code>scope</code>. Next: <a href="/en/docs/integration">connect your application</a>.</p>

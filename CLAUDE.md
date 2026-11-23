@@ -70,7 +70,11 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **Uretim imzalama anahtari:** kid `k2026p`; public key `LicensePublicKeys`'te gomulu. Private key yalnizca cluster secret'inda (`demo/licensing-portal`, `signing-private-key`).
   - Portal ilk acilista DB'de anahtar yoksa `LicensingPortalOptions__InitialSigningKey__{Kid,PrivateKey}` ile ice aktarir; anahtar varsa bu ayar yok sayilir.
   - Rotasyon: portalda yeni anahtar uret, public key'i `LicensePublicKeys`'e EKLE (eskisini silme), urunu yayinla.
-- **Tanitim sitesi (portal icinde):** `/` urun, `/paketler` aktif planlar + deneme, `/indir` kurulum paketi (`SiteController`).
+- **Tanitim sitesi (portal icinde, tr + en):** `/{tr|en}`, `/features`, `/pricing`, `/download`, `/docs/...` (`SiteController`).
+  - Sayfa kaydi `Site/SiteCatalog.cs` (menu, dokumantasyon yan menusu, sitemap, hreflang); gorunumler `Views/Site/{tr|en}/`. Yeni sayfa: katalog + iki dilde gorunum.
+  - `/` tarayici diline gore `/tr` ya da `/en`'e (302). Eski `/paketler`, `/indir` 301. SEO: canonical, hreflang, OG, JSON-LD, `/sitemap.xml`, `/robots.txt`.
+  - Dokumantasyon KODA dayanir; panelde gorunup calismayan seceneklerden (LDAP, TOTP, token politikasi) bahsetme.
+  - Animasyon: `.reveal` + `wwwroot/js/site.js` (IntersectionObserver; 2,5 sn emniyet; reduced-motion). Hesap/admin ekranlari `_Layout` ile, yalnizca Turkce.
   - "Lisans al" -> `/hesap/satin-al?plan=<kod>` (`deneme` = ucretsiz deneme). Eksik adimi sirayla tamamlatir ve her adimdan sonra geri doner: firma -> kurulum -> (birden cok kurulumda secim) -> siparis.
   - Panelin "Lisans al" butonu `/?installationId=` ile gelir: giris -> kurulum formu dolu (kurulum zaten kayitliysa Kurulumlarim).
 - **Musteri kurulum paketi:** `deploy/compose/` (docker-compose, `.env.example`, `init/`, `kurulum.sh|ps1`, `BENIOKU.md`).

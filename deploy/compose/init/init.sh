@@ -11,6 +11,19 @@
 set -euo pipefail
 
 : "${PUBLIC_HOST:?PUBLIC_HOST tanimli degil}"
+
+# ------------------------------------------------------------------ .env kontrolu
+# .env.example'daki "CHANGE_ME" yer tutucusu birakildiysa zayif/bilinen bir gizli degerle calismak yerine dur.
+bad=""
+for v in POSTGRES_PASSWORD REDIS_PASSWORD OPENFGA_PRESHARED_KEY HASHING_PEPPER HASHING_ENCRYPTION_KEY IDP_APPLICATION_PEPPER PANEL_SESSION_SECRET BOOTSTRAP_ADMIN_PASSWORD; do
+    val="$(printenv "CHECK_$v" || true)"
+    if [ -z "$val" ] || [ "$val" = "CHANGE_ME" ]; then bad="$bad $v"; fi
+done
+if [ -n "$bad" ]; then
+    echo "[init] HATA: .env icinde su degerler bos ya da CHANGE_ME:$bad" >&2
+    echo "[init] Kurulum betigini calistirin (./kurulum.sh ya da kurulum.ps1) veya bu degerleri uzun rastgele degerlerle doldurun." >&2
+    exit 1
+fi
 APP_UID="${APP_UID:-1654}"
 CA_DIR=/work/pki/ca
 TRUST_DIR=/work/pki/trust
