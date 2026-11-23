@@ -20,6 +20,20 @@ public sealed class LicensingPortalOptions
     /// <summary>Havale/EFT talimati (gizli degil). Degerler girilmeden siparis ekraninda yer tutucu gorunur.</summary>
     public BankAccountOptions Bank { get; set; } = new();
 
+    /// <summary>
+    /// Ilk acilista veritabaninda anahtar YOKSA ice aktarilacak imzalama anahtari (cluster secret'indan).
+    /// Public key'i urune onceden gomulebilsin diye anahtar disarida bir kez uretilir. Anahtar varsa yok sayilir.
+    /// </summary>
+    public InitialSigningKeyOptions? InitialSigningKey { get; set; }
+
+    public sealed class InitialSigningKeyOptions
+    {
+        public string Kid { get; set; } = string.Empty;
+
+        /// <summary>Ed25519 private key (32 bayt), base64. GIZLIDIR; yalnizca secret ile verilir.</summary>
+        public string PrivateKey { get; set; } = string.Empty;
+    }
+
     /// <summary>Yalnizca lokal gelistirmede false (self-signed sertifika / http).</summary>
     public bool RequireHttpsMetadata { get; set; } = true;
 

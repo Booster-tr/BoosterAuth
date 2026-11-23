@@ -2,6 +2,7 @@ using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Hashing.TwoWays.Aes;
 using Booster.Licensing.Portal.Data;
 using Booster.Licensing.Portal.Data.Entities;
+using Booster.Licensing.Portal.Options;
 using Booster.Licensing.Signing;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,10 @@ namespace Booster.Licensing.Portal.Services;
 /// <summary>
 /// Imzalama anahtarlarinin tek giris noktasi. Private key yalnizca bu sinifta cozulur ve hicbir yere loglanmaz.
 /// </summary>
-public sealed class SigningKeyStore(LicensingDbContext db, ISecretProtector protector, ILogger<SigningKeyStore> logger)
+public sealed class SigningKeyStore(LicensingDbContext db, ISecretProtector protector, LicensingPortalOptions options, ILogger<SigningKeyStore> logger)
 {
     /// <summary>
-    /// Aktif anahtar yoksa uretir (ilk acilis). Kid bicimi: k&lt;yil&gt;&lt;harf&gt;, or. k2026a.
+    /// Aktif anahtar yoksa: <see cref="LicensingPortalOptions.InitialSigningKey"/> verilmisse onu ice aktarir, yoksa uretir (ilk acilis). Kid bicimi: k&lt;yil&gt;&lt;harf&gt;, or. k2026a.
     /// Yalnizca kid ve public key loglanir.
     /// </summary>
     public async Task EnsureActiveKeyAsync(CancellationToken ct)
@@ -22,10 +23,18 @@ public sealed class SigningKeyStore(LicensingDbContext db, ISecretProtector prot
             return;
 
         var existing = await db.SigningKeys.Select(k => k.Kid).ToListAsync(ct);
-        var year = DateTime.UtcNow.Year;
-        var kid = Enumerable.Range('a', 26).Select(c => $"k{year}{(char)c}").First(k => !existing.Contains(k));
-
-        var key = LicenseSigningKey.Generate(kid);
+        LicenseSigningKey key;
+        var initial = options.InitialSigningKey;
+        if (initial is { Kid.Length: > 0, PrivateKey.Length: > 0 } && !existing.Contains(initial.Kid))
+        {
+            key = LicenseSigningKey.FromPrivateKey(initial.Kid, Convert.FromBase64String(initial.PrivateKey));
+        }
+        else
+        {
+            var year = DateTime.UtcNow.Year;
+            key = LicenseSigningKey.Generate(Enumerable.Range('a', 26).Select(c => $"k{year}{(char)c}").First(k => !existing.Contains(k)));
+        }
+        var kid = key.Kid;
         db.SigningKeys.Add(new SigningKey
         {
             Id = EntityId.New(),
@@ -39,7 +48,7 @@ public sealed class SigningKeyStore(LicensingDbContext db, ISecretProtector prot
         {
             await db.SaveChangesAsync(ct);
             logger.LogWarning(
-                "Yeni lisans imzalama anahtari uretildi: kid={Kid} public={PublicKey}. Public key urune (LicensePublicKeys) eklenmeli.",
+                "Lisans imzalama anahtari etkinlestirildi: kid={Kid} public={PublicKey}. Public key urune (LicensePublicKeys) eklenmeli.",
                 kid, key.PublicKeyBase64Url);
         }
         catch (DbUpdateException)
