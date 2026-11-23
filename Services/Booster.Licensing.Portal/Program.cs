@@ -25,6 +25,7 @@ builder.Services.AddScoped<SigningKeyStore>();
 builder.Services.AddScoped<LicenseIssuer>();
 builder.Services.AddScoped<CustomerPortalService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddSingleton<InstallPackage>();
 
 // Musteri e-postalari Booster Notification servisi uzerinden (Kafka + EF outbox).
 builder.Services.AddBoosterMessaging<LicensingDbContext>(builder.Configuration,

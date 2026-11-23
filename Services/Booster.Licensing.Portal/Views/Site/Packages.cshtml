@@ -1,0 +1,57 @@
+@model List<Plan>
+@using Booster.Licensing.Portal.Services
+@{
+    ViewData["Title"] = "Paketler";
+    ViewData["Wide"] = true;
+    var tr = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+}
+<section class="site-head">
+    <h1>Paketler</h1>
+    <p class="lead">Tüm paketlerde Booster Auth'un bütün özellikleri vardır; paketler yalnızca kullanım limitlerinde ayrılır.
+        Lisans kurulum başınadır ve yıllıktır.</p>
+</section>
+
+<div class="plans">
+    <article class="plan" data-plan="deneme">
+        <h2>Ücretsiz deneme</h2>
+        <p class="plan-price">Ücretsiz</p>
+        <ul class="plan-limits">
+            <li>@LicenseIssuer.Defaults.TrialUsers.ToString("N0", tr) kullanıcı</li>
+            <li>@LicenseIssuer.Defaults.TrialPools kullanıcı havuzu</li>
+            <li>@LicenseIssuer.Defaults.TrialClients uygulama</li>
+            <li>@LicenseIssuer.Defaults.TrialDays gün</li>
+        </ul>
+        <p class="muted small">Firma e-postanız ve firmanıza ait domain ile, domain başına bir kez.</p>
+        <a class="btn btn-ghost" href="/hesap/satin-al?plan=deneme">Ücretsiz dene</a>
+    </article>
+    @foreach (var p in Model)
+    {
+        <article class="plan" data-plan="@p.Code">
+            <h2>@p.Name</h2>
+            <p class="plan-price">@(p.Price > 0 ? $"{p.Price.ToString("N2", tr)} {p.Currency}" : "Teklif alın")<small>@(p.Price > 0 ? $" / {p.DurationMonths} ay" : "")</small></p>
+            <ul class="plan-limits">
+                <li>@p.MaxUsers.ToString("N0", tr) kullanıcı</li>
+                <li>@p.MaxPools kullanıcı havuzu</li>
+                <li>@p.MaxClients uygulama</li>
+                <li>@p.DurationMonths ay</li>
+            </ul>
+            <p class="muted small">Havale / EFT ile ödeme. Ödeme onaylanınca lisans e-postanıza gelir.</p>
+            <a class="btn btn-primary" href="/hesap/satin-al?plan=@Uri.EscapeDataString(p.Code)" data-buy="@p.Code">Lisans al</a>
+        </article>
+    }
+</div>
+
+<section class="card">
+    <h2>Sık sorulanlar</h2>
+    <dl class="faq">
+        <dt>Lisans süresi dolarsa ne olur?</dt>
+        <dd>Bitişten sonra 14 günlük ek süre boyunca her şey çalışır. Ardından yönetim paneli salt okunur olur; son
+            kullanıcı girişleri ücretli lisanslarda kesilmez.</dd>
+        <dt>Erken yenilersem kalan günlerim yanar mı?</dt>
+        <dd>Hayır. Yeni süre mevcut lisansınızın bitiş tarihine eklenir.</dd>
+        <dt>Sunucumu değiştirirsem?</dt>
+        <dd>Lisansınızı portaldan yeni kurulumunuza kendiniz aktarabilirsiniz (yılda en fazla 3 kez).</dd>
+        <dt>Ürün internete bağlanmak zorunda mı?</dt>
+        <dd>Hayır. Lisans çevrimdışı doğrulanır; yalnızca image'ları indirmek için internet gerekir.</dd>
+    </dl>
+</section>

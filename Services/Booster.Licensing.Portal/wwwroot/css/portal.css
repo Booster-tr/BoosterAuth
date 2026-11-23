@@ -91,3 +91,43 @@ th { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: 
     .facts dd { margin-bottom: .5rem; }
     th:nth-child(2), td:nth-child(2) { display: none; }
 }
+
+/* --- Tanitim sitesi (/, /paketler, /indir) --- */
+.small { font-size: .875rem; }
+.nav-site { padding-right: .5rem; border-right: 1px solid var(--border); }
+.site-hero { background: linear-gradient(160deg, var(--navy) 0%, #20407a 100%); color: #fff; border-radius: var(--radius); padding: 3.5rem 1.5rem; margin-bottom: 1.5rem; }
+.site-hero-inner { max-width: 720px; margin: 0 auto; text-align: center; }
+.site-hero h1 { color: #fff; font-size: 2.1rem; line-height: 1.2; margin-bottom: 1rem; }
+.site-hero .lead { color: #d6def0; }
+.site-hero .muted { color: #b8c4de; }
+.site-hero .btn-ghost { color: #fff; border-color: rgba(255,255,255,.45); }
+.eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 700; color: #7fd8cb; margin: 0 0 .5rem; }
+.cta { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0 1rem; }
+.how .cta { justify-content: flex-start; }
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.feature { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; }
+.feature h3 { margin: 0 0 .4rem; font-size: 1.02rem; color: var(--navy); }
+.feature p { margin: 0; color: var(--muted); }
+.how-steps { padding-left: 1.25rem; }
+.how-steps li { margin-bottom: .6rem; }
+.site-head { text-align: center; padding: 1.5rem 1rem 1rem; }
+.site-head .lead { max-width: 680px; margin: 0 auto 1rem; }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.plan { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; display: flex; flex-direction: column; }
+.plan h2 { margin: 0 0 .25rem; }
+.plan-price { font-size: 1.4rem; font-weight: 700; color: var(--teal); margin: .25rem 0 .75rem; }
+.plan-price small { font-size: .85rem; font-weight: 500; color: var(--muted); }
+.plan-limits { list-style: none; padding: 0; margin: 0 0 .75rem; }
+.plan-limits li { padding: .2rem 0; border-bottom: 1px dashed var(--border); }
+.plan .btn { margin-top: auto; }
+.stat-selected { border-color: var(--teal); box-shadow: 0 0 0 2px var(--teal) inset; }
+.faq dt { font-weight: 600; margin-top: .75rem; }
+.faq dd { margin: .25rem 0 0; color: var(--muted); }
+.code { background: var(--navy-soft); border: 1px solid var(--border); border-radius: 8px; padding: .6rem .8rem; font: .85rem/1.5 ui-monospace, Consolas, monospace; overflow-x: auto; margin: .5rem 0; }
+.files { columns: 2; padding-left: 1.1rem; }
+@media (max-width: 640px) {
+    .site-hero { padding: 2.25rem 1rem; }
+    .site-hero h1 { font-size: 1.6rem; }
+    .nav-site { border-right: 0; }
+    .files { columns: 1; }
+}

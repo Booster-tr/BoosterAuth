@@ -1,0 +1,20 @@
+@model List<CustomerInstallation>
+@{
+    ViewData["Title"] = "Kurulum seçin";
+    var plan = ViewBag.Plan as string ?? "";
+}
+<h1>Hangi kurulum için?</h1>
+<p class="muted">Lisans kurulum başınadır. Lisans almak istediğiniz kurulumu seçin.</p>
+@foreach (var inst in Model)
+{
+    <section class="card" data-installation="@inst.InstallationId">
+        <div class="page-head">
+            <div>
+                <h2>@inst.Label</h2>
+                <p class="muted"><code>@inst.InstallationId</code> · @string.Join(", ", inst.Domains)</p>
+            </div>
+            <a class="btn btn-primary" href="/hesap/siparis/yeni?InstallationId=@inst.InstallationId&plan=@Uri.EscapeDataString(plan)">Seç</a>
+        </div>
+    </section>
+}
+<p><a href="/hesap/kurulumlar/yeni?returnUrl=@Uri.EscapeDataString($"/hesap/satin-al?plan={plan}")">Yeni kurulum ekle</a></p>

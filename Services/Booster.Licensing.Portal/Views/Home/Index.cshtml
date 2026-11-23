@@ -1,11 +1,64 @@
-@{ ViewData["Title"] = "Hoş geldiniz"; }
-<section class="hero">
-    <h1>Booster Auth lisansları</h1>
-    <p class="lead">Kurulumunuz için deneme lisansı alın, lisans satın alın veya yenileyin.</p>
-    <ol class="steps">
-        <li>Booster Auth yönetim panelinde <b>Sistem &gt; Lisans</b> ekranından kurulum GUID'inizi kopyalayın.</li>
-        <li>Bu portala giriş yapın ya da hesap oluşturun.</li>
-        <li>Lisansınızı alın ve token'ı panele yapıştırın.</li>
+@{
+    ViewData["Title"] = "Kendi sunucunuzda kimlik ve yetki yönetimi";
+    ViewData["Wide"] = true;
+}
+<section class="site-hero">
+    <div class="site-hero-inner">
+        <p class="eyebrow">Booster Auth</p>
+        <h1>Kendi sunucunuzda kimlik ve yetki yönetimi</h1>
+        <p class="lead">Uygulamalarınızın girişini, kullanıcılarını ve yetkilerini tek yerden yönetin. OpenID Connect uyumlu,
+            Docker Compose ile dakikalar içinde kurulur; verileriniz sizin altyapınızda kalır.</p>
+        <div class="cta">
+            <a class="btn btn-primary btn-lg" href="/indir" data-cta="download">Ücretsiz indir</a>
+            <a class="btn btn-ghost btn-lg" href="/paketler" data-cta="packages">Paketleri incele</a>
+        </div>
+        <p class="muted small">7 günlük deneme lisansı ücretsizdir; kredi kartı gerekmez.</p>
+    </div>
+</section>
+
+<section class="features" aria-label="Özellikler">
+    <article class="feature">
+        <h3>OpenID Connect sağlayıcı</h3>
+        <p>Web, mobil ve sunucu uygulamaları için standart OIDC / OAuth 2.0 girişi. PKCE, yenileme token'ları ve
+            kendi markanıza uygun giriş ekranları.</p>
+    </article>
+    <article class="feature">
+        <h3>Güçlü giriş seçenekleri</h3>
+        <p>Parolalı ve parolasız giriş, e-posta / SMS doğrulama kodları, iki adımlı doğrulama ve harici sağlayıcılarla
+            (federasyon) giriş.</p>
+    </article>
+    <article class="feature">
+        <h3>Kullanıcı havuzları</h3>
+        <p>Her ürün ya da müşteri için ayrı kullanıcı havuzu, kayıt ve parola politikası, izinli yönlendirme adresleri.</p>
+    </article>
+    <article class="feature">
+        <h3>İlişki tabanlı yetkilendirme</h3>
+        <p>OpenFGA üzerinde rol ve izin yönetimi; uygulamalarınız tek bir API çağrısıyla "bu kullanıcı bunu yapabilir mi?"
+            sorusunu yanıtlar.</p>
+    </article>
+    <article class="feature">
+        <h3>Yönetim paneli</h3>
+        <p>Havuzlar, uygulamalar, kullanıcılar, roller ve sistem mesajları için web paneli. Kullanıcı ekleme, CSV ile toplu
+            içe aktarma ve e-posta davetiyle hesap açma.</p>
+    </article>
+    <article class="feature">
+        <h3>Kendi altyapınızda</h3>
+        <p>Tüm servisler sizin sunucunuzda çalışır. Lisans çevrimdışı doğrulanır; ürün dışarıya bağlanmaz, verileriniz
+            paylaşılmaz.</p>
+    </article>
+</section>
+
+<section class="card how" aria-label="Nasıl başlarım">
+    <h2>Nasıl başlarım?</h2>
+    <ol class="how-steps">
+        <li><b>İndirin.</b> Kurulum paketini indirip <code>kurulum</code> betiğini çalıştırın, ardından
+            <code>docker compose up -d</code>.</li>
+        <li><b>Panele girin.</b> Yönetim panelinde <b>Sistem &gt; Lisans</b> ekranındaki <b>Lisans al</b> butonuna basın.</li>
+        <li><b>Lisansınızı alın.</b> Bu portalda hesap açın; ücretsiz deneme alın ya da bir paket satın alın.</li>
+        <li><b>Yapıştırın.</b> Lisans anahtarını panele yapıştırın; servisleri yeniden başlatmanız gerekmez.</li>
     </ol>
-    <a class="btn btn-primary btn-lg" href="/giris?returnUrl=@Uri.EscapeDataString(ViewBag.Next as string ?? "/hesap")">Giriş yap / Hesap oluştur</a>
+    <div class="cta">
+        <a class="btn btn-primary" href="/indir">Kurulum paketini indir</a>
+        <a class="btn btn-ghost" href="/hesap/satin-al?plan=deneme">Ücretsiz deneme al</a>
+    </div>
 </section>

@@ -1,4 +1,3 @@
-using Booster.Licensing.Portal.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -8,21 +7,23 @@ using Microsoft.AspNetCore.Mvc;
 namespace Booster.Licensing.Portal.Controllers;
 
 [AllowAnonymous]
-public sealed class HomeController(LicensingPortalOptions options) : Controller
+public sealed class HomeController : Controller
 {
+    /// <summary>
+    /// Urun tanitim sayfasi. Urun panelindeki "Lisans al" butonu kurulum GUID'ini tasir (?installationId=): o zaman
+    /// sayfa gosterilmez; giris yapilir ve kurulum formu GUID dolu acilir.
+    /// </summary>
     [HttpGet("/")]
     public IActionResult Index([FromQuery] Guid? installationId)
     {
-        // Urun panelindeki "Lisans al" butonu kurulum GUID'ini tasir; giristen sonra kurulum formu dolu acilir.
-        var next = installationId is { } g && g != Guid.Empty ? $"/hesap/kurulumlar/yeni?installationId={g}" : "/hesap";
-        if (User.Identity?.IsAuthenticated != true)
+        if (installationId is { } g && g != Guid.Empty)
         {
-            ViewBag.Next = next;
-            return View();
+            var next = $"/hesap/kurulumlar/yeni?installationId={g}";
+            return User.Identity?.IsAuthenticated == true
+                ? Redirect(next)
+                : Redirect($"/giris?returnUrl={Uri.EscapeDataString(next)}");
         }
-        if (string.Equals(User.FindFirst("email_verified")?.Value, "true", StringComparison.OrdinalIgnoreCase) && options.IsAdmin(User.FindFirst("email")?.Value))
-            return Redirect("/admin");
-        return Redirect(next);
+        return View();
     }
 
     /// <summary>Booster Auth giris ekranina yonlendirir. Kayit ("Hesap olustur") da o ekrandadir.</summary>
