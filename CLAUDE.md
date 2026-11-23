@@ -92,6 +92,19 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Yonetim havuzu her zaman aciktir, cunku yonetici yeni lisansi yapistirabilmeli.
 - **Hata kodu:** is kurali hatalari ProblemDetails'te `code` alaniyla da doner. Bu alan mesaj anahtaridir; panel metne degil koda bakar.
 
+## Kullanici ekleme ve davet (IdP)
+- **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).
+  - Panelden ekleme (`POST pools/users`) ve CSV ice aktarma (`POST pools/users/import`) bunu kullanir.
+  - Faz 1.5'te limit kontrolu buraya eklenir; self-servis kayit ve federasyon ilk girisi de bu sinifa tasinir. Yeni bir kullanici olusturma yolu yazarken BU SINIFI KULLAN.
+- **Davet:** `InvitationManager`.
+  - Baglanti `/idp/ui/invite?token=`; 1 gun gecerli ve tek kullanimlik.
+  - Yeniden gonderilen davet (`POST pools/users/invite`) eskisini gecersiz kilar.
+  - Kabul edilince parola belirlenir ve e-posta dogrulanmis sayilir.
+- Havuz politikasi istemcisiz akislarda `PoolDataReader` (Management `GetPoolData` gRPC) ile okunur.
+- **OUTBOX KURALI:** `IEventBus.PublishAsync` olayi EF outbox'a yazar; olay ancak ayni DbContext'te `SaveChanges` cagrilinca kaydedilir.
+  - Publish'ten sonra SaveChanges yoksa olay (e-posta) HIC gitmez.
+  - Baska bir degisiklik olmasa bile SaveChanges cagir (bkz. `ResendPoolUserInvitation`).
+
 ## Komutlar
 ```bash
 dotnet build Booster.Auth.slnx -v q

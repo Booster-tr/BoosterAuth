@@ -51,6 +51,40 @@ public sealed class ClientDataGrpcService(
         return response;
     }
 
+    public override async Task<GetClientDataResponse> GetPoolData(
+        GetPoolDefinitionsRequest request, ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.UserPoolId, out var poolId))
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "user_pool_id geçersiz."));
+
+        var ct = context.CancellationToken;
+
+        var pool = await userPoolRepository.Query().AsNoTracking().FirstOrDefaultAsync(p => p.Id == poolId, ct);
+        if (pool is null)
+            return new GetClientDataResponse { Found = false };
+
+        // Istemciye ozel alanlar bos: bu veri yalnizca havuz politikasi icin kullanilir (OAuth akisi YOK).
+        var poolOnly = new Client
+        {
+            Id = Guid.Empty,
+            ClientKey = string.Empty,
+            DisplayName = pool.Name,
+            UserPoolId = pool.Id,
+            UserPool = pool,
+            Status = EntityStatus.Active,
+            AllowedGrantTypes = OAuthGrantType.None,
+            RequireConsent = false
+        };
+
+        var defaultRoles = await ResolveDefaultRolesAsync(pool, ct);
+
+        return new GetClientDataResponse
+        {
+            Found = true,
+            Client = ClientDataMapper.ToMessage(BuildClientData(poolOnly, defaultRoles, []))
+        };
+    }
+
     public override async Task<GetClientDataResponse> GetByClientKey(
         GetClientDataRequest request, ServerCallContext context)
     {

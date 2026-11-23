@@ -97,6 +97,14 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.ResetTokenInvalid, "Sıfırlama bağlantısı", "Bu sıfırlama bağlantısı geçersiz ya da süresi dolmuş. Lütfen yeniden talep edin.", "Reset link", "This reset link is invalid or has expired. Please request a new one."),
         new(IdpMessageKeys.PasswordResetRequested, "Parola sıfırlama", "Girdiğiniz bilgiye ait bir hesap varsa sıfırlama bağlantısı gönderildi.", "Password reset", "If an account matches what you entered, a reset link has been sent."),
 
+        // --- Panelden kullanıcı ekleme / içe aktarma / davet ---
+        new(IdpMessageKeys.InvitationInvalid, "Davet", "Bu davet bağlantısı geçersiz ya da süresi dolmuş. Yöneticinizden yeni bir davet isteyin.", "Invitation", "This invitation link is invalid or has expired. Ask your administrator for a new invitation."),
+        new(IdpMessageKeys.InvitationNotPending, "Davet", "Bu kullanıcı parolasını zaten belirlemiş; davet gönderilemez.", "Invitation", "This user has already set a password; an invitation cannot be sent."),
+        new(IdpMessageKeys.ImportCsvInvalid, "İçe aktarma", "CSV dosyası okunamadı. İlk satır başlık olmalı ve bir email sütunu içermeli (email,ad,soyad).", "Import", "The CSV file could not be read. The first row must be a header containing an email column (email,first_name,last_name)."),
+        new(IdpMessageKeys.ImportTooManyRows, "İçe aktarma", "Bir dosyada en fazla {Max} kullanıcı içe aktarılabilir.", "Import", "At most {Max} users can be imported in one file."),
+        new(IdpMessageKeys.EmailInvalid, "E-posta", "Geçerli bir e-posta adresi girin.", "Email", "Enter a valid email address."),
+        new(IdpMessageKeys.DisplayNameRequired, "Kullanıcı", "Ad soyad zorunludur.", "User", "Display name is required."),
+
         // --- Servis hesapları ---
         new(IdpMessageKeys.ServiceAccountKeyRequired, "Servis hesabı", "service_account_key ve service_account_secret parametreleri zorunludur.", "Service account", "The service_account_key and service_account_secret parameters are required."),
         new(IdpMessageKeys.InvalidServiceAccount, "Servis hesabı", "Servis hesabı bilgileri hatalı.", "Service account", "The service account credentials are incorrect."),

@@ -16,6 +16,11 @@ service ClientDataService {
   // Havuzda tanimli roller ve kapsamlar. IdP, kullaniciya rol/kapsam atarken
   // yalnizca bunlarin secilebildigini dogrular.
   rpc GetPoolDefinitions (GetPoolDefinitionsRequest) returns (GetPoolDefinitionsResponse);
+
+  // Bir istemci olmadan HAVUZUN politikalari (parola, giris, kayit) ve varsayilan rol/kapsamlari.
+  // Panelden kullanici ekleme ve davet kabulu icin: bu akislarda OAuth istemcisi yoktur.
+  // Yanit ClientDataMessage bicimindedir; istemciye ozel alanlar bos gelir.
+  rpc GetPoolData (GetPoolDefinitionsRequest) returns (GetClientDataResponse);
 }
 
 message GetClientDataRequest {
