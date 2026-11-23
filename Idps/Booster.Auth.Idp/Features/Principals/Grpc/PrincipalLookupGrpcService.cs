@@ -12,9 +12,14 @@ namespace Booster.Auth.Idp.Features.Principals.Grpc;
 [AllowAnonymous]
 public sealed class PrincipalLookupGrpcService(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
-    IRequestContextAccessor requestContextAccessor)
+    IRequestContextAccessor requestContextAccessor,
+    Booster.Auth.Idp.Managers.UserManagers.EndUserFactory endUserFactory)
     : PrincipalLookupService.PrincipalLookupServiceBase
 {
+    /// <summary>Limit kontroluyle AYNI sayim (EndUserFactory.CountLicensedUsersAsync).</summary>
+    public override async Task<CountLicensedUsersResponse> CountLicensedUsers(CountLicensedUsersRequest request, ServerCallContext context)
+        => new() { Count = await endUserFactory.CountLicensedUsersAsync(context.CancellationToken) };
+
     public override async Task<FindByIdentifierResponse> FindByIdentifier(
         FindByIdentifierRequest request, ServerCallContext context)
     {

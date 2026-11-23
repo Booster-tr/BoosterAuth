@@ -18,4 +18,12 @@ public static class LicenseMessageKeys
     public const string InstallationMismatch = "LICENSE_INSTALLATION_MISMATCH";
     public const string UnsupportedVersion = "LICENSE_UNSUPPORTED_VERSION";
     public const string Expired = "LICENSE_EXPIRED";
+
+    // --- Limitler (yeni kayit olusturma reddedildi; mevcut kayitlar ETKILENMEZ) ---
+    public const string LimitUsers = "LICENSE_LIMIT_USERS";
+    public const string LimitPools = "LICENSE_LIMIT_POOLS";
+    public const string LimitClients = "LICENSE_LIMIT_CLIENTS";
+
+    /// <summary>Self-servis kayit / federasyon ilk girisi limit nedeniyle kapali. Son kullaniciya teknik ayrinti gosterilmez.</summary>
+    public const string RegistrationClosed = "LICENSE_REGISTRATION_CLOSED";
 }

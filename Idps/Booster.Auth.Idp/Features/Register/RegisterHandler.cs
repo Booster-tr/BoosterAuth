@@ -21,6 +21,7 @@ using Booster.Hashing.OneWays.Argon;
 using FastEndpoints;
 using FluentValidation;
 using FluentValidation.Results;
+using Booster.Auth.Idp.Managers.UserManagers;
 
 namespace Booster.Auth.Idp.Features.Register;
 
@@ -36,7 +37,8 @@ public sealed class RegisterHandler(
     AuthorizationService.AuthorizationServiceClient authorizationClient,
     ILocalUserStore userStore,
     ILoginChallengeManager loginChallengeManager,
-    IRequestContextAccessor requestContextAccessor) : ICommandHandler<RegisterCommand, RegisterResult>
+    IRequestContextAccessor requestContextAccessor,
+    EndUserFactory endUserFactory) : ICommandHandler<RegisterCommand, RegisterResult>
 {
     public async Task<RegisterResult> ExecuteAsync(RegisterCommand cmd, CancellationToken ct)
     {
@@ -60,11 +62,17 @@ public sealed class RegisterHandler(
         ValidateRequiredIdentifiers(client.Login, userName, email, phone);
         passwordPolicyManager.Validate(client.Password, cmd.Password, nameof(RegisterCommand.Password));
 
-        Guid principalId;
+        Guid principalId = default;
         using (requestContextAccessor.BeginSystemContext(client.IsolationId))
         {
             await EnsureIdentifiersAreUniqueAsync(userName, email, phone, ct);
 
+            // Lisans kullanici limiti (yaris durumuna karsi transaction + kilit). Doluysa son kullaniciya teknik
+            // ayrinti GOSTERILMEZ: genel "kayit su an kapali" mesaji; yonetici panelde limit uyarisini gorur.
+            try
+            {
+            await endUserFactory.RunWithinUserLimitAsync(async _ =>
+            {
             var principal = new Principal
             {
                 Id = EntityId.New(),
@@ -103,6 +111,12 @@ public sealed class RegisterHandler(
             await principalRepository.SaveChangesAsync(ct);
 
             principalId = principal.Id;
+            }, ct, LicenseMessageKeys.RegistrationClosed);
+            }
+            catch (Booster.ExceptionManager.Abstraction.Exceptions.BusinessException e) when (e.Message == LicenseMessageKeys.RegistrationClosed)
+            {
+                throw Invalid(LicenseMessageKeys.RegistrationClosed);
+            }
         }
 
         // Havuz doğrulama istiyorsa kullanıcı giriş ekranına değil doğrudan kod

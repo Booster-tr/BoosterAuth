@@ -40,5 +40,24 @@ public class LicenseMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<Lic
             "Bu lisansın süresi (ek süre dahil) dolmuş. Lisans portalından lisansınızı yenileyin.",
             "License",
             "This license has expired (including the grace period). Renew your license from the license portal."),
+
+        // --- Limitler (mevcut kayitlar etkilenmez) ---
+        new(LicenseMessageKeys.LimitUsers, "Lisans limiti",
+            "Kullanıcı limitiniz doldu. Yeni kullanıcı eklemek için planınızı yükseltin (Sistem > Lisans).",
+            "License limit",
+            "Your user limit has been reached. Upgrade your plan to add new users (System > License)."),
+        new(LicenseMessageKeys.LimitPools, "Lisans limiti",
+            "Havuz limitiniz doldu. Yeni havuz oluşturmak için planınızı yükseltin (Sistem > Lisans).",
+            "License limit",
+            "Your pool limit has been reached. Upgrade your plan to create new pools (System > License)."),
+        new(LicenseMessageKeys.LimitClients, "Lisans limiti",
+            "Uygulama limitiniz doldu. Yeni uygulama oluşturmak için planınızı yükseltin (Sistem > Lisans).",
+            "License limit",
+            "Your application limit has been reached. Upgrade your plan to create new applications (System > License)."),
+        // Son kullanici gorur: teknik ayrinti YOK.
+        new(LicenseMessageKeys.RegistrationClosed, "Kayıt",
+            "Kayıt şu an kapalı. Lütfen daha sonra tekrar deneyin.",
+            "Registration",
+            "Registration is currently closed. Please try again later."),
     ];
 }

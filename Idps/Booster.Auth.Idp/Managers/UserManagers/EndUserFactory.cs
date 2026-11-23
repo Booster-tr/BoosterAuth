@@ -6,6 +6,8 @@ using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Z.Grpc;
 using Booster.Database.Repositories;
+using Booster.Auth.Common.Internal.Licensing;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Auth.Idp.Managers.UserManagers;
 
@@ -23,8 +25,31 @@ public sealed class EndUserFactory(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IAsyncRepository<PrincipalScope, IdpDbContext> principalScopeRepository,
     IAsyncRepository<PrincipalRole, IdpDbContext> principalRoleRepository,
-    AuthorizationService.AuthorizationServiceClient authorizationClient)
+    AuthorizationService.AuthorizationServiceClient authorizationClient,
+    IdpDbContext db,
+    ILicenseLimitService licenseLimits)
 {
+    /// <summary>
+    /// Lisansin kullanici limitine sayilan kullanicilar: tum havuzlarda Type=User; yonetim havuzu (panel yoneticileri)
+    /// ve silinmisler HARIC. Pasif/askidaki kullanicilar sayilir (yeniden acilabilirler). Servis hesaplari sayilmaz.
+    /// </summary>
+    public Task<int> CountLicensedUsersAsync(CancellationToken ct) =>
+        db.Principals.IgnoreQueryFilters().CountAsync(p =>
+            p.Type == PrincipalType.User && p.IsolationId != AuthConstants.ManagementPoolId && p.DeletedTime == null, ct);
+
+    /// <summary>
+    /// Yeni kullanici olusturan HER yol bunu kullanir: limit kontrolu + olusturma + kaydetme tek transaction ve kilit
+    /// altinda (ayni anda iki kayit son yeri alamaz). <paramref name="create"/> SaveChanges'i kendisi cagirmalidir.
+    /// Limit doluysa <c>LICENSE_LIMIT_USERS</c> (ya da <paramref name="rejectWith"/>) ile reddedilir; mevcut kullanicilar etkilenmez.
+    /// </summary>
+    public async Task RunWithinUserLimitAsync(Func<CancellationToken, Task> create, CancellationToken ct, string? rejectWith = null)
+    {
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+        await licenseLimits.EnsureCanCreateAsync(db, LicensedResource.Users, CountLicensedUsersAsync, ct, rejectWith);
+        await create(ct);
+        await tx.CommitAsync(ct);
+    }
+
     public static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();
 
     public Task<bool> EmailExistsAsync(string normalizedEmail, CancellationToken ct) =>

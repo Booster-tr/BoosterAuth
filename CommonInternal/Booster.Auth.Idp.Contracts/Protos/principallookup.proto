@@ -8,6 +8,15 @@ package idp;
 // ogrenmesine gerek yok.
 service PrincipalLookupService {
   rpc FindByIdentifier (FindByIdentifierRequest) returns (FindByIdentifierResponse);
+
+  // Lisansin kullanici limitine sayilan kullanici sayisi (yonetim havuzu ve silinmisler haric). Kullanim ekrani icin.
+  rpc CountLicensedUsers (CountLicensedUsersRequest) returns (CountLicensedUsersResponse);
+}
+
+message CountLicensedUsersRequest {}
+
+message CountLicensedUsersResponse {
+  int32 count = 1;
 }
 
 message FindByIdentifierRequest {

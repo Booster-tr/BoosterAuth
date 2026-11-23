@@ -39,7 +39,8 @@ public class ImportPoolUsersEndpoint : Endpoint<ImportPoolUsersCommand, ImportPo
 
 public record ImportPoolUsersCommand(Guid UserPoolId, string Csv, bool SendInvitations = true) : ICommand<ImportPoolUsersResponse>;
 
-public enum ImportRowStatus { Created = 1, AlreadyExists = 2, Duplicate = 3, Invalid = 4 }
+/// <summary>LimitReached: lisansin kullanici limiti doldu; bu ve sonraki satirlar eklenmedi.</summary>
+public enum ImportRowStatus { Created = 1, AlreadyExists = 2, Duplicate = 3, Invalid = 4, LimitReached = 5 }
 
 public sealed record ImportRowResult(int Line, string? Email, string? DisplayName, ImportRowStatus Status, Guid? PrincipalId);
 
@@ -81,6 +82,7 @@ public class ImportPoolUsersCommandHandler(
 
         var results = new List<ImportRowResult>(rows.Count);
         var seen = new HashSet<string>(StringComparer.Ordinal);
+        var limitReached = false;
 
         foreach (var row in rows)
         {
@@ -90,6 +92,12 @@ public class ImportPoolUsersCommandHandler(
             if (email is null || !IsEmail(email) || string.IsNullOrWhiteSpace(name) || name.Length > 200)
             {
                 results.Add(new(row.Line, row.Email, name, ImportRowStatus.Invalid, null));
+                continue;
+            }
+
+            if (limitReached)
+            {
+                results.Add(new(row.Line, email, name, ImportRowStatus.LimitReached, null));
                 continue;
             }
 
@@ -105,13 +113,28 @@ public class ImportPoolUsersCommandHandler(
                 continue;
             }
 
-            var principal = await factory.CreateInvitedAsync(pool, name, email, ct);
-            if (cmd.SendInvitations)
-                await invitations.SendAsync(principal, cmd.UserPoolId, ct);
-
             // Satir satir kaydedilir: bir hata, onceki satirlarin kullanicilarini ve davetlerini (outbox) geri almaz.
-            await principalRepository.SaveChangesAsync(ct);
-            results.Add(new(row.Line, email, name, ImportRowStatus.Created, principal.Id));
+            Guid? createdId = null;
+            try
+            {
+                await factory.RunWithinUserLimitAsync(async c =>
+                {
+                    var principal = await factory.CreateInvitedAsync(pool, name, email, c);
+                    if (cmd.SendInvitations)
+                        await invitations.SendAsync(principal, cmd.UserPoolId, c);
+                    await principalRepository.SaveChangesAsync(c);
+                    createdId = principal.Id;
+                }, ct);
+            }
+            catch (BusinessException e) when (e.Message == LicenseMessageKeys.LimitUsers)
+            {
+                // Limit doldu: kalan satirlar da eklenmez, raporda gosterilir (mevcut kullanicilar etkilenmez).
+                limitReached = true;
+                results.Add(new(row.Line, email, name, ImportRowStatus.LimitReached, null));
+                continue;
+            }
+
+            results.Add(new(row.Line, email, name, ImportRowStatus.Created, createdId));
         }
 
         var created = results.Count(r => r.Status == ImportRowStatus.Created);

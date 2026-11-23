@@ -41,6 +41,7 @@ public static class ServiceExtensions
         services.AddSingleton<LicenseService>();
         services.AddSingleton<ILicenseStatusProvider>(sp => sp.GetRequiredService<LicenseService>());
         services.AddHostedService<LicenseMonitor>();
+        services.AddScoped<Booster.Auth.Common.Internal.Licensing.ILicenseLimitService, Booster.Auth.Common.Internal.Licensing.LicenseLimitService>();
         services.AddScoped<IClientDataCacheStore, ClientDataCacheStore>();
         services.AddScoped<IAccessManager, AccessManager>();
         services.AddScoped<IPrincipalLookupManager, PrincipalLookupManager>();
