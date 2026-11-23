@@ -1,0 +1,77 @@
+<h1>Kurulum</h1>
+<p class="lead">Booster Auth'u Docker Compose ile tek bir makineye kurun. Kendi bilgisayarınızda denemek için de aynı adımlar geçerlidir.</p>
+
+<h2 id="gereksinimler">Gereksinimler</h2>
+<ul>
+    <li>Docker Engine 24+ ve Docker Compose v2 (Windows / macOS: Docker Desktop)</li>
+    <li>En az 4 GB boş bellek ve 10 GB disk</li>
+    <li>Kurulum sırasında internet erişimi (image'lar <code>ghcr.io/booster-tr</code> adresinden indirilir)</li>
+    <li>Booster Auth için bir adres: ör. <code>auth.firma.com</code>. Bu adres <b>lisansınızdaki domain'lerden biri</b> olmalıdır.</li>
+</ul>
+
+<h2 id="indir">1. Paketi indirin</h2>
+<p><a href="/tr/download">İndir</a> sayfasından <code>booster-auth.zip</code> dosyasını indirip açın:</p>
+<div class="code"><span class="lbl">Linux / macOS</span><pre>unzip booster-auth.zip
+cd booster-auth</pre></div>
+<div class="code"><span class="lbl">Windows (PowerShell)</span><pre>Expand-Archive booster-auth.zip .
+cd booster-auth</pre></div>
+
+<h2 id="env">2. .env dosyasını hazırlayın</h2>
+<p>Tüm ayarlar <code>.env</code> dosyasındadır. En kolay yol kurulum betiğidir: adresleri sorar, tüm parola ve anahtarları rastgele üretir ve
+    <code>.env</code> dosyasını yazar.</p>
+<div class="code"><span class="lbl">Linux / macOS</span><pre>./kurulum.sh</pre></div>
+<div class="code"><span class="lbl">Windows</span><pre>powershell -ExecutionPolicy Bypass -File .\kurulum.ps1</pre></div>
+<p>Betiğin sorduğu değerler:</p>
+<table>
+    <thead><tr><th>Soru</th><th>Örnek</th><th>Açıklama</th></tr></thead>
+    <tbody>
+        <tr><td>Booster Auth adresi</td><td><code>auth.firma.com</code></td><td>Uygulamalarınızın giriş için yönleneceği adres; OIDC issuer bundan oluşur.</td></tr>
+        <tr><td>HTTPS portu</td><td><code>443</code></td><td>443 doluysa ör. <code>8443</code>.</td></tr>
+        <tr><td>Panel portu / adresi</td><td><code>3000</code> · <code>http://localhost:3000</code></td><td>Yönetim panelinin adresi.</td></tr>
+        <tr><td>Yönetici e-postası</td><td><code>it@@firma.com</code></td><td>İlk yöneticinin e-postası.</td></tr>
+    </tbody>
+</table>
+<p>İsterseniz betiği kullanmadan <code>.env.example</code> dosyasını <code>.env</code> olarak kopyalayıp kendiniz de doldurabilirsiniz:</p>
+<table>
+    <thead><tr><th>Değişken</th><th>Ne işe yarar</th></tr></thead>
+    <tbody>
+        <tr><td><code>PUBLIC_HOST</code>, <code>PUBLIC_URL</code>, <code>GATEWAY_HTTPS_PORT</code></td><td>Booster Auth adresi. <code>PUBLIC_URL</code> 443 dışındaki portu da içermelidir.</td></tr>
+        <tr><td><code>PANEL_PORT</code>, <code>PANEL_PUBLIC_URL</code></td><td>Yönetim paneli.</td></tr>
+        <tr><td><code>BOOTSTRAP_ADMIN_EMAIL</code>, <code>BOOTSTRAP_ADMIN_PASSWORD</code></td><td>İlk yönetici. Kullanıcı adı her zaman <code>admin</code>'dir.</td></tr>
+        <tr><td><code>POSTGRES_PASSWORD</code>, <code>REDIS_PASSWORD</code>, <code>OPENFGA_PRESHARED_KEY</code></td><td>Altyapı parolaları; uzun ve rastgele olmalı.</td></tr>
+        <tr><td><code>HASHING_PEPPER</code>, <code>HASHING_ENCRYPTION_KEY</code> (base64, 32 bayt), <code>IDP_APPLICATION_PEPPER</code></td><td>Parola ve gizli veri şifreleme anahtarları. <b>Kurulumdan sonra değiştirmeyin</b>; mevcut parolalar okunamaz olur.</td></tr>
+        <tr><td><code>PANEL_SESSION_SECRET</code></td><td>Panel oturum çerezlerinin imzası.</td></tr>
+        <tr><td><code>MAIL_*</code></td><td>İsteğe bağlı SMTP ayarları (kayıt doğrulama, davet, şifre sıfırlama e-postaları).</td></tr>
+        <tr><td><code>BOOSTER_VERSION</code></td><td>Image sürümü; varsayılan <code>latest</code>.</td></tr>
+    </tbody>
+</table>
+<div class="callout warn"><p><b>Önemli.</b> <code>CHANGE_ME</code> değeri kalan bir gizli alan varsa sistem başlamaz ve hangi değişkenin eksik olduğunu
+    söyler. <code>.env</code> dosyasını yedekleyin ve kimseyle paylaşmayın.</p></div>
+
+<h2 id="hosts">3. Adresi tanımlayın (yerel deneme)</h2>
+<p>Adresiniz henüz DNS'te yoksa, bilgisayarınızın <code>hosts</code> dosyasına bir satır ekleyin:</p>
+<div class="code"><span class="lbl">hosts</span><pre>127.0.0.1   auth.firma.com</pre></div>
+<p>Windows: <code>C:\Windows\System32\drivers\etc\hosts</code> (yönetici olarak açın) · Linux / macOS: <code>/etc/hosts</code></p>
+
+<h2 id="baslat">4. Başlatın</h2>
+<div class="code"><pre>docker compose up -d
+docker compose ps</pre></div>
+<p>İlk açılışta image'lar indirilir ve veritabanları oluşturulur; birkaç dakika sürer. Tüm servisler <code>running</code> olduğunda:</p>
+<ul>
+    <li><b>Yönetim paneli:</b> <code>http://localhost:3000</code> (ya da verdiğiniz adres)</li>
+    <li><b>OIDC keşif adresi:</b> <code>https://auth.firma.com/idp/.well-known/openid-configuration</code></li>
+</ul>
+
+<h2 id="https">HTTPS sertifikası</h2>
+<p>İlk açılışta kendi yerel sertifika yetkiliniz (CA) ve sunucu sertifikası otomatik üretilir (<code>pki/</code> klasörü). Tarayıcı bu sertifikayı
+    tanımadığı için uyarı verir:</p>
+<ul>
+    <li><b>Deneme:</b> <code>pki/trust/ca.crt</code> dosyasını işletim sisteminize güvenilir kök sertifika olarak ekleyin ya da uyarıyı geçin.</li>
+    <li><b>Üretim:</b> önüne kendi sertifikanızla bir reverse proxy (nginx, Traefik, Cloudflare Tunnel) koyun ya da <code>pki/tls/server.crt</code> ve
+        <code>server.key</code> dosyalarını kendi sertifikanızla değiştirin.</li>
+</ul>
+
+<h2 id="ilk-giris">5. İlk giriş</h2>
+<p>Panele <b><code>admin</code></b> kullanıcı adı ve kurulum betiğinin gösterdiği ilk parolayla girin. İlk girişte yeni bir parola belirlemeniz
+    istenir. Panel ilk açılışta <b>lisanssız</b> çalışır: son kullanıcı girişleri çalışır, yönetim ekranları salt okunurdur. Lisans almak için
+    <a href="/tr/docs/licensing">Lisans</a> sayfasına geçin.</p>

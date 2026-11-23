@@ -1,0 +1,63 @@
+<h1>Yetki kontrolü</h1>
+<p class="lead">"Bu kullanıcı bunu yapabilir mi?" sorusuna iki yoldan cevap verebilirsiniz: token'daki <b>rol ve kapsamlarla</b> ya da kayıt
+    düzeyinde <b>yetki şeması ve AuthZ API</b> ile.</p>
+
+<h2 id="hangisi">Hangisini kullanmalıyım?</h2>
+<table>
+    <thead><tr><th>İhtiyaç</th><th>Öneri</th></tr></thead>
+    <tbody>
+        <tr><td>"Yöneticiler sipariş silebilir" gibi genel kurallar</td><td>Roller ve kapsamlar — token'a bakmak yeterli.</td></tr>
+        <tr><td>"Ali yalnızca kendi ekibinin belgelerini düzenleyebilir"</td><td>Yetki şeması (ReBAC) + AuthZ API.</td></tr>
+        <tr><td>Paylaşım, klasör / proje hiyerarşisi, kaynak sahipliği</td><td>Yetki şeması (ReBAC) + AuthZ API.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="roller">Roller ve kapsamlar</h2>
+<p>Havuzda tanımladığınız roller ve kapsamlar erişim token'ına yazılır. API'niz token'ı doğruladıktan sonra claim'e bakar:</p>
+<div class="code"><span class="lbl">Erişim token'ı (özet)</span><pre>{
+  "sub": "6f1c…",
+  "aud": "https://api.firma.com",
+  "scope": "openid orders:read orders:write",
+  "role": ["manager"]
+}</pre></div>
+
+<h2 id="sema">Yetki şeması (ReBAC)</h2>
+<p>Panelde havuz menüsündeki <b>Yetki Şeması</b> ekranında:</p>
+<ol>
+    <li><b>Kaynak türlerini</b> tanımlayın, ör. <code>folder</code> ve <code>document</code>.</li>
+    <li>Türler arasındaki <b>bağları</b> ekleyin, ör. her belgenin bir klasörü vardır.</li>
+    <li><b>İzinleri</b> tanımlayın: doğrudan verilen (ör. <code>editor</code>), başka bir izinden gelen (editörler görüntüleyebilir) ya da bağ
+        üzerinden miras alınan (klasörün editörü içindeki belgelerin de editörüdür).</li>
+    <li>Şemayı <b>canlıya alın</b>. Şemalar sürümlenir: taslak, canlı, pasif. Hazır Sahip / Editör / Görüntüleyici şablonuyla başlayabilirsiniz.</li>
+</ol>
+<p><b>İlişkiler</b> ekranında kullanıcılara kayıtlar üzerinde izin verir, kayıtları birbirine bağlarsınız. <b>Yetki Testi</b> ekranında bir
+    kullanıcının bir kayıt üzerinde hangi izinlere sahip olduğunu deneyebilirsiniz.</p>
+
+<h2 id="api">AuthZ API</h2>
+<p>Uygulamanız (genellikle arka ucunuz) AuthZ API'ye bir Bearer token ile istek atar. Token'ın audience değeri
+    <code>https://auth.firma.com/authz</code> olmalıdır; bunun için uygulamanın izin verilen API'lerine AuthZ adresini ekleyin ve token isterken
+    <code>resource</code> olarak verin. Token yalnızca <b>çağıranı</b> doğrular; sorgulanan kullanıcı istek gövdesindedir.</p>
+<div class="code"><span class="lbl">İzin kontrolü</span><pre>POST https://auth.firma.com/authz/check
+Authorization: Bearer &lt;erişim token'ı&gt;
+Content-Type: application/json
+
+{
+  "isolationId": "&lt;havuz kimliği&gt;",
+  "user": "user:&lt;kullanıcı sub&gt;",
+  "relation": "editor",
+  "object": "document:siparis-2026-001"
+}</pre></div>
+<div class="code"><span class="lbl">Yanıt</span><pre>{ "data": { "allowed": true } }</pre></div>
+<p>Diğer uç noktalar:</p>
+<table>
+    <thead><tr><th>Uç nokta</th><th>Ne yapar</th></tr></thead>
+    <tbody>
+        <tr><td><code>POST /authz/batch-check</code></td><td>Tek istekte birden çok kontrol (<code>checks</code> listesi, her biri bir <code>correlationId</code> ile).</td></tr>
+        <tr><td><code>POST /authz/lookup/by-user</code></td><td>Bir kullanıcının erişebildiği kayıtlar.</td></tr>
+        <tr><td><code>POST /authz/lookup/by-object</code></td><td>Bir kayda erişebilen kullanıcılar.</td></tr>
+        <tr><td><code>POST /authz/lookup/my-access</code></td><td>Verilen türlerde kullanıcının erişimleri.</td></tr>
+        <tr><td><code>POST / DELETE /authz/relations</code></td><td>İlişki ekleme / silme (ör. bir belgeyi klasöre bağlama).</td></tr>
+    </tbody>
+</table>
+<div class="callout tip"><p><b>İpucu.</b> Kayıt oluştuğunda (ör. yeni belge) arka ucunuzdan <code>/authz/relations</code> ile sahibini ve klasörünü yazın;
+    sonraki tüm kontroller bu ilişkilerden hesaplanır.</p></div>

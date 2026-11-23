@@ -1,0 +1,47 @@
+<h1>İşletim ve sorun giderme</h1>
+<p class="lead">Günlük işlemler, güncelleme, yedekleme ve sık karşılaşılan sorunlar.</p>
+
+<h2 id="komutlar">Günlük komutlar</h2>
+<table>
+    <thead><tr><th>İşlem</th><th>Komut</th></tr></thead>
+    <tbody>
+        <tr><td>Durum</td><td><code>docker compose ps</code></td></tr>
+        <tr><td>Loglar</td><td><code>docker compose logs -f booster-idp</code></td></tr>
+        <tr><td>Durdurma (veri silinmez)</td><td><code>docker compose down</code></td></tr>
+        <tr><td>Ayar değişikliğini uygulama</td><td><code>.env</code>'yi düzenleyip <code>docker compose up -d</code></td></tr>
+    </tbody>
+</table>
+
+<h2 id="guncelleme">Güncelleme</h2>
+<div class="code"><pre>docker compose pull
+docker compose up -d</pre></div>
+<p>Veritabanı şeması açılışta otomatik güncellenir. Belirli bir sürüme sabitlemek için <code>.env</code> içinde <code>BOOSTER_VERSION</code>
+    değerini değiştirin.</p>
+
+<h2 id="yedek">Yedekleme</h2>
+<p>Tüm kalıcı veri kurulum klasöründedir. Tutarlı bir yedek için:</p>
+<ol>
+    <li><code>docker compose down</code></li>
+    <li><code>data/</code>, <code>pki/</code>, <code>secrets/</code> klasörlerini ve <code>.env</code> dosyasını yedekleyin.</li>
+    <li><code>docker compose up -d</code></li>
+</ol>
+<div class="callout warn"><p><b><code>.env</code> olmadan yedek işe yaramaz.</b> Parolalar ve şifreli veriler bu dosyadaki anahtarlarla korunur.</p></div>
+
+<h2 id="eposta">E-posta ayarları</h2>
+<p><code>.env</code> içindeki <code>MAIL_SENDER</code>, <code>MAIL_SMTP_HOST</code>, <code>MAIL_PORT</code>, <code>MAIL_USERNAME</code>,
+    <code>MAIL_PASSWORD</code> ve <code>MAIL_ENABLE_SSL</code> alanlarını doldurup <code>docker compose up -d</code> çalıştırın.</p>
+
+<h2 id="sorunlar">Sık karşılaşılan sorunlar</h2>
+<h3>Tarayıcı sertifika uyarısı veriyor</h3>
+<p>Yerel CA ile üretilen sertifika tarayıcıya tanıtılmadıysa beklenen bir durumdur. <code>pki/trust/ca.crt</code> dosyasını güvenilir kök
+    sertifika olarak ekleyin ya da üretimde kendi sertifikanızı kullanın (<a href="/tr/docs/installation#https">Kurulum › HTTPS</a>).</p>
+<h3>Girişten sonra "redirect_uri" hatası</h3>
+<p>Uygulamanın gönderdiği <code>redirect_uri</code> panelde kayıtlı adresle birebir aynı olmalıdır (şema, port ve sondaki <code>/</code> dahil).
+    Havuzda redirect domain politikası açıksa adresin domain'i de izinli olmalıdır.</p>
+<h3>Panel salt okunur</h3>
+<p>Lisans yok, süresi dolmuş ya da geçersiz demektir. <b>Sistem &gt; Lisans</b> ekranındaki duruma bakın (<a href="/tr/docs/licensing#durumlar">Lisans durumları</a>).</p>
+<h3>Kayıt e-postası gelmiyor</h3>
+<p>SMTP ayarları boşsa e-posta gönderilmez. <code>docker compose logs booster-notification</code> ile gönderim hatalarını görebilirsiniz.</p>
+<h3>Servis açılmıyor</h3>
+<p><code>docker compose ps</code> ile durumu, <code>docker compose logs &lt;servis&gt;</code> ile hatayı görün. <code>.env</code>'de <code>CHANGE_ME</code>
+    kalan alan varsa hazırlık adımı hangi alanın eksik olduğunu yazar: <code>docker compose logs booster-init</code>.</p>

@@ -1,0 +1,56 @@
+@using Booster.Licensing.Portal.Services
+<section class="page-hero">
+    <div class="wrap">
+        <span class="eyebrow" style="color:var(--teal)">İndir</span>
+        <h1 class="reveal">Booster Auth'u kendi bilgisayarınızda çalıştırın</h1>
+        <p class="reveal" style="--d:.08s">Docker Compose kurulum paketi: tüm servisler, PostgreSQL, Redis, Kafka, OpenFGA ve yönetim paneli tek klasörde.</p>
+        <div class="cta reveal" style="justify-content:center;--d:.16s">
+            <a class="btn btn-primary btn-lg" href="/download/@InstallPackage.FileName" data-download>@InstallPackage.FileName indir <span class="arrow">↓</span></a>
+            <a class="btn btn-ghost btn-lg" href="/tr/docs/installation">Ayrıntılı kurulum rehberi</a>
+        </div>
+        <p class="muted small reveal" style="--d:.2s">Ücretsiz · Lisansı kurulumdan sonra alırsınız · Yaklaşık 15 KB</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap grid-2" style="align-items:start;gap:3rem">
+        <div class="reveal">
+            <h2>Dört komutla kurulum</h2>
+            <div class="steps" style="grid-template-columns:1fr;gap:1rem;margin-top:1.5rem">
+                <div class="step"><h3>Paketi açın</h3><p>Zip dosyasını açıp <code>booster-auth</code> klasörüne geçin.</p></div>
+                <div class="step"><h3>Kurulum betiğini çalıştırın</h3><p>Booster Auth adresinizi (ör. <code>auth.firma.com</code>) ve panel adresini sorar; tüm parola ve anahtarları rastgele üretip <code>.env</code> dosyasını yazar.</p></div>
+                <div class="step"><h3>Başlatın</h3><p><code>docker compose up -d</code>. İlk açılışta image'lar indirilir; birkaç dakika sürer.</p></div>
+                <div class="step"><h3>Panele girin ve lisans alın</h3><p><code>admin</code> kullanıcısıyla girin, ilk parolayı değiştirin. <b>Sistem &gt; Lisans</b> ekranındaki <b>Lisans al</b> sizi lisans portalına götürür.</p></div>
+            </div>
+        </div>
+        <div class="reveal" style="--d:.08s">
+            <div class="terminal">
+                <div class="terminal-bar"><i></i><i></i><i></i></div>
+<pre><span class="c"># Linux / macOS</span>
+<span class="p">$</span> unzip booster-auth.zip &amp;&amp; cd booster-auth
+<span class="p">$</span> ./kurulum.sh
+<span class="p">$</span> docker compose up -d
+
+<span class="c"># Windows (PowerShell)</span>
+<span class="p">&gt;</span> Expand-Archive booster-auth.zip .
+<span class="p">&gt;</span> cd booster-auth
+<span class="p">&gt;</span> powershell -ExecutionPolicy Bypass -File .\kurulum.ps1
+<span class="p">&gt;</span> docker compose up -d</pre>
+            </div>
+            <div class="callout info" style="margin-top:1.5rem">
+                <p><b>Yerel deneme.</b> Adresiniz henüz DNS'te yoksa <code>hosts</code> dosyasına <code>127.0.0.1 auth.firma.com</code> satırını ekleyin.
+                    Booster Auth adresi lisansınızdaki domain'lerden biri olmalıdır.</p>
+            </div>
+            <h3 style="margin-top:2rem">Gereksinimler</h3>
+            <ul class="muted">
+                <li>Docker Engine 24+ ve Docker Compose v2 (Windows / macOS: Docker Desktop)</li>
+                <li>En az 4 GB boş bellek, 10 GB disk</li>
+                <li>Kurulumda internet erişimi (image'lar <code>ghcr.io/booster-tr</code> adresinden indirilir)</li>
+            </ul>
+            <h3 style="margin-top:1.5rem">Paketin içeriği</h3>
+            <ul class="muted">
+                @foreach (var f in Model.PackageFiles) { <li><code>booster-auth/@f</code></li> }
+            </ul>
+        </div>
+    </div>
+</section>

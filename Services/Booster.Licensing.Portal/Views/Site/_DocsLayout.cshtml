@@ -1,0 +1,40 @@
+@using Booster.Licensing.Portal.Site
+@{
+    Layout = "~/Views/Site/_SiteLayout.cshtml";
+    var m = (SitePageModel)Model!;
+    var lang = m.Lang;
+    var docs = SiteCatalog.Docs;
+    var i = Array.IndexOf(docs, m.Page);
+    var prev = i > 0 ? docs[i - 1] : null;
+    var next = i >= 0 && i < docs.Length - 1 ? docs[i + 1] : null;
+}
+<div class="docs">
+    <nav class="docs-nav" aria-label="@m.T("nav.docs")">
+        @foreach (var g in SiteCatalog.DocGroups)
+        {
+            <h5>@(lang == "en" ? g.En : g.Tr)</h5>
+            @foreach (var d in docs.Where(d => d.DocGroup == g.Key))
+            {
+                <a href="@d.Path(lang)" class="@(d == m.Page ? "on" : "")" aria-current="@(d == m.Page ? "page" : null)">@d.Title(lang)</a>
+            }
+        }
+    </nav>
+    <article class="doc">
+        @RenderBody()
+        <nav class="doc-pager" aria-label="@(lang == "en" ? "Pagination" : "Sayfalar")">
+            @if (prev is not null)
+            {
+                <a href="@prev.Path(lang)" rel="prev"><small>← @m.T("docs.prev")</small><b>@prev.Title(lang)</b></a>
+            }
+            else { <span></span> }
+            @if (next is not null)
+            {
+                <a class="next" href="@next.Path(lang)" rel="next"><small>@m.T("docs.next") →</small><b>@next.Title(lang)</b></a>
+            }
+        </nav>
+    </article>
+    <aside class="toc" aria-label="@m.T("docs.on_this_page")">
+        <h6>@m.T("docs.on_this_page")</h6>
+        <div data-toc></div>
+    </aside>
+</div>

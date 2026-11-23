@@ -1,0 +1,74 @@
+<h1>Temel kavramlar</h1>
+<p class="lead">Booster Auth'ta her şey dört katmanlı bir yapıya oturur: <b>firma</b> → <b>kullanıcı havuzu</b> → <b>uygulama</b> ve
+    havuzun <b>kullanıcıları</b>. Bu sayfayı okuduktan sonra paneldeki her ekranın ne işe yaradığını bileceksiniz.</p>
+
+<div class="hier">
+    <div class="lvl"><b>Firma</b><span class="tag">tenant</span> <span class="muted">— kurumunuz ya da bir müşteriniz</span>
+        <div class="lvl"><b>Kullanıcı havuzu</b><span class="tag">pool</span> <span class="muted">— bir kullanıcı kitlesi ve onun kuralları</span>
+            <div class="lvl"><b>Uygulamalar</b><span class="tag">client</span> <span class="muted">— bu havuzla giriş yapan web / mobil / API</span></div>
+            <div class="lvl"><b>Kullanıcılar, servis hesapları</b> <span class="muted">— havuzun üyeleri</span></div>
+            <div class="lvl"><b>Roller, kapsamlar, yetki şeması</b> <span class="muted">— kim neyi yapabilir</span></div>
+            <div class="lvl"><b>Kimlik sağlayıcılar</b> <span class="muted">— Google, Microsoft, SAML…</span></div>
+        </div>
+    </div>
+</div>
+
+<h2 id="firma">Firma (tenant)</h2>
+<p>Firma, en üst düzeydeki kapsayıcıdır. Kendi kurumunuz için bir firma açarsınız; birden çok müşteriye hizmet veriyorsanız her müşteri için ayrı
+    firma açabilirsiniz. Firmanın tek ayarı adıdır; asıl işlevi altındaki havuzları ve bu havuzları kimlerin yönetebileceğini bir arada tutmaktır.</p>
+<ul>
+    <li>Firmayı oluşturan kişi onun <b>sahibi</b> olur.</li>
+    <li><b>Firma Erişimi</b> ekranından başka yöneticilere Sahip / Yönetici / Görüntüleyici yetkisi verilir.</li>
+    <li>Firma silinirse altındaki tüm havuzlar da silinir.</li>
+</ul>
+
+<h2 id="havuz">Kullanıcı havuzu (pool)</h2>
+<p>Havuz, bir <b>kullanıcı kitlesi</b> ve o kitleye uygulanan <b>kurallar</b> bütünüdür. Örneğin "Müşteriler" ve "Çalışanlar" için iki ayrı havuz
+    açarsanız; kullanıcıları, oturumları, parola kuralları ve yetkileri birbirinden tamamen ayrı tutulur. Aynı e-posta adresi iki havuzda iki farklı
+    hesap olabilir.</p>
+<p>Havuz düzeyinde yönettikleriniz:</p>
+<table>
+    <thead><tr><th>Politika</th><th>Ne belirler</th></tr></thead>
+    <tbody>
+        <tr><td>Giriş politikası</td><td>Giriş yöntemleri (parola, e-posta kodu, SMS kodu, dış kimlik sağlayıcılar), kullanıcı tanımlayıcısı (e-posta, kullanıcı adı, telefon), hatalı deneme ve kilitleme.</td></tr>
+        <tr><td>Parola politikası</td><td>En az uzunluk; büyük / küçük harf, rakam, özel karakter; geçerlilik süresi ve geçmiş.</td></tr>
+        <tr><td>Çok faktörlü doğrulama</td><td>Parolalı girişten sonra e-posta ya da SMS koduyla ikinci adım; zorunlu tutulabilir.</td></tr>
+        <tr><td>Oturum politikası</td><td>Erişim token'ı (varsayılan 15 dk) ve yenileme token'ı (varsayılan 14 gün) süreleri, boşta kalma zaman aşımı.</td></tr>
+        <tr><td>Kayıt politikası</td><td>Herkes kayıt olabilir ya da yalnızca davetle; e-posta / telefon doğrulama; dış sağlayıcıyla ilk girişte hesap açma.</td></tr>
+        <tr><td>Varsayılan roller ve kapsamlar</td><td>Yeni kayıt olan kullanıcılara otomatik verilenler.</td></tr>
+        <tr><td>Redirect domain politikası</td><td>Havuzdaki uygulamaların hangi domain'lere yönlendirme adresi kaydedebileceği.</td></tr>
+    </tbody>
+</table>
+
+<h2 id="uygulama">Uygulama (client)</h2>
+<p>Uygulama; Booster Auth üzerinden kullanıcı girişi yapan ya da API çağıran yazılımınızdır: bir web sitesi, tek sayfalık uygulama (SPA), mobil
+    uygulama veya bir sunucu servisi. Her uygulama <b>tek bir havuza</b> bağlıdır ve o havuzun kullanıcılarıyla çalışır.</p>
+<ul>
+    <li><b>İstemci anahtarı (client key):</b> OIDC'deki <code>client_id</code> değeridir; uygulamanız bunu kullanır.</li>
+    <li><b>Grant türleri:</b> Authorization Code (kullanıcı girişi), Refresh Token, Client Credentials (servis hesabıyla makine erişimi), Token Exchange.</li>
+    <li><b>Yönlendirme adresleri:</b> girişten sonra kullanıcının döneceği adresler; birebir eşleşmelidir. Çıkış sonrası adresler ayrıca tanımlanır.</li>
+    <li><b>İzin verilen API'ler (audience) ve kapsamlar:</b> uygulamanın hangi API'ler için token alabileceği ve hangi kapsamları isteyebileceği.</li>
+    <li><b>Onay ekranı, durum ve logo:</b> kullanıcıdan onay istenip istenmeyeceği, uygulamanın aktif / pasif olması ve giriş ekranında görünen logo.</li>
+</ul>
+<div class="callout info"><p><b>Client secret yok.</b> Kullanıcı girişi yapan uygulamalar PKCE ile korunur; sunucudan sunucuya erişim için uygulamaya
+    <b>servis hesabı</b> anahtar / sırrı kullanılır.</p></div>
+
+<h2 id="kullanici">Kullanıcılar ve servis hesapları</h2>
+<p><b>Kullanıcılar</b> havuzun üyeleridir; kendileri kayıt olabilir, yönetici tarafından eklenebilir, CSV ile toplu içe aktarılabilir ya da davet
+    edilebilir. <b>Servis hesapları</b> ise insan olmayan, makine kimlikleridir: bir arka plan servisi ya da başka bir sistem, anahtar ve sırrıyla
+    token alır.</p>
+
+<h2 id="yetki">Roller, kapsamlar ve yetki şeması</h2>
+<p>Booster Auth iki tamamlayıcı yetki modeli sunar:</p>
+<ul>
+    <li><b>Roller ve kapsamlar</b> (havuz düzeyinde): örneğin <code>admin</code> rolü ya da <code>orders:read</code> kapsamı. Token'a <code>role</code>
+        ve <code>scope</code> olarak yazılır; uygulamanız token'a bakarak karar verir. Çoğu uygulama için yeterlidir.</li>
+    <li><b>Yetki şeması</b> (ilişki tabanlı, ReBAC): "Ali, Satış klasöründeki bu belgeyi düzenleyebilir mi?" gibi kayıt düzeyindeki sorular için.
+        Kaynak türlerini (Belge, Klasör), aralarındaki bağları ve izinleri tanımlarsınız; uygulamanız AuthZ API'ye sorar.</li>
+</ul>
+<p>Ayrıntılar: <a href="/tr/docs/authorization">Yetki kontrolü</a>.</p>
+
+<h2 id="yonetim">Yönetim havuzu ve panel yetkileri</h2>
+<p>Kurulumda otomatik oluşan <b>Booster</b> firması ve <b>Booster Auth</b> havuzu, yönetim panelinin kendisi içindir. Panele giren yöneticiler
+    bu havuzdadır; bu havuz lisans limitlerine dahil edilmez. Yöneticilerin firma, havuz ve uygulama üzerindeki yetkileri <b>Sahip &gt; Yönetici &gt;
+    Görüntüleyici</b> sırasıyla, ilgili "Erişim" ekranlarından verilir.</p>

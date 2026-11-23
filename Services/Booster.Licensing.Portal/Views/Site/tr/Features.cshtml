@@ -1,0 +1,81 @@
+<section class="page-hero">
+    <div class="wrap">
+        <span class="eyebrow" style="color:var(--teal)">Özellikler</span>
+        <h1 class="reveal">Kurumsal kimlik yönetiminin tamamı, tek pakette</h1>
+        <p class="reveal" style="--d:.08s">Booster Auth; kimlik doğrulama, kullanıcı yönetimi ve yetkilendirmeyi tek bir ürün olarak, kendi altyapınızda sunar.
+            Tüm özellikler tüm paketlerde vardır.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">Kimlik doğrulama</span><h2>Standart, güvenli, esnek giriş</h2></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("key")</div><h3>OpenID Connect / OAuth 2.0</h3>
+                <p>Authorization Code + PKCE (S256 zorunlu), yenileme token'ı, client credentials (servis hesapları) ve token exchange. RS256 imzalı JWT, standart keşif adresi ve JWKS.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("mail")</div><h3>Parolasız giriş</h3>
+                <p>Kullanıcılar e-posta ya da SMS ile gelen 6 haneli kodla giriş yapabilir. Kod 5 hatalı denemede geçersiz olur.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("shield")</div><h3>İki adımlı doğrulama</h3>
+                <p>Parolalı girişte e-posta ya da SMS kodu ile ikinci adım. Havuz bazında zorunlu tutulabilir.</p></article>
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("globe")</div><h3>Harici sağlayıcılar</h3>
+                <p>Google, Microsoft, Apple, LinkedIn, Facebook, GitHub, X, genel OpenID Connect ve SAML. İlk girişte hesap otomatik açılabilir.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("lock")</div><h3>Parola ve kilitleme politikası</h3>
+                <p>En az uzunluk, büyük / küçük harf, rakam, özel karakter, geçerlilik süresi ve geçmiş kontrolü. Hatalı denemede geçici kilitleme.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("clock")</div><h3>Oturum yönetimi</h3>
+                <p>Erişim ve yenileme token süreleri, boşta kalma zaman aşımı. Uygulama bazında oturum ve onay listesi; tek tek iptal.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">Kullanıcı yönetimi</span><h2>Her kitleye kendi havuzu</h2></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("users")</div><h3>Firma ve havuz yapısı</h3>
+                <p>Firmalar (tenant) altında birden çok kullanıcı havuzu. Kullanıcılar, oturumlar ve yetkiler havuzlar arasında tamamen yalıtılır.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("mail")</div><h3>Kayıt ve davet</h3>
+                <p>Herkese açık kayıt ya da yalnızca davetle üyelik. E-posta / telefon doğrulama, 1 gün geçerli tek kullanımlık davet bağlantıları.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("box")</div><h3>CSV ile toplu içe aktarma</h3>
+                <p>Tek seferde 1000 kullanıcıya kadar; Türkçe ve İngilizce sütun adları tanınır, satır satır sonuç raporu verilir.</p></article>
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("server")</div><h3>Servis hesapları</h3>
+                <p>Makineden makineye erişim için anahtar / sır çifti; süre sınırı, sır yenileme ve askıya alma.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("globe")</div><h3>Yönlendirme politikası</h3>
+                <p>Havuzdaki uygulamaların yalnızca izin verilen domain'lere yönlendirme adresi kaydedebilmesi; test ve mobil şema seçenekleri.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("panel")</div><h3>Markalı giriş ekranı</h3>
+                <p>Her uygulama kendi logosunu giriş ekranında gösterir. Giriş ve kayıt ekranları Türkçe ve İngilizcedir.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">Yetkilendirme</span><h2>Roller, kapsamlar ve ilişki tabanlı izinler</h2>
+            <p>Basit uygulamalar token'daki rol ve kapsamlarla yetinir; karmaşık senaryolarda OpenFGA tabanlı yetki şeması devreye girer.</p></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("shield")</div><h3>Roller ve kapsamlar</h3>
+                <p>Havuz bazında roller (<code>role</code>) ve kapsamlar (<code>scope</code>) token'a yazılır. Yeni kullanıcılara varsayılan rol ve kapsam atanabilir.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("graph")</div><h3>Yetki şeması (ReBAC)</h3>
+                <p>Kaynak türleri, aralarındaki bağlar ve izinler; sürümlenir (taslak / canlı). Sahip / düzenleyici / görüntüleyici şablonu hazır gelir.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("code")</div><h3>Yetki API'si</h3>
+                <p>Tekli ve toplu izin kontrolü, "bu kullanıcı neye erişebilir?" sorguları. Panelde yetki testi ekranı.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="section-head reveal"><span class="kicker">İşletim</span><h2>Kendi altyapınızda, sorunsuz</h2></div>
+        <div class="grid-3">
+            <article class="card reveal"><div class="icon">@SiteArt.Icon("box")</div><h3>Docker Compose ile kurulum</h3>
+                <p>Tek paket; PostgreSQL, Redis, Kafka ve OpenFGA dahil. Kurulum betiği tüm parola ve anahtarları üretir.</p></article>
+            <article class="card reveal" style="--d:.06s"><div class="icon">@SiteArt.Icon("lock")</div><h3>Sertleştirilmiş servisler</h3>
+                <p>Salt okunur dosya sistemi, root olmayan kullanıcı, kapatılmış Linux yetenekleri; altyapı dışarıya port açmaz.</p></article>
+            <article class="card reveal" style="--d:.12s"><div class="icon">@SiteArt.Icon("bolt")</div><h3>Çevrimdışı lisans</h3>
+                <p>Lisans anahtarı panele yapıştırılır, servisler yeniden başlatılmaz. Kullanım ve limitler panelde görünür.</p></article>
+        </div>
+        <div class="center" style="margin-top:3rem">
+            <a class="btn btn-primary btn-lg" href="/tr/download">Ücretsiz indir <span class="arrow">→</span></a>
+            <a class="btn btn-ghost btn-lg" href="/tr/docs/concepts" style="margin-left:.5rem">Kavramları öğren</a>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,58 @@
+@using Booster.Licensing.Portal.Services
+<h1>Licensing</h1>
+<p class="lead">A Booster Auth license is per installation and verified offline. The product never contacts a license server; you just paste the
+    license key into the console.</p>
+
+<h2 id="installation-id">Installation ID</h2>
+<p>Every installation has a unique <b>installation ID</b> (a GUID), shown on the <b>System &gt; License</b> screen. A license is bound to this ID and
+    does not work on another installation.</p>
+
+<h2 id="get">Two ways to get a license</h2>
+<ol>
+    <li><b>From the console:</b> the <b>Get a license</b> button on <b>System &gt; License</b> opens the license portal with your installation ID filled in.</li>
+    <li><b>From this site:</b> pick a plan on the <a href="/en/pricing">Pricing</a> page. The portal walks you through company details, installation and order.</li>
+</ol>
+<p>You sign in to the portal with a Booster Auth account; if you do not have one, create it on the sign-in screen. Then:</p>
+<ol>
+    <li><b>Company details:</b> your billing information.</li>
+    <li><b>Installation:</b> the installation ID, a label (e.g. Production) and the installation's domains (e.g. <code>company.com</code>; subdomains included).</li>
+    <li><b>Trial or order.</b></li>
+</ol>
+<div class="callout info"><p><b>Language.</b> The license portal's account screens are currently in Turkish.</p></div>
+
+<h2 id="trial">Free trial</h2>
+<ul>
+    <li>@LicenseIssuer.Defaults.TrialDays days; @LicenseIssuer.Defaults.TrialUsers users, @LicenseIssuer.Defaults.TrialPools pool, @LicenseIssuer.Defaults.TrialClients applications.</li>
+    <li>Requires a company e-mail address whose domain matches the installation's domain. Free e-mail providers are not eligible.</li>
+    <li>One trial per domain.</li>
+</ul>
+
+<h2 id="purchase">Purchasing</h2>
+<ol>
+    <li>Pick a plan in the portal and place the order; you get a <b>reference code</b> (e.g. <code>BST-2026-000123</code>) and bank transfer details.</li>
+    <li>Write the reference code in the transfer description.</li>
+    <li>Once the payment is confirmed, the license is generated automatically, e-mailed to you and listed under <b>My installations</b> in the portal.</li>
+</ol>
+
+<h2 id="activate">Activating the license</h2>
+<p>A license key is a long text starting with <code>BSTR1.</code>. Paste it into <b>System &gt; License</b> in the console and click <b>Activate</b>.
+    No service restart is needed; limits and usage are shown on the <b>Usage</b> screen.</p>
+
+<h2 id="states">License states</h2>
+<table>
+    <thead><tr><th>State</th><th>Console</th><th>End-user sign-ins</th></tr></thead>
+    <tbody>
+        <tr><td>No license</td><td>Read-only</td><td>Work</td></tr>
+        <tr><td>Active</td><td>Full</td><td>Work</td></tr>
+        <tr><td>Warning (14 days before expiry)</td><td>Full, renewal notice</td><td>Work</td></tr>
+        <tr><td>Grace period (paid @LicenseIssuer.Defaults.PaidGraceDays days, trial @LicenseIssuer.Defaults.TrialGraceDays days)</td><td>Full</td><td>Work</td></tr>
+        <tr><td>Restricted (after grace)</td><td>Read-only</td><td>Paid: work · Trial: stop</td></tr>
+    </tbody>
+</table>
+<p>When a limit (users, pools, applications) is reached, new records cannot be added; existing ones keep working.</p>
+
+<h2 id="renewal">Renewal and transfer</h2>
+<ul>
+    <li><b>Renewal:</b> place a new order for the same installation. The new period is added to the current end date, so renewing early loses nothing. You get e-mail reminders 30 and 7 days before expiry.</li>
+    <li><b>Transfer:</b> when you move servers, transfer your license to the new installation ID in the portal, up to 3 times a year.</li>
+</ul>

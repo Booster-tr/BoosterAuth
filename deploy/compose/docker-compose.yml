@@ -70,6 +70,15 @@ services:
     entrypoint: ["sh", "-c", "apk add --no-cache -q bash openssl >/dev/null && tr -d '\\r' < /scripts/init.sh > /tmp/init.sh && exec bash /tmp/init.sh"]
     environment:
       PUBLIC_HOST: ${PUBLIC_HOST:?PUBLIC_HOST .env icinde tanimli olmali}
+      # Yalnizca "CHANGE_ME" kontrolu icin (init.sh): sablondaki yer tutucuyla sistem baslatilmaz.
+      CHECK_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+      CHECK_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      CHECK_OPENFGA_PRESHARED_KEY: ${OPENFGA_PRESHARED_KEY:-}
+      CHECK_HASHING_PEPPER: ${HASHING_PEPPER:-}
+      CHECK_HASHING_ENCRYPTION_KEY: ${HASHING_ENCRYPTION_KEY:-}
+      CHECK_IDP_APPLICATION_PEPPER: ${IDP_APPLICATION_PEPPER:-}
+      CHECK_PANEL_SESSION_SECRET: ${PANEL_SESSION_SECRET:-}
+      CHECK_BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
     volumes:
       - ./init:/scripts:ro
       - ./pki:/work/pki

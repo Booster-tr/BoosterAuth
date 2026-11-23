@@ -1,0 +1,77 @@
+<h1>Installation</h1>
+<p class="lead">Install Booster Auth on a single machine with Docker Compose. The same steps work for a trial on your own laptop.</p>
+
+<h2 id="requirements">Requirements</h2>
+<ul>
+    <li>Docker Engine 24+ and Docker Compose v2 (Windows / macOS: Docker Desktop)</li>
+    <li>At least 4 GB of free memory and 10 GB of disk</li>
+    <li>Internet access during installation (images are pulled from <code>ghcr.io/booster-tr</code>)</li>
+    <li>An address for Booster Auth, e.g. <code>auth.company.com</code>. It must be on <b>one of the domains in your license</b>.</li>
+</ul>
+
+<h2 id="download">1. Download the package</h2>
+<p>Download <code>booster-auth.zip</code> from the <a href="/en/download">Download</a> page and unzip it:</p>
+<div class="code"><span class="lbl">Linux / macOS</span><pre>unzip booster-auth.zip
+cd booster-auth</pre></div>
+<div class="code"><span class="lbl">Windows (PowerShell)</span><pre>Expand-Archive booster-auth.zip .
+cd booster-auth</pre></div>
+
+<h2 id="env">2. Prepare the .env file</h2>
+<p>All settings live in the <code>.env</code> file. The easiest way is the setup script: it asks for your addresses, generates every password and
+    key at random and writes <code>.env</code>.</p>
+<div class="code"><span class="lbl">Linux / macOS</span><pre>./kurulum.sh</pre></div>
+<div class="code"><span class="lbl">Windows</span><pre>powershell -ExecutionPolicy Bypass -File .\kurulum.ps1</pre></div>
+<p>The script asks for (prompts are in Turkish):</p>
+<table>
+    <thead><tr><th>Prompt</th><th>Example</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td>Booster Auth adresi (address)</td><td><code>auth.company.com</code></td><td>Where your applications send users to sign in; the OIDC issuer is built from it.</td></tr>
+        <tr><td>HTTPS portu (port)</td><td><code>443</code></td><td>Use e.g. <code>8443</code> if 443 is taken.</td></tr>
+        <tr><td>Panel portu / adresi</td><td><code>3000</code> · <code>http://localhost:3000</code></td><td>The admin console address.</td></tr>
+        <tr><td>Yönetici e-postası (admin e-mail)</td><td><code>it@@company.com</code></td><td>The first administrator's e-mail.</td></tr>
+    </tbody>
+</table>
+<p>You can also skip the script, copy <code>.env.example</code> to <code>.env</code> and fill it in yourself:</p>
+<table>
+    <thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
+    <tbody>
+        <tr><td><code>PUBLIC_HOST</code>, <code>PUBLIC_URL</code>, <code>GATEWAY_HTTPS_PORT</code></td><td>The Booster Auth address. <code>PUBLIC_URL</code> must include any port other than 443.</td></tr>
+        <tr><td><code>PANEL_PORT</code>, <code>PANEL_PUBLIC_URL</code></td><td>The admin console.</td></tr>
+        <tr><td><code>BOOTSTRAP_ADMIN_EMAIL</code>, <code>BOOTSTRAP_ADMIN_PASSWORD</code></td><td>The first administrator. The username is always <code>admin</code>.</td></tr>
+        <tr><td><code>POSTGRES_PASSWORD</code>, <code>REDIS_PASSWORD</code>, <code>OPENFGA_PRESHARED_KEY</code></td><td>Infrastructure passwords; long and random.</td></tr>
+        <tr><td><code>HASHING_PEPPER</code>, <code>HASHING_ENCRYPTION_KEY</code> (base64, 32 bytes), <code>IDP_APPLICATION_PEPPER</code></td><td>Password and secret encryption keys. <b>Never change them after installation</b>; existing passwords would become unreadable.</td></tr>
+        <tr><td><code>PANEL_SESSION_SECRET</code></td><td>Signs the console's session cookies.</td></tr>
+        <tr><td><code>MAIL_*</code></td><td>Optional SMTP settings (verification, invitation and password reset e-mails).</td></tr>
+        <tr><td><code>BOOSTER_VERSION</code></td><td>Image version; default <code>latest</code>.</td></tr>
+    </tbody>
+</table>
+<div class="callout warn"><p><b>Important.</b> If any secret still contains <code>CHANGE_ME</code>, the system will not start and tells you which variable is
+    missing. Back up <code>.env</code> and never share it.</p></div>
+
+<h2 id="hosts">3. Map the address (local trial)</h2>
+<p>If your address is not in DNS yet, add a line to your computer's <code>hosts</code> file:</p>
+<div class="code"><span class="lbl">hosts</span><pre>127.0.0.1   auth.company.com</pre></div>
+<p>Windows: <code>C:\Windows\System32\drivers\etc\hosts</code> (open as administrator) · Linux / macOS: <code>/etc/hosts</code></p>
+
+<h2 id="start">4. Start</h2>
+<div class="code"><pre>docker compose up -d
+docker compose ps</pre></div>
+<p>The first start downloads the images and creates the databases; it takes a few minutes. When every service is <code>running</code>:</p>
+<ul>
+    <li><b>Admin console:</b> <code>http://localhost:3000</code> (or the address you entered)</li>
+    <li><b>OIDC discovery:</b> <code>https://auth.company.com/idp/.well-known/openid-configuration</code></li>
+</ul>
+
+<h2 id="https">HTTPS certificate</h2>
+<p>On first start, your own local certificate authority (CA) and a server certificate are generated (the <code>pki/</code> folder). Browsers do not
+    know this CA and will show a warning:</p>
+<ul>
+    <li><b>Trial:</b> add <code>pki/trust/ca.crt</code> to your operating system as a trusted root certificate, or accept the warning.</li>
+    <li><b>Production:</b> put a reverse proxy (nginx, Traefik, Cloudflare Tunnel) with your own certificate in front, or replace
+        <code>pki/tls/server.crt</code> and <code>server.key</code> with your own certificate.</li>
+</ul>
+
+<h2 id="first-sign-in">5. First sign-in</h2>
+<p>Sign in to the console with the username <b><code>admin</code></b> and the initial password shown by the setup script. You will be asked to set
+    a new password. The console starts <b>without a license</b>: end-user sign-ins work, management screens are read-only. Continue with
+    <a href="/en/docs/licensing">Licensing</a>.</p>

@@ -1,0 +1,118 @@
+@using Booster.Licensing.Portal.Site
+@inject Booster.Licensing.Portal.Options.LicensingPortalOptions Options
+@{
+    var m = (SitePageModel)Model!;
+    var lang = m.Lang;
+    var other = lang == "tr" ? "en" : "tr";
+    var baseUrl = Options.PublicUrl.TrimEnd('/');
+    var cur = m.Page;
+    var canonical = baseUrl + cur.Path(lang);
+    var title = cur == SiteCatalog.Home ? $"{SiteCatalog.ProductName} · {cur.Title(lang)}" : $"{cur.Title(lang)} · {SiteCatalog.ProductName}";
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    bool Active(string slug) => slug.Length == 0 ? cur == SiteCatalog.Home : cur.Slug == slug || cur.Slug.StartsWith(slug + "/");
+}
+<!DOCTYPE html>
+<html lang="@lang" class="no-js">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title</title>
+    <meta name="description" content="@cur.Description(lang)" />
+    <link rel="canonical" href="@canonical" />
+    @foreach (var l in SiteCatalog.Languages)
+    {
+        <link rel="alternate" hreflang="@l" href="@(baseUrl + cur.Path(l))" />
+    }
+    <link rel="alternate" hreflang="x-default" href="@(baseUrl + cur.Path(SiteCatalog.DefaultLanguage))" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@SiteCatalog.ProductName" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:description" content="@cur.Description(lang)" />
+    <meta property="og:url" content="@canonical" />
+    <meta property="og:locale" content="@(lang == "tr" ? "tr_TR" : "en_US")" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#182D55" />
+    <link rel="icon" href="/img/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @if (cur == SiteCatalog.Home)
+    {
+        <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "SoftwareApplication",
+          "name": "Booster Auth",
+          "applicationCategory": "SecurityApplication",
+          "operatingSystem": "Linux, Windows, macOS (Docker)",
+          "description": "@cur.Description(lang)",
+          "url": "@canonical",
+          "inLanguage": "@lang",
+          "offers": { "@@type": "Offer", "price": "0", "priceCurrency": "TRY", "description": "@(lang == "tr" ? "Ücretsiz deneme" : "Free trial")" }
+        }
+        </script>
+    }
+    @await RenderSectionAsync("Head", required: false)
+</head>
+<body class="site @(cur.DocGroup is not null ? "is-docs" : "")">
+<a class="skip" href="#main">@(lang == "tr" ? "İçeriğe geç" : "Skip to content")</a>
+<header class="sh" data-header>
+    <div class="sh-inner">
+        <a class="logo" href="/@lang" aria-label="Booster Auth">
+            <img src="/img/logo.svg" alt="" width="32" height="32" />
+            <span>Booster <b>Auth</b></span>
+        </a>
+        <button class="sh-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+            <span class="sr">@m.T("menu")</span><i></i><i></i><i></i>
+        </button>
+        <nav class="sh-nav" id="site-nav" data-nav>
+            <a href="/@lang/features" class="@(Active("features") ? "on" : "")">@m.T("nav.features")</a>
+            <a href="/@lang/docs" class="@(Active("docs") ? "on" : "")">@m.T("nav.docs")</a>
+            <a href="/@lang/pricing" class="@(Active("pricing") ? "on" : "")">@m.T("nav.pricing")</a>
+            <a href="/@lang/download" class="@(Active("download") ? "on" : "")">@m.T("nav.download")</a>
+            <span class="sh-sep"></span>
+            <a class="lang" href="@cur.Path(other)" hreflang="@other" lang="@other" data-lang-switch>@m.T("lang.switch")</a>
+            <a class="btn btn-sm btn-primary" href="@(signedIn ? "/hesap" : "/giris?returnUrl=%2Fhesap")">@m.T("nav.portal")</a>
+        </nav>
+    </div>
+</header>
+
+<main id="main">
+    @RenderBody()
+</main>
+
+<footer class="sf">
+    <div class="wrap sf-grid">
+        <div>
+            <a class="logo" href="/@lang"><img src="/img/logo.svg" alt="" width="28" height="28" /><span>Booster <b>Auth</b></span></a>
+            <p class="sf-tag">@m.T("footer.tagline")</p>
+        </div>
+        <div>
+            <h4>@m.T("footer.product")</h4>
+            <a href="/@lang/features">@m.T("nav.features")</a>
+            <a href="/@lang/pricing">@m.T("nav.pricing")</a>
+            <a href="/@lang/download">@m.T("nav.download")</a>
+        </div>
+        <div>
+            <h4>@m.T("footer.resources")</h4>
+            @foreach (var d in SiteCatalog.Docs.Take(6))
+            {
+                <a href="@d.Path(lang)">@d.Title(lang)</a>
+            }
+        </div>
+        <div>
+            <h4>@m.T("footer.account")</h4>
+            <a href="/giris?returnUrl=%2Fhesap">@m.T("footer.signin")</a>
+            <a href="/hesap/kurulumlar">@m.T("footer.installations")</a>
+            <a href="/hesap/siparisler">@m.T("footer.orders")</a>
+        </div>
+    </div>
+    <div class="wrap sf-bottom">
+        <span>© @DateTime.UtcNow.Year Booster. @m.T("footer.rights")</span>
+        <a href="@cur.Path(other)" hreflang="@other">@m.T("lang.switch")</a>
+    </div>
+</footer>
+<script src="~/js/site.js" asp-append-version="true" defer></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<h1>İlk yapılandırma</h1>
+<p class="lead">Kurulum bitti ve lisansınızı yüklediniz. Bu rehberde ilk uygulamanızı Booster Auth'a bağlamaya hazır hale getireceksiniz:
+    firma → havuz → uygulama → kullanıcılar.</p>
+<div class="callout info"><p><b>Panelde gezinme.</b> Sol üstteki bağlam seçiciyle <b>Firma</b>, <b>Havuz</b>, <b>Uygulama</b> ve <b>Sistem</b> arasında
+    geçiş yaparsınız; sol menü seçilen bağlama göre değişir.</p></div>
+
+<h2 id="firma">1. Firma oluşturun</h2>
+<ol>
+    <li>Bağlam seçiciden <b>Firma &gt; Yeni Firma</b>'yı açın.</li>
+    <li>Firmanızın adını girin (ör. <i>Acme</i>) ve kaydedin. Firmanın sahibi siz olursunuz.</li>
+    <li>Başka yöneticiler ekleyecekseniz <b>Firma Erişimi</b> ekranından yetki verin.</li>
+</ol>
+
+<h2 id="havuz">2. Kullanıcı havuzu oluşturun</h2>
+<ol>
+    <li>Firmanın altında yeni bir havuz açın (ör. <i>Müşteriler</i>).</li>
+    <li><b>Havuz Bilgileri</b> ekranında politikaları gözden geçirin:
+        <ul>
+            <li><b>Giriş politikası:</b> parola, e-posta / SMS kodu, dış kimlik sağlayıcılar; kullanıcı tanımlayıcısı olarak e-posta, kullanıcı adı ya da telefon.</li>
+            <li><b>Kayıt politikası:</b> kullanıcılar kendileri mi kayıt olacak yoksa yalnızca davetle mi? E-posta doğrulaması varsayılan olarak açıktır.</li>
+            <li><b>Parola, çok faktörlü doğrulama ve oturum</b> süreleri.</li>
+        </ul>
+    </li>
+    <li>Kurumsal kullanım için <b>Redirect domain politikası</b>nı açıp yalnızca kendi domain'lerinize izin vermenizi öneririz.</li>
+</ol>
+<div class="callout warn"><p><b>E-posta gönderimi.</b> Kayıt doğrulama, davet ve şifre sıfırlama e-postaları için <code>.env</code> içindeki
+    <code>MAIL_*</code> ayarlarını doldurun. Doldurulmazsa e-posta gönderilmez ve e-posta doğrulamalı kayıt tamamlanamaz.</p></div>
+
+<h2 id="uygulama">3. Uygulama ekleyin</h2>
+<ol>
+    <li>Havuz menüsünde <b>Uygulamalar</b>'a girin ve yeni uygulama oluşturun.</li>
+    <li><b>Uygulama adı</b> ve <b>istemci anahtarı</b> (client_id) belirleyin, ör. <code>acme-web</code>.</li>
+    <li><b>Grant türleri:</b> kullanıcı girişi yapan uygulamalar için <i>Authorization Code</i> ve <i>Refresh Token</i>.</li>
+    <li><b>Yönlendirme adresleri:</b> uygulamanızın giriş dönüş adresi, ör. <code>https://app.firma.com/callback</code>. Adres birebir eşleşmelidir.</li>
+    <li><b>Çıkış sonrası adresler:</b> ör. <code>https://app.firma.com/</code>.</li>
+    <li>Uygulamanız kendi API'nizi çağıracaksa <b>İzin verilen API'ler</b> ve <b>İzin Verilen Kapsamlar</b>'ı ekleyin.</li>
+    <li>İsterseniz giriş ekranında görünecek bir <b>logo</b> yükleyin (PNG / JPEG / GIF / WebP, en fazla 1 MB).</li>
+</ol>
+
+<h2 id="kullanicilar">4. Kullanıcıları ekleyin</h2>
+<p><b>Kullanıcılar</b> ekranında üç yol vardır:</p>
+<ul>
+    <li><b>Tek tek ekleme:</b> e-posta ve ad girin, "davet gönder" seçeneğiyle kullanıcıya parola belirleme bağlantısı gider.</li>
+    <li><b>CSV ile içe aktarma:</b> başlık satırı olan, virgül ya da noktalı virgülle ayrılmış UTF-8 dosya; tek seferde en fazla 1000 satır (1 MB).
+        Tanınan sütunlar: <code>email</code> / <code>e-posta</code>, <code>ad</code> / <code>first_name</code>, <code>soyad</code> / <code>last_name</code>
+        ya da tek sütunda <code>ad soyad</code> / <code>name</code>.</li>
+    <li><b>Kendi kendine kayıt:</b> kayıt politikası "herkes kayıt olabilir" ise kullanıcılar giriş ekranından hesap açar.</li>
+</ul>
+<div class="code"><span class="lbl">kullanicilar.csv</span><pre>email;ad;soyad
+ayse@@firma.com;Ayşe;Yılmaz
+mehmet@@firma.com;Mehmet;Kaya</pre></div>
+<p>Davet bağlantıları <b>1 gün</b> geçerli ve tek kullanımlıktır; yeniden gönderilen davet eskisini geçersiz kılar. Davet kabul edilince
+    kullanıcı parolasını belirler ve e-postası doğrulanmış sayılır.</p>
+
+<h2 id="roller">5. Roller ve kapsamlar</h2>
+<ol>
+    <li><b>Kapsamlar</b> ekranında API'nizin izinlerini tanımlayın, ör. <code>orders:read</code>, <code>orders:write</code>.</li>
+    <li><b>Roller</b> ekranında rol oluşturun (ör. <code>manager</code>) ve role kapsamlar ekleyin.</li>
+    <li>Kullanıcılara rol atayın ya da havuzun <b>varsayılan rolleri</b>ni belirleyin.</li>
+</ol>
+<p>Roller token'da <code>role</code>, kapsamlar <code>scope</code> claim'i olarak yer alır. Sırada: <a href="/tr/docs/integration">uygulamanızı bağlamak</a>.</p>
