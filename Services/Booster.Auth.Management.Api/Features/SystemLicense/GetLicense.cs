@@ -13,7 +13,8 @@ namespace Booster.Auth.Management.Api.Features.SystemLicense;
 
 /// <summary>
 /// Sistem &gt; Lisans ekraninin verisi. Lisans kisitliyken de calisir (yonetici lisansi gorup yenileyebilsin).
-/// Yalnizca yonetim havuzunun admin rolu.
+/// Her panel kullanicisi okur (banner ve yonlendirme icin; kurulum GUID'i gizli degildir).
+/// Etkinlestirme yalnizca admin rolundedir; <see cref="GetLicenseResponse.CanActivate"/> bunu panele soyler.
 /// </summary>
 public class GetLicenseEndpoint(LicenseService license, ApiAuthOptions apiAuth, BootstrapOptions bootstrap)
     : EndpointWithoutRequest<GetLicenseResponse>
@@ -23,9 +24,7 @@ public class GetLicenseEndpoint(LicenseService license, ApiAuthOptions apiAuth, 
         Get("license");
         Group<SystemEndpointGroup>();
         Options(x => x
-            .RequireAuthorization(
-                new RequireScopeAttribute(ManagementPolicies.PanelScope),
-                new RequireRoleAttribute(AuthConstants.AdminRoleName))
+            .RequireAuthorization(new RequireScopeAttribute(ManagementPolicies.PanelScope))
             .WithMetadata(new AllowWhenLicenseRestricted()));
         Summary(s => s.Summary = "Kurulumun lisans durumu (kurulum GUID'i, plan, sure, limitler, domain kontrolu)");
     }
@@ -33,10 +32,14 @@ public class GetLicenseEndpoint(LicenseService license, ApiAuthOptions apiAuth, 
     public override async Task HandleAsync(CancellationToken ct)
     {
         var e = await license.GetEvaluationAsync(ct);
-        await Send.OkAsync(GetLicenseResponse.From(e, DomainTargets(apiAuth, bootstrap)), ct);
+        await Send.OkAsync(GetLicenseResponse.From(e, DomainTargets(apiAuth, bootstrap)) with { CanActivate = CanActivate(User) }, ct);
     }
 
     /// <summary>Lisanstaki domain'lerle karsilastirilan adresler: issuer ve yonetim paneli.</summary>
+    /// <summary>Etkinlestirme ucuyla ayni kural: yonetim havuzunun admin rolu.</summary>
+    internal static bool CanActivate(System.Security.Claims.ClaimsPrincipal user) =>
+        user.FindAll("role").Any(r => string.Equals(r.Value, AuthConstants.AdminRoleName, StringComparison.OrdinalIgnoreCase));
+
     internal static IReadOnlyList<(string Name, string Url)> DomainTargets(ApiAuthOptions apiAuth, BootstrapOptions bootstrap) =>
     [
         ("issuer", apiAuth.Authority),
@@ -53,7 +56,8 @@ public sealed record GetLicenseResponse(
     bool ClockRollbackDetected,
     DateTimeOffset EvaluatedAt,
     LicenseDetails? License,
-    IReadOnlyList<DomainCheckResult> DomainChecks)
+    IReadOnlyList<DomainCheckResult> DomainChecks,
+    bool CanActivate = false)
 {
     internal static GetLicenseResponse From(LicenseEvaluation e, IReadOnlyList<(string Name, string Url)> targets)
     {
