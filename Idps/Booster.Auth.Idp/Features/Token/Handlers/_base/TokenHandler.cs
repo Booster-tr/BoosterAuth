@@ -3,12 +3,15 @@ using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features.Token.Handlers.Models;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.ExceptionManager.Abstraction.Exceptions;
+using Booster.Auth.Common.Internal.Constants.Messages;
+using Booster.Auth.Idp.Managers.LicenseManagers;
 
 namespace Booster.Auth.Idp.Features.Token.Handlers._base;
 
 public sealed class TokenHandler(
     IClientDataStore clientDataStore,
-    IEnumerable<IGrantTypeHandler> grantHandlers)
+    IEnumerable<IGrantTypeHandler> grantHandlers,
+    EndUserLicenseGate licenseGate)
 {
     public async Task<TokenResponse> ExecuteAsync(TokenRequest request, CancellationToken ct)
     {
@@ -27,6 +30,10 @@ public sealed class TokenHandler(
 
         if (!client.IsActive)
             throw new BusinessException(IdpMessageKeys.ClientInactive);
+
+        // Yalnizca deneme lisansinin ek suresi bittiyse (ucretli lisansta ASLA).
+        if (!await licenseGate.IsAllowedAsync(client, ct))
+            throw new BusinessException(LicenseMessageKeys.ServiceUnavailable);
 
         if (!client.AllowedGrantTypes.HasFlag(grantType))
             throw new BusinessException(IdpMessageKeys.UnsupportedGrantType);

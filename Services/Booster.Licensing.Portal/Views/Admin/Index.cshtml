@@ -1,0 +1,30 @@
+@model List<SigningKey>
+@{ ViewData["Title"] = "Genel"; }
+<h1>Genel</h1>
+<div class="stats">
+    <a class="stat" href="/admin/musteriler"><b>@ViewBag.CustomerCount</b><span>Müşteri</span></a>
+    <a class="stat" href="/admin/lisanslar"><b>@ViewBag.LicenseCount</b><span>Lisans</span></a>
+</div>
+
+<section class="card">
+    <h2>İmzalama anahtarları</h2>
+    <p class="muted">
+        Portal anahtarı ilk açılışta kendisi üretir. Private key veritabanında şifreli durur ve hiçbir ekranda gösterilmez.
+        Aşağıdaki <b>public key</b> ürüne (<code>LicensePublicKeys</code>) eklenmelidir; ürün yalnızca tanıdığı anahtarlarla
+        imzalanmış lisansları kabul eder.
+    </p>
+    <table>
+        <thead><tr><th>Kid</th><th>Public key</th><th>Durum</th><th>Oluşturma</th></tr></thead>
+        <tbody>
+        @foreach (var k in Model)
+        {
+            <tr>
+                <td><code>@k.Kid</code></td>
+                <td><code class="wrap" id="pk-@k.Kid">@k.PublicKey</code> <button class="btn btn-ghost btn-sm" type="button" data-copy="pk-@k.Kid">Kopyala</button></td>
+                <td>@(k.IsActive ? "Aktif" : "Eski")</td>
+                <td>@k.CreatedTime.ToString("yyyy-MM-dd HH:mm")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

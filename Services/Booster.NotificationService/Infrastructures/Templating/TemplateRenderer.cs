@@ -30,8 +30,10 @@ public class TemplateRenderer(
             return null;
 
         return new RenderedTemplate(
-            translation.Subject is null ? null : Fill(translation.Subject, data),
-            Fill(translation.Body, data),
+            translation.Subject is null ? null : Fill(translation.Subject, data, htmlEncode: false),
+            // E-posta govdesi HTML'dir: degerler (firma adi, ad soyad gibi kullanici girdileri) KACIS ile yerlestirilir;
+            // aksi halde girdiye yazilan HTML e-postaya enjekte edilebilirdi. Konu ve SMS duz metindir.
+            Fill(translation.Body, data, htmlEncode: channel == NotificationChannel.Email),
             translation.LanguageCode);
     }
 
@@ -56,7 +58,9 @@ public class TemplateRenderer(
         return fallback ?? template.Translations.FirstOrDefault();
     }
 
-    private static string Fill(string text, IReadOnlyDictionary<string, string> data)
+    private static string Fill(string text, IReadOnlyDictionary<string, string> data, bool htmlEncode)
         => SafeRegex.Replace(text, PlaceholderPattern, match =>
-            data.TryGetValue(match.Groups["key"].Value, out var value) ? value : string.Empty);
+            data.TryGetValue(match.Groups["key"].Value, out var value)
+                ? (htmlEncode ? System.Net.WebUtility.HtmlEncode(value) : value)
+                : string.Empty);
 }

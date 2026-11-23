@@ -1,4 +1,7 @@
 using Booster.Auth.Common.Internal.Amqp.Extensions;
+using Booster.Auth.Idp.Managers.LicenseManagers;
+using Booster.Auth.Management.Contracts;
+using Booster.Licensing.Runtime;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.FederationBased;
 using Booster.Auth.Idp.Providers.Apple;
 using Booster.Auth.Idp.Providers.Facebook;
@@ -75,6 +78,30 @@ public static class ServiceExtensions
                 EnableMultipleHttp2Connections = true
             };
         });
+
+        // Lisans durumu Management'tan gelir (1 dk onbellek). Yalnizca DENEME lisansinin ek suresi bitince son
+        // kullanici akislari durur; ulasilamazsa her sey acik kalir (GrpcLicenseStatusProvider).
+        services.AddGrpcClient<LicenseStatusService.LicenseStatusServiceClient>(options =>
+        {
+            options.Address = new Uri(managementSettings.GrpcAddress);
+        })
+        .ConfigureChannel(channel =>
+        {
+            channel.HttpHandler = new SocketsHttpHandler
+            {
+                ConnectTimeout = TimeSpan.FromSeconds(managementSettings.TimeoutSeconds),
+                EnableMultipleHttp2Connections = true
+            };
+        });
+        services.AddSingleton<ILicenseStatusProvider>(sp => new GrpcLicenseStatusProvider(
+            sp.GetRequiredService<LicenseStatusService.LicenseStatusServiceClient>()));
+        services.AddScoped<EndUserLicenseGate>();
+
+        // Panelden kullanici ekleme / CSV ice aktarma / davet
+        services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.PoolDataReader>();
+        services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.EndUserFactory>();
+        services.AddScoped<Booster.Auth.Common.Internal.Licensing.ILicenseLimitService, Booster.Auth.Common.Internal.Licensing.LicenseLimitService>();
+        services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.InvitationManager>();
 
         services.AddScoped<IClientDataStore, ClientDataStore>();
         services.AddSingleton<IClientLogoStore, ClientLogoStore>();

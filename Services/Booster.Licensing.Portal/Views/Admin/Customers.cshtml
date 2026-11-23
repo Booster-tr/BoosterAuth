@@ -1,0 +1,25 @@
+@model List<CustomerRow>
+@{ ViewData["Title"] = "Müşteriler"; }
+<div class="page-head">
+    <h1>Müşteriler</h1>
+    <a class="btn btn-primary" href="/admin/musteriler/yeni">Yeni müşteri</a>
+</div>
+@if (Model.Count == 0)
+{
+    <p class="muted">Henüz müşteri yok.</p>
+}
+else
+{
+    <table>
+        <thead><tr><th>Firma</th><th>E-posta</th><th>Vergi no</th><th>Lisans</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td><a href="/admin/musteriler/detay?CustomerId=@c.Id">@c.Name</a></td><td>@c.ContactEmail</td><td>@c.TaxNumber</td><td>@c.LicenseCount</td>
+                <td><a class="btn btn-ghost btn-sm" href="/admin/lisanslar/yeni?customerId=@c.Id">Lisans üret</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

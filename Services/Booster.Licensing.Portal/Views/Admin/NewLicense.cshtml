@@ -1,0 +1,66 @@
+@model LicenseForm
+@{
+    ViewData["Title"] = "Lisans üret";
+    var customers = (List<CustomerOption>)ViewBag.Customers;
+}
+<h1>Lisans üret</h1>
+@if (customers.Count == 0)
+{
+    <p class="alert">Önce bir müşteri ekleyin. <a href="/admin/musteriler/yeni">Yeni müşteri</a></p>
+}
+else
+{
+<form method="post" class="card form">
+    <div asp-validation-summary="ModelOnly" class="alert"></div>
+    <label>Müşteri
+        <select asp-for="CustomerId">
+            @foreach (var c in customers)
+            {
+                <option value="@c.Id" selected="@(Model.CustomerId == c.Id)">@c.Name</option>
+            }
+        </select>
+    </label>
+    <label>Kurulum GUID'i <small class="muted">ürün panelinde Sistem &gt; Lisans</small>
+        <input asp-for="InstallationId" placeholder="00000000-0000-0000-0000-000000000000" required />
+    </label>
+    <span asp-validation-for="InstallationId" class="field-error"></span>
+    <label>Domain'ler <small class="muted">ana domain; alt alanları otomatik kapsar (auth.firma.com → firma.com)</small>
+        <textarea asp-for="Domains" rows="2" placeholder="firma.com"></textarea>
+    </label>
+    @* asp-validation-for yalnizca ILK hatayi gosterir; her hatali domain ayri satirda gorunsun. *@
+    @if (ViewData.ModelState.TryGetValue(nameof(LicenseForm.Domains), out var domainState) && domainState.Errors.Count > 0)
+    {
+        <ul class="field-error">
+            @foreach (var e in domainState.Errors)
+            {
+                <li>@e.ErrorMessage</li>
+            }
+        </ul>
+    }
+    <div class="row">
+        <label>Tür
+            <select asp-for="Type" id="type">
+                <option value="paid">Ücretli</option>
+                <option value="trial">Deneme</option>
+            </select>
+        </label>
+        <label>Plan <input asp-for="Plan" required /></label>
+    </div>
+    <div class="row">
+        <label>Kullanıcı <input asp-for="MaxUsers" type="number" min="1" /></label>
+        <label>Pool <input asp-for="MaxPools" type="number" min="1" /></label>
+        <label>Client <input asp-for="MaxClients" type="number" min="1" /></label>
+    </div>
+    <div class="row">
+        <label>Süre (gün) <input asp-for="DurationDays" type="number" min="1" /></label>
+        <label>Ek süre (gün) <input asp-for="GraceDays" type="number" min="0" /></label>
+    </div>
+    <span asp-validation-for="MaxUsers" class="field-error"></span>
+    <span asp-validation-for="DurationDays" class="field-error"></span>
+    <label>Not <input asp-for="Note" /></label>
+    <div class="actions">
+        <a class="btn btn-ghost" href="/admin/lisanslar">Vazgeç</a>
+        <button class="btn btn-primary" type="submit">Üret</button>
+    </div>
+</form>
+}

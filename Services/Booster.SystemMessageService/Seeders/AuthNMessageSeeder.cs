@@ -39,6 +39,9 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.ScopeAlreadyDefined, "Yetki", "Bu yetki zaten tanımlı.", "Scope", "This scope is already defined."),
         new(AuthNMessageKeys.RoleScopeAlreadyAdded, "Rol yetkisi", "Bu yetki role zaten eklenmiş.", "Role scope", "This scope is already added to the role."),
         new(AuthNMessageKeys.ClientKeyAlreadyExists, "Uygulama", "Bu uygulama anahtarı zaten kullanımda.", "Client", "This client key is already in use."),
+        new(AuthNMessageKeys.RedirectDomainNotAllowed, "Yönlendirme adresi", "Bu adresler havuzun izin verilen domain politikasına uymuyor: {Uris}", "Redirect URI", "These addresses do not comply with the pool's allowed domain policy: {Uris}"),
+        new(AuthNMessageKeys.RedirectDomainInvalid, "Yönlendirme politikası", "Geçerli bir domain girin (ör. firma.com). Test adresleri için ayrı seçeneği kullanın.", "Redirect policy", "Enter a valid domain (e.g. company.com). Use the separate option for test addresses."),
+        new(AuthNMessageKeys.RedirectDomainsRequired, "Yönlendirme politikası", "Politika açıkken en az bir domain girin ya da test adreslerine / mobil şemalara izin verin.", "Redirect policy", "While the policy is on, enter at least one domain or allow test addresses / mobile schemes."),
 
         // --- Biçim ---
         new(AuthNMessageKeys.RoleKeyInvalidFormat, "Rol", "Geçersiz rol anahtarı biçimi.", "Role", "Invalid role key format."),

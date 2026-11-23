@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
 using Booster.ExceptionManager.Abstraction.Constants;
@@ -7,6 +8,8 @@ using FluentValidation;
 
 namespace Booster.Auth.Z.Features.Check.CheckPermission;
 
+/// <summary>Salt okuma: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class CheckPermissionEndpoint : Endpoint<CheckPermissionCommand, CheckPermissionResponse>
 {
     public override void Configure()

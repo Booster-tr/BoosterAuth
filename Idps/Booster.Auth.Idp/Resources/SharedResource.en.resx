@@ -946,4 +946,43 @@
   <data name="Challenge.Mfa.BrandLead" xml:space="preserve">
     <value>Even if someone gets your password, they cannot sign in without this code.</value>
   </data>
+  <data name="Invite.PageTitle" xml:space="preserve">
+    <value>Set your password</value>
+  </data>
+  <data name="Invite.PageTitleWithErrors" xml:space="preserve">
+    <value>Set your password ({0} errors)</value>
+  </data>
+  <data name="Invite.BrandHeadline" xml:space="preserve">
+    <value>Your account is ready</value>
+  </data>
+  <data name="Invite.BrandLead" xml:space="preserve">
+    <value>Set your password, then sign in to your application.</value>
+  </data>
+  <data name="Invite.Heading" xml:space="preserve">
+    <value>Set your password</value>
+  </data>
+  <data name="Invite.Subtitle" xml:space="preserve">
+    <value>An account has been created for you. Set a password to get started.</value>
+  </data>
+  <data name="Invite.EmailLabel" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Invite.Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Invite.PasswordConfirm" xml:space="preserve">
+    <value>Confirm password</value>
+  </data>
+  <data name="Invite.Submit" xml:space="preserve">
+    <value>Set my password</value>
+  </data>
+  <data name="Invite.Busy" xml:space="preserve">
+    <value>Saving…</value>
+  </data>
+  <data name="Invite.DoneTitle" xml:space="preserve">
+    <value>Your password is set</value>
+  </data>
+  <data name="Invite.DoneText" xml:space="preserve">
+    <value>Your account is ready. You can now sign in to your application with your email address and password.</value>
+  </data>
 </root>

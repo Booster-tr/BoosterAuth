@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Booster.Auth.Management.Api.Features.UserPools.Policies;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
@@ -50,13 +52,22 @@ public readonly record struct UpdateClientResponse(Guid Id);
 
 public class UpdateClientCommandHandler(
     IAsyncRepository<Client, AuthNDbContext> clientRepository,
-    IClientDataCacheStore clientDataCacheStore)
+    IClientDataCacheStore clientDataCacheStore,
+    AuthNDbContext db)
     : ICommandHandler<UpdateClientCommand, UpdateClientResponse>
 {
     public async Task<UpdateClientResponse> ExecuteAsync(UpdateClientCommand command, CancellationToken ct)
     {
         var client = await clientRepository.GetAsync(c => c.Id == command.ClientId, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
+
+        // Redirect politikasi yalnizca YENI eklenen adreslere uygulanir: politika sonradan acildiysa mevcut
+        // (uymayan) adresler client'in baska alanlarini guncellemeyi engellemesin.
+        var existing = client!.RedirectUris.Concat(client.PostLogoutRedirectUris).ToHashSet(StringComparer.Ordinal);
+        var added = command.RedirectUris.Concat(command.PostLogoutRedirectUris).Where(u => !existing.Contains(u));
+        var redirectPolicy = await db.Set<UserPool>().AsNoTracking().Where(p => p.Id == client.UserPoolId)
+            .Select(p => p.Policy.Redirect).FirstOrDefaultAsync(ct);
+        RedirectPolicyGuard.EnsureAllowed(redirectPolicy, added);
 
         command.Adapt(client);
 

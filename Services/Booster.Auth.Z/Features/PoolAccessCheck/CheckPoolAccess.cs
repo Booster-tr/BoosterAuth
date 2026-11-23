@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.Constants.Messages;
 using Booster.Auth.Common.Internal.EntityExtensions;
@@ -15,6 +16,8 @@ using FluentValidation;
 
 namespace Booster.Auth.Z.Features.PoolAccessCheck;
 
+/// <summary>Salt okuma: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class CheckPoolAccessEndpoint : Endpoint<CheckPoolAccessQuery, CheckPoolAccessResponse>
 {
     public override void Configure()

@@ -12,6 +12,7 @@ using Booster.Database.Helpers;
 using Booster.Database.NameValueCollectionHelpers;
 using Booster.Database.Repositories;
 using FastEndpoints;
+using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Auth.Idp.Features.PoolUsers.GetList;
 
@@ -50,10 +51,16 @@ public record PoolUserResponse(
     string? Email,
     string? PhoneNumber,
     PrincipalStatus Status,
-    DateTimeOffset CreatedTime);
+    DateTimeOffset CreatedTime)
+{
+    /// <summary>Parolasini henuz belirlememis (davet bekleyen) kullanici. Federasyonla gelen kullanicilarda da parola yoktur; onlar kimlik saglayicisi baglantisi ile ayrilir.</summary>
+    public bool InvitationPending { get; init; }
+}
 
 public class GetListPoolUserQueryHandler(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
+    IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
+    IAsyncRepository<PrincipalIdentity, IdpDbContext> identityRepository,
     IRequestContextAccessor requestContextAccessor)
     : ICommandHandler<GetListPoolUserQuery, ListModel<PoolUserResponse>>
 {
@@ -69,6 +76,18 @@ public class GetListPoolUserQueryHandler(
             enableTracking: false,
             cancellationToken: ct);
 
-        return data.MapListModel<Principal, PoolUserResponse>(command);
+        var list = data.MapListModel<Principal, PoolUserResponse>(command);
+
+        // Davet bekleyen = yerel parolasi YOK ve dis kimlik saglayicisi baglantisi YOK.
+        var ids = list.Items.Select(u => u.Id).ToList();
+        if (ids.Count == 0) return list;
+        var withPassword = await credentialRepository.Query().AsNoTracking()
+            .Where(c => ids.Contains(c.PrincipalId)).Select(c => c.PrincipalId).ToListAsync(ct);
+        var federated = await identityRepository.Query().AsNoTracking()
+            .Where(i => ids.Contains(i.PrincipalId)).Select(i => i.PrincipalId).ToListAsync(ct);
+        var active = withPassword.Concat(federated).ToHashSet();
+        list.Items = list.Items.Select(u => u with { InvitationPending = !active.Contains(u.Id) }).ToList();
+
+        return list;
     }
 }

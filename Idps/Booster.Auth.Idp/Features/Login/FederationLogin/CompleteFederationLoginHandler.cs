@@ -32,7 +32,8 @@ public sealed class CompleteFederationLoginHandler(
     IAsyncRepository<PrincipalRole, IdpDbContext> principalRoleRepository,
     ISessionStore sessionStore,
     AuthorizationService.AuthorizationServiceClient authorizationClient,
-    IRequestContextAccessor requestContextAccessor)
+    IRequestContextAccessor requestContextAccessor,
+    Booster.Auth.Idp.Managers.UserManagers.EndUserFactory endUserFactory)
     : ICommandHandler<CompleteFederationLoginCommand, CompleteFederationLoginResult>
 {
     public async Task<CompleteFederationLoginResult> ExecuteAsync(
@@ -136,7 +137,13 @@ public sealed class CompleteFederationLoginHandler(
         CompleteFederationLoginCommand cmd,
         CancellationToken ct)
     {
-        var principal = new Principal
+        Principal principal = null!;
+        try
+        {
+            // Lisans kullanici limiti (transaction + kilit). Doluysa genel "kayit su an kapali" hata ekrani.
+            await endUserFactory.RunWithinUserLimitAsync(async _ =>
+            {
+        principal = new Principal
         {
             Id = EntityId.New(),
             DisplayName = external.DisplayName ?? email,
@@ -172,6 +179,12 @@ public sealed class CompleteFederationLoginHandler(
         await authorizationClient.WriteRelationsAsync(endUser, cancellationToken: ct);
 
         await principalRepository.SaveChangesAsync(ct);
+            }, ct, LicenseMessageKeys.RegistrationClosed);
+        }
+        catch (Booster.ExceptionManager.Abstraction.Exceptions.BusinessException e) when (e.Message == LicenseMessageKeys.RegistrationClosed)
+        {
+            throw new AuthorizeException(LicenseMessageKeys.RegistrationClosed);
+        }
 
         return await OpenSessionAsync(principal.Id, state, client, cmd, ct);
     }

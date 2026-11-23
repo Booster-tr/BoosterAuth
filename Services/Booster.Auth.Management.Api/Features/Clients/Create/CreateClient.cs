@@ -1,3 +1,6 @@
+using Booster.Auth.Management.Api.Features.UserPools.Policies;
+using Microsoft.EntityFrameworkCore;
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
@@ -54,7 +57,9 @@ public class CreateClientCommandHandler(
     IAsyncRepository<Client, AuthNDbContext> clientRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
     IClientDataCacheStore clientDataCacheStore,
-    IAccessManager accessManager)
+    IAccessManager accessManager,
+    AuthNDbContext db,
+    ILicenseLimitService licenseLimits)
     : ICommandHandler<CreateClientCommand, CreateClientResponse>
 {
     public async Task<CreateClientResponse> ExecuteAsync(CreateClientCommand command, CancellationToken ct)
@@ -74,12 +79,23 @@ public class CreateClientCommandHandler(
         if (keyExists)
             throw new BusinessException(AuthNMessageKeys.ClientKeyAlreadyExists);
 
+        // Havuzun redirect domain politikasi (acik ise). Lisansla ilgisi yok; musterinin guvenlik ayari.
+        RedirectPolicyGuard.EnsureAllowed(pool.Policy.Redirect, command.RedirectUris.Concat(command.PostLogoutRedirectUris));
+
         var client = command.Adapt<Client>();
         client.SetId();
         client.Status = EntityStatus.Active;
 
-        await clientRepository.AddAsync(client, ct);
-        await clientRepository.SaveChangesAsync(ct);
+        // Lisans limiti: sayim + ekleme ayni transaction ve kilit altinda. Yonetim havuzunun client'lari (panel) sayilmaz.
+        await using (var tx = await db.Database.BeginTransactionAsync(ct))
+        {
+            await licenseLimits.EnsureCanCreateAsync(db, LicensedResource.Clients,
+                c => db.Set<Client>().CountAsync(x => x.UserPoolId != AuthConstants.ManagementPoolId, c), ct);
+
+            await clientRepository.AddAsync(client, ct);
+            await clientRepository.SaveChangesAsync(ct);
+            await tx.CommitAsync(ct);
+        }
 
         await accessManager.LinkParentAsync(
             AuthConstants.ClientType, client.Id, AuthConstants.PoolType, client.UserPoolId, ct);

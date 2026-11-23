@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Managers.LookupManagers;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.Auth.Z.Features._base;
@@ -6,6 +7,8 @@ using FluentValidation;
 
 namespace Booster.Auth.Z.Features.Lookup.LookupByUser;
 
+/// <summary>Salt okuma: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class LookupByUserEndpoint : Endpoint<LookupByUserCommand, LookupResponse>
 {
     public override void Configure()
