@@ -12,6 +12,9 @@
         <a href="/admin/siparisler?status=Cancelled">İptal</a>
         <a href="/admin/siparisler">Tümü</a>
     </nav>
+    <form method="post" action="/admin/hatirlatmalar/calistir" asp-antiforgery="true">
+        <button class="btn btn-ghost btn-sm" type="submit" title="Normalde 6 saatte bir otomatik çalışır">Yenileme hatırlatmalarını şimdi gönder</button>
+    </form>
 </div>
 @if (TempData["Info"] is string info) { <p class="alert" data-flash="info">@info</p> }
 @if (TempData["Error"] is string err) { <p class="alert" data-flash="error">@err</p> }

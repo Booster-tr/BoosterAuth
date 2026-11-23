@@ -26,6 +26,13 @@ builder.Services.AddScoped<LicenseIssuer>();
 builder.Services.AddScoped<CustomerPortalService>();
 builder.Services.AddScoped<OrderService>();
 
+// Musteri e-postalari Booster Notification servisi uzerinden (Kafka + EF outbox).
+builder.Services.AddBoosterMessaging<LicensingDbContext>(builder.Configuration,
+    configureRider: rider => Booster.Auth.Common.Internal.Amqp.Extensions.NotificationBusExtensions.AddNotificationProducer(rider));
+builder.Services.AddScoped<PortalNotifier>();
+builder.Services.AddScoped<RenewalReminderService>();
+builder.Services.AddHostedService<RenewalReminderWorker>();
+
 builder.Services.AddDataProtection()
     .SetApplicationName("Booster.Licensing.Portal")
     .PersistKeysToDbContext<LicensingDbContext>();
@@ -105,6 +112,7 @@ forwarded.KnownProxies.Clear();
 app.UseForwardedHeaders(forwarded);
 
 app.UseExceptionHandler("/hata");
+app.UseBoosterMessaging();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();

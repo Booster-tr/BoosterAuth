@@ -75,6 +75,18 @@ public static class EmailLayout
         <p style="margin:0 0 16px 0;font-size:13px;line-height:20px;word-break:break-all;"><a href="{url}" style="color:{Accent};">{url}</a></p>
         """;
 
+    /// <summary>Lisans token'i gibi uzun, kopyalanacak degerler: tek blok, satir kirilabilir, es aralikli.</summary>
+    public static string TokenBox(string value) =>
+        $"""
+        <div style="margin:16px 0 24px 0;background-color:{Canvas};border:1px solid {Border};border-radius:10px;padding:14px;font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;font-size:12px;line-height:18px;color:{Ink};word-break:break-all;">{value}</div>
+        """;
+
+    /// <summary>Etiket / deger satirlari (siparis ve lisans ozetleri).</summary>
+    public static string Facts(params (string Label, string Value)[] rows) =>
+        "<table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin:0 0 16px 0;font-size:14px;line-height:22px;\">" +
+        string.Concat(rows.Select(r => $"<tr><td style=\"padding:2px 16px 2px 0;color:{Muted};white-space:nowrap;\">{r.Label}</td><td style=\"padding:2px 0;color:{Ink};\">{r.Value}</td></tr>")) +
+        "</table>";
+
     /// <summary>Doğrulama kodu gibi kısa değerler için okunaklı kutu.</summary>
     public static string CodeBox(string value) =>
         $"""

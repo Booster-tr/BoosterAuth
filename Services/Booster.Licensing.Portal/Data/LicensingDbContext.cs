@@ -3,6 +3,7 @@ using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Licensing.Portal.Data.Entities;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Licensing.Portal.Data;
@@ -20,6 +21,7 @@ public class LicensingDbContext(
     public DbSet<LicenseTransfer> LicenseTransfers => Set<LicenseTransfer>();
     public DbSet<Plan> Plans => Set<Plan>();
     public DbSet<Order> Orders => Set<Order>();
+    public DbSet<LicenseReminder> LicenseReminders => Set<LicenseReminder>();
 
     /// <summary>Siparis referans kodu sayaci (BST-yyyy-NNNNNN). Veritabani dizisi: ayni anda iki siparis ayni kodu alamaz.</summary>
     public const string OrderReferenceSequence = "OrderReferenceNumbers";
@@ -34,6 +36,12 @@ public class LicensingDbContext(
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasSequence<long>(OrderReferenceSequence);
+
+        // MassTransit outbox tablolari (AddBoosterMessaging altyapisi bekler). NOT: Kafka rider ureticileri bu
+        // tablolari KULLANMAZ; olaylar dogrudan gonderilir (bkz. PortalNotifier).
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

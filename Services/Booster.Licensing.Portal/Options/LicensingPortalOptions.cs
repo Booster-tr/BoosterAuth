@@ -14,6 +14,9 @@ public sealed class LicensingPortalOptions
     /// </summary>
     public List<string> AdminEmails { get; set; } = [];
 
+    /// <summary>Portalin disaridan erisilen adresi; e-postalardaki baglantilar buna gore uretilir.</summary>
+    public string PublicUrl { get; set; } = "https://licensing.appnuraymind.com";
+
     /// <summary>Havale/EFT talimati (gizli degil). Degerler girilmeden siparis ekraninda yer tutucu gorunur.</summary>
     public BankAccountOptions Bank { get; set; } = new();
 

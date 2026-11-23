@@ -10,7 +10,7 @@ namespace Booster.Licensing.Portal.Services;
 /// Siparis -&gt; havale/EFT -&gt; admin "odeme alindi" -&gt; lisans otomatik uretilir.
 /// Yenileme ve plan yukseltme ayni akistir: kurulumda gecerli ucretli lisans varsa sure onun BITISINE eklenir.
 /// </summary>
-public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, TimeProvider time)
+public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, TimeProvider time, PortalNotifier notifier)
 {
     public async Task<Order> CreateAsync(Customer customer, CustomerInstallation installation, Plan plan, string createdBy, CancellationToken ct)
     {
@@ -45,6 +45,7 @@ public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, Ti
         };
         db.Orders.Add(order);
         await db.SaveChangesAsync(ct);
+        await notifier.OrderReceivedAsync(order, ct);
         return order;
     }
 
@@ -86,6 +87,8 @@ public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, Ti
         order.LicenseId = license.Id;
         await db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
+        // E-posta COMMIT'ten sonra: onay geri alinirsa e-posta gitmez.
+        await notifier.LicenseIssuedAsync(order, license, ct);
         return license;
     }
 
