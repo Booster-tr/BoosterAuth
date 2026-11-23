@@ -44,8 +44,8 @@ public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, Ti
             CreatedBy = createdBy,
         };
         db.Orders.Add(order);
-        await db.SaveChangesAsync(ct);
         await notifier.OrderReceivedAsync(order, ct);
+        await db.SaveChangesAsync(ct);
         return order;
     }
 
@@ -85,10 +85,10 @@ public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, Ti
             ExpiresAtOverride: start.AddMonths(order.DurationMonths)), ct);
 
         order.LicenseId = license.Id;
+        // "Lisansiniz hazir" e-postasi lisansla AYNI transaction'da (outbox): onay geri alinirsa e-posta da gitmez.
+        await notifier.LicenseIssuedAsync(order, license, ct);
         await db.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
-        // E-posta COMMIT'ten sonra: onay geri alinirsa e-posta gitmez.
-        await notifier.LicenseIssuedAsync(order, license, ct);
         return license;
     }
 

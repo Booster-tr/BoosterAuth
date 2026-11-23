@@ -27,7 +27,7 @@ public sealed class InvitationPendingData
 /// <summary>
 /// Davet: rastgele token + e-posta. Token 1 gun gecerli ve tek kullanimliktir (bildirim sablonu da "1 gun" der).
 /// <para>
-/// Olay EF outbox'a yazilir; outbox ancak SaveChanges ile kaydedilir. Bu yuzden cagiran, <see cref="SendAsync"/>'ten
+/// Olay Booster outbox'ina yazilir; outbox ancak SaveChanges ile kaydedilir. Bu yuzden cagiran, <see cref="SendAsync"/>'ten
 /// SONRA IdpDbContext'te SaveChanges cagirmalidir; aksi halde e-posta HIC gitmez.
 /// </para>
 /// </summary>

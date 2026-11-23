@@ -1,3 +1,4 @@
+using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
@@ -23,7 +24,8 @@ public sealed class StartPasswordlessLoginHandler(
     IClientDataStore clientDataStore,
     IProviderFactory providerFactory,
     IRequestContextAccessor requestContextAccessor,
-    IEventBus eventBus) : ICommandHandler<StartPasswordlessLoginCommand>
+    IEventBus eventBus,
+    IdpDbContext db) : ICommandHandler<StartPasswordlessLoginCommand>
 {
     public async Task ExecuteAsync(StartPasswordlessLoginCommand cmd, CancellationToken ct)
     {
@@ -75,6 +77,8 @@ public sealed class StartPasswordlessLoginHandler(
                     ((int)Math.Ceiling((result.ExpiresAt!.Value - DateTimeOffset.UtcNow).TotalMinutes)).ToString()
             }
         }, ct);
+        // Outbox: olay ancak SaveChanges ile kaydedilir (bu akista baska DB degisikligi yok).
+        await db.SaveChangesAsync(ct);
     }
 
     private static ProviderConfig BuildConfig(string providerType, ClientData client)

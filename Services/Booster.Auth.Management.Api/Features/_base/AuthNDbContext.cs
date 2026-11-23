@@ -1,4 +1,5 @@
-﻿using Booster.Auth.Database.DbContextBase;
+﻿using Booster.Amqp.Outbox;
+using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Management.Api.Features._base.Entities;
 using Booster.Auth.Manager.RequestContexts;
 using MassTransit;
@@ -27,6 +28,8 @@ public class AuthNDbContext(
 
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
+
+        modelBuilder.AddBoosterOutbox();
         modelBuilder.AddOutboxStateEntity();
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

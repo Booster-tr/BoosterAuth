@@ -26,7 +26,8 @@ public sealed class ForgotPasswordHandler(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IRequestContextAccessor requestContextAccessor,
     ISimpleHasher simpleHasher,
-    IEventBus eventBus) : ICommandHandler<ForgotPasswordCommand>
+    IEventBus eventBus,
+    IdpDbContext db) : ICommandHandler<ForgotPasswordCommand>
 {
     private static readonly TimeSpan ResetCodeTtl = TimeSpan.FromMinutes(15);
 
@@ -86,6 +87,8 @@ public sealed class ForgotPasswordHandler(
                 ["ExpiresInMinutes"] = ((int)ResetCodeTtl.TotalMinutes).ToString()
             }
         }, ct);
+        // Outbox: olay ancak SaveChanges ile kaydedilir (bu akista baska DB degisikligi yok).
+        await db.SaveChangesAsync(ct);
     }
 
     private async Task<Principal?> FindPrincipalAsync(

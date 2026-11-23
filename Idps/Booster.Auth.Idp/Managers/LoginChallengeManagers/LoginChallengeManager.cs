@@ -1,3 +1,4 @@
+using Booster.Auth.Idp.Features._base;
 using System.Security.Cryptography;
 using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Database.Models;
@@ -50,7 +51,8 @@ public sealed class LoginChallengeManager(
     ILocalUserStore userStore,
     ISessionStore sessionStore,
     IRequestContextAccessor requestContextAccessor,
-    IEventBus eventBus) : ILoginChallengeManager
+    IEventBus eventBus,
+    IdpDbContext db) : ILoginChallengeManager
 {
     /// <summary>Yarım girişin ömrü: süresi dolarsa kullanıcı parolayı yeniden girer.</summary>
     private static readonly TimeSpan ChallengeLifetime = TimeSpan.FromMinutes(15);
@@ -266,6 +268,8 @@ public sealed class LoginChallengeManager(
                 ["ExpiresInMinutes"] = ((int)CodeLifetime.TotalMinutes).ToString()
             }
         }, ct);
+        // Outbox: olay ancak SaveChanges ile kaydedilir (bu akista baska DB degisikligi yok).
+        await db.SaveChangesAsync(ct);
     }
 
     private async Task<LoginChallengeData> RequireAsync(string interactionKey, ClientData client, CancellationToken ct)

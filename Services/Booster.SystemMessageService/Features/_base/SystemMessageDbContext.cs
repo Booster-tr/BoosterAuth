@@ -1,4 +1,5 @@
-﻿using Booster.Auth.Database.DbContextBase;
+﻿using Booster.Amqp.Outbox;
+using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.SystemMessageService.Features.SystemMessages._base.Entities;
 using MassTransit;
@@ -17,6 +18,8 @@ public class SystemMessageDbContext(DbContextOptions<SystemMessageDbContext> opt
         base.OnModelCreating(modelBuilder);
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
+
+        modelBuilder.AddBoosterOutbox();
         modelBuilder.AddOutboxStateEntity();
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }

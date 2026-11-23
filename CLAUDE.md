@@ -61,7 +61,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Havale bilgileri `LicensingPortalOptions__Bank__{BankName,AccountName,Iban}` ayarlarindan okunur (gizli degil).
 - **Portal e-postalari (`PortalNotifier`):** Notification servisi gonderir; sablonlar `license_*` anahtarlariyla `NotificationBootstrapper`'da (tr/en).
   - Akislar: deneme, siparis alindi, lisans hazir, aktarim, yenileme hatirlatmasi. Alici firmanin fatura e-postasi.
-  - Gonderim commit'ten SONRA ve en-iyi-cabadir: Kafka hatasi loglanir, islem bozulmaz.
+  - Olay outbox ile is verisiyle ayni transaction'da yazilir: islem geri alinirsa e-posta gitmez; Kafka kapaliysa bekler.
   - Baglantilar `LicensingPortalOptions__PublicUrl` ile uretilir.
 - **Yenileme hatirlatmasi (`RenewalReminderService`):** acilista ve 6 saatte bir calisir; admin Siparisler ekranindan elle de tetiklenebilir.
   - Bitise 30 ve 7 gun kala, lisans ve tur basina BIR KEZ (`LicenseReminders` tekil index'i).
@@ -125,10 +125,12 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Yeniden gonderilen davet (`POST pools/users/invite`) eskisini gecersiz kilar.
   - Kabul edilince parola belirlenir ve e-posta dogrulanmis sayilir.
 - Havuz politikasi istemcisiz akislarda `PoolDataReader` (Management `GetPoolData` gRPC) ile okunur.
-- **OLAYLAR OUTBOX'A YAZILMAZ (2026-11 yerelde dogrulandi):** `IEventBus.PublishAsync` -> Kafka rider `ITopicProducer`, olayi HEMEN gonderir.
-  - `UseBusOutbox` rider ureticilerini kapsamiyor; `OutboxMessage` tablolarina (IdP, Management, portal) hic satir yazilmiyor.
-  - Sonuc: transaction geri alinsa da olay gitmis olur; Kafka kapaliysa olay kaybolur.
-  - Kural: olayi is islemi KAYDEDILDIKTEN/commit edildikten SONRA yayinla. Yinelenmemesi gereken islerde once DB'de sahiplen (`ON CONFLICT DO NOTHING`), sonra yayinla (bkz. portal `RenewalReminderService`).
+- **OUTBOX KURALI (Booster outbox, `Common/Amqp/Booster.Amqp/Outbox`):** `IEventBus.PublishAsync` olayi servisin DbContext'ine `BoosterOutboxEvents` satiri olarak EKLER.
+  - Olay ancak AYNI DbContext'te `SaveChanges` cagrilinca kaydedilir. Publish'ten sonra SaveChanges yoksa olay HIC gitmez; baska degisiklik olmasa bile SaveChanges cagir (bkz. `ForgotPasswordHandler`).
+  - Islem geri alinirsa olay da geri alinir. `OutboxDispatcher` kaydedilen satirlari Kafka'ya gonderip siler; Kafka kapaliysa artan bekleme ile tekrar dener (en-az-bir-kez teslim).
+  - Neden kendi outbox'imiz: MassTransit `UseBusOutbox` Kafka rider ureticilerini (`ITopicProducer`) KAPSAMAZ; eskiden olaylar dogrudan gidiyordu.
+  - Outbox DbContext bazinda istege baglidir: `modelBuilder.AddBoosterOutbox()` + migration. Yalnizca tuketen servisler (Logging, Notification) kullanmaz.
+  - Loglar outbox'a girmez: `AmqpLogWriter` -> `IDirectEventBus` (dogrudan, kayip kabul edilir).
 
 ## Komutlar
 ```bash

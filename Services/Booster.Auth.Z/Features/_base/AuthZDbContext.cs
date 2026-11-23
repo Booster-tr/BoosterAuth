@@ -1,3 +1,4 @@
+using Booster.Amqp.Outbox;
 using MassTransit;
 using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Manager.RequestContexts;
@@ -23,6 +24,8 @@ public class AuthZDbContext(
         // bile kayit kaybolmaz, baglanti gelince teslim edilir.
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
+
+        modelBuilder.AddBoosterOutbox();
         modelBuilder.AddOutboxStateEntity();
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

@@ -2,6 +2,7 @@
 using Booster.Amqp.Constants;
 using Booster.Amqp.Contexts;
 using Booster.Amqp.Middlewares;
+using Booster.Amqp.Outbox;
 using Booster.Amqp.Providers.ProducerProvider;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -20,7 +21,12 @@ public static class ServiceExtensions
     {
         services.AddScoped<IKafkaProducerProvider, KafkaProducerProvider>();
 
-        services.AddScoped<IEventBus, MassTransitEventBus>();
+        services.AddScoped<IDirectEventBus, DirectEventBus>();
+
+        // Is olaylari: Booster transactional outbox (MassTransit bus outbox Kafka rider ureticilerini KAPSAMAZ).
+        services.AddScoped<IEventBus, OutboxEventBus<TContext>>();
+        services.AddSingleton<OutboxSignal<TContext>>();
+        services.AddHostedService<OutboxDispatcher<TContext>>();
 
         services.AddMassTransit(x =>
         {
@@ -57,7 +63,7 @@ public static class ServiceExtensions
                 // Kasıtlı olarak false: true olsaydı broker ayakta değilken
                 // uygulama HİÇ açılmazdı. Kimlik doğrulama ve yetkilendirme
                 // Kafka'ya bağımlı değil; mesajlaşma geçici olarak çalışmasa
-                // bile giriş akışı ayakta kalmalı. Üretilen mesajlar outbox'a
+                // bile giriş akışı ayakta kalmalı. IEventBus olayları Booster outbox'ına
                 // yazıldığı için bağlantı geri geldiğinde teslim edilir.
                 options.WaitUntilStarted = false;
             });

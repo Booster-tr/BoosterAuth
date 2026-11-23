@@ -1,3 +1,4 @@
+using Booster.Amqp.Outbox;
 using MassTransit;
 using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -27,6 +28,8 @@ public class IdpDbContext(DbContextOptions<IdpDbContext> options, IRequestContex
 
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
+
+        modelBuilder.AddBoosterOutbox();
         modelBuilder.AddOutboxStateEntity();
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

@@ -1,3 +1,4 @@
+using Booster.Amqp.Outbox;
 using System.Reflection;
 using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Manager.RequestContexts;
@@ -37,10 +38,10 @@ public class LicensingDbContext(
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasSequence<long>(OrderReferenceSequence);
 
-        // MassTransit outbox tablolari (AddBoosterMessaging altyapisi bekler). NOT: Kafka rider ureticileri bu
-        // tablolari KULLANMAZ; olaylar dogrudan gonderilir (bkz. PortalNotifier).
+        // MassTransit tablolari (altyapi bekler) + Booster outbox (IEventBus olaylari; bkz. PortalNotifier).
         modelBuilder.AddInboxStateEntity();
         modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddBoosterOutbox();
         modelBuilder.AddOutboxStateEntity();
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }

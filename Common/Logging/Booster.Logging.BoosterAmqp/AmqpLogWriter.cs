@@ -4,7 +4,8 @@ using Booster.Logging.Abstraction;
 namespace Booster.Logging.BoosterAmqp;
 
 
-public class AmqpLogWriter(IEventBus producer) : ILogPublisher
+/// <summary>Loglar outbox'a yazilmaz: is islemi disinda da uretilirler; dogrudan gonderilir.</summary>
+public class AmqpLogWriter(IDirectEventBus producer) : ILogPublisher
 {
     public async Task LogAsync(LogLevel level, string message, Exception? exception = null, IReadOnlyDictionary<string, string?>? properties = null, CancellationToken ct = default)
     {

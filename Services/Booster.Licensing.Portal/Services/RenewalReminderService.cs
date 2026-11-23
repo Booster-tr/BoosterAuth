@@ -9,8 +9,8 @@ namespace Booster.Licensing.Portal.Services;
 /// <summary>
 /// Bitise 30 ve 7 gun kala yenileme hatirlatmasi.
 /// <para>
-/// Her lisans ve tur icin EN FAZLA BIR KEZ gonderilir: (LicenseId, Kind) tekil index.i uzerinde once kayit
-/// sahiplenilir, sonra e-posta gonderilir. Servis yeniden baslasa da, birden fazla pod calissa da tekrar gitmez.
+/// Her lisans ve tur icin EN FAZLA BIR KEZ gonderilir: (LicenseId, Kind) tekil index'i uzerinde kayit ve e-posta
+/// olayi (outbox) ayni transaction'da yazilir. Servis yeniden baslasa da, birden fazla pod calissa da tekrar gitmez.
 /// </para>
 /// Musteri ayni kurulum icin daha uzun sureli bir lisans almissa (yenilemisse) hatirlatma GONDERILMEZ.
 /// </summary>
@@ -42,21 +42,20 @@ public sealed class RenewalReminderService(LicensingDbContext db, PortalNotifier
             // En yakin esik: 7 gun icindeyse 7, degilse 30. Gec kalinan 30 gunluk hatirlatma 7'nin yerine gecmez.
             var kind = Kinds.Where(k => daysLeft <= k).Min();
 
-            // Once SAHIPLEN, sonra gonder. Kafka olayi geri alinamadigi icin (outbox yok) "gonder + kaydet" sirasi
-            // es zamanli calismada e-postayi yineler. ON CONFLICT ile yalnizca satiri yazabilen calisma gonderir.
-            var reminderId = EntityId.New();
+            // Sahiplen + e-posta olayi AYNI transaction'da (outbox). ON CONFLICT: es zamanli ikinci calisma, ilki
+            // commit edene kadar bekler ve 0 satir alir; e-posta yalnizca bir kez kuyruga girer.
+            await using var tx = await db.Database.BeginTransactionAsync(ct);
             var claimed = await db.Database.ExecuteSqlInterpolatedAsync($"""
                 INSERT INTO "LicenseReminders" ("Id", "LicenseId", "Kind", "CreatedTime")
-                VALUES ({reminderId}, {license.Id}, {kind}, {now})
+                VALUES ({EntityId.New()}, {license.Id}, {kind}, {now})
                 ON CONFLICT ("LicenseId", "Kind") DO NOTHING
                 """, ct);
             if (claimed == 0) continue;
 
-            if (await notifier.RenewalReminderAsync(license.Customer, license, daysLeft, ct))
-                sent++;
-            else
-                // Gonderilemedi: sahiplik birakilir, bir sonraki turda tekrar denenir.
-                await db.LicenseReminders.Where(r => r.Id == reminderId).ExecuteDeleteAsync(ct);
+            await notifier.RenewalReminderAsync(license.Customer, license, daysLeft, ct);
+            await db.SaveChangesAsync(ct);
+            await tx.CommitAsync(ct);
+            sent++;
         }
 
         if (sent > 0) logger.LogInformation("{Count} yenileme hatirlatmasi gonderildi.", sent);

@@ -91,8 +91,8 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
             "self-service", "Portal: ucretsiz deneme"), ct);
 
         request.LicenseId = license.Id;
-        await db.SaveChangesAsync(ct);
         await notifier.TrialIssuedAsync(customer, license, ct);
+        await db.SaveChangesAsync(ct);
         return new SelfServiceResult(license, null);
     }
 
@@ -137,8 +137,8 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
             ToInstallationId = target.InstallationId,
             RequestedBy = requestedBy,
         });
-        await db.SaveChangesAsync(ct);
         await notifier.TransferredAsync(customer, license, moved, requestedBy, ct);
+        await db.SaveChangesAsync(ct);
         return new SelfServiceResult(moved, null);
     }
 
