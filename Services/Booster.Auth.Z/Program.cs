@@ -6,6 +6,7 @@ using Booster.Authorization.Relational.Extensions;
 using Booster.Authorization.Relational.Options;
 using Booster.Common.Extensions.ServiceExtensions;
 using FastEndpoints;
+using Microsoft.AspNetCore.Rewrite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,11 @@ builder.Services.AddBoosterApi(builder.Configuration);
 builder.Services.AddGrpc();
 
 var app = builder.Build();
+
+// Gateway "/authz" on ekini SILMEZ (AuthZ rotalari "authz/..." ile baslar); bu yuzden public
+// https://auth.../authz/version istegi buraya "/authz/version" olarak gelir. Surum ucu "/version"da (ortak).
+// Routing'den ONCE yeniden yazilir; cluster ici "/version" (panel Servis Durumu) aynen calisir.
+app.UseRewriter(new RewriteOptions().AddRewrite("^authz/version$", "version", skipRemainingRules: true));
 
 app.UseBoosterServices();
 app.UseBoosterMessaging();
