@@ -16,7 +16,7 @@ else
         @foreach (var c in Model)
         {
             <tr>
-                <td>@c.Name</td><td>@c.ContactEmail</td><td>@c.TaxNumber</td><td>@c.LicenseCount</td>
+                <td><a href="/admin/musteriler/detay?CustomerId=@c.Id">@c.Name</a></td><td>@c.ContactEmail</td><td>@c.TaxNumber</td><td>@c.LicenseCount</td>
                 <td><a class="btn btn-ghost btn-sm" href="/admin/lisanslar/yeni?customerId=@c.Id">Lisans üret</a></td>
             </tr>
         }

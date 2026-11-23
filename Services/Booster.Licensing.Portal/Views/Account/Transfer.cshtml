@@ -1,0 +1,37 @@
+@{
+    ViewData["Title"] = "Lisansı aktar";
+    var license = (IssuedLicense)ViewBag.License;
+    var targets = (List<CustomerInstallation>)ViewBag.Targets;
+}
+<h1>Lisansı başka kuruluma aktar</h1>
+<section class="card">
+    <p>
+        <b>@license.Plan</b> lisansı (<code>@license.InstallationId</code>) seçtiğiniz kuruluma aynı bitiş tarihi
+        (@license.ExpiresAt.ToString("yyyy-MM-dd")) ve limitlerle aktarılır. Bir lisans yılda en fazla 3 kez aktarılabilir.
+    </p>
+    <p class="muted">
+        Not: Booster Auth çevrimdışı çalıştığı için eski kurulumdaki lisans o sunucuda süresi dolana kadar çalışmaya devam eder.
+        Aktarımı yalnızca eski kurulumu kullanmayı bıraktığınızda yapın.
+    </p>
+    @if (targets.Count == 0)
+    {
+        <p class="alert">Aktarabileceğiniz başka kurulum yok. <a href="/hesap/kurulumlar/yeni">Önce yeni kurulumu ekleyin.</a></p>
+    }
+    else
+    {
+        <form method="post" class="form">
+            <label>Yeni kurulum
+                <select name="targetInstallationId">
+                    @foreach (var t in targets)
+                    {
+                        <option value="@t.InstallationId">@t.Label — @t.InstallationId</option>
+                    }
+                </select>
+            </label>
+            <div class="actions">
+                <a class="btn btn-ghost" href="/hesap/lisans?LicenseId=@license.Id">Vazgeç</a>
+                <button class="btn btn-primary" type="submit">Aktar</button>
+            </div>
+        </form>
+    }
+</section>

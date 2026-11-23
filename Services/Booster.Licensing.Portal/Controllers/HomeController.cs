@@ -11,13 +11,18 @@ namespace Booster.Licensing.Portal.Controllers;
 public sealed class HomeController(LicensingPortalOptions options) : Controller
 {
     [HttpGet("/")]
-    public IActionResult Index()
+    public IActionResult Index([FromQuery] Guid? installationId)
     {
-        if (User.Identity?.IsAuthenticated != true) return View();
+        // Urun panelindeki "Lisans al" butonu kurulum GUID'ini tasir; giristen sonra kurulum formu dolu acilir.
+        var next = installationId is { } g && g != Guid.Empty ? $"/hesap/kurulumlar/yeni?installationId={g}" : "/hesap";
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            ViewBag.Next = next;
+            return View();
+        }
         if (string.Equals(User.FindFirst("email_verified")?.Value, "true", StringComparison.OrdinalIgnoreCase) && options.IsAdmin(User.FindFirst("email")?.Value))
             return Redirect("/admin");
-        // Musteri ekranlari Faz 2.2'de gelir.
-        return View("CustomerSoon");
+        return Redirect(next);
     }
 
     /// <summary>Booster Auth giris ekranina yonlendirir. Kayit ("Hesap olustur") da o ekrandadir.</summary>

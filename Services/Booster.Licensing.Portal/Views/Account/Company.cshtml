@@ -1,0 +1,20 @@
+@model CompanyForm
+@{ ViewData["Title"] = "Firma bilgileri"; }
+<h1>Firma bilgileri</h1>
+<p class="muted">Lisanslarınız bu firma adına üretilir. Fatura bilgileri sipariş verirken kullanılır.</p>
+<form method="post" class="card form" data-company-form>
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+    <div asp-validation-summary="ModelOnly" class="alert"></div>
+    <label>Firma adı <input asp-for="Name" required /></label>
+    <span asp-validation-for="Name" class="field-error"></span>
+    <label>Fatura e-postası <input asp-for="ContactEmail" type="email" required /></label>
+    <span asp-validation-for="ContactEmail" class="field-error"></span>
+    <div class="row">
+        <label>Vergi dairesi <input asp-for="TaxOffice" /></label>
+        <label>Vergi no / TCKN <input asp-for="TaxNumber" /></label>
+    </div>
+    <label>Fatura adresi <textarea asp-for="Address" rows="2"></textarea></label>
+    <div class="actions">
+        <button class="btn btn-primary" type="submit">Kaydet</button>
+    </div>
+</form>

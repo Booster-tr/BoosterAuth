@@ -7,5 +7,5 @@
         <li>Bu portala giriş yapın ya da hesap oluşturun.</li>
         <li>Lisansınızı alın ve token'ı panele yapıştırın.</li>
     </ol>
-    <a class="btn btn-primary btn-lg" href="/giris">Giriş yap / Hesap oluştur</a>
+    <a class="btn btn-primary btn-lg" href="/giris?returnUrl=@Uri.EscapeDataString(ViewBag.Next as string ?? "/hesap")">Giriş yap / Hesap oluştur</a>
 </section>

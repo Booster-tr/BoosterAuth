@@ -18,7 +18,10 @@ public sealed record IssueLicenseRequest(
     int DurationDays,
     int GraceDays,
     string IssuedBy,
-    string? Note);
+    string? Note,
+    // Aktarimda: yeni lisans eskisinin bitis tarihini ve zincirin ilk lisansini tasir.
+    DateTimeOffset? ExpiresAtOverride = null,
+    Guid? OriginLicenseId = null);
 
 /// <summary>Lisans uretir, imzalar, kendi public key'iyle hemen dogrular ve kaydeder.</summary>
 public sealed class LicenseIssuer(LicensingDbContext db, SigningKeyStore keys, TimeProvider time)
@@ -37,6 +40,7 @@ public sealed class LicenseIssuer(LicensingDbContext db, SigningKeyStore keys, T
         if (req.AllowedDomains.Count == 0) throw new ArgumentException("En az bir domain gerekli.");
         if (req.MaxUsers < 1 || req.MaxPools < 1 || req.MaxClients < 1) throw new ArgumentException("Limitler en az 1 olmali.");
         if (req.DurationDays < 1 || req.GraceDays < 0) throw new ArgumentException("Sure en az 1 gun, ek sure 0 veya fazla olmali.");
+        if (req.ExpiresAtOverride is { } exp && exp <= time.GetUtcNow()) throw new ArgumentException("Bitis tarihi gecmiste olamaz.");
 
         var customer = await db.Customers.AsNoTracking().SingleOrDefaultAsync(c => c.Id == req.CustomerId, ct)
                        ?? throw new ArgumentException("Musteri bulunamadi.");
@@ -55,7 +59,7 @@ public sealed class LicenseIssuer(LicensingDbContext db, SigningKeyStore keys, T
             Limits = new LicenseLimits(req.MaxUsers, req.MaxPools, req.MaxClients),
             AllowedDomains = req.AllowedDomains,
             IssuedAt = now,
-            ExpiresAt = now.AddDays(req.DurationDays),
+            ExpiresAt = req.ExpiresAtOverride ?? now.AddDays(req.DurationDays),
             GraceDays = req.GraceDays,
             InstallationId = req.InstallationId,
         };
@@ -85,6 +89,7 @@ public sealed class LicenseIssuer(LicensingDbContext db, SigningKeyStore keys, T
             Token = token,
             IssuedBy = req.IssuedBy,
             Note = string.IsNullOrWhiteSpace(req.Note) ? null : req.Note.Trim(),
+            OriginLicenseId = req.OriginLicenseId ?? payload.LicenseId,
         };
         db.IssuedLicenses.Add(entity);
         await db.SaveChangesAsync(ct);

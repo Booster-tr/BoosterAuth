@@ -15,6 +15,9 @@ public class LicensingDbContext(
     public DbSet<SigningKey> SigningKeys => Set<SigningKey>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<IssuedLicense> IssuedLicenses => Set<IssuedLicense>();
+    public DbSet<CustomerInstallation> CustomerInstallations => Set<CustomerInstallation>();
+    public DbSet<TrialRequest> TrialRequests => Set<TrialRequest>();
+    public DbSet<LicenseTransfer> LicenseTransfers => Set<LicenseTransfer>();
 
     /// <summary>
     /// Oturum cerezlerinin anahtarlari. Veritabaninda tutulur; aksi halde her yeniden baslatmada tum kullanicilarin

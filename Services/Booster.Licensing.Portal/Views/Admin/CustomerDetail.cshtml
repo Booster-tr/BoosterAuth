@@ -1,0 +1,98 @@
+@model Customer
+@{
+    ViewData["Title"] = Model.Name;
+    var trials = (List<TrialRequest>)ViewBag.Trials;
+    var transfers = (List<LicenseTransfer>)ViewBag.Transfers;
+}
+<div class="page-head">
+    <h1>@Model.Name</h1>
+    <a class="btn btn-primary" href="/admin/lisanslar/yeni?customerId=@Model.Id">Lisans üret</a>
+</div>
+<section class="card">
+    <dl class="facts">
+        <dt>Fatura e-postası</dt><dd>@Model.ContactEmail</dd>
+        <dt>Vergi</dt><dd>@Model.TaxOffice @Model.TaxNumber</dd>
+        <dt>Adres</dt><dd>@Model.Address</dd>
+        <dt>Kaynak</dt><dd>@(Model.OwnerPrincipalId is null ? "Admin tarafından eklendi" : "Self-servis (portal)")</dd>
+    </dl>
+</section>
+
+<section class="card">
+    <h2>Kurulumlar</h2>
+    @if (Model.Installations.Count == 0)
+    {
+        <p class="muted">Kurulum yok.</p>
+    }
+    else
+    {
+        <table>
+            <thead><tr><th>Ad</th><th>GUID</th><th>Domain'ler</th><th>Eklendi</th></tr></thead>
+            <tbody>
+            @foreach (var i in Model.Installations.OrderBy(i => i.Label))
+            {
+                <tr><td>@i.Label</td><td><code>@i.InstallationId</code></td><td>@string.Join(", ", i.Domains)</td><td>@i.CreatedTime.ToString("yyyy-MM-dd")</td></tr>
+            }
+            </tbody>
+        </table>
+    }
+</section>
+
+<section class="card">
+    <h2>Lisanslar</h2>
+    <table>
+        <thead><tr><th>Tür</th><th>Plan</th><th>GUID</th><th>Bitiş</th><th>Üreten</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var l in Model.Licenses.OrderByDescending(l => l.IssuedAt))
+        {
+            <tr>
+                <td>@(l.Type == "trial" ? "Deneme" : "Ücretli")@(l.TransferredToLicenseId is not null ? " (aktarıldı)" : "")</td>
+                <td>@l.Plan</td><td><code>@l.InstallationId</code></td><td>@l.ExpiresAt.ToString("yyyy-MM-dd")</td><td>@l.IssuedBy</td>
+                <td><a class="btn btn-ghost btn-sm" href="/admin/lisanslar/detay?LicenseId=@l.Id">Token</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>
+
+<section class="card">
+    <h2>Deneme talepleri</h2>
+    @if (trials.Count == 0)
+    {
+        <p class="muted">Talep yok.</p>
+    }
+    else
+    {
+        <table>
+            <thead><tr><th>Tarih</th><th>E-posta</th><th>Domain'ler</th><th>IP</th><th>Sonuç</th></tr></thead>
+            <tbody>
+            @foreach (var t in trials)
+            {
+                <tr>
+                    <td>@t.CreatedTime.ToString("yyyy-MM-dd HH:mm")</td><td>@t.Email</td><td>@string.Join(", ", t.Domains)</td><td>@t.IpAddress</td>
+                    <td><span class="tag @(t.Granted ? "tag-ok" : "tag-warn")">@(t.Granted ? "Verildi" : t.RejectReason)</span></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</section>
+
+<section class="card">
+    <h2>Aktarım geçmişi</h2>
+    @if (transfers.Count == 0)
+    {
+        <p class="muted">Aktarım yok.</p>
+    }
+    else
+    {
+        <table>
+            <thead><tr><th>Tarih</th><th>Eski GUID</th><th>Yeni GUID</th><th>Yapan</th></tr></thead>
+            <tbody>
+            @foreach (var t in transfers)
+            {
+                <tr><td>@t.CreatedTime.ToString("yyyy-MM-dd HH:mm")</td><td><code>@t.FromInstallationId</code></td><td><code>@t.ToInstallationId</code></td><td>@t.RequestedBy</td></tr>
+            }
+            </tbody>
+        </table>
+    }
+</section>

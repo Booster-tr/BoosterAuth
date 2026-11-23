@@ -21,6 +21,8 @@ public class Customer : Entity
     public Guid? OwnerPrincipalId { get; set; }
 
     public List<IssuedLicense> Licenses { get; set; } = [];
+
+    public List<CustomerInstallation> Installations { get; set; } = [];
 }
 
 internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
@@ -34,6 +36,7 @@ internal sealed class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(x => x.TaxOffice).HasMaxLength(100);
         builder.Property(x => x.TaxNumber).HasMaxLength(20);
         builder.Property(x => x.Address).HasMaxLength(500);
-        builder.HasIndex(x => x.OwnerPrincipalId);
+        // Bir kullanici tek firmanin sahibidir (self-servis).
+        builder.HasIndex(x => x.OwnerPrincipalId).IsUnique().HasFilter("\"OwnerPrincipalId\" IS NOT NULL AND \"DeletedTime\" IS NULL");
     }
 }

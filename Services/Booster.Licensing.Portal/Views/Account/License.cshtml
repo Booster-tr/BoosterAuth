@@ -1,0 +1,51 @@
+@model IssuedLicense
+@{
+    ViewData["Title"] = "Lisans";
+    var inst = ViewBag.Installation as CustomerInstallation;
+    var transfers = (List<LicenseTransfer>)ViewBag.Transfers;
+    var transferable = Model.Type == "paid" && Model.TransferredToLicenseId is null && Model.ExpiresAt > DateTimeOffset.UtcNow;
+}
+<h1>Lisans</h1>
+@if (TempData["Error"] is string error)
+{
+    <p class="alert" data-error-code="@TempData["ErrorCode"]">@error</p>
+}
+<section class="card">
+    <dl class="facts">
+        <dt>Kurulum</dt><dd>@(inst?.Label ?? "—") <code>@Model.InstallationId</code></dd>
+        <dt>Tür / plan</dt><dd>@(Model.Type == "trial" ? "Deneme" : "Ücretli") / @Model.Plan</dd>
+        <dt>Limitler</dt><dd>@Model.MaxUsers kullanıcı, @Model.MaxPools havuz, @Model.MaxClients uygulama</dd>
+        <dt>Domain'ler</dt><dd>@string.Join(", ", Model.AllowedDomains)</dd>
+        <dt>Geçerlilik</dt><dd>@Model.IssuedAt.ToString("yyyy-MM-dd") – @Model.ExpiresAt.ToString("yyyy-MM-dd") (+@Model.GraceDays gün ek süre)</dd>
+    </dl>
+
+    @if (Model.TransferredToLicenseId is not null)
+    {
+        <p class="alert">Bu lisans başka bir kuruluma aktarıldı. <a href="/hesap/lisans?LicenseId=@Model.TransferredToLicenseId">Yeni lisansı görüntüle</a></p>
+    }
+    else
+    {
+        <h2>Lisans token'ı</h2>
+        <p class="muted">Bu metni Booster Auth yönetim panelinde <b>Sistem &gt; Lisans</b> ekranına yapıştırın. Yalnızca yukarıdaki kurulumda çalışır.</p>
+        <pre class="token" id="token">@Model.Token</pre>
+        <button class="btn btn-primary" type="button" data-copy="token">Token'ı kopyala</button>
+        @if (transferable)
+        {
+            <a class="btn btn-ghost" href="/hesap/lisans/aktar?LicenseId=@Model.Id">Başka kuruluma aktar</a>
+        }
+    }
+
+    @if (transfers.Count > 0)
+    {
+        <h2>Aktarım geçmişi</h2>
+        <table>
+            <thead><tr><th>Tarih</th><th>Eski kurulum</th><th>Yeni kurulum</th><th>Yapan</th></tr></thead>
+            <tbody>
+            @foreach (var t in transfers)
+            {
+                <tr><td>@t.CreatedTime.ToString("yyyy-MM-dd HH:mm")</td><td><code>@t.FromInstallationId</code></td><td><code>@t.ToInstallationId</code></td><td>@t.RequestedBy</td></tr>
+            }
+            </tbody>
+        </table>
+    }
+</section>

@@ -19,13 +19,21 @@
             <a href="/admin">Genel</a>
             <a href="/admin/musteriler">Müşteriler</a>
             <a href="/admin/lisanslar">Lisanslar</a>
+            <a href="/hesap">Müşteri alanı</a>
+        </nav>
+    }
+    else if (email is not null)
+    {
+        <nav class="nav">
+            <a href="/hesap/kurulumlar">Kurulumlarım</a>
+            <a href="/hesap/firma">Firma bilgileri</a>
         </nav>
     }
     <div class="user">
         @if (email is not null)
         {
             <span class="muted">@email</span>
-            <form method="post" action="/cikis"><button class="btn btn-ghost" type="submit">Çıkış</button></form>
+            <form method="post" action="/cikis" asp-antiforgery="true"><button class="btn btn-ghost" type="submit">Çıkış</button></form>
         }
         else
         {

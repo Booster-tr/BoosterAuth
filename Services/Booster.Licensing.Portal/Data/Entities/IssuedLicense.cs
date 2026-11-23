@@ -38,6 +38,12 @@ public class IssuedLicense : Entity
     public string IssuedBy { get; set; } = default!;
 
     public string? Note { get; set; }
+
+    /// <summary>Aktarim zincirinin ilk lisansi (aktarilmamis lisansta kendisi). Yillik aktarim siniri bunun uzerinden sayilir.</summary>
+    public Guid? OriginLicenseId { get; set; }
+
+    /// <summary>Bu lisans baska bir kuruluma aktarildiysa yeni lisans. Aktarilmis lisans tekrar aktarilamaz.</summary>
+    public Guid? TransferredToLicenseId { get; set; }
 }
 
 internal sealed class IssuedLicenseConfiguration : IEntityTypeConfiguration<IssuedLicense>
