@@ -47,7 +47,6 @@ public record GetByIdClientResponse(
     List<string> PostLogoutRedirectUris,
     List<string> AllowedAudiences,
     bool RequireConsent,
-    List<TokenScopePolicyItem> TokenScopePolicy,
     string UserPoolName,
     IReadOnlyList<ClientScopeResponse> AllowedScopes,
     DateTimeOffset CreatedTime,

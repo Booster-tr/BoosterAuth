@@ -64,7 +64,8 @@ public class UpdateMfaPolicyValidator : Validator<UpdateMfaPolicyCommand>
     {
         RuleFor(x => x.UserPoolId).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
         RuleFor(x => x.AllowedMethods)
-            .Must(v => (v & ~(MfaMethod.Totp | MfaMethod.Sms | MfaMethod.Email)) == 0)
+            // TOTP desteklenmiyor (kaldirildi): yalnizca e-posta ve SMS kodu.
+            .Must(v => (v & ~(MfaMethod.Sms | MfaMethod.Email)) == 0)
             .WithMessage(ValidationErrors.InvalidType);
         RuleFor(x => x.AllowedMethods)
             .NotEqual(MfaMethod.None).When(x => x.Required)

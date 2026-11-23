@@ -27,25 +27,9 @@ public class Client : Entity
 
     public bool RequireConsent { get; set; } = true;
 
-    public List<TokenScopePolicyItem> TokenScopePolicy { get; set; } = [];
-
     public virtual ICollection<ClientAllowedScope> AllowedScopes { get; set; } = [];
 
 
-}
-
-public class TokenScopePolicyItem
-{
-    public string Key { get; set; } = default!;
-
-    /// <summary>Açıksa, token verilirken bu anahtarın değeri üzerinde yetki grafiği kontrol edilir.</summary>
-    public bool PermissionCheckRequired { get; set; }
-
-    public bool IsRequired { get; set; }
-
-    public List<string> RequiredPermissions { get; set; } = [];
-
-    public List<string> GrantedPermissions { get; set; } = [];
 }
 
 
@@ -70,8 +54,6 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.PrimitiveCollection(x => x.RedirectUris);
         builder.PrimitiveCollection(x => x.PostLogoutRedirectUris);
         builder.PrimitiveCollection(x => x.AllowedAudiences);
-
-        builder.OwnsMany(x => x.TokenScopePolicy, p => p.ToJson());
 
         builder.HasIndex(x => x.UserPoolId).IsUnique(false);
 
