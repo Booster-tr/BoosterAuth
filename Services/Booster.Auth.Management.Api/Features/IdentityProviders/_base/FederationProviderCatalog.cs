@@ -1,3 +1,5 @@
+using L = Booster.Auth.Ldap.LdapSettings;
+
 namespace Booster.Auth.Management.Api.Features.IdentityProviders._base;
 
 public static class FederationProviderCatalog
@@ -11,18 +13,23 @@ public static class FederationProviderCatalog
     public const string X = "x";
     public const string Oidc = "oidc";
     public const string Saml = "saml";
+    /// <summary>LDAP / Active Directory: giris ekraninda buton DEGIL; parola formu dizinle dogrular.</summary>
+    public const string Ldap = Booster.Auth.Ldap.LdapSettings.ProviderType;
 
     private static readonly HashSet<string> FixedIssuerTypes =
         new(StringComparer.OrdinalIgnoreCase) { Google, Apple, LinkedIn };
 
     private static readonly HashSet<string> NoClientIdTypes =
-        new(StringComparer.OrdinalIgnoreCase) { Saml };
+        new(StringComparer.OrdinalIgnoreCase) { Saml, Ldap };
 
     public static readonly IReadOnlySet<string> All =
         new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            Google, Microsoft, Apple, LinkedIn, Facebook, GitHub, X, Oidc, Saml
+            Google, Microsoft, Apple, LinkedIn, Facebook, GitHub, X, Oidc, Saml, Ldap
         };
+
+    public static bool IsLdap(string? providerType)
+        => string.Equals(providerType, Ldap, StringComparison.OrdinalIgnoreCase);
 
     public static bool IsKnown(string? providerType)
         => providerType is not null && All.Contains(providerType);
@@ -42,6 +49,25 @@ public static class FederationProviderCatalog
     /// </summary>
     public static IReadOnlyList<ProviderField> FieldsOf(string providerType)
     {
+        if (IsLdap(providerType))
+        {
+            // Varsayilanlar Active Directory'ye gore; OpenLDAP icin filtre "(uid={0})", kimlik alani "entryUUID".
+            return
+            [
+                new(L.KeyHost, Required: true, Secret: false, Multiline: false),
+                new(L.KeySecurity, Required: true, Secret: false, Multiline: false, Options: L.SecurityOptions, Default: L.SecurityLdaps),
+                new(L.KeyPort, Required: true, Secret: false, Multiline: false, Default: "636"),
+                new(L.KeyBindDn, Required: true, Secret: false, Multiline: false),
+                new(IdentityProviderSettings.ClientSecret, Required: true, Secret: true, Multiline: false),
+                new(L.KeyBaseDn, Required: true, Secret: false, Multiline: false),
+                new(L.KeyUserFilter, Required: true, Secret: false, Multiline: false, Default: L.DefaultUserFilter),
+                new(L.KeyUsernameAttribute, Required: false, Secret: false, Multiline: false, Default: "sAMAccountName"),
+                new(L.KeyEmailAttribute, Required: false, Secret: false, Multiline: false, Default: "mail"),
+                new(L.KeyNameAttribute, Required: false, Secret: false, Multiline: false, Default: "displayName"),
+                new(L.KeyIdAttribute, Required: false, Secret: false, Multiline: false, Default: "objectGUID"),
+            ];
+        }
+
         if (string.Equals(providerType, Saml, StringComparison.OrdinalIgnoreCase))
         {
             return
@@ -81,4 +107,6 @@ public static class FederationProviderCatalog
     }
 }
 
-public record ProviderField(string Key, bool Required, bool Secret, bool Multiline);
+/// <param name="Options">Doluysa panel secim listesi gosterir.</param>
+/// <param name="Default">Yeni saglayicida alanin on degeri.</param>
+public record ProviderField(string Key, bool Required, bool Secret, bool Multiline, IReadOnlyList<string>? Options = null, string? Default = null);

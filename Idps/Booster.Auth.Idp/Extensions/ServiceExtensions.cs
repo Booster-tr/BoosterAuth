@@ -100,6 +100,8 @@ public static class ServiceExtensions
         // Panelden kullanici ekleme / CSV ice aktarma / davet
         services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.PoolDataReader>();
         services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.EndUserFactory>();
+        services.AddSingleton<Booster.Auth.Ldap.LdapDirectory>();
+        services.AddScoped<Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService>();
         services.AddScoped<Booster.Auth.Common.Internal.Licensing.ILicenseLimitService, Booster.Auth.Common.Internal.Licensing.LicenseLimitService>();
         services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.InvitationManager>();
 

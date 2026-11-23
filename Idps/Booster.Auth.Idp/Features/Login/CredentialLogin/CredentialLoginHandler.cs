@@ -38,7 +38,8 @@ public sealed class CredentialLoginHandler(
     IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
     ICacheService cacheService,
     ISecureCacheStore<ForcedPasswordChangeData> forcedChangeStore,
-    IRequestContextAccessor requestContextAccessor) : ICommandHandler<CredentialLoginCommand, CredentialLoginResult>
+    IRequestContextAccessor requestContextAccessor,
+    Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService ldapLogin) : ICommandHandler<CredentialLoginCommand, CredentialLoginResult>
 {
     public async Task<CredentialLoginResult> ExecuteAsync(CredentialLoginCommand cmd, CancellationToken ct)
     {
@@ -47,6 +48,30 @@ public sealed class CredentialLoginHandler(
 
         var client = await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
+
+        // LDAP / Active Directory: havuzda etkin LDAP saglayicisi varsa, YEREL PAROLASI OLMAYAN kullanici (ilk giriste
+        // henuz hic olmayan dahil) ayni parola formunda dizinle dogrulanir. Yerel parolali kullanicilar (or. yoneticiler)
+        // Booster parolasiyla girmeye devam eder.
+        var ldap = Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService.FindProvider(client);
+        if (ldap is not null)
+        {
+            using var ldapScope = requestContextAccessor.BeginSystemContext(client.IsolationId);
+            var candidate = await userStore.FindAsync(cmd.Identifier, client.Login.AllowedIdentifiers, ct);
+            var localAllowed = client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.Local);
+            if (candidate is null || !candidate.HasPassword || !localAllowed)
+            {
+                // Daha once dizinden gelmis kullanici e-postasiyla girerse dizinde kayitli kullanici adiyla aranir
+                // (filtre genellikle kullanici adina gore yazilir).
+                var ldapIdentifier = candidate?.UserName ?? cmd.Identifier;
+                var ldapUser = await ldapLogin.SignInAsync(client, ldap, ldapIdentifier, cmd.Password, ct);
+                var ldapOutcome = await loginChallengeManager.BeginAsync(
+                    cmd.InteractionKey, client, ldapUser,
+                    authMethod: Booster.Auth.Ldap.LdapSettings.ProviderType,
+                    passwordLogin: true,                // havuzun MFA politikasi LDAP girisinde de uygulanir
+                    cmd.UserAgent, cmd.IpAddress, ct);
+                return new CredentialLoginResult { SessionToken = ldapOutcome.SessionToken, ExpiresAt = ldapOutcome.ExpiresAt };
+            }
+        }
 
         var provider = providerFactory.GetCredentialProvider(cmd.ProviderType)
             ?? throw new AuthorizeException(IdpMessageKeys.ProviderNotAvailable);

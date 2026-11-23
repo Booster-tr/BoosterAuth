@@ -37,6 +37,7 @@
     <Project Path="CommonInternal/Booster.Auth.Common.Internal/Booster.Auth.Common.Internal.csproj" />
     <Project Path="CommonInternal/Booster.Auth.Database/Booster.Auth.Database.csproj" />
     <Project Path="CommonInternal/Booster.Auth.Idp.Contracts/Booster.Auth.Idp.Contracts.csproj" />
+    <Project Path="CommonInternal/Booster.Auth.Ldap/Booster.Auth.Ldap.csproj" />
     <Project Path="CommonInternal/Booster.Auth.Management.Contracts/Booster.Auth.Management.Contracts.csproj" />
     <Project Path="CommonInternal/Booster.Auth.Manager/Booster.Auth.Manager.csproj" />
   </Folder>
