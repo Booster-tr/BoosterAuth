@@ -23,6 +23,10 @@
     <Project Path="Common/ExceptionManagers/Booster.ExceptionManager.LocalDict/Booster.ExceptionManager.LocalDict.csproj" />
     <Project Path="Common/ExceptionManagers/Booster.ExceptionManager.WithCacheProvider/Booster.ExceptionManager.WithCacheProvider.csproj" />
   </Folder>
+  <Folder Name="/Common/Licensing/">
+    <Project Path="Common/Licensing/Booster.Licensing.Signing/Booster.Licensing.Signing.csproj" />
+    <Project Path="Common/Licensing/Booster.Licensing/Booster.Licensing.csproj" />
+  </Folder>
   <Folder Name="/Common/Logging/">
     <Project Path="Common/Logging/Booster.Logging.Abstraction/Booster.Logging.Abstraction.csproj" />
     <Project Path="Common/Logging/Booster.Logging.BoosterAmqp/Booster.Logging.BoosterAmqp.csproj" />
