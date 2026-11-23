@@ -34,6 +34,13 @@ using (var scope = app.Services.CreateScope())
     // Yönetim store'u yukarıda hazırlanır; Walk to Win ilişkileri o store'a yazılır.
     var walkToWinBootstrapper = scope.ServiceProvider.GetRequiredService<WalkToWinBootstrapper>();
     await walkToWinBootstrapper.InitializeAsync(CancellationToken.None);
+
+    // Lisans portali yalnizca Booster'in kendi kurulumunda acilir (Management.Api ile ayni bayrak).
+    if (builder.Configuration.GetValue<bool>("BootstrapOptions:Licensing:Enabled"))
+    {
+        var licensingBootstrapper = scope.ServiceProvider.GetRequiredService<LicensingBootstrapper>();
+        await licensingBootstrapper.InitializeAsync(CancellationToken.None);
+    }
 }
 
 app.Run();

@@ -62,6 +62,31 @@ public static class AuthConstants
     /// <summary>Mobil uygulamada av başlatma / oynama izni.</summary>
     public const string WalkToWinPlayScope = "walktowin:play";
 
+    // --- Lisans portali (licensing.appnuraymind.com) -------------------
+    // YALNIZCA Booster'in kendi kurulumunda acilir (BootstrapOptions.Licensing.Enabled).
+    // Musteri kurulumlarinda bu tenant/havuz/client OLUSMAZ.
+
+    public static readonly Guid LicensingTenantId = Guid.Parse("00000000-0000-0000-0000-000000000201");
+
+    /// <summary>Lisans portalina kayit olan musteri kullanicilarinin havuzu.</summary>
+    public static readonly Guid LicensingPoolId = Guid.Parse("00000000-0000-0000-0000-000000000202");
+
+    /// <summary>Portalin OAuth client kaydi. Panel gibi PKCE'li authorization code; client secret yok.</summary>
+    public static readonly Guid LicensingClientId = Guid.Parse("00000000-0000-0000-0000-000000000203");
+
+    public static readonly Guid LicensingCustomerRoleId = Guid.Parse("00000000-0000-0000-0000-000000000204");
+
+    public const string LicensingTenantName = "Booster Licensing";
+    public const string LicensingPoolName = "Booster Musterileri";
+    public const string LicensingClientKey = "licensing-portal";
+    public const string LicensingClientName = "Booster Lisans Portali";
+
+    public const string LicensingCustomerRoleName = "customer";
+    public const string LicensingCustomerRoleDisplayName = "Musteri";
+
+    /// <summary>Lisans portalini kullanma izni.</summary>
+    public const string LicensingPortalScope = "licensing:portal";
+
     // --- Resource tipleri --------------------------------------------------
 
     public const string UserPrefix = "user";

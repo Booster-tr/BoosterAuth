@@ -21,6 +21,7 @@ public static class ServiceExtensions
 
         services.AddScoped<ManagementBootstrapper>();
         services.AddScoped<WalkToWinBootstrapper>();
+        services.AddScoped<LicensingBootstrapper>();
 
         services.AddBoosterCacheLanguageTranslator();
         services.AddBoosterExceptionHandler();
