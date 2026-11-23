@@ -13,6 +13,7 @@
   -->
   <ItemGroup>
     <Protobuf Include="Protos\clientdata.proto" GrpcServices="Both" />
+    <Protobuf Include="Protos\license.proto" GrpcServices="Both" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,8 @@
   <!-- ClientData POCO'su ve enum'lar: iki taraf da aynı modeli kullanır -->
   <ItemGroup>
     <ProjectReference Include="..\Booster.Auth.Database\Booster.Auth.Database.csproj" />
+    <!-- ILicenseStatusProvider (GrpcLicenseStatusProvider) -->
+    <ProjectReference Include="..\..\Common\Licensing\Booster.Licensing\Booster.Licensing.csproj" />
   </ItemGroup>
 
 </Project>

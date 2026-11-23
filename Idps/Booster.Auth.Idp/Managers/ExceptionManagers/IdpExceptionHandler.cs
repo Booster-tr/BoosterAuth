@@ -162,6 +162,10 @@ public sealed class IdpExceptionHandler(
         if (errors is not null)
             problem.Extensions["errors"] = errors;
 
+        // Mesaj anahtari makine okunur kod olarak da doner (or. LICENSE_SERVICE_UNAVAILABLE).
+        if (e.Exception is BusinessException codeEx)
+            problem.Extensions["code"] = codeEx.Message;
+
         ctx.Response.StatusCode = status;
         ctx.Response.ContentType = "application/problem+json";
         await ctx.Response.WriteAsJsonAsync(problem, ct);

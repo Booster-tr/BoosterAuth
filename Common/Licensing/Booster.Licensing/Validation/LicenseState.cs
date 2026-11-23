@@ -2,6 +2,8 @@ using Booster.Licensing.Tokens;
 
 namespace Booster.Licensing.Validation;
 
+/// <summary>JSON'da metin olarak yazilir ("Active"); panel ve loglar sayi yerine adi gorur.</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<LicenseState>))]
 public enum LicenseState
 {
     /// <summary>Hic lisans girilmemis (yeni kurulum).</summary>
@@ -17,6 +19,7 @@ public enum LicenseState
     Invalid = 5,
 }
 
+[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<LicenseInvalidReason>))]
 public enum LicenseInvalidReason
 {
     Malformed = 1,

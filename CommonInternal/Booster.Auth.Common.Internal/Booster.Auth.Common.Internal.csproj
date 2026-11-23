@@ -37,6 +37,9 @@
 		<ProjectReference Include="..\..\Common\Logging\Booster.Logging.BoosterAmqp\Booster.Logging.BoosterAmqp.csproj" />
 
 		<ProjectReference Include="..\Booster.Auth.Database\Booster.Auth.Database.csproj" />
+
+		<!-- Lisans durumu (LicenseGuard). Yalnizca dogrulama; imzalama YOK. -->
+		<ProjectReference Include="..\..\Common\Licensing\Booster.Licensing\Booster.Licensing.csproj" />
 	</ItemGroup>
 
 </Project>

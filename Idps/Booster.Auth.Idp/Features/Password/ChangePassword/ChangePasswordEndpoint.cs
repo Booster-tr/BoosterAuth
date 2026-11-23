@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Managers.PasswordManagers;
@@ -16,6 +17,8 @@ using System.Text.Json.Serialization;
 
 namespace Booster.Auth.Idp.Features.Password.ChangePassword;
 
+/// <summary>Kullanicinin kendi islemi: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class ChangePasswordEndpoint(
     IRequestContextAccessor requestContextAccessor,
     IClientDataStore clientDataStore,

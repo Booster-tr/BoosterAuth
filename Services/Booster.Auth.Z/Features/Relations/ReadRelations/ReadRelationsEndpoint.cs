@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
 using Booster.ExceptionManager.Abstraction.Constants;
@@ -9,6 +10,8 @@ using FluentValidation;
 
 namespace Booster.Auth.Z.Features.Relations.ReadRelations;
 
+/// <summary>Salt okuma: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class ReadRelationsEndpoint : Endpoint<ReadRelationsCommand, ReadRelationsResponse>
 {
     public override void Configure()

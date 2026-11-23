@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -11,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Auth.Idp.Features.Principals.GetDisplayNames;
 
+/// <summary>Salt okuma: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class GetDisplayNamesEndpoint : Endpoint<GetDisplayNamesQuery, GetDisplayNamesResponse>
 {
     public override void Configure()
