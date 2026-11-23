@@ -34,6 +34,11 @@ public class AuthNMessageKeys
     public const string RoleScopeAlreadyAdded = "authn.role_scope_already_added";
     public const string ClientKeyAlreadyExists = "authn.client_key_already_exists";
 
+    // --- Redirect domain politikasi (havuz guvenlik ayari; lisansla ilgisi yok) ---
+    public const string RedirectDomainNotAllowed = "authn.redirect_domain_not_allowed";
+    public const string RedirectDomainInvalid = "authn.redirect_domain_invalid";
+    public const string RedirectDomainsRequired = "authn.redirect_domains_required";
+
     // --- Biçim ---
     public const string RoleKeyInvalidFormat = "authn.role_key_invalid_format";
     public const string ScopeInvalidFormat = "authn.scope_invalid_format";

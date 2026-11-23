@@ -84,6 +84,10 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Durum bilinemiyorsa (Management'a ulasilamiyor) limit UYGULANMAZ.
   - Kullanim: `GET management/system/license/usage`. 30 sn onbellek yalnizca gosterim icindir.
 - **Client redirect URI'leri lisansla kisitlanmaz.** Bunun yerine pool ayarlarinda ayri bir "izin verilen redirect domain'leri" politikasi bulunur (varsayilan kapali).
+  - Ayar: `UserPoolPolicy.Redirect` (Enabled, AllowedDomains, AllowTestHosts, AllowCustomSchemes); uc `PUT userpools/policy/redirect`.
+  - Kontrol: `RedirectPolicyChecker` / `RedirectPolicyGuard`. Client olusturmada tum adresler, guncellemede yalnizca YENI eklenen adresler kontrol edilir.
+  - Politika sonradan acilirsa mevcut client'lar calismaya devam eder; uymayan adresleri client detayinda (`redirectPolicyViolations`) ve politika kaydinin yanitinda uyari olarak doner.
+  - Giris anindaki redirect kontrolu (birebir eslesme) degismedi.
 
 ### Lisans calisma zamani (nerede ne var)
 - **Sahip Management.**

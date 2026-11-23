@@ -36,6 +36,28 @@ public class UserPoolPolicy
     public SessionPolicy Session { get; set; } = new();
     public RegistrationPolicy Registration { get; set; } = new();
     public LoginPolicy Login { get; set; } = new();
+
+    /// <summary>Izin verilen redirect domain'leri. null = eski kayit (politika yok, KAPALI).</summary>
+    public RedirectPolicy? Redirect { get; set; }
+}
+
+/// <summary>
+/// Client redirect / post-logout adresleri icin musterinin acip kapattigi guvenlik politikasi. Lisansla ILGISI YOKTUR.
+/// Yalnizca YAPILANDIRMA aninda (client olusturma/guncelleme) uygulanir; calisan client'larin girisi kesilmez.
+/// </summary>
+public class RedirectPolicy
+{
+    /// <summary>Varsayilan KAPALI: acilmadikca her adres kabul edilir (bugunku davranis).</summary>
+    public bool Enabled { get; set; }
+
+    /// <summary>Ana domain'ler; alt alanlari kapsar (auth.firma.com -> firma.com).</summary>
+    public List<string> AllowedDomains { get; set; } = [];
+
+    /// <summary>localhost, *.local, *.internal ve IP adresleri (gelistirme ortamlari).</summary>
+    public bool AllowTestHosts { get; set; } = true;
+
+    /// <summary>Mobil uygulama adresleri (walktowin://...). Domain tasimadiklari icin domain ile kontrol edilemezler.</summary>
+    public bool AllowCustomSchemes { get; set; } = true;
 }
 
 public class PasswordPolicy
@@ -106,6 +128,7 @@ public class UserPoolConfiguration : IEntityTypeConfiguration<UserPool>
             policy.OwnsOne(p => p.Session);
             policy.OwnsOne(p => p.Registration);
             policy.OwnsOne(p => p.Login);
+            policy.OwnsOne(p => p.Redirect);
         });
 
         builder.PrimitiveCollection(x => x.DefaultScopes);

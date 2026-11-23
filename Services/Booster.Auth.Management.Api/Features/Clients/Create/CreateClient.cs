@@ -1,3 +1,4 @@
+using Booster.Auth.Management.Api.Features.UserPools.Policies;
 using Microsoft.EntityFrameworkCore;
 using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Common.Internal.EntityExtensions;
@@ -77,6 +78,9 @@ public class CreateClientCommandHandler(
 
         if (keyExists)
             throw new BusinessException(AuthNMessageKeys.ClientKeyAlreadyExists);
+
+        // Havuzun redirect domain politikasi (acik ise). Lisansla ilgisi yok; musterinin guvenlik ayari.
+        RedirectPolicyGuard.EnsureAllowed(pool.Policy.Redirect, command.RedirectUris.Concat(command.PostLogoutRedirectUris));
 
         var client = command.Adapt<Client>();
         client.SetId();
