@@ -14,7 +14,8 @@ public static class LicensePublicKeys
 {
     private static readonly Dictionary<string, string> Keys = new(StringComparer.Ordinal)
     {
-        // ["k2026a"] = "<portalin Anahtar sayfasindaki public key>",
+        // Uretim anahtari (licensing.appnuraymind.com). Private key yalnizca cluster secret'inda / portal DB'sinde.
+        ["k2026p"] = "lNDhGak1eYjGSANfUf1nzH0oLoko2EEXY3GqNEluUd8",
     };
 
     public static IReadOnlyDictionary<string, byte[]> All { get; } =

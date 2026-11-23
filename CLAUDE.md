@@ -67,6 +67,9 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Bitise 30 ve 7 gun kala, lisans ve tur basina BIR KEZ (`LicenseReminders` tekil index'i).
   - Ayni kurulumda daha gec biten ucretli lisans varsa (yenilenmis) gonderilmez.
 - **Notification sablonlari:** e-posta govdesine yerlestirilen degerler HTML kacislidir (firma adi gibi kullanici girdileri e-postaya HTML enjekte edemez). Konu ve SMS duz metindir.
+- **Uretim imzalama anahtari:** kid `k2026p`; public key `LicensePublicKeys`'te gomulu. Private key yalnizca cluster secret'inda (`demo/licensing-portal`, `signing-private-key`).
+  - Portal ilk acilista DB'de anahtar yoksa `LicensingPortalOptions__InitialSigningKey__{Kid,PrivateKey}` ile ice aktarir; anahtar varsa bu ayar yok sayilir.
+  - Rotasyon: portalda yeni anahtar uret, public key'i `LicensePublicKeys`'e EKLE (eskisini silme), urunu yayinla.
 - **Razor:** `action` ozniteligi acikca yazilan POST formlarina `asp-antiforgery="true"` EKLE. Tag helper o durumda CSRF token'ini kendiliginden koymaz; form 400 doner.
 
 - **Token:** `BSTR1.<payload>.<imza>`.
