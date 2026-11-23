@@ -30,6 +30,13 @@ public sealed class InteractionStateData
     public string CodeChallengeMethod => "S256";
     public string? Resource { get; init; }
     public string? UiLocale { get; init; }
+
+    /// <summary>
+    /// Doluysa bu bir OIDC istegi degil, "Hesabim" sayfasinin girisidir: giris tamamlaninca kod uretilmez,
+    /// kullanici bu (IdP icindeki) adrese dondurulur. Yalnizca AccountController doldurur.
+    /// </summary>
+    public string? AccountReturnUrl { get; init; }
+
     public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
 }
 

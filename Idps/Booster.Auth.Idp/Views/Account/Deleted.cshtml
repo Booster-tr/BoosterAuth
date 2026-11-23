@@ -1,0 +1,18 @@
+@model Booster.Auth.Idp.Controllers.AccountPageModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = T["Deleted.Heading"].Value;
+}
+
+<section class="auth-card">
+    <div class="auth-status">
+        <h1 class="auth-card__title">@T["Deleted.Heading"]</h1>
+        <p class="auth-status__text">@T["Deleted.Text"]</p>
+        @if (Model.ReturnUrl is not null)
+        {
+            <div class="auth-status__actions">
+                <a class="auth-btn auth-btn--primary auth-btn--block" href="@Model.ReturnUrl">@T["Account.BackToApp"]</a>
+            </div>
+        }
+    </div>
+</section>

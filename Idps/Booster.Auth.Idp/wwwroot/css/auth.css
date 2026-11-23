@@ -1446,3 +1446,158 @@ html:has(.auth-cookiebar:not([hidden])) {
         border: 1px solid CanvasText;
     }
 }
+
+/* ==========================================================================
+   13. Hesabim (/ui/account)
+   Ozet: etiket / deger / eylem satirlari. Tehlikeli eylem (hesap silme) ayri
+   bolumde, dolu kirmizi buton yalnizca son onay ekraninda.
+   ========================================================================== */
+
+.account-list {
+    margin: 0 0 var(--space-6);
+    border-top: var(--border-width-hairline) solid var(--color-border);
+}
+
+.account-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-1) var(--space-4);
+    padding: var(--space-4) 0;
+    border-bottom: var(--border-width-hairline) solid var(--color-border);
+}
+
+.account-row__label {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+    color: var(--color-text-muted);
+}
+
+.account-row__value {
+    grid-column: 1;
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+}
+
+.account-row__value--muted { color: var(--color-text-muted); }
+
+.account-row__action {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+}
+
+.account-badge {
+    display: inline-block;
+    margin-left: var(--space-2);
+    padding: 0 var(--space-2);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    border-radius: var(--radius-full);
+    color: var(--color-success-text);
+    background-color: var(--color-success-surface);
+    vertical-align: 1px;
+}
+
+.account-badge--muted {
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-sunken);
+}
+
+.account-danger {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: var(--border-width-hairline) solid var(--color-border);
+}
+
+.account-danger__title {
+    margin: 0 0 var(--space-1);
+    font-size: 0.9375rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-danger-text);
+}
+
+.account-danger__text {
+    margin: 0 0 var(--space-3);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.account-link-danger { color: var(--color-danger-text); }
+.account-link-danger:hover { color: var(--color-danger-text); }
+
+.auth-btn--danger {
+    color: #fff;
+    background-color: var(--color-danger-solid);
+    border-color: var(--color-danger-solid);
+}
+
+.auth-btn--danger:hover {
+    color: #fff;
+    background-color: var(--color-danger-text);
+    text-decoration: none;
+}
+
+.account-effects {
+    margin: 0 0 var(--space-6);
+    padding-left: var(--space-5);
+    list-style: disc;
+    font-size: 0.9375rem;
+    line-height: 1.5rem;
+    color: var(--color-text-secondary);
+}
+
+.account-check {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+.account-check input {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--color-danger-solid);
+}
+
+.account-sessions {
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    list-style: none;
+    border-top: var(--border-width-hairline) solid var(--color-border);
+}
+
+.account-session {
+    padding: var(--space-4) 0;
+    border-bottom: var(--border-width-hairline) solid var(--color-border);
+}
+
+.account-session__name {
+    font-size: 0.9375rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
+.account-session__meta {
+    margin-top: var(--space-1);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+}
+
+.account-back {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+}

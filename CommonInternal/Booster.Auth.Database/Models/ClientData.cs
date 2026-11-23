@@ -65,6 +65,9 @@ public sealed record RegistrationPolicyData
     public required bool RequireEmailVerification { get; init; }
     public required bool RequirePhoneVerification { get; init; }
     public required bool AllowFederatedJit { get; init; }
+
+    /// <summary>Kullanici "Hesabim" sayfasindan hesabini silebilir. required DEGIL: eski kayitlarda kapali.</summary>
+    public bool AllowSelfDeletion { get; init; }
 }
 
 public sealed record PasswordPolicyData

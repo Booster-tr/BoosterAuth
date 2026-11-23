@@ -92,6 +92,9 @@ public class RegistrationPolicy
     public bool RequirePhoneVerification { get; set; } = false;
 
     public bool AllowFederatedJit { get; set; } = true;
+
+    /// <summary>Son kullanici IdP'deki "Hesabim" sayfasindan hesabini silebilir. Varsayilan KAPALI.</summary>
+    public bool AllowSelfDeletion { get; set; }
 }
 
 public class LoginPolicy

@@ -78,6 +78,7 @@ message RegistrationPolicyMessage {
   bool require_email_verification = 2;
   bool require_phone_verification = 3;
   bool allow_federated_jit = 4;
+  bool allow_self_deletion = 5;             // Hesabim sayfasindan hesap silme
 }
 
 message PasswordPolicyMessage {

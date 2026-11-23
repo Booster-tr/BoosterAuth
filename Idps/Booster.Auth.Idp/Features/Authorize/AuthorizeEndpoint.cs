@@ -46,6 +46,20 @@ public class AuthorizeEndpoint(
 
         var client = await ResolveAndValidateClientAsync(interaction, ct);
 
+        // "Hesabim" girisi: oturum acildiysa sayfaya don; kod uretilmez, izin ekrani gosterilmez.
+        if (interaction.AccountReturnUrl is not null)
+        {
+            if (await ResolveSessionAsync(client, ct) is null)
+            {
+                await RedirectAsync(uiOptions.GetLoginUrl(interactionKey));
+                return;
+            }
+
+            await interactionStore.RemoveAsync(interactionKey, ct);
+            await RedirectAsync(interaction.AccountReturnUrl);
+            return;
+        }
+
         ValidateProtocol(interaction, client);
 
         if (IsRegisterPrompt(req))

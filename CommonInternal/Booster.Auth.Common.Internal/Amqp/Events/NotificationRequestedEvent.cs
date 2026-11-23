@@ -38,6 +38,9 @@ public static class NotificationTemplateKeys
 
     public const string PhoneLoginCode = "phone_login_code";
 
+    /// <summary>Hesabim: yeni e-posta adresine dogrulama kodu.</summary>
+    public const string EmailChange = "email_change";
+
     // --- Lisans portali (licensing.appnuraymind.com) ---
     public const string LicenseTrialIssued = "license_trial_issued";
     public const string LicenseOrderReceived = "license_order_received";

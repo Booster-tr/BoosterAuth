@@ -12,6 +12,14 @@ public struct RefreshCacheSystemMessagesEvent() : IEvent;
 public class RefreshCacheSystemMessagesEventHandler(IAsyncRepository<SystemMessage, SystemMessageDbContext> repository, ICacheService cacheService) : IEventHandler<RefreshCacheSystemMessagesEvent>
 {
     string CacheKey(string language, string key) => $"trans:{language}:{key}";
+
+    /// <summary>
+    /// Ceviriler bu sureyle yazilir ve CacheSeederService her 70 dakikada yeniler; sure yenileme araligindan UZUN olmali.
+    /// Sure verilmezse onbellegin varsayilani (30 dk) uygulanir ve ceviriler bir sonraki yenilemeye kadar ~40 dk silinmis
+    /// kalirdi (ekranlarda "idp.password_too_short" gibi ham anahtarlar gorunurdu).
+    /// </summary>
+    private static readonly TimeSpan Expiry = TimeSpan.FromHours(3);
+
     public async Task HandleAsync(RefreshCacheSystemMessagesEvent eventModel, CancellationToken ct)
     {
         var allMessages = await repository.ListAsync(
@@ -32,7 +40,7 @@ public class RefreshCacheSystemMessagesEventHandler(IAsyncRepository<SystemMessa
 
                 var cacheKey = CacheKey(lang, key);
 
-                return cacheService.SetAsync(cacheKey, value, expiry: null);
+                return cacheService.SetAsync(cacheKey, value, expiry: Expiry);
             }));
 
         await Task.WhenAll(tasks);

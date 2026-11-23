@@ -27,7 +27,8 @@ public static class ClientDataMapper
                 Mode = (int)source.Registration.Mode,
                 RequireEmailVerification = source.Registration.RequireEmailVerification,
                 RequirePhoneVerification = source.Registration.RequirePhoneVerification,
-                AllowFederatedJit = source.Registration.AllowFederatedJit
+                AllowFederatedJit = source.Registration.AllowFederatedJit,
+                AllowSelfDeletion = source.Registration.AllowSelfDeletion
             },
             Password = new PasswordPolicyMessage
             {
@@ -106,7 +107,8 @@ public static class ClientDataMapper
                 Mode = (RegistrationMode)message.Registration.Mode,
                 RequireEmailVerification = message.Registration.RequireEmailVerification,
                 RequirePhoneVerification = message.Registration.RequirePhoneVerification,
-                AllowFederatedJit = message.Registration.AllowFederatedJit
+                AllowFederatedJit = message.Registration.AllowFederatedJit,
+                AllowSelfDeletion = message.Registration.AllowSelfDeletion
             },
             Password = new PasswordPolicyData
             {

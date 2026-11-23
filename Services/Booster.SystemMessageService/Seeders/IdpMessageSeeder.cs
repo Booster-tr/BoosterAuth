@@ -100,6 +100,17 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.ResetTokenInvalid, "Sıfırlama bağlantısı", "Bu sıfırlama bağlantısı geçersiz ya da süresi dolmuş. Lütfen yeniden talep edin.", "Reset link", "This reset link is invalid or has expired. Please request a new one."),
         new(IdpMessageKeys.PasswordResetRequested, "Parola sıfırlama", "Girdiğiniz bilgiye ait bir hesap varsa sıfırlama bağlantısı gönderildi.", "Password reset", "If an account matches what you entered, a reset link has been sent."),
 
+        // --- Hesabım (son kullanıcının kendi hesabı) ---
+        new(IdpMessageKeys.AccountDisplayNameInvalid, "Ad soyad", "Ad soyad boş olamaz ve en fazla 300 karakter olabilir.", "Name", "Your name cannot be empty and can be at most 300 characters."),
+        new(IdpMessageKeys.AccountPhoneInvalid, "Telefon", "Telefon numarasını ülke koduyla girin (ör. +90 532 000 00 00).", "Phone", "Enter the phone number with its country code (e.g. +44 7700 900000)."),
+        new(IdpMessageKeys.AccountContactUnchanged, "Hesap", "Bu zaten hesabınızda kayıtlı olan bilgi.", "Account", "This is already the information on your account."),
+        new(IdpMessageKeys.AccountCodeInvalid, "Doğrulama kodu", "Kod hatalı ya da süresi dolmuş. Gerekirse yeni bir kod isteyin.", "Verification code", "The code is incorrect or has expired. Request a new code if needed."),
+        new(IdpMessageKeys.AccountDirectoryManaged, "Hesap", "Bu bilgi kurum dizininden yönetiliyor. Değiştirmek için yöneticinize başvurun.", "Account", "This information is managed by your organization's directory. Contact your administrator to change it."),
+        new(IdpMessageKeys.AccountNoPassword, "Parola", "Hesabınızda parola tanımlı değil; giriş yönteminizle oturum açmaya devam edin.", "Password", "Your account has no password; keep signing in with your current method."),
+        new(IdpMessageKeys.AccountDeletionDisabled, "Hesap", "Bu uygulamada hesap silme kapalı. Hesabınızın silinmesi için yöneticinize başvurun.", "Account", "Account deletion is turned off for this application. Contact your administrator to have your account deleted."),
+        new(IdpMessageKeys.AccountDeletionConfirmRequired, "Onay", "Devam etmek için hesabınızın kalıcı olarak silineceğini onaylayın.", "Confirmation", "Confirm that your account will be permanently deleted to continue."),
+        new(IdpMessageKeys.AccountUnavailable, "Hesap", "Hesap sayfası bu uygulama için kullanılamıyor.", "Account", "The account page is not available for this application."),
+
         // --- Panelden kullanıcı ekleme / içe aktarma / davet ---
         new(IdpMessageKeys.InvitationInvalid, "Davet", "Bu davet bağlantısı geçersiz ya da süresi dolmuş. Yöneticinizden yeni bir davet isteyin.", "Invitation", "This invitation link is invalid or has expired. Ask your administrator for a new invitation."),
         new(IdpMessageKeys.InvitationNotPending, "Davet", "Bu kullanıcı parolasını zaten belirlemiş; davet gönderilemez.", "Invitation", "This user has already set a password; an invitation cannot be sent."),

@@ -98,4 +98,15 @@ public class IdpMessageKeys
     public const string ImportTooManyRows = "idp.import_too_many_rows";
     public const string DisplayNameRequired = "idp.display_name_required";
     public const string EmailInvalid = "idp.email_invalid";
+
+    // --- Hesabim (son kullanicinin kendi hesabi) ------------------------------
+    public const string AccountDisplayNameInvalid = "idp.account_display_name_invalid";
+    public const string AccountPhoneInvalid = "idp.account_phone_invalid";
+    public const string AccountContactUnchanged = "idp.account_contact_unchanged";
+    public const string AccountCodeInvalid = "idp.account_code_invalid";
+    public const string AccountDirectoryManaged = "idp.account_directory_managed";
+    public const string AccountNoPassword = "idp.account_no_password";
+    public const string AccountDeletionDisabled = "idp.account_deletion_disabled";
+    public const string AccountDeletionConfirmRequired = "idp.account_deletion_confirm_required";
+    public const string AccountUnavailable = "idp.account_unavailable";
 }

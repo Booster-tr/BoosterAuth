@@ -1,0 +1,35 @@
+@model Booster.Auth.Idp.Controllers.AccountPageModel
+@using Booster.Auth.Idp.Controllers
+@using Booster.Auth.Idp.Managers.AccountManagers
+@* E-posta ya da telefon degisikligi, adim 2: yeni adrese gonderilen kod. *@
+@{
+    Layout = "_AuthLayout";
+    var email = Model.Kind == ContactKind.Email;
+    ViewData["Title"] = T["Verify.Heading"].Value;
+    var slug = email ? "email" : "phone";
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["Verify.Heading"]</h1>
+        <p class="auth-card__subtitle">@(email ? T["Verify.Subtitle.Email", Model.Value!] : T["Verify.Subtitle.Phone", Model.Value!])</p>
+    </header>
+
+    <partial name="_ValidationSummary" />
+
+    <form method="post" action="@Url.Idp($"/ui/account/{slug}/verify")" class="auth-form" data-auth-form asp-antiforgery="false">
+        <partial name="_Hidden" model="Model" />
+        <partial name="_Field" model="@(new AccountFieldModel("Code", T["Verify.Code"].Value, Autocomplete: "one-time-code", Autofocus: true, InputMode: "numeric"))" />
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-btn auth-btn--primary auth-btn--block" data-submit-guard>
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["Verify.Submit"]</span>
+            </button>
+        </div>
+    </form>
+
+    <div class="account-back">
+        <a class="auth-link auth-link--sm" href="@Url.Idp($"/ui/account/{slug}?{Model.Query}")">@T["Verify.Resend"]</a>
+        <a class="auth-link auth-link--standalone auth-link--sm" href="@Url.Idp($"/ui/account?{Model.Query}")">@T["Account.Cancel"]</a>
+    </div>
+</section>

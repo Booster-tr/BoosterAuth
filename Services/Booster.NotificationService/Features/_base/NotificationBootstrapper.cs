@@ -132,6 +132,20 @@ public class NotificationBootstrapper(
                 intro: "A password reset was requested for your account. Enter the code below on the reset screen to choose a new password.",
                 footer: "The code is valid for 15 minutes and only works in the browser where you started the reset. If you did not request this, you can ignore this email; your password stays unchanged.")),
 
+        new(NotificationTemplateKeys.EmailChange, NotificationChannel.Email,
+            "E-posta değişikliği kodunuz",
+            CodeBody(
+                preheader: "Yeni e-posta adresinizi doğrulamak için kodunuz.",
+                heading: "E-posta değişikliği kodunuz",
+                intro: "Hesabınızın e-posta adresini bu adresle değiştirmek istediniz. Değişikliği tamamlamak için aşağıdaki kodu Hesabım ekranına girin.",
+                footer: "Kod 15 dakika geçerlidir. Bu talebi siz yapmadıysanız bu e-postayı yok sayabilirsiniz; hesabınızda bir değişiklik olmaz."),
+            "Your email change code",
+            CodeBody(
+                preheader: "Your code to verify your new email address.",
+                heading: "Your email change code",
+                intro: "You asked to change your account's email address to this one. Enter the code below on the My account screen to finish.",
+                footer: "The code is valid for 15 minutes. If you did not request this, you can ignore this email; nothing changes on your account.")),
+
         new(NotificationTemplateKeys.PasswordReset, NotificationChannel.Sms,
             "Parola sıfırlama kodu",
             "Booster parola sıfırlama kodun: {{Code}}. Kodu kimseyle paylaşma.",

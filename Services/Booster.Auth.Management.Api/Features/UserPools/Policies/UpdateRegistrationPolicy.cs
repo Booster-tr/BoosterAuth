@@ -37,7 +37,8 @@ public record UpdateRegistrationPolicyCommand(
     RegistrationMode Mode,
     bool RequireEmailVerification,
     bool RequirePhoneVerification,
-    bool AllowFederatedJit) : ICommand<UserPoolPolicyChangeResponse>;
+    bool AllowFederatedJit,
+    bool AllowSelfDeletion = false) : ICommand<UserPoolPolicyChangeResponse>;
 
 public class UpdateRegistrationPolicyCommandHandler(
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,

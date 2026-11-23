@@ -1,0 +1,63 @@
+<h1>My account (end users)</h1>
+<p class="lede">Your users manage their own name, email, phone, password and sessions, and can delete their account if the pool allows it.
+    You do not build these screens: Booster Auth provides them, and a single link in your application is enough.</p>
+
+<h2 id="link">Add a link to your application</h2>
+<p>Put a "My account" link in your application's menu:</p>
+<div class="code"><span class="lbl">Link</span><pre>https://auth.company.com/idp/ui/account?client_id=acme-web&amp;return_url=https%3A%2F%2Fapp.company.com%2Fsettings</pre></div>
+<ul>
+    <li><code>client_id</code>: your application's ID. The page follows the rules of the application's pool (password rules, sign-in methods).</li>
+    <li><code>return_url</code> (optional): where the "Back to the application" button goes. For security, only addresses on the <b>same host and port</b>
+        as one of the application's registered redirect or sign-out addresses are accepted.</li>
+</ul>
+<p>If the user signed in to your application with Booster Auth, the page opens directly. Without a session the normal sign-in screen appears
+    first and the user returns to My account afterwards.</p>
+
+<h2 id="features">What users can do</h2>
+<table>
+    <thead><tr><th>Action</th><th>How it works</th></tr></thead>
+    <tbody>
+        <tr><td>Full name</td><td>Updated directly; new tokens carry the new name.</td></tr>
+        <tr><td>Change email</td><td>A 6-digit code is sent to the new address; the old address stays in effect until the code is entered. Addresses already used by another user are refused.</td></tr>
+        <tr><td>Add / change phone</td><td>A code is sent to the new number by SMS. Without a country code, the pool's default country code is used.
+            The phone row appears only if the pool uses phones (phone sign-in or SMS two-step verification).</td></tr>
+        <tr><td>Change password</td><td>The current password is required; the pool's password rules and history apply. Other devices are signed out afterwards.</td></tr>
+        <tr><td>Sessions</td><td>Open sessions are listed; one button signs out all other devices.</td></tr>
+        <tr><td>Delete account</td><td>Only if enabled for the pool (see below).</td></tr>
+    </tbody>
+</table>
+<div class="callout info"><p><b>Sensitive actions ask for the password.</b> Changing email / phone and deleting the account require the current password again,
+    so an account cannot be taken over from a browser left signed in. For users without a password (email code, external provider)
+    the session and the code sent to the new address are enough.</p></div>
+
+<h2 id="deletion">Enabling account deletion</h2>
+<p>It is off by default. In the console, turn on <b>"Users can delete their account from My account"</b> under
+    <b>Pool Details &gt; Registration policy</b>. This lets users fulfil their own data erasure requests (GDPR / KVKK).</p>
+<p>For a deleted account:</p>
+<ul>
+    <li>name, email, phone and username are removed; the record is anonymized and marked deleted;</li>
+    <li>password, password history, external provider links, application consents, roles and authorization relations are removed;</li>
+    <li>all sessions and refresh tokens are revoked;</li>
+    <li>the user no longer counts toward your license and can sign up again with the same email.</li>
+</ul>
+<p>Administrators of the admin console cannot delete their account from My account.</p>
+
+<h2 id="ldap">Corporate directory (LDAP) users</h2>
+<p>Name, email and password come from the directory, so they cannot be changed in My account; the page shows a note saying so.
+    Phone, sessions and (if enabled) account deletion are available.</p>
+
+<h2 id="api">Building your own form</h2>
+<p>To change the password on your own screen, call the IdP's password endpoint with the user's access token:</p>
+<div class="code"><span class="lbl">HTTP</span><pre>POST https://auth.company.com/idp/password/change
+Authorization: Bearer &lt;the user's access token&gt;
+Content-Type: application/json
+
+{
+  "client_id": "acme-web",
+  "current_password": "...",
+  "new_password": "...",
+  "new_password_confirm": "..."
+}</pre></div>
+<p>It returns <code>204</code> on success. Errors return <code>400</code> with per-field messages (<code>errors[].property</code> and
+    <code>errors[].message</code>, in the language of the <code>Accept-Language</code> header). For the other actions we recommend the My account page;
+    verification codes, password rules and security checks are already built in.</p>

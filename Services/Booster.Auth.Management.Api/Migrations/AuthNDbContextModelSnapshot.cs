@@ -740,6 +740,8 @@ namespace Booster.Auth.Management.Api.Migrations
 
                                     b2.Property<bool>("AllowFederatedJit");
 
+                                    b2.Property<bool>("AllowSelfDeletion");
+
                                     b2.Property<int>("Mode");
 
                                     b2.Property<bool>("RequireEmailVerification");

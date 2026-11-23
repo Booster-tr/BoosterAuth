@@ -1,0 +1,24 @@
+@model Booster.Auth.Idp.Controllers.AccountFieldModel
+@* Hesabim formlarinda tek alan: etiket, girdi, istege bagli ipucu ve alan hatasi. *@
+@{
+    var invalid = ViewData.ModelState.HasError(Model.Name);
+    var describedBy = Model.Hint is null ? $"{Model.Name}-error" : $"{Model.Name}-hint {Model.Name}-error";
+    var isPassword = Model.Type == "password";
+}
+<div class="auth-field @(invalid ? "auth-field--invalid" : null)">
+    <label class="auth-field__label" for="@Model.Name">@Model.Label</label>
+    <div class="auth-field__control">
+        <input class="auth-field__input" id="@Model.Name" name="@Model.Name" type="@Model.Type"
+               value="@(isPassword ? null : Model.Value)"
+               autocomplete="@Model.Autocomplete" inputmode="@Model.InputMode"
+               autocapitalize="none" spellcheck="false" required
+               data-initial-focus="@(Model.Autofocus ? "" : null)"
+               data-caps-warn="@(isPassword ? "" : null)"
+               aria-describedby="@describedBy" aria-invalid="@(invalid ? "true" : null)" />
+    </div>
+    @if (Model.Hint is not null)
+    {
+        <p class="auth-field__hint" id="@(Model.Name)-hint">@Model.Hint</p>
+    }
+    <partial name="_FieldError" model="@Model.Name" />
+</div>
