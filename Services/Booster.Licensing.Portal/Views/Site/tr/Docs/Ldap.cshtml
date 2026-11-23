@@ -1,0 +1,68 @@
+<h1>LDAP / Active Directory</h1>
+<p class="lede">Kullanıcılarınız uygulamalarınıza kurum dizinindeki kullanıcı adı ve parolalarıyla girsin. Parolalar dizinde kalır; Booster Auth
+    onları saklamaz, her girişte dizine sorar.</p>
+
+<h2 id="nasil-calisir">Nasıl çalışır?</h2>
+<ol>
+    <li>Kullanıcı, uygulamanızın giriş ekranındaki normal parola formuna kullanıcı adını (ör. <code>ayse</code>) ya da e-postasını ve dizin parolasını yazar.</li>
+    <li>Booster Auth, servis hesabıyla dizinde kullanıcıyı arar; bulunan kayıt ve kullanıcının parolasıyla <b>ayrı bir bağlantıda</b> doğrulama yapar.</li>
+    <li>İlk girişte kullanıcının hesabı otomatik açılır; ad ve e-posta her girişte dizinden güncellenir.</li>
+    <li>Havuzda iki adımlı doğrulama zorunluysa, LDAP girişinden sonra da kod istenir.</li>
+</ol>
+<div class="callout info"><p><b>Yerel kullanıcılar etkilenmez.</b> Booster Auth'ta kendi parolası olan kullanıcılar (ör. yöneticiler) bu parolayla girmeye devam eder.
+    Dizin, yalnızca yerel parolası olmayan kullanıcılar için kullanılır.</p></div>
+
+<h2 id="kurulum">Bağlantıyı ekleyin</h2>
+<ol>
+    <li>Konsolda ilgili havuzu seçin ve <b>Kimlik Sağlayıcılar</b> ekranında yeni sağlayıcı ekleyin; tür olarak <b>LDAP / Active Directory</b>'yi seçin.</li>
+    <li>Aşağıdaki alanları doldurun ve <b>Bağlantıyı test et</b> ile deneyin. Test; sunucuya ulaşılabildiğini, servis hesabının doğrulandığını ve arama kökünün bulunduğunu ayrı ayrı söyler.</li>
+    <li>Kaydedin. Ardından <b>Havuz Bilgileri &gt; Giriş politikası</b>'nda <b>LDAP</b> yöntemini açın.</li>
+    <li>Dizin kullanıcılarının ilk girişte hesap açabilmesi için <b>Kayıt politikası</b>'nda "ilk dış girişte hesap aç" seçeneği açık olmalıdır.</li>
+</ol>
+<p>Bir havuzda tek bir LDAP bağlantısı olabilir; farklı dizinler için farklı havuzlar kullanın.</p>
+
+<h2 id="alanlar">Alanlar</h2>
+<table>
+    <thead><tr><th>Alan</th><th>Active Directory örneği</th><th>OpenLDAP örneği</th></tr></thead>
+    <tbody>
+        <tr><td>Sunucu</td><td><code>dc01.firma.local</code></td><td><code>ldap.firma.com</code></td></tr>
+        <tr><td>Bağlantı güvenliği · port</td><td>LDAPS · <code>636</code></td><td>StartTLS · <code>389</code></td></tr>
+        <tr><td>Servis hesabı (bind DN)</td><td><code>CN=booster-svc,OU=Servis,DC=firma,DC=local</code></td><td><code>cn=booster,dc=firma,dc=com</code></td></tr>
+        <tr><td>Servis hesabı parolası</td><td colspan="2">Şifrelenerek saklanır; hiçbir ekranda ya da API yanıtında geri gösterilmez.</td></tr>
+        <tr><td>Arama kökü (base DN)</td><td><code>OU=Kullanicilar,DC=firma,DC=local</code></td><td><code>ou=users,dc=firma,dc=com</code></td></tr>
+        <tr><td>Kullanıcı filtresi</td><td><code>(&amp;(objectClass=user)(sAMAccountName={0}))</code></td><td><code>(uid={0})</code></td></tr>
+        <tr><td>Kullanıcı adı alanı</td><td><code>sAMAccountName</code></td><td><code>uid</code></td></tr>
+        <tr><td>E-posta / ad soyad alanı</td><td><code>mail</code> · <code>displayName</code></td><td><code>mail</code> · <code>displayName</code></td></tr>
+        <tr><td>Benzersiz kimlik alanı</td><td><code>objectGUID</code></td><td><code>entryUUID</code></td></tr>
+    </tbody>
+</table>
+<p><code>{0}</code> yerine kullanıcının yazdığı ad konur. Kullanıcıların e-postayla da girebilmesi için filtreyi genişletin:
+    <code>(|(sAMAccountName={0})(mail={0}))</code>. Benzersiz kimlik alanı, kullanıcının adı ya da e-postası değişse bile hesabın aynı kalmasını sağlar.</p>
+
+<h2 id="ldaps">LDAPS ve kurum sertifikası</h2>
+<p>Üretimde <b>LDAPS</b> ya da <b>StartTLS</b> kullanın; şifresiz bağlantı yalnızca test içindir. Dizin sunucusunun sertifikası doğrulanır; sunucu adı
+    sertifikayla eşleşmeli ve sertifikayı imzalayan CA güvenilir olmalıdır.</p>
+<p>Kurumunuzun kendi CA'sı varsa, CA sertifikasını (PEM) kurulum klasöründeki <code>pki/trust/ca.crt</code> dosyasının <b>sonuna ekleyin</b> ve
+    <code>docker compose up -d</code> çalıştırın. Servisler bu dosyadaki CA'lara güvenir.</p>
+
+<h2 id="guvenlik">Güvenlik kuralları</h2>
+<ul>
+    <li><b>Boş parola reddedilir.</b> LDAP'ta boş parolayla yapılan doğrulama "anonim giriş" sayılıp başarılı dönebilir; Booster Auth bunu hiçbir zaman kabul etmez.</li>
+    <li><b>Kullanıcı girdisi kaçışlanır</b> (RFC 4515); filtre, girilen adla değiştirilemez. Arama birden fazla kayıt döndürürse giriş reddedilir.</li>
+    <li><b>Parolalı yerel hesaba otomatik bağlanmaz.</b> Aynı e-postayla Booster Auth'ta parolalı bir hesap varsa, dizin kaydı o hesaba bağlanmaz; kullanıcı kendi parolasıyla girer.</li>
+    <li><b>Şifre sıfırlama kapalıdır.</b> Dizin kullanıcılarına şifre sıfırlama kodu gönderilmez; böylece dizinde kapatılmış bir hesap yerel parola edinerek giremez.</li>
+    <li><b>Hatalı denemeler sayılır.</b> Havuzun kilitleme politikası LDAP girişinde de uygulanır; dizinin kendi kilitleme politikası ayrıca geçerlidir.</li>
+    <li><b>Lisans limiti</b> ilk girişte açılan hesaplar için de geçerlidir.</li>
+</ul>
+
+<h2 id="sorunlar">Sık karşılaşılan durumlar</h2>
+<table>
+    <thead><tr><th>Mesaj</th><th>Ne yapmalı</th></tr></thead>
+    <tbody>
+        <tr><td>Kurum dizinine şu an ulaşılamıyor</td><td>Sunucu adını, portu ve Booster Auth sunucusundan dizine ağ erişimini kontrol edin; <b>Bağlantıyı test et</b> ile deneyin.</td></tr>
+        <tr><td>TLS bağlantısı kurulamadı</td><td>Sertifika sunucu adıyla eşleşmiyor ya da CA güvenilir değil. <a href="#ldaps">LDAPS ve kurum sertifikası</a> bölümüne bakın.</td></tr>
+        <tr><td>Servis hesabı reddedildi</td><td>Bind DN'yi tam olarak (CN=…,OU=…,DC=…) ve parolayı kontrol edin.</td></tr>
+        <tr><td>Bu uygulamada hesabınız yok</td><td>Havuzun kayıt politikasında "ilk dış girişte hesap aç" kapalı; açın ya da kullanıcıyı önceden ekleyin.</td></tr>
+        <tr><td>Parolalı bir hesap zaten var</td><td>Bu kullanıcı Booster Auth parolasıyla girmeye devam eder; yerel parolalı hesaplar güvenlik nedeniyle dizine otomatik bağlanmaz.</td></tr>
+    </tbody>
+</table>
