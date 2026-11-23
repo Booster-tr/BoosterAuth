@@ -1,0 +1,35 @@
+@model Order
+@{
+    ViewData["Title"] = $"Sipariş {Model.ReferenceCode}";
+    var bank = (Booster.Licensing.Portal.Options.LicensingPortalOptions.BankAccountOptions)ViewBag.Bank;
+    var tr = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+}
+<h1>Sipariş <code data-order-ref>@Model.ReferenceCode</code></h1>
+<section class="card">
+    <dl class="facts">
+        <dt>Durum</dt>
+        <dd data-order-status="@Model.Status">
+            @(Model.Status switch { OrderStatus.Pending => "Ödeme bekleniyor", OrderStatus.Paid => "Ödeme alındı", _ => "İptal edildi" })
+        </dd>
+        <dt>Plan</dt><dd>@Model.PlanName (@Model.MaxUsers kullanıcı, @Model.MaxPools havuz, @Model.MaxClients uygulama, @Model.DurationMonths ay)</dd>
+        <dt>Tutar</dt><dd>@(Model.Price > 0 ? $"{Model.Price.ToString("N2", tr)} {Model.Currency}" : "Size ayrıca bildirilecek")</dd>
+        <dt>Kurulum</dt><dd><code>@Model.InstallationId</code></dd>
+        <dt>Fatura</dt><dd>@Model.BillingName, @Model.BillingTaxOffice @Model.BillingTaxNumber</dd>
+    </dl>
+
+    @if (Model.Status == OrderStatus.Pending)
+    {
+        <h2>Havale / EFT talimatı</h2>
+        <dl class="facts" data-bank>
+            <dt>Banka</dt><dd>@bank.BankName</dd>
+            <dt>Alıcı</dt><dd>@bank.AccountName</dd>
+            <dt>IBAN</dt><dd><code id="iban">@bank.Iban</code> <button class="btn btn-ghost btn-sm" type="button" data-copy="iban">Kopyala</button></dd>
+            <dt>Açıklama</dt><dd><b><code id="ref">@Model.ReferenceCode</code></b> <button class="btn btn-ghost btn-sm" type="button" data-copy="ref">Kopyala</button></dd>
+        </dl>
+        <p class="alert">Ödemenin size ait olduğunu anlayabilmemiz için açıklamaya mutlaka <b>@Model.ReferenceCode</b> yazın. Ödeme onaylanınca lisansınız <a href="/hesap/kurulumlar">Kurulumlarım</a> ekranında görünür.</p>
+    }
+    else if (Model.Status == OrderStatus.Paid && Model.LicenseId is not null)
+    {
+        <p><a class="btn btn-primary" href="/hesap/lisans?LicenseId=@Model.LicenseId">Lisansı görüntüle</a></p>
+    }
+</section>

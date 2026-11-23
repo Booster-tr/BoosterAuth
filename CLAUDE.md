@@ -52,6 +52,13 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
     - Deneme: ucretsiz e-posta saglayicisi kabul edilmez; e-posta domaini kurulum domainiyle uyusmali; ayni domaine (alt alan dahil) tek deneme; IP basina gunde 3 istek (`CF-Connecting-IP`).
     - Aktarim: yalnizca ucretli ve suresi dolmamis lisans; ayni bitis tarihi ve limitler; zincirin ilk lisansi (`OriginLicenseId`) basina yilda 3.
     - Cevrimdisi model: eski kurulumdaki lisans o sunucuda suresi dolana kadar calismaya devam eder.
+- **Siparis (`OrderService`):** akis siparis -> havale/EFT -> admin "Odeme alindi" -> lisans otomatik uretilir.
+  - Plan ve fatura bilgileri siparise KOPYALANIR; plan sonradan degisse de siparis etkilenmez.
+  - Referans kodu `BST-yyyy-NNNNNN` bicimindedir ve veritabani dizisinden (`OrderReferenceNumbers`) gelir.
+  - **Onay:** `ExecuteUpdate ... WHERE Status = Pending` ile ve transaction icinde yapilir. Cift tiklama ya da es zamanli onay TEK lisans uretir.
+  - **Yenileme / yukseltme:** kurulumda gecerli ve aktarilmamis ucretli lisans varsa yeni sure onun bitisine eklenir; yoksa bugunden baslar.
+  - Planlar admin ekranindan yonetilir; ilk acilista ornek planlar fiyatsiz eklenir.
+  - Havale bilgileri `LicensingPortalOptions__Bank__{BankName,AccountName,Iban}` ayarlarindan okunur (gizli degil).
 - **Razor:** `action` ozniteligi acikca yazilan POST formlarina `asp-antiforgery="true"` EKLE. Tag helper o durumda CSRF token'ini kendiliginden koymaz; form 400 doner.
 
 - **Token:** `BSTR1.<payload>.<imza>`.

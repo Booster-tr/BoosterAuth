@@ -18,6 +18,11 @@ public class LicensingDbContext(
     public DbSet<CustomerInstallation> CustomerInstallations => Set<CustomerInstallation>();
     public DbSet<TrialRequest> TrialRequests => Set<TrialRequest>();
     public DbSet<LicenseTransfer> LicenseTransfers => Set<LicenseTransfer>();
+    public DbSet<Plan> Plans => Set<Plan>();
+    public DbSet<Order> Orders => Set<Order>();
+
+    /// <summary>Siparis referans kodu sayaci (BST-yyyy-NNNNNN). Veritabani dizisi: ayni anda iki siparis ayni kodu alamaz.</summary>
+    public const string OrderReferenceSequence = "OrderReferenceNumbers";
 
     /// <summary>
     /// Oturum cerezlerinin anahtarlari. Veritabaninda tutulur; aksi halde her yeniden baslatmada tum kullanicilarin
@@ -28,6 +33,7 @@ public class LicensingDbContext(
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.HasSequence<long>(OrderReferenceSequence);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

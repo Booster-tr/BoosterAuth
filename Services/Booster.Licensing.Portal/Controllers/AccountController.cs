@@ -16,7 +16,8 @@ namespace Booster.Licensing.Portal.Controllers;
 /// </summary>
 [Authorize(Policy = PortalPolicies.Customer)]
 [Route("hesap")]
-public sealed class AccountController(LicensingDbContext db, CustomerPortalService portal) : Controller
+public sealed class AccountController(LicensingDbContext db, CustomerPortalService portal, OrderService orders,
+    Booster.Licensing.Portal.Options.LicensingPortalOptions options) : Controller
 {
     private Guid PrincipalId => Guid.Parse(User.FindFirst("sub")!.Value);
     private string Email => User.FindFirst("email")!.Value;
@@ -179,6 +180,53 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
             return Redirect($"/hesap/lisans?LicenseId={licenseId}");
         }
         return Redirect($"/hesap/lisans?LicenseId={result.License!.Id}");
+    }
+
+    // ---------------------------------------------------------------- Siparis (satin alma / yenileme / yukseltme)
+
+    [HttpGet("siparis/yeni")]
+    public async Task<IActionResult> NewOrder([FromQuery(Name = "InstallationId")] Guid installationId, CancellationToken ct)
+    {
+        var c = await CurrentCustomerAsync(ct);
+        var inst = c?.Installations.SingleOrDefault(i => i.InstallationId == installationId);
+        if (c is null || inst is null) return NotFound();
+
+        ViewBag.Installation = inst;
+        ViewBag.Current = await db.IssuedLicenses.AsNoTracking()
+            .Where(l => l.InstallationId == installationId && l.Type == "paid" && l.TransferredToLicenseId == null && l.ExpiresAt > DateTimeOffset.UtcNow)
+            .OrderByDescending(l => l.ExpiresAt).FirstOrDefaultAsync(ct);
+        return View(await db.Plans.AsNoTracking().Where(p => p.IsActive).OrderBy(p => p.SortOrder).ToListAsync(ct));
+    }
+
+    [HttpPost("siparis/yeni")]
+    public async Task<IActionResult> NewOrder([FromForm] Guid installationId, [FromForm] Guid planId, CancellationToken ct)
+    {
+        var c = await CurrentCustomerAsync(ct);
+        var inst = c?.Installations.SingleOrDefault(i => i.InstallationId == installationId);
+        // Pasif plan siparis edilemez (adres elle yazilsa da).
+        var plan = await db.Plans.AsNoTracking().SingleOrDefaultAsync(p => p.Id == planId && p.IsActive, ct);
+        if (c is null || inst is null || plan is null) return NotFound();
+
+        var order = await orders.CreateAsync(c, inst, plan, Email, ct);
+        return Redirect($"/hesap/siparis?OrderId={order.Id}");
+    }
+
+    [HttpGet("siparis")]
+    public async Task<IActionResult> Order([FromQuery(Name = "OrderId")] Guid orderId, CancellationToken ct)
+    {
+        var c = await CurrentCustomerAsync(ct);
+        var order = c is null ? null : await db.Orders.AsNoTracking().SingleOrDefaultAsync(o => o.Id == orderId && o.CustomerId == c.Id, ct);
+        if (order is null) return NotFound();
+        ViewBag.Bank = options.Bank;
+        return View(order);
+    }
+
+    [HttpGet("siparisler")]
+    public async Task<IActionResult> Orders(CancellationToken ct)
+    {
+        var c = await CurrentCustomerAsync(ct);
+        if (c is null) return Redirect("/hesap/firma");
+        return View(await db.Orders.AsNoTracking().Where(o => o.CustomerId == c.Id).OrderByDescending(o => o.CreatedTime).ToListAsync(ct));
     }
 
     private static string? Clean(string? v) => string.IsNullOrWhiteSpace(v) ? null : v.Trim();

@@ -24,6 +24,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<SigningKeyStore>();
 builder.Services.AddScoped<LicenseIssuer>();
 builder.Services.AddScoped<CustomerPortalService>();
+builder.Services.AddScoped<OrderService>();
 
 builder.Services.AddDataProtection()
     .SetApplicationName("Booster.Licensing.Portal")
@@ -121,6 +122,7 @@ using (var scope = app.Services.CreateScope())
 
     var keys = scope.ServiceProvider.GetRequiredService<SigningKeyStore>();
     await keys.EnsureActiveKeyAsync(app.Lifetime.ApplicationStopping);
+    await scope.ServiceProvider.GetRequiredService<OrderService>().SeedPlansAsync(app.Lifetime.ApplicationStopping);
 }
 
 app.Run();
