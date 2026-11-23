@@ -2,7 +2,7 @@
 
 Cok kiracili (multi-tenant) OIDC/OAuth2 kimlik saglayici (IdP) ve yetki platformu (OpenFGA).
 Booster'in tum urunleri kimlik ve yetkiyi buradan alir. Yonetim paneli ayri bir repodadir (`booster-management`).
-Urun, musteri sunucusunda on-prem calisir ve **cevrimdisi lisansla** acilir (lisans altyapisi: `booster-licensing` reposu).
+Urun, musteri sunucusunda on-prem calisir ve **cevrimdisi lisansla** acilir. Lisanslar bu solution icindeki lisans portalinda (`licensing.appnuraymind.com`) uretilir.
 
 ## Calisma tarzi
 - **KISS, YAGNI.** Iletisim ve kod yorumlari **Turkce**. Yorum NEDEN'i anlatir.
@@ -29,13 +29,20 @@ Urun, musteri sunucusunda on-prem calisir ve **cevrimdisi lisansla** acilir (lis
 Ortak kutuphaneler `Common/` ve `CommonInternal/` altinda. Diger urunlere kopya-yapistir ile gecer.
 
 ## Lisans kurallari (degismez)
-Lisans altyapisi `booster-licensing` reposundadir. Token bicimi ve anahtar yonetimi orada tanimlidir (`CLAUDE.md`, `docs/KEYS.md`).
+Ayri repo YOK; hepsi bu solution icindedir.
+
+| Proje | Kim kullanir | Icerik |
+|---|---|---|
+| `Common/Licensing/Booster.Licensing` | Urun ve portal | Token bicimi, `LicensePublicKeys` (gomulu), `LicenseValidator`, `LicenseValidationResult` (`PanelWritable`, `EndUserFlowsAllowed`), `DomainRules`, `LicenseClock` + `ILicenseClockStore` |
+| `Common/Licensing/Booster.Licensing.Signing` | YALNIZCA portal | `LicenseSigningKey` (uretme, imzalama). Urun projeleri bu projeye referans VERMEZ |
+
+Portal imzalama anahtarini ilk acilista kendisi uretir ve `licensingdb`'ye yazar. Elle anahtar islemi yoktur.
 
 - **Token:** `BSTR1.<payload>.<imza>`.
   - Iki parca da base64url; imza Ed25519 (BouncyCastle) ile atilir ve `"BSTR1." + payload` metnini kapsar.
   - Payload alanlari: `v, kid, licenseId, customer{id,name}, plan, type(trial|paid), limits{users,pools,clients}, allowedDomains[], issuedAt, expiresAt, graceDays, installationId`.
 - **Public key'ler KODA GOMULUDUR** (`kid` -> key). Config veya env ile eklenemez ya da degistirilemez.
-- Urunde imzalama kodu ve private key **bulunmaz**.
+- Urunde imzalama kodu (`Booster.Licensing.Signing`) ve private key **bulunmaz**.
 - **Tamamen cevrimdisi:** urun lisans sunucusuna HIC istek atmaz.
 - **installationId:**
   - Ilk acilista rastgele bir GUID uretilir ve veritabanina yazilir.

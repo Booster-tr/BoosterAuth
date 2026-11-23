@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- YALNIZCA lisans portali referans verir. Urun (IdP/Management/panel) bu projeyi ASLA referans almaz. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Booster.Licensing\Booster.Licensing.csproj" />
+  </ItemGroup>
+
+</Project>
