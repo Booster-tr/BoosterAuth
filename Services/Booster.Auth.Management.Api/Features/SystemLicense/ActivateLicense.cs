@@ -34,7 +34,7 @@ public class ActivateLicenseEndpoint(LicenseService license, ApiAuthOptions apiA
     {
         var by = User.FindFirst("email")?.Value ?? User.FindFirst("sub")?.Value ?? "admin";
         var e = await license.ActivateAsync(req.Token, by, ct);
-        await Send.OkAsync(GetLicenseResponse.From(e, GetLicenseEndpoint.DomainTargets(apiAuth, bootstrap)), ct);
+        await Send.OkAsync(GetLicenseResponse.From(e, GetLicenseEndpoint.DomainTargets(apiAuth, bootstrap)) with { CanActivate = true }, ct);
     }
 }
 
