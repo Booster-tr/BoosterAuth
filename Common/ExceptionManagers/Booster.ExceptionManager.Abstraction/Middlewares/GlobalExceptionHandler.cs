@@ -118,6 +118,11 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         problemDetails.Extensions["correlationId"] = correlationId;
 
+        // Is kurali hatalarinda mesaj anahtari makine okunur kod olarak da doner (or. LICENSE_RESTRICTED);
+        // istemci metne degil koda gore davranir (panel: lisans ekranina yonlendirir).
+        if (exception is BusinessException codeEx)
+            problemDetails.Extensions["code"] = codeEx.Message;
+
         if (validationErrors.Any())
         {
             problemDetails.Extensions["errors"] = validationErrors;

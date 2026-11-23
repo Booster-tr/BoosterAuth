@@ -14,6 +14,8 @@ using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Constants;
 using FastEndpoints;
 using FluentValidation;
+using Booster.Auth.Common.Internal.Constants.Messages;
+using Booster.Auth.Idp.Managers.LicenseManagers;
 
 namespace Booster.Auth.Idp.Features.Authorize;
 
@@ -24,7 +26,8 @@ public class AuthorizeEndpoint(
     ISecureCacheStore<InteractionStateData> interactionStore,
     ISecureCacheStore<AuthorizationCodeData> codeStore,
     ISessionCookieManager cookieManager,
-    IdpUiOptions uiOptions) : Endpoint<AuthorizeRequest>
+    IdpUiOptions uiOptions,
+    EndUserLicenseGate licenseGate) : Endpoint<AuthorizeRequest>
 {
     private static readonly TimeSpan InteractionTtl = TimeSpan.FromMinutes(30);
     private static readonly TimeSpan CodeTtl = TimeSpan.FromMinutes(2);
@@ -104,6 +107,10 @@ public class AuthorizeEndpoint(
 
         if (!client.IsActive)
             throw new AuthorizeException(IdpMessageKeys.ClientInactive);
+
+        // Yalnizca deneme lisansinin ek suresi bittiyse; son kullaniciya teknik ayrinti gosterilmez.
+        if (!await licenseGate.IsAllowedAsync(client, ct))
+            throw new AuthorizeException(LicenseMessageKeys.ServiceUnavailable);
 
         if (string.IsNullOrEmpty(interaction.RedirectUri) || !client.RedirectUris.Contains(interaction.RedirectUri, StringComparer.Ordinal))
             throw new AuthorizeException(IdpMessageKeys.InvalidRedirectUri);

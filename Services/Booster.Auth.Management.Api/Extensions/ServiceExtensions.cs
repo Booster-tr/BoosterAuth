@@ -12,6 +12,10 @@ using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Common.Extensions.ServiceExtensions;
 using Booster.ExceptionManager.Abstraction.Extensions;
 using Booster.ExceptionManager.WithCacheProvider.Extensions;
+using Booster.Auth.Management.Api.Licensing;
+using Booster.Licensing.Runtime;
+using Booster.Licensing.Validation;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Booster.Auth.Management.Api.Extensions;
 
@@ -29,6 +33,14 @@ public static class ServiceExtensions
         services.AddScoped<ManagementBootstrapper>();
         services.AddScoped<WalkToWinBootstrapper>();
         services.AddScoped<LicensingBootstrapper>();
+
+        // Lisans: sahibi bu servis. Dogrulama tamamen cevrimdisi; yalnizca koda gomulu public key'ler.
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<ILicenseValidator, LicenseValidator>();
+        services.AddScoped<InstallationStore>();
+        services.AddSingleton<LicenseService>();
+        services.AddSingleton<ILicenseStatusProvider>(sp => sp.GetRequiredService<LicenseService>());
+        services.AddHostedService<LicenseMonitor>();
         services.AddScoped<IClientDataCacheStore, ClientDataCacheStore>();
         services.AddScoped<IAccessManager, AccessManager>();
         services.AddScoped<IPrincipalLookupManager, PrincipalLookupManager>();

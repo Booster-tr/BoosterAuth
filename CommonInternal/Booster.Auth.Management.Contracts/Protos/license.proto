@@ -1,0 +1,19 @@
+syntax = "proto3";
+option csharp_namespace = "Booster.Auth.Management.Grpc";
+package management;
+
+// Kurulumun lisans durumu. Lisansin sahibi Management'tir (token + kurulum GUID'i authndb'de).
+// IdP ve AuthZ karar icin bunu cagirir ve kisa sure onbellekte tutar. Ham token donmez.
+service LicenseStatusService {
+  rpc GetStatus (GetLicenseStatusRequest) returns (LicenseStatusMessage);
+}
+
+message GetLicenseStatusRequest {}
+
+message LicenseStatusMessage {
+  // Booster.Licensing.Validation.LicenseState sayisal degeri.
+  int32 state = 1;
+  bool is_trial = 2;
+  bool panel_writable = 3;
+  bool end_user_flows_allowed = 4;
+}

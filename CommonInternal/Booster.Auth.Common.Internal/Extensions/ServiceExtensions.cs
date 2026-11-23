@@ -7,6 +7,7 @@ using Booster.Authorization.Fga.Extensions;
 using Booster.Authorization.Fga.Options;
 using Booster.Caching.Redis;
 using Booster.Auth.Common.Internal.Models;
+using Booster.Auth.Common.Internal.Licensing;
 using FastEndpoints;
 using FluentValidation;
 using Booster.Caching.Redis.Extensions;
@@ -105,6 +106,9 @@ public static class ServiceExtensions
 
         app.UseFastEndpoints(c =>
         {
+            // Lisans kisitliyken panel yazma isteklerini reddeder; son kullanici akislarina dokunmaz (LicenseGuard).
+            c.Endpoints.Configurator = ep => ep.PreProcessor<LicenseGuard>(Order.Before);
+
             if (!wrapResponses) return;
 
             c.Errors.ResponseBuilder = (failures, _, _) => throw new ValidationException(failures);

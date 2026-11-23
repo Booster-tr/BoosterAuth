@@ -3,6 +3,7 @@ using System.Net;
 
 namespace Booster.Licensing.Domains;
 
+[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<DomainCheck>))]
 public enum DomainCheck
 {
     /// <summary>Lisanstaki bir domain'in kendisi veya alt alani.</summary>

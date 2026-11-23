@@ -24,6 +24,8 @@
     <ProjectReference Include="..\..\Common\AuthZ\Booster.Authorization.Relational\Booster.Authorization.Relational.csproj" />
     <ProjectReference Include="..\..\Common\Booster.Common.Extensions\Booster.Common.Extensions.csproj" />
     <ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
+    <!-- Lisans durumu (LicenseStatusService istemcisi): lisans kisitliyken panelin yetki yazma islemleri reddedilir -->
+    <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Management.Contracts\Booster.Auth.Management.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

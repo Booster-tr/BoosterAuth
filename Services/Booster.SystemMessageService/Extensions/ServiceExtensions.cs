@@ -23,6 +23,7 @@ public static class ServiceExtensions
         services.AddScoped<RefreshCacheSystemMessagesEventHandler>();
 
         services.AddHostedService<AuthNMessageSeeder>();
+        services.AddHostedService<LicenseMessageSeeder>();
         services.AddHostedService<AuthZMessageSeeder>();
         services.AddHostedService<IdpMessageSeeder>();
         services.AddHostedService<CommonMessageSeeder>();

@@ -169,6 +169,44 @@ namespace Booster.Auth.Management.Api.Migrations
                     b.ToTable("IdentityProviders", (string)null);
                 });
 
+            modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.Installation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ClockHighWaterMark")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("InstallationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("LicenseActivatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LicenseActivatedBy")
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<string>("LicenseToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstallationId")
+                        .IsUnique();
+
+                    b.ToTable("Installations", (string)null);
+                });
+
             modelBuilder.Entity("Booster.Auth.Management.Api.Features._base.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")

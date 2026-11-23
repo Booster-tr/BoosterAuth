@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Features._base;
 using Booster.Auth.Z.Features.Lookup.MyAccess;
 using Booster.Auth.Z.Managers.LookupManagers;
@@ -7,6 +8,8 @@ using FluentValidation;
 
 namespace Booster.Auth.Z.Features.Lookup.ObjectAccess;
 
+/// <summary>Salt okuma: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class ObjectAccessEndpoint : Endpoint<ObjectAccessCommand, ObjectAccessResponse>
 {
     public override void Configure()

@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
 using Booster.ExceptionManager.Abstraction.Constants;
@@ -8,6 +9,8 @@ using FluentValidation;
 
 namespace Booster.Auth.Z.Features.Check.BatchCheckPermissions;
 
+/// <summary>Salt okuma: lisans kisitliyken de calisir (panel ekrani cizebilsin).</summary>
+[AllowWhenLicenseRestricted]
 public class BatchCheckPermissionsEndpoint : Endpoint<BatchCheckPermissionsCommand, BatchCheckPermissionsResponse>
 {
     public override void Configure()
