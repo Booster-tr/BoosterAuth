@@ -31,6 +31,21 @@ public sealed class AdminController(LicensingDbContext db, SigningKeyStore keys,
             .Select(c => new CustomerRow(c.Id, c.Name, c.ContactEmail, c.TaxNumber, c.Licenses.Count))
             .ToListAsync(ct));
 
+    [HttpGet("musteriler/detay")]
+    public async Task<IActionResult> CustomerDetail([FromQuery(Name = "CustomerId")] Guid customerId, CancellationToken ct)
+    {
+        var c = await db.Customers.AsNoTracking().Include(x => x.Installations).Include(x => x.Licenses)
+            .SingleOrDefaultAsync(x => x.Id == customerId, ct);
+        if (c is null) return NotFound();
+
+        var licenseIds = c.Licenses.Select(l => l.Id).ToList();
+        ViewBag.Trials = await db.TrialRequests.AsNoTracking().Where(t => t.CustomerId == c.Id)
+            .OrderByDescending(t => t.CreatedTime).ToListAsync(ct);
+        ViewBag.Transfers = await db.LicenseTransfers.AsNoTracking().Where(t => licenseIds.Contains(t.FromLicenseId))
+            .OrderByDescending(t => t.CreatedTime).ToListAsync(ct);
+        return View(c);
+    }
+
     [HttpGet("musteriler/yeni")]
     public IActionResult NewCustomer() => View(new CustomerForm());
 

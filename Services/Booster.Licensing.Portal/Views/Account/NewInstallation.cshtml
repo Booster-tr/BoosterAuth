@@ -1,0 +1,30 @@
+@model InstallationForm
+@{ ViewData["Title"] = "Kurulum ekle"; }
+<h1>Kurulum ekle</h1>
+<form method="post" class="card form">
+    <div asp-validation-summary="ModelOnly" class="alert"></div>
+    <label>Kurulum kimliği (GUID) <small class="muted">Booster Auth yönetim paneli → Sistem &gt; Lisans</small>
+        <input asp-for="InstallationId" placeholder="00000000-0000-0000-0000-000000000000" required />
+    </label>
+    <span asp-validation-for="InstallationId" class="field-error"></span>
+    <label>Ad <small class="muted">ör. Üretim, Test</small>
+        <input asp-for="Label" required />
+    </label>
+    <span asp-validation-for="Label" class="field-error"></span>
+    <label>Domain'ler <small class="muted">ana domain; alt alanları kapsar (auth.firma.com → firma.com). Deneme için e-posta domain'inizle uyuşmalı.</small>
+        <textarea asp-for="Domains" rows="2" placeholder="firma.com"></textarea>
+    </label>
+    @if (ViewData.ModelState.TryGetValue(nameof(InstallationForm.Domains), out var ds) && ds.Errors.Count > 0)
+    {
+        <ul class="field-error">
+            @foreach (var e in ds.Errors)
+            {
+                <li>@e.ErrorMessage</li>
+            }
+        </ul>
+    }
+    <div class="actions">
+        <a class="btn btn-ghost" href="/hesap/kurulumlar">Vazgeç</a>
+        <button class="btn btn-primary" type="submit">Kaydet</button>
+    </div>
+</form>

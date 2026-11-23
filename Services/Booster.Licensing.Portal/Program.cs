@@ -23,6 +23,7 @@ var portal = builder.Services.AddSettings<LicensingPortalOptions>(builder.Config
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<SigningKeyStore>();
 builder.Services.AddScoped<LicenseIssuer>();
+builder.Services.AddScoped<CustomerPortalService>();
 
 builder.Services.AddDataProtection()
     .SetApplicationName("Booster.Licensing.Portal")
@@ -73,6 +74,11 @@ builder.Services
     });
 
 builder.Services.AddAuthorizationBuilder()
+    // Musteri alani: e-postasi DOGRULANMIS her kullanici (deneme kurallari e-posta domainine dayanir).
+    .AddPolicy(PortalPolicies.Customer, p => p
+        .RequireAuthenticatedUser()
+        .RequireAssertion(ctx => string.Equals(ctx.User.FindFirst("email_verified")?.Value, "true", StringComparison.OrdinalIgnoreCase)
+                                 && ctx.User.FindFirst("sub") is not null))
     .AddPolicy(PortalPolicies.Admin, p => p
         .RequireAuthenticatedUser()
         // E-posta Booster Auth tarafindan DOGRULANMIS olmali (kayitta e-posta kodu); aksi halde biri admin
@@ -122,4 +128,5 @@ app.Run();
 public static class PortalPolicies
 {
     public const string Admin = "admin";
+    public const string Customer = "customer";
 }

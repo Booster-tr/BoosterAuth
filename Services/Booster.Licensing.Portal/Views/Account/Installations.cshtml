@@ -1,0 +1,68 @@
+@model List<CustomerInstallation>
+@{
+    ViewData["Title"] = "Kurulumlarım";
+    var licenses = (List<IssuedLicense>)ViewBag.Licenses;
+    var customer = (Customer)ViewBag.Customer;
+    var now = DateTimeOffset.UtcNow;
+}
+<div class="page-head">
+    <h1>Kurulumlarım</h1>
+    <a class="btn btn-primary" href="/hesap/kurulumlar/yeni">Kurulum ekle</a>
+</div>
+<p class="muted">@customer.Name</p>
+
+@if (TempData["Error"] is string error)
+{
+    <p class="alert" data-error-code="@TempData["ErrorCode"]">@error</p>
+}
+
+@if (Model.Count == 0)
+{
+    <section class="card">
+        <p>Henüz kurulum eklemediniz. Booster Auth yönetim panelinde <b>Sistem &gt; Lisans</b> ekranındaki kurulum kimliğini (GUID) kopyalayıp ekleyin.</p>
+    </section>
+}
+
+@foreach (var inst in Model)
+{
+    var own = licenses.Where(l => l.InstallationId == inst.InstallationId).ToList();
+    var current = own.Where(l => l.TransferredToLicenseId is null).OrderByDescending(l => l.ExpiresAt).FirstOrDefault();
+    <section class="card" data-installation="@inst.InstallationId">
+        <div class="page-head">
+            <h2>@inst.Label</h2>
+            @if (current is null)
+            {
+                @* action acikca yazildiginda tag helper CSRF token'ini kendiliginden eklemez; asp-antiforgery sart. *@
+                <form method="post" action="/hesap/deneme" asp-antiforgery="true">
+                    <input type="hidden" name="installationId" value="@inst.InstallationId" />
+                    <button class="btn btn-primary" type="submit">Ücretsiz deneme al (7 gün)</button>
+                </form>
+            }
+        </div>
+        <dl class="facts">
+            <dt>Kurulum kimliği</dt><dd><code>@inst.InstallationId</code></dd>
+            <dt>Domain'ler</dt><dd>@string.Join(", ", inst.Domains)</dd>
+        </dl>
+        @if (own.Count > 0)
+        {
+            <table>
+                <thead><tr><th>Tür</th><th>Plan</th><th>Bitiş</th><th>Durum</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var l in own)
+                {
+                    var status = l.TransferredToLicenseId is not null ? "Aktarıldı"
+                        : l.ExpiresAt > now ? $"{(int)(l.ExpiresAt - now).TotalDays} gün kaldı"
+                        : l.ExpiresAt.AddDays(l.GraceDays) > now ? "Ek süre" : "Süresi doldu";
+                    <tr>
+                        <td><span class="tag @(l.Type == "trial" ? "tag-warn" : "tag-ok")">@(l.Type == "trial" ? "Deneme" : "Ücretli")</span></td>
+                        <td>@l.Plan</td>
+                        <td>@l.ExpiresAt.ToString("yyyy-MM-dd")</td>
+                        <td>@status</td>
+                        <td><a class="btn btn-ghost btn-sm" href="/hesap/lisans?LicenseId=@l.Id">Token</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+    </section>
+}

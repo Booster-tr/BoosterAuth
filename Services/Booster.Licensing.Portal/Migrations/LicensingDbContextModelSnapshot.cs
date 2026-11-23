@@ -65,9 +65,52 @@ namespace Booster.Licensing.Portal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerPrincipalId");
+                    b.HasIndex("OwnerPrincipalId")
+                        .IsUnique()
+                        .HasFilter("\"OwnerPrincipalId\" IS NOT NULL AND \"DeletedTime\" IS NULL");
 
                     b.ToTable("Customers", (string)null);
+                });
+
+            modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.CustomerInstallation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.PrimitiveCollection<List<string>>("Domains")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<Guid>("InstallationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("InstallationId")
+                        .IsUnique()
+                        .HasFilter("\"DeletedTime\" IS NULL");
+
+                    b.ToTable("CustomerInstallations", (string)null);
                 });
 
             modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.IssuedLicense", b =>
@@ -124,6 +167,9 @@ namespace Booster.Licensing.Portal.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<Guid?>("OriginLicenseId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Plan")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -132,6 +178,9 @@ namespace Booster.Licensing.Portal.Migrations
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("TransferredToLicenseId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -148,6 +197,48 @@ namespace Booster.Licensing.Portal.Migrations
                     b.HasIndex("InstallationId");
 
                     b.ToTable("IssuedLicenses", (string)null);
+                });
+
+            modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.LicenseTransfer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FromInstallationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FromLicenseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OriginLicenseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RequestedBy")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<Guid>("ToInstallationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ToLicenseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OriginLicenseId", "CreatedTime");
+
+                    b.ToTable("LicenseTransfers", (string)null);
                 });
 
             modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.SigningKey", b =>
@@ -194,6 +285,59 @@ namespace Booster.Licensing.Portal.Migrations
                     b.ToTable("SigningKeys", (string)null);
                 });
 
+            modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.TrialRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.PrimitiveCollection<List<string>>("Domains")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<bool>("Granted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("InstallationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid?>("LicenseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RejectReason")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("IpAddress", "CreatedTime");
+
+                    b.ToTable("TrialRequests", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
@@ -213,6 +357,17 @@ namespace Booster.Licensing.Portal.Migrations
                     b.ToTable("DataProtectionKeys");
                 });
 
+            modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.CustomerInstallation", b =>
+                {
+                    b.HasOne("Booster.Licensing.Portal.Data.Entities.Customer", "Customer")
+                        .WithMany("Installations")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.IssuedLicense", b =>
                 {
                     b.HasOne("Booster.Licensing.Portal.Data.Entities.Customer", "Customer")
@@ -226,6 +381,8 @@ namespace Booster.Licensing.Portal.Migrations
 
             modelBuilder.Entity("Booster.Licensing.Portal.Data.Entities.Customer", b =>
                 {
+                    b.Navigation("Installations");
+
                     b.Navigation("Licenses");
                 });
 #pragma warning restore 612, 618
