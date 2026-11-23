@@ -285,8 +285,7 @@ public sealed class LoginChallengeManager(
     }
 
     /// <summary>
-    /// Havuzun izin verdiği ve kullanıcının hedefi olan kanallar. TOTP henüz
-    /// desteklenmiyor; yalnızca TOTP'ye izin veren havuzda MFA uygulanmaz.
+    /// Havuzun izin verdiği ve kullanıcının hedefi olan kanallar (e-posta, SMS).
     /// </summary>
     private static List<ChallengeChannel> ResolveMfaChannels(MfaMethod allowed, LocalUser user)
     {

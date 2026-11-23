@@ -59,14 +59,6 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.ClientRedirectUriInvalid, "Uygulama", "Geçersiz yönlendirme adresi.", "Client", "Invalid redirect URI."),
 
         // --- Token scope politikası ---
-        new(AuthNMessageKeys.TokenScopePolicyMax, "Token politikası", "İzin verilen politika sayısı aşıldı.", "Token policy", "The maximum number of policies has been exceeded."),
-        new(AuthNMessageKeys.TokenScopePolicyKeyDuplicate, "Token politikası", "Aynı anahtar birden fazla kez kullanılamaz.", "Token policy", "The same key cannot be used more than once."),
-        new(AuthNMessageKeys.TokenScopePolicyKeyInvalid, "Token politikası", "Anahtar küçük harfle başlamalı; yalnızca küçük harf, rakam ve alt çizgi içerebilir.", "Token policy", "The key must start with a lowercase letter and contain only lowercase letters, digits and underscores."),
-        new(AuthNMessageKeys.TokenScopePolicyKeyRequired, "Token politikası", "Politika anahtarı zorunludur.", "Token policy", "The policy key is required."),
-        new(AuthNMessageKeys.TokenScopePolicyRequiredPermissionsRequired, "Token politikası", "Zorunlu politika için en az bir izin belirtmelisiniz.", "Token policy", "A required policy must list at least one permission."),
-        new(AuthNMessageKeys.TokenScopePolicyPermissionEmpty, "Token politikası", "İzin adı boş olamaz.", "Token policy", "A permission name cannot be empty."),
-        new(AuthNMessageKeys.TokenScopePolicyPermissionDuplicate, "Token politikası", "Aynı izin birden fazla kez verilmiş.", "Token policy", "The same permission is listed more than once."),
-        new(AuthNMessageKeys.TokenScopePolicyPermissionsNotAllowed, "Token politikası", "Bu izinler uygulama için tanımlı değil.", "Token policy", "These permissions are not defined for the client."),
 
         // --- Dış kimlik sağlayıcıları ---
         new(AuthNMessageKeys.IdentityProviderNotFound, "Sağlayıcı", "Sağlayıcı bulunamadı.", "Provider", "The provider was not found."),

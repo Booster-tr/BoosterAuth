@@ -567,40 +567,6 @@ namespace Booster.Auth.Management.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("Booster.Auth.Management.Api.Features._base.Entities.TokenScopePolicyItem", "TokenScopePolicy", b1 =>
-                        {
-                            b1.Property<Guid>("ClientId");
-
-                            b1.Property<int>("__synthesizedOrdinal")
-                                .ValueGeneratedOnAdd();
-
-                            b1.PrimitiveCollection<string>("GrantedPermissions")
-                                .IsRequired();
-
-                            b1.Property<bool>("IsRequired");
-
-                            b1.Property<string>("Key")
-                                .IsRequired();
-
-                            b1.Property<bool>("PermissionCheckRequired");
-
-                            b1.PrimitiveCollection<string>("RequiredPermissions")
-                                .IsRequired();
-
-                            b1.HasKey("ClientId", "__synthesizedOrdinal");
-
-                            b1.ToTable("Clients");
-
-                            b1
-                                .ToJson("TokenScopePolicy")
-                                .HasColumnType("jsonb");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ClientId");
-                        });
-
-                    b.Navigation("TokenScopePolicy");
-
                     b.Navigation("UserPool");
                 });
 
