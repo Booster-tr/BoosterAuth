@@ -87,4 +87,12 @@ public class IdpMessageKeys
     public const string ClientLogoRequired = "idp.client_logo_required";
     public const string ClientLogoTooLarge = "idp.client_logo_too_large";
     public const string ClientLogoInvalidFormat = "idp.client_logo_invalid_format";
+
+    // --- Panelden kullanici ekleme / ice aktarma / davet ---------------------
+    public const string InvitationInvalid = "idp.invitation_invalid";
+    public const string InvitationNotPending = "idp.invitation_not_pending";
+    public const string ImportCsvInvalid = "idp.import_csv_invalid";
+    public const string ImportTooManyRows = "idp.import_too_many_rows";
+    public const string DisplayNameRequired = "idp.display_name_required";
+    public const string EmailInvalid = "idp.email_invalid";
 }

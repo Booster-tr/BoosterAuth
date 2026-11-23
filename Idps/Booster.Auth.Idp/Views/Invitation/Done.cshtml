@@ -1,0 +1,15 @@
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = T["Invite.DoneTitle"].Value;
+    ViewData["MainModifier"] = "auth-main--reset";
+    ViewData["BrandHeadline"] = T["Invite.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["Invite.BrandLead"].Value;
+}
+
+@* Davetin bagli oldugu bir OAuth istemcisi yoktur; kullanici kendi uygulamasindan giris yapar. *@
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title" data-invite-done>@T["Invite.DoneTitle"]</h1>
+        <p class="auth-card__subtitle">@T["Invite.DoneText"]</p>
+    </header>
+</section>

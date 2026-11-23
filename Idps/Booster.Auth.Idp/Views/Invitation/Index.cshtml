@@ -1,0 +1,147 @@
+@model Booster.Auth.Idp.Features.Invitations.AcceptInvitationCommand
+@{
+    Layout = "_AuthLayout";
+
+    var errorCount = ViewData.ModelState.AllErrors().Count;
+
+    ViewData["Title"] = errorCount > 0
+        ? T["Invite.PageTitleWithErrors", errorCount].Value
+        : T["Invite.PageTitle"].Value;
+
+    ViewData["MainModifier"] = "auth-main--reset";
+    var invitationEmail = ViewData["InvitationEmail"] as string;
+    ViewData["BrandHeadline"] = T["Invite.BrandHeadline"].Value;
+    ViewData["BrandLead"] = T["Invite.BrandLead"].Value;
+
+    var passwordInvalid = ViewData.ModelState.HasError(nameof(Model.Password));
+    var confirmInvalid = ViewData.ModelState.HasError(nameof(Model.PasswordConfirm));
+
+    // Parola kurallari havuz politikasindan gelir; controller set eder.
+    var passwordPolicy = ViewData["PasswordPolicy"] as Booster.Auth.Database.Models.PasswordPolicyData;
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["Invite.Heading"]</h1>
+        <p class="auth-card__subtitle">@T["Invite.Subtitle"]</p>
+    </header>
+
+    <partial name="_ValidationSummary" />
+
+    @* Gerçek route InvitationController üzerindeki [HttpPost("/ui/invite")]'dir. *@
+    <form method="post" action="@Url.Idp("/ui/invite")" class="auth-form"
+          data-auth-form asp-antiforgery="false">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Token" />
+
+        @* --- Davet edilen hesap ---------------------------------------------- *@
+        <div class="auth-field">
+            <label class="auth-field__label" for="InvitationEmail">@T["Invite.EmailLabel"]</label>
+            <div class="auth-field__control">
+                <input class="auth-field__input" id="InvitationEmail" type="email" value="@invitationEmail" readonly autocomplete="username" />
+            </div>
+        </div>
+
+        @* --- Yeni parola ------------------------------------------------------ *@
+        <div class="auth-field auth-field--icon auth-field--action @(passwordInvalid ? "auth-field--invalid" : null)">
+            <label class="auth-field__label" for="Password">@T["Invite.Password"]</label>
+
+            <div class="auth-field__control">
+                <span class="auth-field__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" focusable="false">
+                        <rect x="4" y="8.5" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.6" />
+                        <path d="M7 8.5V6.25a3 3 0 1 1 6 0V8.5" stroke="currentColor" stroke-width="1.6"
+                              stroke-linecap="round" />
+                    </svg>
+                </span>
+                <input class="auth-field__input" asp-for="Password" type="password"
+                       autocomplete="new-password" autocapitalize="none" spellcheck="false"
+                       enterkeyhint="next" required data-caps-warn data-initial-focus
+                       aria-describedby="Password-error Password-caps Password-hint"
+                       aria-invalid="@(passwordInvalid ? "true" : null)" />
+
+                <button type="button" class="auth-toggle" hidden
+                        data-pw-toggle aria-controls="Password"
+                        data-label-show="@T["Common.ShowPassword"]" data-label-hide="@T["Common.HidePassword"]"
+                        aria-label="@T["Common.ShowPassword"]" title="@T["Common.ShowPassword"]">
+                    <svg class="auth-toggle__icon auth-toggle__icon--on" width="20" height="20"
+                         viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                        <path d="M1.75 10S4.75 4.75 10 4.75 18.25 10 18.25 10 15.25 15.25 10 15.25 1.75 10 1.75 10Z"
+                              stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                        <circle cx="10" cy="10" r="2.4" stroke="currentColor" stroke-width="1.6" />
+                    </svg>
+                    <svg class="auth-toggle__icon auth-toggle__icon--off" width="20" height="20"
+                         viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                        <path d="M4.2 5.4C2.6 6.8 1.75 10 1.75 10S4.75 15.25 10 15.25c1.4 0 2.6-.37 3.65-.93M8.1 5.1c.6-.15 1.24-.23 1.9-.23 5.25 0 8.25 5.13 8.25 5.13s-.85 1.5-2.35 2.9"
+                              stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M8.3 8.3a2.4 2.4 0 0 0 3.4 3.4M3 3l14 14"
+                              stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <partial name="_PasswordRules" model="passwordPolicy" />
+
+            <p class="auth-note auth-note--warn" id="Password-caps" hidden>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M8 2.25 14.25 13.5H1.75L8 2.25Z" stroke="currentColor" stroke-width="1.5"
+                          stroke-linejoin="round" />
+                    <path d="M8 6.75v2.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <circle cx="8" cy="11.3" r="0.75" fill="currentColor" />
+                </svg>
+                @T["Common.CapsLockOn"]
+            </p>
+
+            <partial name="_FieldError" model="@nameof(Model.Password)" />
+        </div>
+
+        @* --- Parola tekrar ---------------------------------------------------- *@
+        <div class="auth-field auth-field--icon auth-field--action @(confirmInvalid ? "auth-field--invalid" : null)">
+            <label class="auth-field__label" for="PasswordConfirm">@T["Invite.PasswordConfirm"]</label>
+
+            <div class="auth-field__control">
+                <span class="auth-field__icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" focusable="false">
+                        <rect x="4" y="8.5" width="12" height="8" rx="2" stroke="currentColor" stroke-width="1.6" />
+                        <path d="M7 8.5V6.25a3 3 0 1 1 6 0V8.5" stroke="currentColor" stroke-width="1.6"
+                              stroke-linecap="round" />
+                    </svg>
+                </span>
+                <input class="auth-field__input" asp-for="PasswordConfirm" type="password"
+                       autocomplete="new-password" autocapitalize="none" spellcheck="false"
+                       enterkeyhint="done" required data-caps-warn
+                       aria-describedby="PasswordConfirm-error"
+                       aria-invalid="@(confirmInvalid ? "true" : null)" />
+
+                <button type="button" class="auth-toggle" hidden
+                        data-pw-toggle aria-controls="PasswordConfirm"
+                        data-label-show="@T["Common.ShowPassword"]" data-label-hide="@T["Common.HidePassword"]"
+                        aria-label="@T["Common.ShowPassword"]" title="@T["Common.ShowPassword"]">
+                    <svg class="auth-toggle__icon auth-toggle__icon--on" width="20" height="20"
+                         viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                        <path d="M1.75 10S4.75 4.75 10 4.75 18.25 10 18.25 10 15.25 15.25 10 15.25 1.75 10 1.75 10Z"
+                              stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                        <circle cx="10" cy="10" r="2.4" stroke="currentColor" stroke-width="1.6" />
+                    </svg>
+                    <svg class="auth-toggle__icon auth-toggle__icon--off" width="20" height="20"
+                         viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                        <path d="M4.2 5.4C2.6 6.8 1.75 10 1.75 10S4.75 15.25 10 15.25c1.4 0 2.6-.37 3.65-.93M8.1 5.1c.6-.15 1.24-.23 1.9-.23 5.25 0 8.25 5.13 8.25 5.13s-.85 1.5-2.35 2.9"
+                              stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M8.3 8.3a2.4 2.4 0 0 0 3.4 3.4M3 3l14 14"
+                              stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+
+            <partial name="_FieldError" model="@nameof(Model.PasswordConfirm)" />
+        </div>
+
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-btn auth-btn--primary auth-btn--block"
+                    data-submit-guard data-busy-label="@T["Invite.Busy"]">
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["Invite.Submit"]</span>
+            </button>
+        </div>
+    </form>
+</section>

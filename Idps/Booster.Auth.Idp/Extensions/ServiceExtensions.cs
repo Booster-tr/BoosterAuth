@@ -97,6 +97,11 @@ public static class ServiceExtensions
             sp.GetRequiredService<LicenseStatusService.LicenseStatusServiceClient>()));
         services.AddScoped<EndUserLicenseGate>();
 
+        // Panelden kullanici ekleme / CSV ice aktarma / davet
+        services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.PoolDataReader>();
+        services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.EndUserFactory>();
+        services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.InvitationManager>();
+
         services.AddScoped<IClientDataStore, ClientDataStore>();
         services.AddSingleton<IClientLogoStore, ClientLogoStore>();
         services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();
