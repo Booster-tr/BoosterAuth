@@ -23,7 +23,6 @@ public static class ServiceExtensions
         services.AddScoped<ILookupManager, LookupManager>();
 
         services.AddScoped<ManagementBootstrapper>();
-        services.AddScoped<WalkToWinBootstrapper>();
         services.AddScoped<LicensingBootstrapper>();
 
         // Lisans: panel yazma islemleri (iliski/sema) lisans kisitliyken reddedilir (LicenseGuard).
