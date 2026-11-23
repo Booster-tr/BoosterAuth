@@ -14,8 +14,18 @@ public sealed class LicensingPortalOptions
     /// </summary>
     public List<string> AdminEmails { get; set; } = [];
 
+    /// <summary>Havale/EFT talimati (gizli degil). Degerler girilmeden siparis ekraninda yer tutucu gorunur.</summary>
+    public BankAccountOptions Bank { get; set; } = new();
+
     /// <summary>Yalnizca lokal gelistirmede false (self-signed sertifika / http).</summary>
     public bool RequireHttpsMetadata { get; set; } = true;
+
+    public sealed class BankAccountOptions
+    {
+        public string BankName { get; set; } = "(banka adi girilmedi)";
+        public string AccountName { get; set; } = "(alici adi girilmedi)";
+        public string Iban { get; set; } = "(IBAN girilmedi)";
+    }
 
     public bool IsAdmin(string? email) =>
         !string.IsNullOrWhiteSpace(email)

@@ -13,7 +13,7 @@ namespace Booster.Licensing.Portal.Controllers;
 /// <summary>Booster ekibinin ekranlari. Erisim: LicensingPortalOptions.AdminEmails.</summary>
 [Authorize(Policy = PortalPolicies.Admin)]
 [Route("admin")]
-public sealed class AdminController(LicensingDbContext db, SigningKeyStore keys, LicenseIssuer issuer) : Controller
+public sealed class AdminController(LicensingDbContext db, SigningKeyStore keys, LicenseIssuer issuer, OrderService orders) : Controller
 {
     [HttpGet("")]
     public async Task<IActionResult> Index(CancellationToken ct)
@@ -112,11 +112,112 @@ public sealed class AdminController(LicensingDbContext db, SigningKeyStore keys,
         return license is null ? NotFound() : View(license);
     }
 
+    // ---------------------------------------------------------------- Siparisler
+
+    [HttpGet("siparisler")]
+    public async Task<IActionResult> Orders(OrderStatus? status, CancellationToken ct)
+    {
+        var q = db.Orders.AsNoTracking().Include(o => o.Customer).AsQueryable();
+        if (status is not null) q = q.Where(o => o.Status == status);
+        ViewBag.Status = status;
+        return View(await q.OrderByDescending(o => o.CreatedTime).Take(500).ToListAsync(ct));
+    }
+
+    /// <summary>Odeme alindi: lisans otomatik uretilir. Ayni siparis ikinci kez onaylanamaz (cift lisans yok).</summary>
+    [HttpPost("siparisler/odeme")]
+    public async Task<IActionResult> ConfirmPayment([FromForm] Guid orderId, CancellationToken ct)
+    {
+        var license = await orders.ConfirmPaymentAsync(orderId, User.FindFirst("email")?.Value ?? "admin", ct);
+        TempData[license is null ? "Error" : "Info"] = license is null
+            ? "Sipariş zaten işlenmiş (onaylanmış ya da iptal edilmiş)."
+            : "Ödeme onaylandı; lisans üretildi.";
+        return Redirect("/admin/siparisler?status=Pending");
+    }
+
+    [HttpPost("siparisler/iptal")]
+    public async Task<IActionResult> CancelOrder([FromForm] Guid orderId, CancellationToken ct)
+    {
+        var ok = await orders.CancelAsync(orderId, User.FindFirst("email")?.Value ?? "admin", ct);
+        TempData[ok ? "Info" : "Error"] = ok ? "Sipariş iptal edildi." : "Yalnızca ödeme bekleyen sipariş iptal edilebilir.";
+        return Redirect("/admin/siparisler?status=Pending");
+    }
+
+    // ---------------------------------------------------------------- Planlar
+
+    [HttpGet("planlar")]
+    public async Task<IActionResult> Plans(CancellationToken ct) =>
+        View(await db.Plans.AsNoTracking().OrderBy(p => p.SortOrder).ThenBy(p => p.Name).ToListAsync(ct));
+
+    [HttpGet("planlar/duzenle")]
+    public async Task<IActionResult> EditPlan([FromQuery(Name = "PlanId")] Guid? planId, CancellationToken ct)
+    {
+        if (planId is null) return View(new PlanForm { DurationMonths = 12, Currency = "TRY", IsActive = true });
+        var p = await db.Plans.AsNoTracking().SingleOrDefaultAsync(x => x.Id == planId, ct);
+        if (p is null) return NotFound();
+        return View(new PlanForm
+        {
+            Id = p.Id, Code = p.Code, Name = p.Name, MaxUsers = p.MaxUsers, MaxPools = p.MaxPools, MaxClients = p.MaxClients,
+            DurationMonths = p.DurationMonths, Price = p.Price, Currency = p.Currency, IsActive = p.IsActive, SortOrder = p.SortOrder,
+        });
+    }
+
+    /// <summary>Plan degisikligi verilmis siparisleri ETKILEMEZ (siparis plani kopyalar).</summary>
+    [HttpPost("planlar/duzenle")]
+    public async Task<IActionResult> EditPlan(PlanForm form, CancellationToken ct)
+    {
+        var code = form.Code?.Trim().ToLowerInvariant();
+        if (code is not null && await db.Plans.AnyAsync(p => p.Code == code && p.Id != form.Id, ct))
+            ModelState.AddModelError(nameof(form.Code), "Bu kod başka bir planda kullanılıyor.");
+        if (!ModelState.IsValid) return View(form);
+
+        var plan = form.Id is null ? null : await db.Plans.SingleOrDefaultAsync(p => p.Id == form.Id, ct);
+        if (plan is null)
+        {
+            plan = new Plan { Id = EntityId.New() };
+            db.Plans.Add(plan);
+        }
+        plan.Code = code!;
+        plan.Name = form.Name!.Trim();
+        plan.MaxUsers = form.MaxUsers;
+        plan.MaxPools = form.MaxPools;
+        plan.MaxClients = form.MaxClients;
+        plan.DurationMonths = form.DurationMonths;
+        plan.Price = form.Price;
+        plan.Currency = form.Currency!.Trim().ToUpperInvariant();
+        plan.IsActive = form.IsActive;
+        plan.SortOrder = form.SortOrder;
+        await db.SaveChangesAsync(ct);
+        return Redirect("/admin/planlar");
+    }
+
     private async Task LoadCustomersAsync(CancellationToken ct) =>
         ViewBag.Customers = await db.Customers.AsNoTracking().OrderBy(c => c.Name)
             .Select(c => new CustomerOption(c.Id, c.Name)).ToListAsync(ct);
 
     private static string? Clean(string? v) => string.IsNullOrWhiteSpace(v) ? null : v.Trim();
+}
+
+public sealed class PlanForm
+{
+    public Guid? Id { get; set; }
+
+    [Required(ErrorMessage = "Kod zorunlu."), RegularExpression("^[a-zA-Z0-9-]{2,50}$", ErrorMessage = "Kod 2-50 karakter; harf, rakam, tire.")]
+    public string? Code { get; set; }
+
+    [Required(ErrorMessage = "Ad zorunlu."), StringLength(100)]
+    public string? Name { get; set; }
+
+    [Range(1, 10_000_000, ErrorMessage = "Kullanıcı limiti en az 1.")] public int MaxUsers { get; set; }
+    [Range(1, 100_000, ErrorMessage = "Havuz limiti en az 1.")] public int MaxPools { get; set; }
+    [Range(1, 100_000, ErrorMessage = "Uygulama limiti en az 1.")] public int MaxClients { get; set; }
+    [Range(1, 60, ErrorMessage = "Süre 1-60 ay.")] public int DurationMonths { get; set; }
+    [Range(0, 100_000_000, ErrorMessage = "Fiyat 0 veya fazla.")] public decimal Price { get; set; }
+
+    [Required, RegularExpression("^[A-Za-z]{3}$", ErrorMessage = "Para birimi 3 harf (TRY, USD, EUR).")]
+    public string? Currency { get; set; }
+
+    public bool IsActive { get; set; }
+    public int SortOrder { get; set; }
 }
 
 public sealed record CustomerRow(Guid Id, string Name, string ContactEmail, string? TaxNumber, int LicenseCount);

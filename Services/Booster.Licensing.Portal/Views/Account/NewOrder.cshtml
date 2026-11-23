@@ -1,0 +1,47 @@
+@model List<Plan>
+@{
+    ViewData["Title"] = "Lisans satın al";
+    var inst = (CustomerInstallation)ViewBag.Installation;
+    var current = ViewBag.Current as IssuedLicense;
+    var tr = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+}
+<h1>Lisans satın al / yenile</h1>
+<section class="card">
+    <dl class="facts">
+        <dt>Kurulum</dt><dd>@inst.Label <code>@inst.InstallationId</code></dd>
+        <dt>Domain'ler</dt><dd>@string.Join(", ", inst.Domains)</dd>
+        @if (current is not null)
+        {
+            <dt>Mevcut lisans</dt><dd>@current.Plan, bitiş @current.ExpiresAt.ToString("yyyy-MM-dd")</dd>
+        }
+    </dl>
+    <p class="muted">
+        @if (current is not null)
+        {
+            @:Mevcut lisansınız devam ediyor; yeni süre mevcut bitiş tarihine eklenir (kalan günleriniz yanmaz). Plan değiştirirseniz yeni lisans seçtiğiniz planın limitleriyle üretilir.
+        }
+        else
+        {
+            @:Ödeme onaylandığında lisansınız bugünden itibaren başlar.
+        }
+    </p>
+</section>
+
+@if (Model.Count == 0)
+{
+    <p class="alert">Şu anda satışta plan yok. Lütfen bizimle iletişime geçin.</p>
+}
+<div class="stats">
+    @foreach (var p in Model)
+    {
+        <form method="post" class="stat" data-plan="@p.Code">
+            <input type="hidden" name="installationId" value="@inst.InstallationId" />
+            <input type="hidden" name="planId" value="@p.Id" />
+            <b>@p.Name</b>
+            <span>@p.MaxUsers.ToString("N0", tr) kullanıcı · @p.MaxPools havuz · @p.MaxClients uygulama</span>
+            <span>@p.DurationMonths ay</span>
+            <span class="price">@(p.Price > 0 ? $"{p.Price.ToString("N2", tr)} {p.Currency}" : "Fiyat için bizimle iletişime geçin")</span>
+            <button class="btn btn-primary" type="submit">Sipariş ver</button>
+        </form>
+    }
+</div>

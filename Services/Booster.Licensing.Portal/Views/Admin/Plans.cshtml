@@ -1,0 +1,25 @@
+@model List<Plan>
+@{
+    ViewData["Title"] = "Planlar";
+    var tr = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+}
+<div class="page-head">
+    <h1>Planlar</h1>
+    <a class="btn btn-primary" href="/admin/planlar/duzenle">Yeni plan</a>
+</div>
+<p class="muted">Müşteri yalnızca aktif planları görür. Plan değişikliği verilmiş siparişleri etkilemez.</p>
+<table>
+    <thead><tr><th>Sıra</th><th>Kod</th><th>Ad</th><th>Limitler</th><th>Süre</th><th>Fiyat</th><th>Durum</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr data-plan="@p.Code">
+            <td>@p.SortOrder</td><td><code>@p.Code</code></td><td>@p.Name</td>
+            <td>@p.MaxUsers / @p.MaxPools / @p.MaxClients</td><td>@p.DurationMonths ay</td>
+            <td>@(p.Price > 0 ? $"{p.Price.ToString("N2", tr)} {p.Currency}" : "girilmedi")</td>
+            <td><span class="tag @(p.IsActive ? "tag-ok" : "tag-warn")">@(p.IsActive ? "Aktif" : "Pasif")</span></td>
+            <td><a class="btn btn-ghost btn-sm" href="/admin/planlar/duzenle?PlanId=@p.Id">Düzenle</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
