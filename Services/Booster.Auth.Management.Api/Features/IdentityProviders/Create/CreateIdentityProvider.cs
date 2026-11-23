@@ -77,6 +77,16 @@ public class CreateIdentityProviderCommandHandler(
         var settings = IdentityProviderSettings.Normalize(command.Settings, providerType);
         IdentityProviderSettings.EnsureRequired(providerType, settings);
 
+        if (FederationProviderCatalog.IsLdap(providerType))
+        {
+            // Servis hesabi parolasi olmadan dizinde arama yapilamaz.
+            if (string.IsNullOrWhiteSpace(command.ClientSecret))
+                throw new BusinessException(AuthNMessageKeys.IdentityProviderLdapPasswordRequired);
+            // Parola formu tek bir dizine gider; havuz basina bir LDAP baglantisi.
+            if (await providerRepository.AnyAsync(p => p.UserPoolId == command.UserPoolId && p.ProviderType == FederationProviderCatalog.Ldap, cancellationToken: ct))
+                throw new BusinessException(AuthNMessageKeys.IdentityProviderLdapAlreadyExists);
+        }
+
         var provider = new IdentityProvider
         {
             UserPoolId = command.UserPoolId,

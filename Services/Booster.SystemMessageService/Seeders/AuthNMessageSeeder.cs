@@ -62,6 +62,10 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
 
         // --- Dış kimlik sağlayıcıları ---
         new(AuthNMessageKeys.IdentityProviderNotFound, "Sağlayıcı", "Sağlayıcı bulunamadı.", "Provider", "The provider was not found."),
+        new(AuthNMessageKeys.IdentityProviderLdapSettingsRequired, "LDAP", "LDAP için sunucu, bind DN ve arama kökü (base DN) zorunludur.", "LDAP", "LDAP requires a server, a bind DN and a search base (base DN)."),
+        new(AuthNMessageKeys.IdentityProviderLdapSettingsInvalid, "LDAP", "LDAP ayarları geçersiz: port 1-65535 olmalı, güvenlik ldaps / starttls / none olmalı, kullanıcı filtresi parantez içinde ve {0} içermeli.", "LDAP", "Invalid LDAP settings: port must be 1-65535, security ldaps / starttls / none, and the user filter must be parenthesized and contain {0}."),
+        new(AuthNMessageKeys.IdentityProviderLdapPasswordRequired, "LDAP", "Servis hesabı (bind) parolası zorunludur.", "LDAP", "The service account (bind) password is required."),
+        new(AuthNMessageKeys.IdentityProviderLdapAlreadyExists, "LDAP", "Bu havuzda zaten bir LDAP bağlantısı var; mevcut olanı düzenleyin.", "LDAP", "This pool already has an LDAP connection; edit the existing one."),
         new(AuthNMessageKeys.IdentityProviderKeyAlreadyExists, "Sağlayıcı", "Bu sağlayıcı anahtarı havuzda zaten kullanımda.", "Provider", "This provider key is already in use in the pool."),
         new(AuthNMessageKeys.IdentityProviderKeyInvalidFormat, "Sağlayıcı", "Sağlayıcı anahtarı yalnızca küçük harf, rakam ve tire içerebilir.", "Provider", "The provider key may contain only lowercase letters, digits and hyphens."),
         new(AuthNMessageKeys.IdentityProviderTypeUnknown, "Sağlayıcı", "Bu sağlayıcı türü desteklenmiyor.", "Provider", "This provider type is not supported."),

@@ -41,6 +41,7 @@
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.X\Booster.Auth.Idp.Providers.X.csproj" />
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Oidc\Booster.Auth.Idp.Providers.Oidc.csproj" />
     <ProjectReference Include="..\Providers\Booster.Auth.Idp.Providers.Saml\Booster.Auth.Idp.Providers.Saml.csproj" />
+    <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Ldap\Booster.Auth.Ldap.csproj" />
   </ItemGroup>
 
 </Project>

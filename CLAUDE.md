@@ -151,6 +151,11 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Panelden ekleme (`POST pools/users`) ve CSV ice aktarma (`POST pools/users/import`) bunu kullanir.
   - Self-servis kayit ve federasyon ilk girisi kendi kayitlarini olusturur ama limit kontrolunu `EndUserFactory.RunWithinUserLimitAsync` ile yapar.
   - Yeni bir kullanici olusturma yolu yazarken BU SINIFI KULLAN; aksi halde yol lisans limitini atlar.
+- **LDAP / Active Directory:** havuzda `ldap` turunde kimlik saglayici (`IdentityProviders`; bind parolasi `ClientSecretEncrypted`) + giris politikasinda `LoginProviderType.Ldap`. Havuz basina TEK LDAP.
+  - Baglanti kodu `CommonInternal/Booster.Auth.Ldap` (`LdapDirectory`): search-then-bind; BOS PAROLA reddedilir (anonim bind), filtre RFC 4515 ile kacislanir, coklu eslesme reddedilir. LDAPS/StartTLS sertifikasi OS guven deposuyla (kurum CA'si `EXTRA_CA_CERTS`).
+  - Giris (`LdapLoginService`, `CredentialLoginHandler`): yerel parolasi OLMAYAN kullanici parola formunda dizinle dogrulanir; eslesme `PrincipalIdentity` (saglayici + objectGUID/entryUUID). Ilk giriste hesap (`AllowFederatedJit` + lisans limiti), ad/e-posta her giriste dizinden. Yerel parolali hesaba otomatik BAGLANMAZ. Hatali deneme kilidi onbellekte (havuz + kullanici adi). MFA uygulanir.
+  - LDAP kullanicisina sifre sifirlama kodu gonderilmez (dizini atlayamasin). Giris ekraninda LDAP butonu yoktur; LDAP acikken kimlik alani kullanici adi da kabul eder.
+  - Panel "Baglantiyi test et": `POST identity-providers/ldap/test`. Yerel test: `bitnamilegacy/openldap` (ag adi `openldap`, 1389/1636).
 - **Davet:** `InvitationManager`.
   - Baglanti `/idp/ui/invite?token=`; 1 gun gecerli ve tek kullanimlik.
   - Yeniden gonderilen davet (`POST pools/users/invite`) eskisini gecersiz kilar.
