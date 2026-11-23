@@ -44,6 +44,16 @@ public static class IdentityProviderSettings
         if (FederationProviderCatalog.RequiresIssuerUrl(providerType) && !Has(settings, IssuerUrl))
             throw new BusinessException(AuthNMessageKeys.IdentityProviderIssuerRequired);
 
+        if (FederationProviderCatalog.IsLdap(providerType))
+        {
+            if (!Has(settings, Booster.Auth.Ldap.LdapSettings.KeyHost) || !Has(settings, Booster.Auth.Ldap.LdapSettings.KeyBindDn)
+                || !Has(settings, Booster.Auth.Ldap.LdapSettings.KeyBaseDn))
+                throw new BusinessException(AuthNMessageKeys.IdentityProviderLdapSettingsRequired);
+            if (Booster.Auth.Ldap.LdapSettings.Validate(settings) is not null)
+                throw new BusinessException(AuthNMessageKeys.IdentityProviderLdapSettingsInvalid);
+            return;
+        }
+
         if (!string.Equals(providerType, FederationProviderCatalog.Saml, StringComparison.OrdinalIgnoreCase))
             return;
 

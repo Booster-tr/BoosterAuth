@@ -26,7 +26,8 @@ public sealed class ForgotPasswordHandler(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IRequestContextAccessor requestContextAccessor,
     ISimpleHasher simpleHasher,
-    IEventBus eventBus) : ICommandHandler<ForgotPasswordCommand>
+    IEventBus eventBus,
+    Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService ldapLogin) : ICommandHandler<ForgotPasswordCommand>
 {
     private static readonly TimeSpan ResetCodeTtl = TimeSpan.FromMinutes(15);
 
@@ -45,6 +46,9 @@ public sealed class ForgotPasswordHandler(
         var principal = await FindPrincipalAsync(identifier, client.Login.AllowedIdentifiers, ct);
 
         if (principal is null || principal.Status != PrincipalStatus.Active)
+            return;
+
+        if (await ldapLogin.IsDirectoryManagedAsync(client, principal.Id, ct))
             return;
 
         var target = ResolveTarget(principal, out var channel);

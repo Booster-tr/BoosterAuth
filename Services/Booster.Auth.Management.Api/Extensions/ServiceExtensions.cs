@@ -36,6 +36,7 @@ public static class ServiceExtensions
 
         // Lisans: sahibi bu servis. Dogrulama tamamen cevrimdisi; yalnizca koda gomulu public key'ler.
         services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<Booster.Auth.Ldap.LdapDirectory>();
         services.AddSingleton<ILicenseValidator, LicenseValidator>();
         services.AddScoped<InstallationStore>();
         services.AddSingleton<LicenseService>();

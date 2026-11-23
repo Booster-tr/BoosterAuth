@@ -69,6 +69,9 @@ public class IdpMessageKeys
     public const string FederationEmailMissing = "idp.federation_email_missing";
     public const string FederationEmailNotVerified = "idp.federation_email_not_verified";
     public const string FederationJitDisabled = "idp.federation_jit_disabled";
+    public const string LdapUnavailable = "idp.ldap_unavailable";
+    public const string LdapJitDisabled = "idp.ldap_jit_disabled";
+    public const string LdapLocalAccountExists = "idp.ldap_local_account_exists";
     public const string FederationAccountInactive = "idp.federation_account_inactive";
     public const string FederationLocalAccountExists = "idp.federation_local_account_exists";
 

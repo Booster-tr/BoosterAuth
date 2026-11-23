@@ -31,6 +31,7 @@
 		<ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
 		<!-- Saglayici istemci sirlarini sifrelemek icin ISecretProtector -->
 		<ProjectReference Include="..\..\Common\Booster.Hashing\Booster.Hashing.csproj" />
+		<ProjectReference Include="..\..\CommonInternal\Booster.Auth.Ldap\Booster.Auth.Ldap.csproj" />
 	</ItemGroup>
 
 

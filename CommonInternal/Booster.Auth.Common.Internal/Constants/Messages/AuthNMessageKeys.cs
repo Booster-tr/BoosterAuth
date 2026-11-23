@@ -61,6 +61,10 @@ public class AuthNMessageKeys
     public const string IdentityProviderKeyAlreadyExists = "authn.identity_provider_key_already_exists";
     public const string IdentityProviderKeyInvalidFormat = "authn.identity_provider_key_invalid_format";
     public const string IdentityProviderTypeUnknown = "authn.identity_provider_type_unknown";
+    public const string IdentityProviderLdapSettingsRequired = "authn.identity_provider_ldap_settings_required";
+    public const string IdentityProviderLdapSettingsInvalid = "authn.identity_provider_ldap_settings_invalid";
+    public const string IdentityProviderLdapPasswordRequired = "authn.identity_provider_ldap_password_required";
+    public const string IdentityProviderLdapAlreadyExists = "authn.identity_provider_ldap_already_exists";
     public const string IdentityProviderClientIdRequired = "authn.identity_provider_client_id_required";
     public const string IdentityProviderIssuerRequired = "authn.identity_provider_issuer_required";
     public const string IdentityProviderSamlSettingsRequired = "authn.identity_provider_saml_settings_required";

@@ -82,6 +82,8 @@ public class IdpBaseController : Controller
             || !client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.Federation)
             ? []
             : client.FederationProviders
+                // LDAP buton degil: parola formu dizinle dogrular.
+                .Where(p => !string.Equals(p.ProviderType, Booster.Auth.Ldap.LdapSettings.ProviderType, StringComparison.OrdinalIgnoreCase))
                 .Select(p => new FederationMethod(p.Key, p.ProviderType, p.DisplayName))
                 .ToList();
 
@@ -115,7 +117,17 @@ public class IdpBaseController : Controller
     }
 
     protected void SetIdentifierField(ClientData? client)
-        => ViewData["IdentifierField"] = client is null
-            ? IdentifierField.From([IdentifierType.Email])
-            : IdentifierField.From(client.Login.AllowedIdentifiers);
+    {
+        if (client is null)
+        {
+            ViewData["IdentifierField"] = IdentifierField.From([IdentifierType.Email]);
+            return;
+        }
+        // LDAP / Active Directory etkinse dizin kullanicilari kullanici adiyla da girer; alan "e-posta" tipinde
+        // kalsaydi tarayici "ayse" gibi bir girdiyi gondermeden reddederdi.
+        var allowed = client.Login.AllowedIdentifiers;
+        if (Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService.FindProvider(client) is not null && !allowed.Contains(IdentifierType.Username))
+            allowed = [.. allowed, IdentifierType.Username];
+        ViewData["IdentifierField"] = IdentifierField.From(allowed);
+    }
 }
