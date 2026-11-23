@@ -1,20 +1,24 @@
 <h1>Core concepts</h1>
-<p class="lead">Everything in Booster Auth fits a four-level structure: <b>tenant</b> → <b>user pool</b> → <b>applications</b> and the pool's
-    <b>users</b>. After this page you will know what every screen in the console is for.</p>
+<p class="lede">Everything in Booster Auth fits a layered structure: <b>tenant</b> → <b>user pool</b> → the pool's <b>applications</b>,
+    <b>users</b> and <b>permissions</b>. After this page you will know what every screen in the console is for.</p>
 
-<div class="hier">
-    <div class="lvl"><b>Tenant</b><span class="tag">tenant</span> <span class="muted">— your organization or one of your customers</span>
-        <div class="lvl"><b>User pool</b><span class="tag">pool</span> <span class="muted">— an audience of users and its rules</span>
-            <div class="lvl"><b>Applications</b><span class="tag">client</span> <span class="muted">— web / mobile / API that sign in with this pool</span></div>
-            <div class="lvl"><b>Users, service accounts</b> <span class="muted">— the members of the pool</span></div>
-            <div class="lvl"><b>Roles, scopes, authorization schema</b> <span class="muted">— who can do what</span></div>
-            <div class="lvl"><b>Identity providers</b> <span class="muted">— Google, Microsoft, SAML…</span></div>
-        </div>
-    </div>
-</div>
+<ul class="tree" aria-label="A tenant, a pool and what lives inside a pool">
+    <li><span class="node t"><b>Tenant</b><i>your organisation or one of your customers</i></span>
+        <ul>
+            <li><span class="node p"><b>User pool</b><i>an audience of users and its rules</i></span>
+                <ul>
+                    <li><span class="node"><b>Applications</b><i>clients · web, mobile, APIs that sign in with this pool</i></span></li>
+                    <li><span class="node"><b>Users, service accounts</b><i>the members of the pool</i></span></li>
+                    <li><span class="node"><b>Roles, scopes, authorization schema</b><i>who can do what</i></span></li>
+                    <li><span class="node"><b>Identity providers</b><i>LDAP / AD, Google, Microsoft, SAML…</i></span></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
 
 <h2 id="tenant">Tenant</h2>
-<p>A tenant is the top-level container. You create a tenant for your own organization; if you serve several customers, you can create one
+<p>A tenant is the top-level container. You create a tenant for your own organisation; if you serve several customers, you can create one
     tenant per customer. Its only setting is a name; its real job is to group pools and control who can manage them.</p>
 <ul>
     <li>The person who creates a tenant becomes its <b>owner</b>.</li>
@@ -23,8 +27,8 @@
 </ul>
 
 <h2 id="pool">User pool</h2>
-<p>A pool is an <b>audience of users</b> plus the <b>rules</b> that apply to it. If you create separate pools for "Customers" and "Employees",
-    their users, sessions, password rules and permissions are fully isolated. The same e-mail address can be two different accounts in two pools.</p>
+<p>A pool is an <b>audience of users</b> plus the <b>rules</b> that apply to it. Create separate pools for “Customers” and “Employees” and their
+    users, sessions, password rules and permissions stay fully isolated. The same e-mail address can be two different accounts in two pools.</p>
 <p>What you manage at pool level:</p>
 <table>
     <thead><tr><th>Policy</th><th>What it controls</th></tr></thead>
@@ -39,6 +43,11 @@
     </tbody>
 </table>
 
+<h2 id="identity-providers">Identity providers</h2>
+<p>The pool's <b>Identity Providers</b> screen lets users sign in with another identity: Google, Microsoft, Apple, LinkedIn, Facebook, GitHub, X,
+    any OpenID Connect provider and SAML. <b>LDAP / Active Directory</b> is added on the same screen; employees then sign in on the normal form with
+    their directory username and password, the account is created on first sign-in and passwords stay in the directory.</p>
+
 <h2 id="application">Application (client)</h2>
 <p>An application is your software that signs users in or calls APIs through Booster Auth: a website, a single-page app (SPA), a mobile app or a
     server-side service. Each application belongs to <b>exactly one pool</b> and works with that pool's users.</p>
@@ -49,11 +58,11 @@
     <li><b>Allowed APIs (audience) and scopes:</b> which APIs the application can get tokens for and which scopes it can request.</li>
     <li><b>Consent, status and logo:</b> whether users are asked for consent, whether the application is active, and the logo on the sign-in screen.</li>
 </ul>
-<div class="callout info"><p><b>No client secret.</b> Applications that sign users in are protected with PKCE; server-to-server access uses a
-    <b>service account</b> key / secret.</p></div>
+<div class="callout"><p><b>No client secret.</b> Applications that sign users in are protected with PKCE; server-to-server access uses the key and
+    secret of a <b>service account</b>.</p></div>
 
 <h2 id="users">Users and service accounts</h2>
-<p><b>Users</b> are the members of a pool. They can sign up themselves, be added by an administrator, be imported in bulk from CSV or be invited.
+<p><b>Users</b> are the members of a pool. They can sign up themselves, be added and invited by an administrator, or be imported in bulk from CSV.
     <b>Service accounts</b> are non-human machine identities: a background job or another system gets tokens with its key and secret.</p>
 
 <h2 id="authorization">Roles, scopes and the authorization schema</h2>
@@ -61,7 +70,7 @@
 <ul>
     <li><b>Roles and scopes</b> (per pool): e.g. an <code>admin</code> role or an <code>orders:read</code> scope. They are written into the token as
         <code>role</code> and <code>scope</code>; your application decides by looking at the token. Enough for most applications.</li>
-    <li><b>Authorization schema</b> (relationship-based, ReBAC): for record-level questions such as "can Ali edit this document in the Sales folder?".
+    <li><b>Authorization schema</b> (relationship-based, ReBAC): for record-level questions such as “can Ali edit this document in the Sales folder?”.
         You define resource types (Document, Folder), the links between them and permissions; your application asks the AuthZ API.</li>
 </ul>
 <p>Details: <a href="/en/docs/authorization">Authorization checks</a>.</p>
@@ -69,4 +78,4 @@
 <h2 id="management">The management pool and console permissions</h2>
 <p>The <b>Booster</b> tenant and the <b>Booster Auth</b> pool created during installation are for the admin console itself. Console administrators
     live in this pool, and it does not count toward license limits. Administrators get rights on tenants, pools and applications in the order
-    <b>Owner &gt; Manager &gt; Viewer</b> on the related "Access" screens.</p>
+    <b>Owner › Manager › Viewer</b> on the related “Access” screens.</p>

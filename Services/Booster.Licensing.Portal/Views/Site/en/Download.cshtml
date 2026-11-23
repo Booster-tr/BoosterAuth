@@ -1,59 +1,117 @@
 @using Booster.Licensing.Portal.Services
-<section class="page-hero">
+<div class="page-head">
     <div class="wrap">
-        <span class="eyebrow" style="color:var(--teal)">Download</span>
-        <h1 class="reveal">Run Booster Auth on your own machine</h1>
-        <p class="reveal" style="--d:.08s">The Docker Compose package: every service, PostgreSQL, Redis, Kafka, OpenFGA and the admin console in one folder.</p>
-        <div class="cta reveal" style="justify-content:center;--d:.16s">
-            <a class="btn btn-primary btn-lg" href="/download/@InstallPackage.FileName" data-download>Download @InstallPackage.FileName <span class="arrow">↓</span></a>
-            <a class="btn btn-ghost btn-lg" href="/en/docs/installation">Detailed installation guide</a>
+        <p class="kicker reveal">Download</p>
+        <div class="page-head-grid" style="margin-top:0;align-items:start">
+            <div>
+                <h1 class="reveal d2">Three commands to <em>your own server</em>.</h1>
+                <p class="lede reveal d3" style="margin-top:28px">The Docker Compose package: every service, PostgreSQL, Redis, Kafka, OpenFGA and the admin console in one
+                    folder. The setup script generates every password and key on your server, so there are no secrets to fill in by hand.</p>
+            </div>
+            <div class="dl-card reveal d3">
+                <div class="file"><b>@InstallPackage.FileName</b><span>about 15 KB</span></div>
+                <a class="btn btn-primary" href="/download/@InstallPackage.FileName" data-download>Download the package <span class="arr" aria-hidden="true">↓</span></a>
+                <ul class="facts">
+                    <li>Free to download; you get the license after installing.</li>
+                    <li>Runs with Docker on Linux, macOS and Windows.</li>
+                    <li>Internet access is only needed to pull images.</li>
+                </ul>
+            </div>
         </div>
-        <p class="muted small reveal" style="--d:.2s">Free · You get the license after installing · About 15 KB</p>
     </div>
-</section>
+</div>
 
-<section class="section">
-    <div class="wrap grid-2" style="align-items:start;gap:3rem">
+<section class="install" aria-labelledby="h-steps" style="margin-top:80px">
+    <div class="wrap inst-grid">
         <div class="reveal">
-            <h2>Install with four commands</h2>
-            <div class="steps" style="grid-template-columns:1fr;gap:1rem;margin-top:1.5rem">
-                <div class="step"><h3>Unzip the package</h3><p>Unzip the file and change into the <code>booster-auth</code> folder.</p></div>
-                <div class="step"><h3>Run the setup script</h3><p>It asks for your Booster Auth address (e.g. <code>auth.company.com</code>) and the console address, generates every password and key and writes the <code>.env</code> file.</p></div>
-                <div class="step"><h3>Start</h3><p><code>docker compose up -d</code>. The first start downloads the images and takes a few minutes.</p></div>
-                <div class="step"><h3>Sign in and get a license</h3><p>Sign in as <code>admin</code> and change the initial password. <b>System &gt; License</b> → <b>Get a license</b> takes you to the license portal.</p></div>
-            </div>
+            <p class="kicker">Installation</p>
+            <h2 id="h-steps">From download to first sign-in.</h2>
+            <ol class="steps" style="margin-top:32px">
+                <li><span class="n">Step 1</span><div><h3>Unpack</h3><p>Unzip the file and change into the <code>booster-auth</code> folder.</p></div></li>
+                <li><span class="n">Step 2</span><div><h3>Run the script</h3><p>It asks for your Booster Auth address (e.g. <code>auth.company.com</code>), the HTTPS port, the console
+                    port and the admin e-mail, then generates every password and key at random and writes <code>.env</code>. Its prompts are in Turkish.</p></div></li>
+                <li><span class="n">Step 3</span><div><h3>Start</h3><p><code>docker compose up -d</code>. The first start pulls the images and creates the databases and the HTTPS certificate.</p></div></li>
+                <li><span class="n">Step 4</span><div><h3>Open the console</h3><p>Sign in at <code>http://localhost:3000</code> as <code>admin</code>; you set a new password on first sign-in.</p></div></li>
+            </ol>
         </div>
-        <div class="reveal" style="--d:.08s">
-            <div class="terminal">
-                <div class="terminal-bar"><i></i><i></i><i></i></div>
-<pre><span class="c"># Linux / macOS</span>
-<span class="p">$</span> unzip booster-auth.zip &amp;&amp; cd booster-auth
-<span class="p">$</span> ./kurulum.sh
-<span class="p">$</span> docker compose up -d
+        <div class="reveal d2">
+            <div class="term" role="region" aria-label="Linux and macOS installation commands">
+                <div class="term-bar"><span>Linux / macOS</span><span>bash</span></div>
+<pre><code><span class="p">$ </span>unzip booster-auth.zip &amp;&amp; cd booster-auth
+<span class="p">$ </span>./kurulum.sh
+<span class="ok">.env olusturuldu.</span>
+<span class="p">$ </span>docker compose up -d</code></pre>
+            </div>
+            <div class="term" role="region" aria-label="Windows installation commands">
+                <div class="term-bar"><span>Windows</span><span>PowerShell</span></div>
+<pre><code><span class="p">&gt; </span>Expand-Archive booster-auth.zip .
+<span class="p">&gt; </span>cd booster-auth
+<span class="p">&gt; </span>powershell -ExecutionPolicy Bypass -File .\kurulum.ps1
+<span class="p">&gt; </span>docker compose up -d</code></pre>
+            </div>
+            <p class="hard">If a secret is still <code>CHANGE_ME</code>, the system refuses to start and names the missing variable. An installation cannot
+                start on placeholder values.</p>
+        </div>
+    </div>
+</section>
 
-<span class="c"># Windows (PowerShell)</span>
-<span class="p">&gt;</span> Expand-Archive booster-auth.zip .
-<span class="p">&gt;</span> cd booster-auth
-<span class="p">&gt;</span> powershell -ExecutionPolicy Bypass -File .\kurulum.ps1
-<span class="p">&gt;</span> docker compose up -d</pre>
-            </div>
-            <div class="callout info" style="margin-top:1.5rem">
-                <p><b>Local trial.</b> If your address is not in DNS yet, add <code>127.0.0.1 auth.company.com</code> to your <code>hosts</code> file.
-                    The Booster Auth address must be on one of the domains in your license.</p>
-            </div>
-            <div class="callout tip">
-                <p><b>Note.</b> The setup scripts and the bundled <code>BENIOKU.md</code> are currently in Turkish; the steps are the same as on this page.</p>
-            </div>
-            <h3 style="margin-top:2rem">Requirements</h3>
-            <ul class="muted">
-                <li>Docker Engine 24+ and Docker Compose v2 (Windows / macOS: Docker Desktop)</li>
-                <li>At least 4 GB of free memory and 10 GB of disk</li>
-                <li>Internet access during installation (images are pulled from <code>ghcr.io/booster-tr</code>)</li>
+<section aria-labelledby="h-prompts">
+    <div class="wrap split">
+        <div class="reveal">
+            <p class="kicker">Setup script</p>
+            <h2 id="h-prompts">Four questions, the rest is automatic.</h2>
+            <p class="prose-2" style="margin-top:20px">These are the values the script asks for. Database, Redis and OpenFGA passwords, the password pepper, the encryption
+                key and the console session secret are never asked; they are all generated at random.</p>
+            <div class="callout tip" style="margin-top:24px"><p><b>Local trial.</b> If your address is not in DNS yet, add <code>127.0.0.1 auth.company.com</code>
+                to your <code>hosts</code> file. The Booster Auth address must be on one of the domains in your license.</p></div>
+        </div>
+        <table class="qa reveal d2">
+            <thead><tr><th scope="col">Prompt</th><th scope="col">Example</th><th scope="col">Meaning</th></tr></thead>
+            <tbody>
+                <tr><th scope="row">Booster Auth address</th><td><code>auth.company.com</code></td><td>Where your applications send users to sign in; the OIDC issuer is built from it.</td></tr>
+                <tr><th scope="row">HTTPS port</th><td><code>443</code></td><td>Use e.g. <code>8443</code> if 443 is taken.</td></tr>
+                <tr><th scope="row">Console port / address</th><td><code>3000</code></td><td>Where the admin console runs, e.g. <code>http://localhost:3000</code>.</td></tr>
+                <tr><th scope="row">Admin e-mail</th><td><code>it@@company.com</code></td><td>The first administrator's e-mail. The username is always <code>admin</code>.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="band" aria-labelledby="h-req">
+    <div class="wrap split">
+        <div class="reveal">
+            <p class="kicker">Requirements</p>
+            <h2 id="h-req" style="margin-bottom:32px">A single machine is enough.</h2>
+            <ul class="req">
+                <li><b>Docker</b><span>Docker Engine 24+ and Docker Compose v2 (Windows / macOS: Docker Desktop)</span></li>
+                <li><b>Memory</b><span>At least 4 GB free</span></li>
+                <li><b>Disk</b><span>10 GB</span></li>
+                <li><b>Network</b><span>Images are pulled from <code>ghcr.io/booster-tr</code> during installation</span></li>
+                <li><b>Included</b><span>PostgreSQL, Redis, Kafka and OpenFGA; nothing else to install</span></li>
             </ul>
-            <h3 style="margin-top:1.5rem">Package contents</h3>
-            <ul class="muted">
-                @foreach (var f in Model.PackageFiles) { <li><code>booster-auth/@f</code></li> }
+        </div>
+        <div class="reveal d2">
+            <p class="kicker">Package contents</p>
+            <h2 style="margin-bottom:32px;font-size:clamp(26px,2.6vw,32px)">Plain, readable files.</h2>
+            <ul class="files">
+                @foreach (var f in Model.PackageFiles)
+                {
+                    <li>booster-auth/@f</li>
+                }
             </ul>
         </div>
     </div>
 </section>
+
+<div class="closing">
+    <div class="wrap closing-inner">
+        <h2 class="reveal">The details are in the documentation.</h2>
+        <div class="side-cta reveal d2">
+            <p>.env variables, the HTTPS certificate, first sign-in and license activation, step by step.</p>
+            <div class="cta-row">
+                <a class="btn btn-primary" href="/en/docs/installation">Installation guide <span class="arr" aria-hidden="true">→</span></a>
+                <a class="btn btn-ghost" href="/en/docs/first-steps">First configuration</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 <h1>Uygulama entegrasyonu (OIDC)</h1>
-<p class="lead">Booster Auth standart bir OpenID Connect sağlayıcısıdır. OIDC destekleyen her kütüphane çalışır; bu sayfada gereken değerleri ve
+<p class="lede">Booster Auth standart bir OpenID Connect sağlayıcısıdır. OIDC destekleyen her kütüphane çalışır; bu sayfada gereken değerleri ve
     yaygın platformlar için örnekleri bulacaksınız.</p>
 
 <h2 id="degerler">Gereken değerler</h2>
@@ -10,12 +10,12 @@
         <tr><td>Keşif adresi</td><td><code>https://auth.firma.com/idp/.well-known/openid-configuration</code></td></tr>
         <tr><td>client_id</td><td>Uygulamanın istemci anahtarı, ör. <code>acme-web</code></td></tr>
         <tr><td>redirect_uri</td><td>Uygulamada kayıtlı adres, ör. <code>https://app.firma.com/callback</code></td></tr>
-        <tr><td>Akış</td><td>Authorization Code + PKCE (<code>S256</code> zorunlu)</td></tr>
+        <tr><td>Akış</td><td>Authorization Code + PKCE (<code>S256</code> zorunlu; implicit akış desteklenmez)</td></tr>
         <tr><td>Kapsamlar</td><td><code>openid profile email offline_access</code> + uygulamaya izin verilen kapsamlar</td></tr>
         <tr><td>resource (isteğe bağlı)</td><td>Token'ın hedef API'si (audience), ör. <code>https://api.firma.com</code></td></tr>
     </tbody>
 </table>
-<div class="callout info"><p><b>Tek issuer.</b> Issuer tüm havuzlar için aynıdır (<code>/idp</code>); kullanıcının hangi havuzda doğrulanacağı
+<div class="callout"><p><b>Tek issuer.</b> Issuer tüm havuzlar için aynıdır (<code>/idp</code>); kullanıcının hangi havuzda doğrulanacağı
     <code>client_id</code>'nin bağlı olduğu havuzdan belirlenir.</p></div>
 
 <h2 id="uc-noktalar">Uç noktalar</h2>

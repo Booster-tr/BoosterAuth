@@ -1,17 +1,21 @@
 <h1>Temel kavramlar</h1>
-<p class="lead">Booster Auth'ta her şey dört katmanlı bir yapıya oturur: <b>firma</b> → <b>kullanıcı havuzu</b> → <b>uygulama</b> ve
-    havuzun <b>kullanıcıları</b>. Bu sayfayı okuduktan sonra paneldeki her ekranın ne işe yaradığını bileceksiniz.</p>
+<p class="lede">Booster Auth'ta her şey katmanlı bir yapıya oturur: <b>firma</b> → <b>kullanıcı havuzu</b> → havuzun <b>uygulamaları</b>,
+    <b>kullanıcıları</b> ve <b>yetkileri</b>. Bu sayfayı okuduktan sonra konsoldaki her ekranın ne işe yaradığını bileceksiniz.</p>
 
-<div class="hier">
-    <div class="lvl"><b>Firma</b><span class="tag">tenant</span> <span class="muted">— kurumunuz ya da bir müşteriniz</span>
-        <div class="lvl"><b>Kullanıcı havuzu</b><span class="tag">pool</span> <span class="muted">— bir kullanıcı kitlesi ve onun kuralları</span>
-            <div class="lvl"><b>Uygulamalar</b><span class="tag">client</span> <span class="muted">— bu havuzla giriş yapan web / mobil / API</span></div>
-            <div class="lvl"><b>Kullanıcılar, servis hesapları</b> <span class="muted">— havuzun üyeleri</span></div>
-            <div class="lvl"><b>Roller, kapsamlar, yetki şeması</b> <span class="muted">— kim neyi yapabilir</span></div>
-            <div class="lvl"><b>Kimlik sağlayıcılar</b> <span class="muted">— Google, Microsoft, SAML…</span></div>
-        </div>
-    </div>
-</div>
+<ul class="tree" aria-label="Firma, havuz ve havuz içindeki kayıtlar">
+    <li><span class="node t"><b>Firma</b><i>tenant · kurumunuz ya da bir müşteriniz</i></span>
+        <ul>
+            <li><span class="node p"><b>Kullanıcı havuzu</b><i>pool · bir kullanıcı kitlesi ve kuralları</i></span>
+                <ul>
+                    <li><span class="node"><b>Uygulamalar</b><i>client · bu havuzla giriş yapan web, mobil, API</i></span></li>
+                    <li><span class="node"><b>Kullanıcılar, servis hesapları</b><i>havuzun üyeleri</i></span></li>
+                    <li><span class="node"><b>Roller, kapsamlar, yetki şeması</b><i>kim neyi yapabilir</i></span></li>
+                    <li><span class="node"><b>Kimlik sağlayıcılar</b><i>LDAP / AD, Google, Microsoft, SAML…</i></span></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
 
 <h2 id="firma">Firma (tenant)</h2>
 <p>Firma, en üst düzeydeki kapsayıcıdır. Kendi kurumunuz için bir firma açarsınız; birden çok müşteriye hizmet veriyorsanız her müşteri için ayrı
@@ -23,8 +27,8 @@
 </ul>
 
 <h2 id="havuz">Kullanıcı havuzu (pool)</h2>
-<p>Havuz, bir <b>kullanıcı kitlesi</b> ve o kitleye uygulanan <b>kurallar</b> bütünüdür. Örneğin "Müşteriler" ve "Çalışanlar" için iki ayrı havuz
-    açarsanız; kullanıcıları, oturumları, parola kuralları ve yetkileri birbirinden tamamen ayrı tutulur. Aynı e-posta adresi iki havuzda iki farklı
+<p>Havuz, bir <b>kullanıcı kitlesi</b> ve o kitleye uygulanan <b>kurallar</b> bütünüdür. Örneğin “Müşteriler” ve “Çalışanlar” için iki ayrı havuz
+    açarsanız kullanıcıları, oturumları, parola kuralları ve yetkileri birbirinden tamamen ayrı tutulur. Aynı e-posta adresi iki havuzda iki farklı
     hesap olabilir.</p>
 <p>Havuz düzeyinde yönettikleriniz:</p>
 <table>
@@ -40,6 +44,11 @@
     </tbody>
 </table>
 
+<h2 id="kimlik-saglayicilar">Kimlik sağlayıcılar</h2>
+<p>Havuzun <b>Kimlik Sağlayıcılar</b> ekranından kullanıcıların başka bir kimlikle girmesini sağlarsınız: Google, Microsoft, Apple, LinkedIn, Facebook,
+    GitHub, X, genel OpenID Connect ve SAML. <b>LDAP / Active Directory</b> de aynı ekrandan eklenir; çalışanlar normal giriş formunda dizindeki
+    kullanıcı adı ve parolasıyla girer, hesap ilk girişte açılır ve parolalar dizinde kalır.</p>
+
 <h2 id="uygulama">Uygulama (client)</h2>
 <p>Uygulama; Booster Auth üzerinden kullanıcı girişi yapan ya da API çağıran yazılımınızdır: bir web sitesi, tek sayfalık uygulama (SPA), mobil
     uygulama veya bir sunucu servisi. Her uygulama <b>tek bir havuza</b> bağlıdır ve o havuzun kullanıcılarıyla çalışır.</p>
@@ -50,25 +59,24 @@
     <li><b>İzin verilen API'ler (audience) ve kapsamlar:</b> uygulamanın hangi API'ler için token alabileceği ve hangi kapsamları isteyebileceği.</li>
     <li><b>Onay ekranı, durum ve logo:</b> kullanıcıdan onay istenip istenmeyeceği, uygulamanın aktif / pasif olması ve giriş ekranında görünen logo.</li>
 </ul>
-<div class="callout info"><p><b>Client secret yok.</b> Kullanıcı girişi yapan uygulamalar PKCE ile korunur; sunucudan sunucuya erişim için uygulamaya
-    <b>servis hesabı</b> anahtar / sırrı kullanılır.</p></div>
+<div class="callout"><p><b>Client secret yok.</b> Kullanıcı girişi yapan uygulamalar PKCE ile korunur; sunucudan sunucuya erişim için uygulamaya bağlı
+    bir <b>servis hesabının</b> anahtar ve sırrı kullanılır.</p></div>
 
 <h2 id="kullanici">Kullanıcılar ve servis hesapları</h2>
-<p><b>Kullanıcılar</b> havuzun üyeleridir; kendileri kayıt olabilir, yönetici tarafından eklenebilir, CSV ile toplu içe aktarılabilir ya da davet
-    edilebilir. <b>Servis hesapları</b> ise insan olmayan, makine kimlikleridir: bir arka plan servisi ya da başka bir sistem, anahtar ve sırrıyla
-    token alır.</p>
+<p><b>Kullanıcılar</b> havuzun üyeleridir; kendileri kayıt olabilir, yönetici tarafından eklenip davet edilebilir ya da CSV ile toplu içe aktarılabilir.
+    <b>Servis hesapları</b> ise insan olmayan, makine kimlikleridir: bir arka plan servisi ya da başka bir sistem, anahtar ve sırrıyla token alır.</p>
 
 <h2 id="yetki">Roller, kapsamlar ve yetki şeması</h2>
 <p>Booster Auth iki tamamlayıcı yetki modeli sunar:</p>
 <ul>
     <li><b>Roller ve kapsamlar</b> (havuz düzeyinde): örneğin <code>admin</code> rolü ya da <code>orders:read</code> kapsamı. Token'a <code>role</code>
         ve <code>scope</code> olarak yazılır; uygulamanız token'a bakarak karar verir. Çoğu uygulama için yeterlidir.</li>
-    <li><b>Yetki şeması</b> (ilişki tabanlı, ReBAC): "Ali, Satış klasöründeki bu belgeyi düzenleyebilir mi?" gibi kayıt düzeyindeki sorular için.
+    <li><b>Yetki şeması</b> (ilişki tabanlı, ReBAC): “Ali, Satış klasöründeki bu belgeyi düzenleyebilir mi?” gibi kayıt düzeyindeki sorular için.
         Kaynak türlerini (Belge, Klasör), aralarındaki bağları ve izinleri tanımlarsınız; uygulamanız AuthZ API'ye sorar.</li>
 </ul>
 <p>Ayrıntılar: <a href="/tr/docs/authorization">Yetki kontrolü</a>.</p>
 
-<h2 id="yonetim">Yönetim havuzu ve panel yetkileri</h2>
-<p>Kurulumda otomatik oluşan <b>Booster</b> firması ve <b>Booster Auth</b> havuzu, yönetim panelinin kendisi içindir. Panele giren yöneticiler
-    bu havuzdadır; bu havuz lisans limitlerine dahil edilmez. Yöneticilerin firma, havuz ve uygulama üzerindeki yetkileri <b>Sahip &gt; Yönetici &gt;
-    Görüntüleyici</b> sırasıyla, ilgili "Erişim" ekranlarından verilir.</p>
+<h2 id="yonetim">Yönetim havuzu ve konsol yetkileri</h2>
+<p>Kurulumda otomatik oluşan <b>Booster</b> firması ve <b>Booster Auth</b> havuzu, yönetim konsolunun kendisi içindir. Konsola giren yöneticiler
+    bu havuzdadır; bu havuz lisans limitlerine dahil edilmez. Yöneticilerin firma, havuz ve uygulama üzerindeki yetkileri <b>Sahip › Yönetici ›
+    Görüntüleyici</b> sırasıyla, ilgili “Erişim” ekranlarından verilir.</p>

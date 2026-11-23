@@ -1,52 +1,43 @@
 // Booster Auth tanitim sitesi: kaydirmayla beliren bolumler, mobil menu, kod kopyalama, dokumantasyon icindekiler.
-// Kutuphane yok; JS kapaliyken de icerik tam gorunur (.reveal yalnizca JS varken gizlenir).
+// Kutuphane yok. JS kapaliyken icerik tam gorunur: .reveal yalnizca <html class="js"> iken gizlenir ve asla gizli kalmaz
+// (ekrandakiler hemen, digerleri gorununce, en gec 2,5 sn sonra hepsi; reduced-motion'da hic gizlenmez).
 (function () {
     "use strict";
     var doc = document.documentElement;
-    doc.classList.remove("no-js");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var lang = doc.lang === "en" ? "en" : "tr";
     var t = lang === "en" ? { copy: "Copy", copied: "Copied" } : { copy: "Kopyala", copied: "Kopyalandı" };
 
     // --- kaydirinca beliren ogeler
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var items = document.querySelectorAll(".reveal");
-    var showAll = function () { items.forEach(function (el) { el.classList.add("in"); }); };
-    if ("IntersectionObserver" in window && !reduce) {
-        // Acilista ekranda olanlar hemen (bir kare sonra, gecis animasyonuyla) gosterilir.
+    var items = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (items.length && "IntersectionObserver" in window && !reduce) {
         var vh = window.innerHeight || 800;
-        requestAnimationFrame(function () {
-            items.forEach(function (el) { if (el.getBoundingClientRect().top < vh) el.classList.add("in"); });
-        });
+        // Ekranda olanlari isaretle, SONRA gizleme sinifini ekle: ilk boyamada gorunen icerik hic kaybolmaz.
+        items.forEach(function (el) { if (el.getBoundingClientRect().top < vh) el.classList.add("in"); });
+        doc.classList.remove("no-js");
+        doc.classList.add("js");
         var io = new IntersectionObserver(function (entries) {
             entries.forEach(function (e) {
                 if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
             });
-        }, { rootMargin: "0px 0px -8% 0px", threshold: 0.01 });
-        items.forEach(function (el) { io.observe(el); });
-        // Emniyet: gozlemci bir sebeple tetiklenmezse icerik asla gizli kalmasin.
-        setTimeout(showAll, 2500);
+        }, { rootMargin: "0px 0px -6% 0px", threshold: 0.01 });
+        items.forEach(function (el) { if (!el.classList.contains("in")) io.observe(el); });
+        setTimeout(function () { items.forEach(function (el) { el.classList.add("in"); }); }, 2500);
     } else {
-        showAll();
+        doc.classList.remove("no-js");
     }
 
-    // --- ust bar golgesi
-    var header = document.querySelector("[data-header]");
-    var onScroll = function () { if (header) header.classList.toggle("scrolled", window.scrollY > 8); };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-
-    // --- mobil menu
-    var toggle = document.querySelector("[data-nav-toggle]");
-    var nav = document.querySelector("[data-nav]");
-    if (toggle && nav) {
-        toggle.addEventListener("click", function () {
-            var open = nav.classList.toggle("open");
-            toggle.setAttribute("aria-expanded", open ? "true" : "false");
-        });
-        nav.addEventListener("click", function (e) {
-            if (e.target.tagName === "A") { nav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); }
-        });
+    // --- mobil menu: baglantiya basinca kapat, disari tiklayinca kapat
+    var menu = document.querySelector("[data-menu]");
+    if (menu) {
+        menu.addEventListener("click", function (e) { if (e.target.tagName === "A") menu.removeAttribute("open"); });
+        document.addEventListener("click", function (e) { if (!menu.contains(e.target)) menu.removeAttribute("open"); });
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape") menu.removeAttribute("open"); });
     }
+
+    // --- dokumantasyon yan menusu: dar ekranda kapali baslar
+    var docsNav = document.querySelector("[data-docs-nav]");
+    if (docsNav && window.matchMedia("(max-width: 860px)").matches) docsNav.removeAttribute("open");
 
     // --- kod bloklari: kopyala butonu
     document.querySelectorAll(".code").forEach(function (block) {

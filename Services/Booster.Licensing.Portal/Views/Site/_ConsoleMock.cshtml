@@ -1,0 +1,60 @@
+@* Yonetim konsolu ekran ornegi (temsili veri). Gercek ekran degil; role="img" ile tek bir gorsel olarak okunur. *@
+@{
+    var tr = Model.Lang != "en";
+    string L(string a, string b) => tr ? a : b;
+}
+<div class="win" role="img" aria-label="@L("Yönetim konsolunda Çalışanlar havuzunun kullanıcı listesi (örnek veri)", "The user list of the Employees pool in the admin console (sample data)")">
+    <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="url">localhost:3000/@L("havuz/calisanlar/kullanicilar", "pool/employees/users")</span></div>
+    <div class="app" aria-hidden="true">
+        <div class="side">
+            <div class="ten"><div><b>@L("Örnek Holding", "Northwind Group")</b><small>@L("Firma", "Tenant")</small></div><span>⌄</span></div>
+            <p class="h">@L("Havuz · Çalışanlar", "Pool · Employees")</p>
+            <span class="i on">@L("Kullanıcılar", "Users") <em>842</em></span>
+            <span class="i">@L("Uygulamalar", "Applications") <em>6</em></span>
+            <span class="i">@L("Servis hesapları", "Service accounts") <em>4</em></span>
+            <span class="i">@L("Roller", "Roles") <em>12</em></span>
+            <span class="i">@L("Kapsamlar", "Scopes")</span>
+            <span class="i">@L("Kimlik sağlayıcılar", "Identity providers")</span>
+            <span class="i">@L("Havuz bilgileri", "Pool settings")</span>
+            <p class="h">@L("Yetkilendirme", "Authorization")</p>
+            <span class="i">@L("Yetki şeması", "Schema")</span>
+            <span class="i">@L("İlişkiler", "Relations")</span>
+            <span class="i">@L("Yetki testi", "Access check")</span>
+            <p class="h">@L("Sistem", "System")</p>
+            <span class="i">@L("Servis durumu", "Service status")</span>
+            <span class="i">@L("Lisans ve kullanım", "License & usage")</span>
+        </div>
+        <div class="main">
+            <div class="crumbs">@L("Örnek Holding / Çalışanlar / Kullanıcılar", "Northwind Group / Employees / Users")</div>
+            <div class="main-head"><p class="t">@L("Kullanıcılar", "Users")</p><div class="acts"><span class="mini">@L("CSV içe aktar", "Import CSV")</span><span class="mini pr">@L("Kullanıcı ekle", "Add user")</span></div></div>
+            <div class="filters"><span class="search">@L("Ad veya e-posta ara", "Search by name or e-mail")</span><span class="chip">@L("Durum: Tümü", "Status: All")</span></div>
+            <div class="tbl-wrap">
+                <table class="utbl">
+                    <thead><tr><th>@L("Kullanıcı", "User")</th><th>@L("Durum", "Status")</th><th>@L("Rol", "Role")</th><th>@L("Son giriş", "Last sign-in")</th></tr></thead>
+                    <tbody>
+                    @if (tr)
+                    {
+                        <tr><td><div class="who"><span class="av">AY</span><div>Ayşe Yılmaz<small>ayse.yilmaz@@ornekholding.com.tr</small></div></div></td><td><span class="st">Aktif</span></td><td><span class="tag">finans-onay</span></td><td>Bugün 09:42</td></tr>
+                        <tr><td><div class="who"><span class="av">MK</span><div>Mehmet Kaya<small>mehmet.kaya@@ornekholding.com.tr</small></div></div></td><td><span class="st">Aktif</span></td><td><span class="tag">bt-destek</span></td><td>Bugün 08:15</td></tr>
+                        <tr><td><div class="who"><span class="av">ZD</span><div>Zeynep Demir<small>zeynep.demir@@ornekholding.com.tr</small></div></div></td><td><span class="st inv">Davet gönderildi</span></td><td><span class="tag">ik-kullanici</span></td><td>—</td></tr>
+                        <tr><td><div class="who"><span class="av">EÇ</span><div>Emre Çelik<small>emre.celik@@ornekholding.com.tr</small></div></div></td><td><span class="st lock">Kilitli</span></td><td><span class="tag">satis</span></td><td>Dün 17:03</td></tr>
+                        <tr><td><div class="who"><span class="av">SA</span><div>Selin Arslan<small>selin.arslan@@ornekholding.com.tr</small></div></div></td><td><span class="st">Aktif</span></td><td><span class="tag">yonetici</span></td><td>21 Kas 14:28</td></tr>
+                        <tr><td><div class="who"><span class="av">BŞ</span><div>Burak Şahin<small>burak.sahin@@ornekholding.com.tr</small></div></div></td><td><span class="st">Aktif</span></td><td><span class="tag">bt-destek</span></td><td>20 Kas 11:50</td></tr>
+                    }
+                    else
+                    {
+                        <tr><td><div class="who"><span class="av">AR</span><div>Alice Reed<small>alice.reed@@northwind.example</small></div></div></td><td><span class="st">Active</span></td><td><span class="tag">finance-approver</span></td><td>Today 09:42</td></tr>
+                        <tr><td><div class="who"><span class="av">MK</span><div>Marcus King<small>marcus.king@@northwind.example</small></div></div></td><td><span class="st">Active</span></td><td><span class="tag">it-support</span></td><td>Today 08:15</td></tr>
+                        <tr><td><div class="who"><span class="av">ZD</span><div>Zoe Dalton<small>zoe.dalton@@northwind.example</small></div></div></td><td><span class="st inv">Invited</span></td><td><span class="tag">hr-user</span></td><td>—</td></tr>
+                        <tr><td><div class="who"><span class="av">EC</span><div>Ethan Cole<small>ethan.cole@@northwind.example</small></div></div></td><td><span class="st lock">Locked</span></td><td><span class="tag">sales</span></td><td>Yesterday 17:03</td></tr>
+                        <tr><td><div class="who"><span class="av">SA</span><div>Sara Adams<small>sara.adams@@northwind.example</small></div></div></td><td><span class="st">Active</span></td><td><span class="tag">admin</span></td><td>21 Nov 14:28</td></tr>
+                        <tr><td><div class="who"><span class="av">BS</span><div>Ben Shaw<small>ben.shaw@@northwind.example</small></div></div></td><td><span class="st">Active</span></td><td><span class="tag">it-support</span></td><td>20 Nov 11:50</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            <div class="pager"><span>@L("842 kullanıcıdan 1–6", "1–6 of 842 users")</span><span>‹ 1 / 141 ›</span></div>
+            <div class="lic-strip"><span><b>@L("Lisans", "License")</b> · @L("kullanıcı limiti", "user limit")</span><span class="bar"><i></i></span><span>@L("1.284 / 2.000", "1,284 / 2,000")</span><span style="color:#7A7E78">@L("bitiş 14.09.2027", "expires 14 Sep 2027")</span></div>
+        </div>
+    </div>
+</div>

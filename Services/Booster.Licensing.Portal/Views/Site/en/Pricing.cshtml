@@ -1,69 +1,137 @@
 @using Booster.Licensing.Portal.Services
 @{
     var c = System.Globalization.CultureInfo.GetCultureInfo("en-US");
-    var featured = Model.Plans.Count > 1 ? Model.Plans[1].Code : null;
 }
-<section class="page-hero">
+<div class="page-head">
     <div class="wrap">
-        <span class="eyebrow" style="color:var(--teal)">Pricing</span>
-        <h1 class="reveal">Simple pricing, every feature included</h1>
-        <p class="reveal" style="--d:.08s">Plans differ only in user, pool and application limits. A license is per installation and annual;
-            there are no monthly per-user fees.</p>
-    </div>
-</section>
-
-<section class="section">
-    <div class="wrap">
-        <div class="plans">
-            <article class="plan reveal" data-plan="deneme">
-                <h3>Free trial</h3>
-                <div class="price">Free</div>
-                <p class="muted small">Try the product in your own environment.</p>
-                <ul>
-                    <li>@LicenseIssuer.Defaults.TrialUsers.ToString("N0", c) users</li>
-                    <li>@LicenseIssuer.Defaults.TrialPools user pool</li>
-                    <li>@LicenseIssuer.Defaults.TrialClients applications</li>
-                    <li>@LicenseIssuer.Defaults.TrialDays days</li>
-                </ul>
-                <a class="btn btn-ghost" href="/hesap/satin-al?plan=deneme">Start free trial</a>
-            </article>
-            @foreach (var (p, i) in Model.Plans.Select((p, i) => (p, i)))
-            {
-                <article class="plan reveal @(p.Code == featured ? "featured" : "")" style="--d:@((i + 1) * 0.06)s" data-plan="@p.Code">
-                    @if (p.Code == featured) { <span class="badge">Most popular</span> }
-                    <h3>@p.Name</h3>
-                    <div class="price">@(p.Price > 0 ? $"{p.Price.ToString("N0", c)} {p.Currency}" : "Contact us")@if (p.Price > 0) {<small> / @p.DurationMonths months</small>}</div>
-                    <p class="muted small">Pay by bank transfer; the license is e-mailed to you.</p>
-                    <ul>
-                        <li>@p.MaxUsers.ToString("N0", c) users</li>
-                        <li>@p.MaxPools user pools</li>
-                        <li>@p.MaxClients applications</li>
-                        <li>Every feature</li>
-                    </ul>
-                    <a class="btn @(p.Code == featured ? "btn-primary" : "btn-ghost")" href="/hesap/satin-al?plan=@Uri.EscapeDataString(p.Code)" data-buy="@p.Code">Get a license</a>
-                </article>
-            }
+        <p class="kicker reveal">Pricing</p>
+        <h1 class="reveal d2">An annual license per installation. <em>That's it.</em></h1>
+        <div class="page-head-grid">
+            <p class="lede reveal d3">Plans differ only by user, pool and application limits; every feature is in every plan. There is no per-user monthly fee,
+                and even when a paid license expires your users keep signing in.</p>
+            <div class="cta-row reveal d3">
+                <a class="btn btn-ghost" href="/hesap/satin-al?plan=deneme">Try it free for 7 days</a>
+                <a class="btn btn-ghost" href="/en/docs/licensing">How licensing works</a>
+            </div>
         </div>
-        <p class="center muted small" style="margin-top:1.5rem">Admin console users and the management pool do not count toward the limits.</p>
+    </div>
+</div>
+
+<section aria-labelledby="h-plans" style="padding-top:72px">
+    <div class="wrap">
+        <h2 id="h-plans" class="sr">Plan list</h2>
+        <table class="plans reveal">
+            <caption>Prices are per installation. Payment is by bank transfer; the license is e-mailed to you once the payment is confirmed.</caption>
+            <thead>
+                <tr><th scope="col">Plan</th><th scope="col">Users</th><th scope="col">Pools</th><th scope="col">Applications</th><th scope="col">Term</th><th scope="col">Price</th><th scope="col"><span class="sr">Buy</span></th></tr>
+            </thead>
+            <tbody>
+                <tr class="trial" data-plan="deneme">
+                    <th scope="row">Free trial<small>Evaluate it in your own environment</small></th>
+                    <td class="num" data-h="Users">@LicenseIssuer.Defaults.TrialUsers.ToString("N0", c)</td>
+                    <td class="num" data-h="Pools">@LicenseIssuer.Defaults.TrialPools</td>
+                    <td class="num" data-h="Applications">@LicenseIssuer.Defaults.TrialClients</td>
+                    <td class="num" data-h="Term">@LicenseIssuer.Defaults.TrialDays days</td>
+                    <td class="price" data-h="Price">Free<small>once per domain</small></td>
+                    <td class="go"><a class="btn btn-ghost btn-sm" href="/hesap/satin-al?plan=deneme">Start the trial</a></td>
+                </tr>
+                @foreach (var p in Model.Plans)
+                {
+                    <tr data-plan="@p.Code">
+                        <th scope="row">@p.Name<small>Every feature included</small></th>
+                        <td class="num" data-h="Users">@p.MaxUsers.ToString("N0", c)</td>
+                        <td class="num" data-h="Pools">@p.MaxPools.ToString("N0", c)</td>
+                        <td class="num" data-h="Applications">@p.MaxClients.ToString("N0", c)</td>
+                        <td class="num" data-h="Term">@p.DurationMonths months</td>
+                        <td class="price" data-h="Price">@if (p.Price > 0)
+                            {
+                                <span>@p.Price.ToString("N0", c) @p.Currency</span><small>per installation</small>
+                            }
+                            else
+                            {
+                                @:Contact us
+                            }</td>
+                        <td class="go"><a class="btn btn-primary btn-sm" href="/hesap/satin-al?plan=@Uri.EscapeDataString(p.Code)" data-buy="@p.Code">Get a license <span class="arr" aria-hidden="true">→</span></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p class="price-note">The admin console's own users and the management pool do not count toward the limits. License portal screens are in Turkish.</p>
     </div>
 </section>
 
-<section class="section alt">
+<section class="band" aria-labelledby="h-included">
     <div class="wrap">
-        <div class="section-head reveal"><h2>Frequently asked questions</h2></div>
-        <div class="faq">
-            <details class="reveal"><summary>Who can get a trial license?</summary>
-                <p>Anyone who signs up with a company e-mail address. The installation's domain must match your e-mail domain, and each domain gets one trial. Free e-mail providers (gmail, outlook, etc.) are not eligible.</p></details>
-            <details class="reveal"><summary>How do I pay?</summary>
-                <p>When you place an order in the license portal you get a reference code and bank transfer details. Once the payment is confirmed, your license is generated automatically and e-mailed to you.</p></details>
-            <details class="reveal"><summary>What happens when a license expires?</summary>
-                <p>Everything keeps working during a grace period: @LicenseIssuer.Defaults.PaidGraceDays days for paid licenses, @LicenseIssuer.Defaults.TrialGraceDays days for trials. After that the admin console becomes read-only; with paid licenses end-user sign-ins never stop. With a trial license, end-user sign-ins also stop after the grace period.</p></details>
-            <details class="reveal"><summary>Do I lose remaining days if I renew early?</summary>
-                <p>No. The new period is added to the end date of your current license.</p></details>
-            <details class="reveal"><summary>What if I move to a new server?</summary>
-                <p>You can transfer your license to the new installation yourself in the portal, up to 3 times a year.</p></details>
-            <details class="reveal"><summary>Does the product need internet access?</summary>
-                <p>No. The license is verified offline inside the product. Internet is only needed to download the images during installation.</p></details>
+        <div class="sec-head reveal">
+            <div>
+                <p class="kicker">In every plan</p>
+                <h2 id="h-included">No features held back.</h2>
+            </div>
+            <p>Every license, the trial included, unlocks the whole product. As you grow, you only raise the limits.</p>
+        </div>
+        <ul class="included reveal">
+            <li>OpenID Connect / OAuth 2.0</li>
+            <li>LDAP / Active Directory sign-in</li>
+            <li>Passwordless sign-in (e-mail / SMS codes)</li>
+            <li>Two-factor via e-mail / SMS</li>
+            <li>Google, Microsoft, Apple and more</li>
+            <li>Any OpenID Connect provider and SAML</li>
+            <li>Isolated user pools</li>
+            <li>Roles, scopes and service accounts</li>
+            <li>OpenFGA authorization schema and AuthZ API</li>
+            <li>Invitations and CSV import</li>
+            <li>Delegation: Owner / Manager / Viewer</li>
+            <li>English / Turkish admin console</li>
+        </ul>
+    </div>
+</section>
+
+<section aria-labelledby="h-buy">
+    <div class="wrap lic-grid">
+        <div class="reveal">
+            <p class="kicker">Buying</p>
+            <h2 id="h-buy">Order, transfer, license.</h2>
+            <p class="prose-2">You sign in to the license portal with a Booster Auth account. The portal walks you through any missing step in order: company
+                details, installation, order.</p>
+            <ul class="terms">
+                <li><b>Early renewal</b><span>The new term is added to the current end date; no days are lost.</span></li>
+                <li><b>Transfer</b><span>Moving servers? Transfer the license to the new installation yourself, up to 3 times a year.</span></li>
+                <li><b>Reminders</b><span>E-mails 30 and 7 days before expiry.</span></li>
+                <li><b>On expiry</b><span>With a paid license sign-ins never stop; the console turns read-only after a @LicenseIssuer.Defaults.PaidGraceDays-day grace period.</span></li>
+            </ul>
+        </div>
+        <ol class="steps reveal d2">
+            <li><span class="n">Step 1</span><div><h3>Choose a plan</h3><p>From this page, or with the <b>Get a license</b> button on <b>System › License</b> in the console.</p></div></li>
+            <li><span class="n">Step 2</span><div><h3>Place the order</h3><p>You get a reference code (e.g. <code>BST-2026-000123</code>) and bank transfer details.</p></div></li>
+            <li><span class="n">Step 3</span><div><h3>Pay</h3><p>Put the reference code in the transfer description. Once the payment is confirmed, the license is generated and e-mailed to you.</p></div></li>
+            <li><span class="n">Step 4</span><div><h3>Paste it into the console</h3><p>Activate the key starting with <code>BSTR1.</code> on <b>System › License</b>. No restart needed.</p></div></li>
+        </ol>
+    </div>
+</section>
+
+<section class="sec-rule" aria-labelledby="faq">
+    <div class="wrap faq-grid">
+        <div class="reveal">
+            <p class="kicker">FAQ</p>
+            <h2 id="faq">About licensing and payment.</h2>
+        </div>
+        <div class="faq reveal">
+            <details open><summary>Who can get a trial license?</summary>
+                <p>Anyone signing up with a company e-mail address. The installation's domain must match your e-mail domain, and each domain gets one trial.
+                    Free e-mail services (gmail, outlook and the like) are not eligible.</p></details>
+            <details><summary>How do I pay?</summary>
+                <p>When you place an order in the license portal you get a reference code and bank transfer details. Once the payment is confirmed, your
+                    license is generated and e-mailed to you.</p></details>
+            <details><summary>What happens when the license expires?</summary>
+                <p>Everything keeps working during the grace period: @LicenseIssuer.Defaults.PaidGraceDays days for paid licenses, @LicenseIssuer.Defaults.TrialGraceDays
+                    for trials. After that the admin console becomes read-only; with a paid license end-user sign-ins never stop. When a trial's grace period
+                    ends, end-user sign-ins stop too.</p></details>
+            <details><summary>Do I lose days if I renew early?</summary>
+                <p>No. The new term is added to your current license's end date.</p></details>
+            <details><summary>What if I move to a new server?</summary>
+                <p>Transfer your license to the new installation yourself in the portal, up to 3 times a year.</p></details>
+            <details><summary>Does the product need internet access?</summary>
+                <p>No. The license is verified offline inside the product. Internet access is only needed to pull images during installation.</p></details>
         </div>
     </div>
 </section>

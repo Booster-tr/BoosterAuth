@@ -1,5 +1,5 @@
 <h1>İşletim ve sorun giderme</h1>
-<p class="lead">Günlük işlemler, güncelleme, yedekleme ve sık karşılaşılan sorunlar.</p>
+<p class="lede">Günlük işlemler, güncelleme, yedekleme ve sık karşılaşılan sorunlar.</p>
 
 <h2 id="komutlar">Günlük komutlar</h2>
 <table>
@@ -36,9 +36,9 @@ docker compose up -d</pre></div>
 <p>Yerel CA ile üretilen sertifika tarayıcıya tanıtılmadıysa beklenen bir durumdur. <code>pki/trust/ca.crt</code> dosyasını güvenilir kök
     sertifika olarak ekleyin ya da üretimde kendi sertifikanızı kullanın (<a href="/tr/docs/installation#https">Kurulum › HTTPS</a>).</p>
 <h3>Girişten sonra "redirect_uri" hatası</h3>
-<p>Uygulamanın gönderdiği <code>redirect_uri</code> panelde kayıtlı adresle birebir aynı olmalıdır (şema, port ve sondaki <code>/</code> dahil).
+<p>Uygulamanın gönderdiği <code>redirect_uri</code> konsolda kayıtlı adresle birebir aynı olmalıdır (şema, port ve sondaki <code>/</code> dahil).
     Havuzda redirect domain politikası açıksa adresin domain'i de izinli olmalıdır.</p>
-<h3>Panel salt okunur</h3>
+<h3>Konsol salt okunur</h3>
 <p>Lisans yok, süresi dolmuş ya da geçersiz demektir. <b>Sistem &gt; Lisans</b> ekranındaki duruma bakın (<a href="/tr/docs/licensing#durumlar">Lisans durumları</a>).</p>
 <h3>Kayıt e-postası gelmiyor</h3>
 <p>SMTP ayarları boşsa e-posta gönderilmez. <code>docker compose logs booster-notification</code> ile gönderim hatalarını görebilirsiniz.</p>
