@@ -7,26 +7,36 @@
     var i = Array.IndexOf(docs, m.Page);
     var prev = i > 0 ? docs[i - 1] : null;
     var next = i >= 0 && i < docs.Length - 1 ? docs[i + 1] : null;
+    var group = SiteCatalog.DocGroups.FirstOrDefault(g => g.Key == m.Page.DocGroup);
 }
-<div class="docs">
-    <nav class="docs-nav" aria-label="@m.T("nav.docs")">
-        @foreach (var g in SiteCatalog.DocGroups)
-        {
-            <h5>@(lang == "en" ? g.En : g.Tr)</h5>
-            @foreach (var d in docs.Where(d => d.DocGroup == g.Key))
+<div class="wrap docs">
+    <nav class="docs-nav" aria-label="@m.T("docs.nav")">
+        <details class="docs-nav-box" open data-docs-nav>
+            <summary>@m.T("docs.label") <span>· @m.Page.Title(lang)</span></summary>
+            @foreach (var g in SiteCatalog.DocGroups)
             {
-                <a href="@d.Path(lang)" class="@(d == m.Page ? "on" : "")" aria-current="@(d == m.Page ? "page" : null)">@d.Title(lang)</a>
+                <p class="docs-group">@(lang == "en" ? g.En : g.Tr)</p>
+                <ul>
+                    @foreach (var d in docs.Where(d => d.DocGroup == g.Key))
+                    {
+                        <li><a href="@d.Path(lang)" aria-current="@(d == m.Page ? "page" : null)">@d.Title(lang)</a></li>
+                    }
+                </ul>
             }
-        }
+        </details>
     </nav>
     <article class="doc">
+        <p class="doc-crumb"><a href="/@lang/docs">@m.T("docs.label")</a> <span aria-hidden="true">/</span> @(lang == "en" ? group.En : group.Tr)</p>
         @RenderBody()
-        <nav class="doc-pager" aria-label="@(lang == "en" ? "Pagination" : "Sayfalar")">
+        <nav class="doc-pager" aria-label="@m.T("docs.pager")">
             @if (prev is not null)
             {
                 <a href="@prev.Path(lang)" rel="prev"><small>← @m.T("docs.prev")</small><b>@prev.Title(lang)</b></a>
             }
-            else { <span></span> }
+            else
+            {
+                <span></span>
+            }
             @if (next is not null)
             {
                 <a class="next" href="@next.Path(lang)" rel="next"><small>@m.T("docs.next") →</small><b>@next.Title(lang)</b></a>
@@ -34,7 +44,7 @@
         </nav>
     </article>
     <aside class="toc" aria-label="@m.T("docs.on_this_page")">
-        <h6>@m.T("docs.on_this_page")</h6>
+        <p class="toc-h">@m.T("docs.on_this_page")</p>
         <div data-toc></div>
     </aside>
 </div>

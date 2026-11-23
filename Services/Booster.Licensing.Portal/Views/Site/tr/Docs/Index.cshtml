@@ -1,18 +1,21 @@
 <h1>Booster Auth dokümantasyonu</h1>
-<p class="lead">Booster Auth'u kurmak, yapılandırmak ve uygulamalarınıza bağlamak için ihtiyacınız olan her şey. İlk kez okuyorsanız
-    sırayla ilerlemenizi öneririz: önce kavramlar, sonra kurulum, sonra ilk yapılandırma.</p>
+<p class="lede">Booster Auth'u kurmak, yapılandırmak ve uygulamalarınıza bağlamak için gereken her şey. İlk kez okuyorsanız sırayla ilerleyin:
+    önce kavramlar, sonra kurulum, sonra ilk yapılandırma.</p>
 
-<div class="doc-cards">
-    <a href="/tr/docs/concepts"><b>1. Temel kavramlar</b><span>Firma, kullanıcı havuzu, uygulama, rol ve izin nedir; nasıl ilişkilidir?</span></a>
-    <a href="/tr/docs/installation"><b>2. Kurulum</b><span>Paketi indirin, .env dosyasını hazırlayın, <code>docker compose up</code>.</span></a>
-    <a href="/tr/docs/first-steps"><b>3. İlk yapılandırma</b><span>Panele giriş, havuz ve uygulama oluşturma, kullanıcı ekleme.</span></a>
-    <a href="/tr/docs/integration"><b>4. Uygulama entegrasyonu</b><span>OpenID Connect ile web, SPA, mobil ve API bağlantısı; örnek kodlar.</span></a>
-    <a href="/tr/docs/authorization"><b>5. Yetki kontrolü</b><span>Roller, kapsamlar ve AuthZ API ile izin sorgulama.</span></a>
-    <a href="/tr/docs/licensing"><b>6. Lisans</b><span>Deneme, satın alma, panele yükleme, yenileme ve aktarım.</span></a>
-</div>
+<h2 id="rehberler">Rehberler</h2>
+<ul class="doc-index">
+    <li><a href="/tr/docs/concepts"><b><small>Başlarken</small>Temel kavramlar</b><span>Firma, kullanıcı havuzu, uygulama, rol ve yetki şeması nedir; birbirleriyle nasıl ilişkilidir?</span></a></li>
+    <li><a href="/tr/docs/installation"><b><small>Başlarken</small>Kurulum</b><span>Paketi indirin, kurulum betiğini çalıştırın, <code>docker compose up -d</code>. Gereksinimler ve HTTPS.</span></a></li>
+    <li><a href="/tr/docs/first-steps"><b><small>Rehber</small>İlk yapılandırma</b><span>Konsola giriş, havuz ve uygulama oluşturma, kullanıcı ekleme, davet ve CSV.</span></a></li>
+    <li><a href="/tr/docs/integration"><b><small>Rehber</small>Uygulama entegrasyonu</b><span>OpenID Connect ile web, SPA, mobil ve API bağlantısı; uç noktalar ve örnek kodlar.</span></a></li>
+    <li><a href="/tr/docs/authorization"><b><small>Rehber</small>Yetki kontrolü</b><span>Roller, kapsamlar ve AuthZ API ile “bu kullanıcı bunu yapabilir mi?” sorusu.</span></a></li>
+    <li><a href="/tr/docs/licensing"><b><small>İşletim</small>Lisans</b><span>Deneme, satın alma, etkinleştirme, lisans durumları, yenileme ve aktarım.</span></a></li>
+    <li><a href="/tr/docs/operations"><b><small>İşletim</small>İşletim ve sorun giderme</b><span>Güncelleme, yedekleme, e-posta ayarları ve sık karşılaşılan sorunlar.</span></a></li>
+</ul>
 
 <h2 id="mimari">Mimari bir bakışta</h2>
-<p>Booster Auth birkaç servisten oluşur ve hepsi tek bir <code>docker compose</code> ile çalışır. Dışarıya yalnızca iki kapı açılır:</p>
+<p>Booster Auth birkaç servisten oluşur ve hepsi tek bir <code>docker compose</code> ile çalışır. Dışarıya yalnızca iki kapı açılır: HTTPS ağ geçidi
+    ve yönetim konsolu. Altyapı servisleri iç ağda kalır.</p>
 <table>
     <thead><tr><th>Bileşen</th><th>Görevi</th><th>Adres</th></tr></thead>
     <tbody>
@@ -20,8 +23,9 @@
         <tr><td><b>IdP</b></td><td>OpenID Connect kimlik sağlayıcı: giriş, kayıt, token.</td><td><code>/idp</code></td></tr>
         <tr><td><b>Management API</b></td><td>Firma, havuz, uygulama, rol yönetimi; lisans.</td><td><code>/management</code></td></tr>
         <tr><td><b>AuthZ</b></td><td>Yetki şeması ve izin kontrolü (OpenFGA üzerinde).</td><td><code>/authz</code></td></tr>
-        <tr><td><b>Yönetim paneli</b></td><td>Yöneticiler için web arayüzü.</td><td><code>http://localhost:3000</code></td></tr>
-        <tr><td>Altyapı</td><td>PostgreSQL, Redis, Kafka, OpenFGA; dışarıya açılmaz.</td><td>-</td></tr>
+        <tr><td><b>Yönetim konsolu</b></td><td>Yöneticiler için web arayüzü (Türkçe / İngilizce).</td><td><code>http://localhost:3000</code></td></tr>
+        <tr><td>Altyapı</td><td>PostgreSQL, Redis, Kafka, OpenFGA; dışarıya açılmaz.</td><td>—</td></tr>
     </tbody>
 </table>
-<div class="callout tip"><p><b>Hızlı başlangıç.</b> Sadece denemek istiyorsanız <a href="/tr/download">paketi indirip</a> <a href="/tr/docs/installation">kurulum</a> sayfasındaki dört adımı izleyin; on dakika içinde panele giriş yapmış olursunuz.</p></div>
+<div class="callout tip"><p><b>Hızlı başlangıç.</b> Yalnızca denemek istiyorsanız <a href="/tr/download">paketi indirip</a>
+    <a href="/tr/docs/installation">kurulum</a> sayfasındaki adımları izleyin: betik gizli değerleri üretir, <code>docker compose up -d</code> sistemi başlatır.</p></div>

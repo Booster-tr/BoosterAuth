@@ -1,0 +1,26 @@
+@* LDAP / Active Directory saglayici ayar ekrani ornegi (temsili veri, sadeleştirilmis). *@
+@{
+    var tr = Model.Lang != "en";
+    string L(string a, string b) => tr ? a : b;
+}
+<div class="win" role="img" aria-label="@L("Kimlik Sağlayıcılar ekranında LDAP / Active Directory bağlantı ayarları (örnek veri)", "LDAP / Active Directory connection settings on the Identity Providers screen (sample data)")">
+    <div class="win-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="url">localhost:3000/@L("havuz/calisanlar/kimlik-saglayicilar/ldap", "pool/employees/identity-providers/ldap")</span></div>
+    <div class="main" aria-hidden="true">
+        <div class="crumbs">@L("Çalışanlar / Kimlik sağlayıcılar / LDAP", "Employees / Identity providers / LDAP")</div>
+        <div class="main-head"><p class="t">@L("Kurumsal dizin", "Corporate directory")</p><div class="acts"><span class="mini">@L("Vazgeç", "Cancel")</span><span class="mini pr">@L("Kaydet", "Save")</span></div></div>
+        <div class="fm">
+            <div><label>@L("Sunucu", "Server")</label><div class="in">@L("dc01.ornekholding.local", "dc01.northwind.local")</div></div>
+            <div><label>@L("Bağlantı güvenliği", "Connection security")</label><div class="seg"><span class="on">LDAPS · 636</span><span>StartTLS · 389</span></div></div>
+            <div><label>@L("Bağlama hesabı", "Bind account")</label><div class="in">@L("CN=svc-booster,OU=Servis,DC=ornek", "CN=svc-booster,OU=Service,DC=northwind")</div></div>
+            <div><label>@L("Bağlama parolası", "Bind password")</label><div class="in pw">••••••••••••</div></div>
+            <div class="full"><label>@L("Arama tabanı", "Search base")</label><div class="in">@L("OU=Personel,DC=ornekholding,DC=local", "OU=Staff,DC=northwind,DC=local")</div></div>
+            <div class="full"><label>@L("Kullanıcı filtresi", "User filter")</label><div class="in">(&amp;(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))</div></div>
+            <p class="fm-sep">@L("Öznitelik eşleme", "Attribute mapping")</p>
+            <div><label>@L("Kullanıcı adı", "Username")</label><div class="in">sAMAccountName</div></div>
+            <div><label>@L("E-posta", "E-mail")</label><div class="in">mail</div></div>
+            <div><label>@L("Ad", "First name")</label><div class="in">givenName</div></div>
+            <div><label>@L("Soyad", "Last name")</label><div class="in">sn</div></div>
+        </div>
+        <div class="fm-foot"><span class="mini">@L("Bağlantıyı test et", "Test connection")</span><span class="okline">@L("Bağlantı başarılı", "Connection succeeded")</span></div>
+    </div>
+</div>

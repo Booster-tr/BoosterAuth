@@ -1,5 +1,5 @@
 <h1>Application integration (OIDC)</h1>
-<p class="lead">Booster Auth is a standard OpenID Connect provider. Any library that supports OIDC works; this page lists the values you need and
+<p class="lede">Booster Auth is a standard OpenID Connect provider. Any library that supports OIDC works; this page lists the values you need and
     examples for common platforms.</p>
 
 <h2 id="values">Values you need</h2>
@@ -10,12 +10,12 @@
         <tr><td>Discovery</td><td><code>https://auth.company.com/idp/.well-known/openid-configuration</code></td></tr>
         <tr><td>client_id</td><td>The application's client key, e.g. <code>acme-web</code></td></tr>
         <tr><td>redirect_uri</td><td>A URI registered on the application, e.g. <code>https://app.company.com/callback</code></td></tr>
-        <tr><td>Flow</td><td>Authorization Code + PKCE (<code>S256</code> required)</td></tr>
+        <tr><td>Flow</td><td>Authorization Code + PKCE (<code>S256</code> required; the implicit flow is not supported)</td></tr>
         <tr><td>Scopes</td><td><code>openid profile email offline_access</code> + scopes allowed for the application</td></tr>
         <tr><td>resource (optional)</td><td>The target API (audience) of the token, e.g. <code>https://api.company.com</code></td></tr>
     </tbody>
 </table>
-<div class="callout info"><p><b>One issuer.</b> The issuer is the same for all pools (<code>/idp</code>); the pool a user signs in to is determined by
+<div class="callout"><p><b>One issuer.</b> The issuer is the same for all pools (<code>/idp</code>); the pool a user signs in to is determined by
     the pool the <code>client_id</code> belongs to.</p></div>
 
 <h2 id="endpoints">Endpoints</h2>

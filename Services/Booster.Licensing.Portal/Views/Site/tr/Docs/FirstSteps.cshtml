@@ -1,19 +1,19 @@
 <h1>İlk yapılandırma</h1>
-<p class="lead">Kurulum bitti ve lisansınızı yüklediniz. Bu rehberde ilk uygulamanızı Booster Auth'a bağlamaya hazır hale getireceksiniz:
+<p class="lede">Kurulum bitti ve lisansınızı etkinleştirdiniz. Bu rehberde ilk uygulamanızı Booster Auth'a bağlamaya hazır hale getireceksiniz:
     firma → havuz → uygulama → kullanıcılar.</p>
-<div class="callout info"><p><b>Panelde gezinme.</b> Sol üstteki bağlam seçiciyle <b>Firma</b>, <b>Havuz</b>, <b>Uygulama</b> ve <b>Sistem</b> arasında
-    geçiş yaparsınız; sol menü seçilen bağlama göre değişir.</p></div>
+<div class="callout"><p><b>Konsolda gezinme.</b> Sol üstteki bağlam seçiciyle <b>Firma</b>, <b>Havuz</b>, <b>Uygulama</b> ve <b>Sistem</b> arasında
+    geçiş yaparsınız; sol menü seçilen bağlama göre değişir. Arayüz dili Türkçe ya da İngilizce seçilebilir.</p></div>
 
 <h2 id="firma">1. Firma oluşturun</h2>
 <ol>
-    <li>Bağlam seçiciden <b>Firma &gt; Yeni Firma</b>'yı açın.</li>
-    <li>Firmanızın adını girin (ör. <i>Acme</i>) ve kaydedin. Firmanın sahibi siz olursunuz.</li>
+    <li>Bağlam seçiciden <b>Firma › Yeni Firma</b>'yı açın.</li>
+    <li>Firmanızın adını girin (ör. <i>Örnek Holding</i>) ve kaydedin. Firmanın sahibi siz olursunuz.</li>
     <li>Başka yöneticiler ekleyecekseniz <b>Firma Erişimi</b> ekranından yetki verin.</li>
 </ol>
 
 <h2 id="havuz">2. Kullanıcı havuzu oluşturun</h2>
 <ol>
-    <li>Firmanın altında yeni bir havuz açın (ör. <i>Müşteriler</i>).</li>
+    <li>Firmanın altında yeni bir havuz açın (ör. <i>Müşteriler</i> ya da <i>Çalışanlar</i>).</li>
     <li><b>Havuz Bilgileri</b> ekranında politikaları gözden geçirin:
         <ul>
             <li><b>Giriş politikası:</b> parola, e-posta / SMS kodu, dış kimlik sağlayıcılar; kullanıcı tanımlayıcısı olarak e-posta, kullanıcı adı ya da telefon.</li>
@@ -22,6 +22,8 @@
         </ul>
     </li>
     <li>Kurumsal kullanım için <b>Redirect domain politikası</b>nı açıp yalnızca kendi domain'lerinize izin vermenizi öneririz.</li>
+    <li>Çalışanlarınız kurumsal hesaplarıyla girecekse <b>Kimlik Sağlayıcılar</b> ekranından LDAP / Active Directory bağlantısını ekleyin ve
+        <b>Bağlantıyı test et</b> ile doğrulayın. Google, Microsoft, SAML gibi dış sağlayıcılar da aynı ekrandan eklenir.</li>
 </ol>
 <div class="callout warn"><p><b>E-posta gönderimi.</b> Kayıt doğrulama, davet ve şifre sıfırlama e-postaları için <code>.env</code> içindeki
     <code>MAIL_*</code> ayarlarını doldurun. Doldurulmazsa e-posta gönderilmez ve e-posta doğrulamalı kayıt tamamlanamaz.</p></div>
@@ -40,17 +42,18 @@
 <h2 id="kullanicilar">4. Kullanıcıları ekleyin</h2>
 <p><b>Kullanıcılar</b> ekranında üç yol vardır:</p>
 <ul>
-    <li><b>Tek tek ekleme:</b> e-posta ve ad girin, "davet gönder" seçeneğiyle kullanıcıya parola belirleme bağlantısı gider.</li>
+    <li><b>Tek tek ekleme:</b> e-posta ve ad girin; “davet gönder” seçeneğiyle kullanıcıya parola belirleme bağlantısı gider.</li>
     <li><b>CSV ile içe aktarma:</b> başlık satırı olan, virgül ya da noktalı virgülle ayrılmış UTF-8 dosya; tek seferde en fazla 1000 satır (1 MB).
         Tanınan sütunlar: <code>email</code> / <code>e-posta</code>, <code>ad</code> / <code>first_name</code>, <code>soyad</code> / <code>last_name</code>
         ya da tek sütunda <code>ad soyad</code> / <code>name</code>.</li>
-    <li><b>Kendi kendine kayıt:</b> kayıt politikası "herkes kayıt olabilir" ise kullanıcılar giriş ekranından hesap açar.</li>
+    <li><b>Kendi kendine kayıt:</b> kayıt politikası “herkes kayıt olabilir” ise kullanıcılar giriş ekranından hesap açar.</li>
 </ul>
 <div class="code"><span class="lbl">kullanicilar.csv</span><pre>email;ad;soyad
 ayse@@firma.com;Ayşe;Yılmaz
 mehmet@@firma.com;Mehmet;Kaya</pre></div>
 <p>Davet bağlantıları <b>1 gün</b> geçerli ve tek kullanımlıktır; yeniden gönderilen davet eskisini geçersiz kılar. Davet kabul edilince
-    kullanıcı parolasını belirler ve e-postası doğrulanmış sayılır.</p>
+    kullanıcı parolasını belirler ve e-postası doğrulanmış sayılır. LDAP / Active Directory kullanıcılarını eklemeniz gerekmez; hesapları ilk
+    girişte açılır.</p>
 
 <h2 id="roller">5. Roller ve kapsamlar</h2>
 <ol>

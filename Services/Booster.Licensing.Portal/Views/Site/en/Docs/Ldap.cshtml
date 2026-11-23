@@ -1,0 +1,68 @@
+<h1>LDAP / Active Directory</h1>
+<p class="lede">Let users sign in to your applications with their corporate directory username and password. Passwords stay in the
+    directory; Booster Auth never stores them and asks the directory on every sign-in.</p>
+
+<h2 id="how-it-works">How it works</h2>
+<ol>
+    <li>The user types a username (e.g. <code>ayse</code>) or e-mail and their directory password into the normal password form of your sign-in page.</li>
+    <li>Booster Auth looks the user up with the service account, then verifies the password <b>on a separate connection</b> as that entry.</li>
+    <li>On first sign-in the account is created automatically; name and e-mail are refreshed from the directory on every sign-in.</li>
+    <li>If the pool requires two-factor authentication, a code is also requested after an LDAP sign-in.</li>
+</ol>
+<div class="callout info"><p><b>Local users are unaffected.</b> Users with their own Booster Auth password (e.g. administrators) keep signing in with it.
+    The directory is used only for users without a local password.</p></div>
+
+<h2 id="setup">Add the connection</h2>
+<ol>
+    <li>In the console, select the pool, open <b>Identity Providers</b> and add a provider of type <b>LDAP / Active Directory</b>.</li>
+    <li>Fill in the fields below and click <b>Test connection</b>. The test tells you separately whether the server is reachable, the service account is accepted and the search base exists.</li>
+    <li>Save, then turn on the <b>LDAP</b> method under <b>Pool Details &gt; Sign-in policy</b>.</li>
+    <li>For directory users to get an account on first sign-in, "create account on first external sign-in" must be on in the <b>Registration policy</b>.</li>
+</ol>
+<p>A pool can have one LDAP connection; use separate pools for separate directories.</p>
+
+<h2 id="fields">Fields</h2>
+<table>
+    <thead><tr><th>Field</th><th>Active Directory example</th><th>OpenLDAP example</th></tr></thead>
+    <tbody>
+        <tr><td>Server</td><td><code>dc01.company.local</code></td><td><code>ldap.company.com</code></td></tr>
+        <tr><td>Connection security · port</td><td>LDAPS · <code>636</code></td><td>StartTLS · <code>389</code></td></tr>
+        <tr><td>Service account (bind DN)</td><td><code>CN=booster-svc,OU=Service,DC=company,DC=local</code></td><td><code>cn=booster,dc=company,dc=com</code></td></tr>
+        <tr><td>Service account password</td><td colspan="2">Stored encrypted; never shown again on any screen or API response.</td></tr>
+        <tr><td>Search base (base DN)</td><td><code>OU=Users,DC=company,DC=local</code></td><td><code>ou=users,dc=company,dc=com</code></td></tr>
+        <tr><td>User filter</td><td><code>(&amp;(objectClass=user)(sAMAccountName={0}))</code></td><td><code>(uid={0})</code></td></tr>
+        <tr><td>Username attribute</td><td><code>sAMAccountName</code></td><td><code>uid</code></td></tr>
+        <tr><td>E-mail / display name attribute</td><td><code>mail</code> · <code>displayName</code></td><td><code>mail</code> · <code>displayName</code></td></tr>
+        <tr><td>Unique ID attribute</td><td><code>objectGUID</code></td><td><code>entryUUID</code></td></tr>
+    </tbody>
+</table>
+<p><code>{0}</code> is replaced by what the user types. To let users sign in with their e-mail too, widen the filter:
+    <code>(|(sAMAccountName={0})(mail={0}))</code>. The unique ID keeps the account the same even if the user's name or e-mail changes.</p>
+
+<h2 id="ldaps">LDAPS and your corporate certificate</h2>
+<p>Use <b>LDAPS</b> or <b>StartTLS</b> in production; plain connections are for testing only. The directory server's certificate is verified: the host
+    name must match the certificate and the issuing CA must be trusted.</p>
+<p>If your organization has its own CA, <b>append</b> its certificate (PEM) to <code>pki/trust/ca.crt</code> in the installation folder and run
+    <code>docker compose up -d</code>. The services trust the CAs in that file.</p>
+
+<h2 id="security">Security rules</h2>
+<ul>
+    <li><b>Empty passwords are rejected.</b> An LDAP bind with an empty password can succeed as an "anonymous bind"; Booster Auth never accepts it.</li>
+    <li><b>User input is escaped</b> (RFC 4515), so the typed name cannot change the filter. If the search returns more than one entry, sign-in is refused.</li>
+    <li><b>No automatic linking to a local password account.</b> If an account with a Booster Auth password already exists for the same e-mail, the directory entry is not linked to it; that user signs in with their own password.</li>
+    <li><b>Password reset is disabled.</b> Directory users are not sent reset codes, so an account disabled in the directory cannot get in by obtaining a local password.</li>
+    <li><b>Failed attempts are counted.</b> The pool's lockout policy applies to LDAP sign-ins; the directory's own lockout policy applies as well.</li>
+    <li><b>License limits</b> also apply to accounts created on first sign-in.</li>
+</ul>
+
+<h2 id="troubleshooting">Common situations</h2>
+<table>
+    <thead><tr><th>Message</th><th>What to do</th></tr></thead>
+    <tbody>
+        <tr><td>The corporate directory cannot be reached</td><td>Check the host name, port and network access from the Booster Auth server to the directory; use <b>Test connection</b>.</td></tr>
+        <tr><td>A TLS connection could not be established</td><td>The certificate does not match the host name or the CA is not trusted. See <a href="#ldaps">LDAPS and your corporate certificate</a>.</td></tr>
+        <tr><td>The service account was rejected</td><td>Check the full bind DN (CN=…,OU=…,DC=…) and the password.</td></tr>
+        <tr><td>You do not have an account in this application</td><td>"Create account on first external sign-in" is off in the pool's registration policy; turn it on or add the user beforehand.</td></tr>
+        <tr><td>An account with a password already exists</td><td>This user keeps signing in with their Booster Auth password; for security, accounts with a local password are never linked to the directory automatically.</td></tr>
+    </tbody>
+</table>

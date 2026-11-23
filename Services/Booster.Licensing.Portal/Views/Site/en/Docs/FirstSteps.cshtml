@@ -1,19 +1,19 @@
 <h1>First configuration</h1>
-<p class="lead">Installation is done and your license is active. In this guide you will get ready to connect your first application:
+<p class="lede">Installation is done and your license is active. In this guide you get ready to connect your first application:
     tenant → pool → application → users.</p>
-<div class="callout info"><p><b>Finding your way.</b> Use the context switcher at the top left to move between <b>Tenant</b>, <b>Pool</b>,
-    <b>Application</b> and <b>System</b>; the left menu changes with the selected context.</p></div>
+<div class="callout"><p><b>Finding your way.</b> Use the context switcher at the top left to move between <b>Tenant</b>, <b>Pool</b>,
+    <b>Application</b> and <b>System</b>; the left menu follows the selected context. The console is available in English and Turkish.</p></div>
 
 <h2 id="tenant">1. Create a tenant</h2>
 <ol>
-    <li>Open <b>Tenant &gt; New Tenant</b> from the context switcher.</li>
-    <li>Enter your organization's name (e.g. <i>Acme</i>) and save. You become the tenant's owner.</li>
+    <li>Open <b>Tenant › New Tenant</b> from the context switcher.</li>
+    <li>Enter your organisation's name (e.g. <i>Northwind Group</i>) and save. You become the tenant's owner.</li>
     <li>To add other administrators, grant them rights on the <b>Tenant Access</b> screen.</li>
 </ol>
 
 <h2 id="pool">2. Create a user pool</h2>
 <ol>
-    <li>Create a new pool under the tenant (e.g. <i>Customers</i>).</li>
+    <li>Create a new pool under the tenant (e.g. <i>Customers</i> or <i>Employees</i>).</li>
     <li>Review the policies on the <b>Pool Details</b> screen:
         <ul>
             <li><b>Sign-in policy:</b> password, e-mail / SMS code, external identity providers; e-mail, username or phone as the identifier.</li>
@@ -22,6 +22,8 @@
         </ul>
     </li>
     <li>For enterprise use we recommend turning on the <b>Redirect domain policy</b> and allowing only your own domains.</li>
+    <li>If employees should sign in with their corporate accounts, add an LDAP / Active Directory connection on the <b>Identity Providers</b>
+        screen and check it with <b>Test connection</b>. Google, Microsoft, SAML and the other providers are added on the same screen.</li>
 </ol>
 <div class="callout warn"><p><b>Sending e-mail.</b> Fill in the <code>MAIL_*</code> settings in <code>.env</code> for verification, invitation and
     password reset e-mails. Without them no e-mail is sent, and sign-ups that require e-mail verification cannot complete.</p></div>
@@ -40,9 +42,9 @@
 <h2 id="users">4. Add users</h2>
 <p>The <b>Users</b> screen offers three ways:</p>
 <ul>
-    <li><b>One by one:</b> enter an e-mail and a name; with "send invitation" the user gets a link to set a password.</li>
+    <li><b>One by one:</b> enter an e-mail and a name; with “send invitation” the user gets a link to set a password.</li>
     <li><b>CSV import:</b> a UTF-8 file with a header row, comma or semicolon separated; up to 1000 rows (1 MB) at a time.
-        Recognized columns: <code>email</code> / <code>e-posta</code>, <code>first_name</code> / <code>ad</code>, <code>last_name</code> / <code>soyad</code>,
+        Recognised columns: <code>email</code> / <code>e-posta</code>, <code>first_name</code> / <code>ad</code>, <code>last_name</code> / <code>soyad</code>,
         or a single <code>name</code> / <code>full_name</code> column.</li>
     <li><b>Self sign-up:</b> if the registration policy allows anyone, users create accounts from the sign-in screen.</li>
 </ul>
@@ -50,7 +52,8 @@
 ayse@@company.com,Ayşe,Yılmaz
 john@@company.com,John,Smith</pre></div>
 <p>Invitation links are valid for <b>1 day</b> and can be used once; resending an invitation invalidates the previous link. When the invitation
-    is accepted, the user sets a password and the e-mail is marked as verified.</p>
+    is accepted, the user sets a password and the e-mail is marked as verified. LDAP / Active Directory users do not need to be added: their
+    accounts are created on first sign-in.</p>
 
 <h2 id="roles">5. Roles and scopes</h2>
 <ol>

@@ -9,12 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@(ViewData["Title"] is string t ? $"{t} - " : "")Booster Auth</title>
     <meta name="description" content="Booster Auth: kendi sunucunuzda OpenID Connect kimlik sağlayıcı, kullanıcı ve yetki yönetimi." />
+    <meta name="theme-color" content="#173F38" />
+    <link rel="icon" href="/img/logo.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/">Booster <span>Auth</span></a>
-    <nav class="nav nav-site">
+    <a class="brand" href="/tr" aria-label="Booster Auth ana sayfa"><img class="brand-mark" src="/img/logo.svg" alt="" width="26" height="26" />Booster <span>Auth</span></a>
+    <nav class="nav nav-site" aria-label="Site">
         <a href="/tr">Ürün</a>
         <a href="/tr/docs">Dokümantasyon</a>
         <a href="/tr/pricing">Paketler</a>
@@ -22,7 +27,7 @@
     </nav>
     @if (isAdminArea)
     {
-        <nav class="nav">
+        <nav class="nav" aria-label="Yönetim">
             <a href="/admin">Genel</a>
             <a href="/admin/musteriler">Müşteriler</a>
             <a href="/admin/lisanslar">Lisanslar</a>
@@ -33,7 +38,7 @@
     }
     else if (email is not null)
     {
-        <nav class="nav">
+        <nav class="nav" aria-label="Hesap">
             <a href="/hesap/kurulumlar">Kurulumlarım</a>
             <a href="/hesap/siparisler">Siparişlerim</a>
             <a href="/hesap/firma">Firma bilgileri</a>
@@ -54,6 +59,10 @@
 <main class="container">
     @RenderBody()
 </main>
+<footer class="portal-foot">
+    <span>© @DateTime.UtcNow.Year Booster Auth</span>
+    <span>Çevrimdışı lisans · lisans sunucusuna bağlanmaz</span>
+</footer>
 <script src="~/js/portal.js" asp-append-version="true"></script>
 </body>
 </html>

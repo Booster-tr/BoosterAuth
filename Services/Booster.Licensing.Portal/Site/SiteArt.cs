@@ -2,58 +2,154 @@ using Microsoft.AspNetCore.Html;
 
 namespace Booster.Licensing.Portal.Site;
 
-/// <summary>Sitede kullanilan satir ici SVG'ler (ikonlar ve mimari semasi). Dis kaynak yok; dil bagimsiz.</summary>
+/// <summary>
+/// Sitede kullanilan satir ici SVG'ler (marka isareti, mimari semasi, lisans zaman cizelgesi).
+/// Razor'da &lt;text&gt; ozel etiket oldugu icin SVG'ler burada uretilir. Dis kaynak yok; metinler dile gore.
+/// </summary>
 public static class SiteArt
 {
-    private const string Stroke = "fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"";
+    /// <summary>Marka isareti. <paramref name="onDark"/>: koyu zemin (footer) icin ters renkler.</summary>
+    public static IHtmlContent Mark(bool onDark = false) => new HtmlString(onDark
+        ? """<svg class="mark" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="#EEF3EF"/><path d="M8 7h6.2a3.6 3.6 0 0 1 1.3 7A3.8 3.8 0 0 1 14.6 19H8z" fill="none" stroke="#173F38" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 13h6" stroke="#9C5E25" stroke-width="1.8"/></svg>"""
+        : """<svg class="mark" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="#173F38"/><path d="M8 7h6.2a3.6 3.6 0 0 1 1.3 7A3.8 3.8 0 0 1 14.6 19H8z" fill="none" stroke="#EEF3EF" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 13h6" stroke="#D6AE80" stroke-width="1.8"/></svg>""");
 
-    public static IHtmlContent Icon(string name) => new HtmlString(name switch
+    /// <summary>Kucuk kilit ikonu (lisans portali baglantisi).</summary>
+    public static IHtmlContent Lock() => new HtmlString(
+        """<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="6" width="9" height="6.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 6V4.2a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>""");
+
+    /// <summary>
+    /// Dagitim mimarisi: kurum sinirinin icinde uygulamalar, LDAP / AD, Booster Auth, ic ag (PostgreSQL, Redis, Kafka, OpenFGA)
+    /// ve lisans dosyasi; sinirin disinda istege bagli dis saglayicilar ve baglanti kurulmayan lisans sunucusu.
+    /// </summary>
+    public static IHtmlContent Architecture(string lang)
     {
-        "key" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><circle cx=\"8\" cy=\"15\" r=\"4\"/><path d=\"m10.8 12.2 9.2-9.2M17 6l3 3M15 8l2 2\"/></svg>",
-        "shield" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><path d=\"M12 3 19 6v6c0 4.4-3 7.8-7 9-4-1.2-7-4.6-7-9V6z\"/><path d=\"m9 12 2 2 4-4\"/></svg>",
-        "users" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><circle cx=\"9\" cy=\"8\" r=\"3.2\"/><path d=\"M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6\"/><circle cx=\"17\" cy=\"9\" r=\"2.6\"/><path d=\"M16 14.2c2.8.3 5 2.6 5 5.8\"/></svg>",
-        "graph" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><circle cx=\"5\" cy=\"6\" r=\"2.2\"/><circle cx=\"19\" cy=\"6\" r=\"2.2\"/><circle cx=\"12\" cy=\"18\" r=\"2.2\"/><path d=\"M7 7.2 10.6 16M17 7.2 13.4 16M7.2 6h9.6\"/></svg>",
-        "server" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><rect x=\"3\" y=\"4\" width=\"18\" height=\"7\" rx=\"2\"/><rect x=\"3\" y=\"13\" width=\"18\" height=\"7\" rx=\"2\"/><path d=\"M7 7.5h.01M7 16.5h.01\"/></svg>",
-        "panel" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 9h18M9 9v11\"/></svg>",
-        "login" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><path d=\"M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4\"/><path d=\"m10 16 4-4-4-4M14 12H4\"/></svg>",
-        "globe" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z\"/></svg>",
-        "mail" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"m3 7 9 6 9-6\"/></svg>",
-        "box" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><path d=\"m12 3 8 4.5v9L12 21l-8-4.5v-9z\"/><path d=\"m4 7.5 8 4.5 8-4.5M12 12v9\"/></svg>",
-        "lock" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><rect x=\"5\" y=\"10\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 10V7a4 4 0 0 1 8 0v3\"/></svg>",
-        "bolt" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><path d=\"M13 3 5 14h6l-1 7 8-11h-6z\"/></svg>",
-        "code" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><path d=\"m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14\"/></svg>",
-        "clock" => $"<svg viewBox=\"0 0 24 24\" {Stroke}><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/></svg>",
-        _ => "",
-    });
+        var tr = lang != "en";
+        string L(string t, string e) => tr ? t : e;
+        var sub2X = tr ? 250 : 214;
+        return new HtmlString($$"""
+<svg viewBox="0 0 1120 580" role="img" aria-labelledby="archT archD">
+  <title id="archT">{{L("Booster Auth dağıtım mimarisi", "Booster Auth deployment architecture")}}</title>
+  <desc id="archD">{{L(
+      "Kurumun altyapısı içinde Booster Auth: solda web, mobil ve arka uç uygulamaları OIDC ile, LDAP / Active Directory dizini ise oturum açma için bağlanır; altta dışarıya açılmayan PostgreSQL, Redis, Kafka ve OpenFGA; sağda yerelde doğrulanan lisans dosyası. Altyapının dışında yalnızca yapılandırılırsa kullanılan dış kimlik sağlayıcıları bulunur; lisans sunucusuna bağlantı kurulmaz.",
+      "Booster Auth inside the organisation's infrastructure: web, mobile and back-end applications connect over OIDC on the left, and an LDAP / Active Directory directory is used for sign-in; below, PostgreSQL, Redis, Kafka and OpenFGA are not exposed; on the right, a license file verified locally. Outside the boundary are external identity providers used only if configured; no connection is made to a license server.")}}</desc>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9" fill="none" stroke="#24564C" stroke-width="1.5"/></marker>
+    <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9" fill="none" stroke="#9C5E25" stroke-width="1.5"/></marker>
+  </defs>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif">
+    <rect x="20" y="40" width="820" height="520" rx="14" fill="#F4F0E8" stroke="#173F38" stroke-width="1.5"/>
+    <text x="44" y="30" font-size="13" font-weight="600" letter-spacing="1.2" fill="#173F38">{{L("KURUMUNUZUN ALTYAPISI", "YOUR INFRASTRUCTURE")}}</text>
+    <text x="{{sub2X}}" y="30" font-size="13" fill="#61665F">{{L("· kendi sunucunuz, kendi ağınız", "· your servers, your network")}}</text>
 
-    /// <summary>Ana sayfadaki animasyonlu mimari: uygulamalar -> Booster Auth (IdP + AuthZ) -> kullanici havuzlari.</summary>
-    public static IHtmlContent Diagram(string lang)
+    <text x="56" y="96" font-size="12" font-weight="600" letter-spacing="1" fill="#61665F">{{L("UYGULAMALARINIZ", "YOUR APPLICATIONS")}}</text>
+    <rect x="56" y="112" width="210" height="70" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+    <text x="74" y="142" font-size="15" font-weight="500" fill="#1C201E">{{L("Web uygulaması", "Web application")}}</text>
+    <text x="74" y="164" font-size="12.5" fill="#61665F" font-family="IBM Plex Mono, monospace">Authorization Code + PKCE</text>
+    <rect x="56" y="200" width="210" height="70" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+    <text x="74" y="230" font-size="15" font-weight="500" fill="#1C201E">{{L("Mobil uygulama", "Mobile app")}}</text>
+    <text x="74" y="252" font-size="12.5" fill="#61665F" font-family="IBM Plex Mono, monospace">PKCE · refresh token</text>
+    <rect x="56" y="288" width="210" height="70" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+    <text x="74" y="318" font-size="15" font-weight="500" fill="#1C201E">{{L("Arka uç servisleri", "Back-end services")}}</text>
+    <text x="74" y="340" font-size="12.5" fill="#61665F" font-family="IBM Plex Mono, monospace">service account · M2M</text>
+
+    <text x="56" y="414" font-size="12" font-weight="600" letter-spacing="1" fill="#61665F">{{L("KURUMSAL DİZİN", "CORPORATE DIRECTORY")}}</text>
+    <rect x="56" y="430" width="210" height="70" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+    <text x="74" y="460" font-size="15" font-weight="500" fill="#1C201E">LDAP / Active Directory</text>
+    <text x="74" y="482" font-size="12.5" fill="#61665F" font-family="IBM Plex Mono, monospace">LDAPS · StartTLS</text>
+
+    <path d="M266 147 C 320 147, 330 200, 378 205" fill="none" stroke="#24564C" stroke-width="1.5" marker-end="url(#ah)"/>
+    <path d="M266 235 L 378 235" fill="none" stroke="#24564C" stroke-width="1.5" marker-end="url(#ah)"/>
+    <path d="M266 323 C 320 323, 330 270, 378 265" fill="none" stroke="#24564C" stroke-width="1.5" marker-end="url(#ah)"/>
+    <rect x="296" y="222" width="52" height="22" rx="3" fill="#F4F0E8"/>
+    <text x="322" y="238" font-size="12" text-anchor="middle" font-family="IBM Plex Mono, monospace" fill="#24564C">OIDC</text>
+    <path d="M378 300 C 340 330, 330 465, 268 465" fill="none" stroke="#24564C" stroke-width="1.5" marker-end="url(#ah)"/>
+
+    <rect x="380" y="112" width="290" height="230" rx="10" fill="#173F38"/>
+    <text x="404" y="146" font-size="12" font-weight="600" letter-spacing="1.2" fill="#D6AE80">BOOSTER AUTH</text>
+    <text x="404" y="176" font-size="22" fill="#FFFFFF" font-family="Source Serif 4, Georgia, serif">{{L("Kimlik sağlayıcı", "Identity provider")}}</text>
+    <rect x="404" y="196" width="242" height="38" rx="5" fill="#24564C"/>
+    <text x="420" y="220" font-size="13.5" fill="#EEF3EF">{{L("OIDC / OAuth 2.0 uç noktaları", "OIDC / OAuth 2.0 endpoints")}}</text>
+    <rect x="404" y="242" width="242" height="38" rx="5" fill="#24564C"/>
+    <text x="420" y="266" font-size="13.5" fill="#EEF3EF">{{L("Oturum açma, MFA, yetkilendirme", "Sign-in, MFA, authorization")}}</text>
+    <rect x="404" y="288" width="242" height="38" rx="5" fill="#24564C"/>
+    <text x="420" y="312" font-size="13.5" fill="#EEF3EF">{{L("Yönetim konsolu · TR / EN", "Admin console · TR / EN")}}</text>
+
+    <rect x="360" y="392" width="460" height="140" rx="10" fill="none" stroke="#9C5E25" stroke-dasharray="5 5"/>
+    <rect x="376" y="382" width="{{(tr ? 232 : 196)}}" height="20" fill="#F4F0E8"/>
+    <text x="384" y="397" font-size="12" font-weight="600" letter-spacing="1" fill="#9C5E25">{{L("İÇ AĞ · DIŞARIYA AÇILMAZ", "INTERNAL · NOT EXPOSED")}}</text>
+    <g font-size="14" font-weight="500" fill="#1C201E">
+      <rect x="380" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="428" y="460" text-anchor="middle">PostgreSQL</text><text x="428" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("kalıcı veri", "persistent data")}}</text>
+      <rect x="488" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="536" y="460" text-anchor="middle">Redis</text><text x="536" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("önbellek", "cache")}}</text>
+      <rect x="596" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="644" y="460" text-anchor="middle">Kafka</text><text x="644" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("olaylar", "events")}}</text>
+      <rect x="704" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="752" y="460" text-anchor="middle">OpenFGA</text><text x="752" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("yetkilendirme", "authorization")}}</text>
+    </g>
+    <path d="M525 342 L 525 382" stroke="#24564C" stroke-width="1.5" marker-end="url(#ah)" marker-start="url(#ah)"/>
+
+    <path d="M712 150 h70 l18 18 v84 h-88 z" fill="#FBF9F4" stroke="#C4BAA8"/>
+    <path d="M782 150 v18 h18" fill="none" stroke="#C4BAA8"/>
+    <line x1="726" y1="186" x2="784" y2="186" stroke="#D6CEBF" stroke-width="3"/>
+    <line x1="726" y1="198" x2="776" y2="198" stroke="#D6CEBF" stroke-width="3"/>
+    <line x1="726" y1="210" x2="780" y2="210" stroke="#D6CEBF" stroke-width="3"/>
+    <circle cx="770" cy="234" r="9" fill="none" stroke="#9C5E25" stroke-width="1.5"/>
+    <path d="M765 234 l3.5 3.5 l6 -7" fill="none" stroke="#9C5E25" stroke-width="1.5"/>
+    <text x="756" y="276" text-anchor="middle" font-size="13" font-weight="500" fill="#1C201E">{{L("Lisans dosyası", "License file")}}</text>
+    <text x="756" y="294" text-anchor="middle" font-size="12" fill="#61665F">{{L("yerelde doğrulanır", "verified locally")}}</text>
+    <path d="M710 200 L 672 200" stroke="#9C5E25" stroke-width="1.5" marker-end="url(#ah2)"/>
+
+    <text x="880" y="96" font-size="12" font-weight="600" letter-spacing="1" fill="#61665F">{{L("DIŞ SAĞLAYICILAR", "EXTERNAL PROVIDERS")}}</text>
+    <text x="880" y="114" font-size="12" fill="#61665F">{{L("isteğe bağlı", "optional")}}</text>
+    <g font-size="13.5" fill="#1C201E">
+      <rect x="880" y="130" width="220" height="196" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="900" y="160">Google</text><text x="1000" y="160">Microsoft</text>
+      <text x="900" y="188">Apple</text><text x="1000" y="188">LinkedIn</text>
+      <text x="900" y="216">GitHub</text><text x="1000" y="216">Facebook</text>
+      <text x="900" y="244">X</text><text x="1000" y="244">SAML</text>
+      <line x1="900" y1="264" x2="1080" y2="264" stroke="#D6CEBF"/>
+      <text x="900" y="292" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#454B47">{{L("genel OIDC sağlayıcı", "generic OIDC provider")}}</text>
+    </g>
+    <path d="M670 132 C 760 110, 800 120, 878 150" fill="none" stroke="#24564C" stroke-width="1.5" stroke-dasharray="2 4" marker-end="url(#ah)"/>
+
+    <rect x="880" y="420" width="220" height="88" rx="6" fill="none" stroke="#93392B" stroke-dasharray="3 4"/>
+    <text x="990" y="456" text-anchor="middle" font-size="14" font-weight="500" fill="#93392B" text-decoration="line-through">{{L("Lisans sunucusu", "License server")}}</text>
+    <text x="990" y="480" text-anchor="middle" font-size="12" fill="#61665F">{{L("bağlantı kurulmaz", "never contacted")}}</text>
+    <path d="M800 465 L 878 465" stroke="#93392B" stroke-width="1.5" stroke-dasharray="3 4"/>
+    <g stroke="#93392B" stroke-width="2"><line x1="832" y1="457" x2="848" y2="473"/><line x1="848" y1="457" x2="832" y2="473"/></g>
+  </g>
+</svg>
+""");
+    }
+
+    /// <summary>Ucretli lisansin suresi doldugunda: girisler devam eder, konsol ek sureden sonra salt okunur.</summary>
+    public static IHtmlContent Timeline(string lang)
     {
         var tr = lang != "en";
         string L(string t, string e) => tr ? t : e;
         return new HtmlString($$"""
-<svg viewBox="0 0 520 380" role="img" aria-label="{{L("Booster Auth mimarisi", "Booster Auth architecture")}}">
-  <g class="node"><rect x="10" y="24" width="140" height="58" rx="12"/><text x="80" y="50" text-anchor="middle">{{L("Web uygulaması", "Web app")}}</text><text class="sub" x="80" y="68" text-anchor="middle">OIDC + PKCE</text></g>
-  <g class="node"><rect x="10" y="161" width="140" height="58" rx="12"/><text x="80" y="187" text-anchor="middle">{{L("Mobil uygulama", "Mobile app")}}</text><text class="sub" x="80" y="205" text-anchor="middle">iOS · Android</text></g>
-  <g class="node"><rect x="10" y="298" width="140" height="58" rx="12"/><text x="80" y="324" text-anchor="middle">{{L("API / servis", "API / service")}}</text><text class="sub" x="80" y="342" text-anchor="middle">{{L("Servis hesabı", "Service account")}}</text></g>
-  <g class="node core"><rect x="200" y="96" width="150" height="188" rx="16"/>
-    <text x="275" y="132" text-anchor="middle">Booster Auth</text>
-    <text class="sub" x="275" y="160" text-anchor="middle">{{L("Kimlik (IdP)", "Identity (IdP)")}}</text>
-    <text class="sub" x="275" y="182" text-anchor="middle">{{L("Yetki (AuthZ)", "Access (AuthZ)")}}</text>
-    <text class="sub" x="275" y="204" text-anchor="middle">{{L("Yönetim paneli", "Admin console")}}</text>
-    <text class="sub" x="275" y="250" text-anchor="middle">{{L("Sizin sunucunuzda", "On your servers")}}</text></g>
-  <g class="node"><rect x="400" y="70" width="110" height="58" rx="12"/><text x="455" y="96" text-anchor="middle">{{L("Havuz A", "Pool A")}}</text><text class="sub" x="455" y="114" text-anchor="middle">{{L("Müşteriler", "Customers")}}</text></g>
-  <g class="node"><rect x="400" y="252" width="110" height="58" rx="12"/><text x="455" y="278" text-anchor="middle">{{L("Havuz B", "Pool B")}}</text><text class="sub" x="455" y="296" text-anchor="middle">{{L("Çalışanlar", "Employees")}}</text></g>
-  <path id="f1" class="flow" d="M150 53 C180 53 175 140 200 150"/>
-  <path id="f2" class="flow" d="M150 190 L200 190"/>
-  <path id="f3" class="flow" d="M150 327 C180 327 175 240 200 230"/>
-  <path id="f4" class="flow" d="M350 150 C375 140 375 99 400 99"/>
-  <path id="f5" class="flow" d="M350 230 C375 240 375 281 400 281"/>
-  <circle class="dot" r="4"><animateMotion dur="2.6s" repeatCount="indefinite"><mpath href="#f1"/></animateMotion></circle>
-  <circle class="dot" r="4"><animateMotion dur="2.2s" begin=".6s" repeatCount="indefinite"><mpath href="#f2"/></animateMotion></circle>
-  <circle class="dot" r="4"><animateMotion dur="2.8s" begin="1.1s" repeatCount="indefinite"><mpath href="#f3"/></animateMotion></circle>
-  <circle class="dot" r="4"><animateMotion dur="2.4s" begin=".3s" repeatCount="indefinite"><mpath href="#f4"/></animateMotion></circle>
-  <circle class="dot" r="4"><animateMotion dur="2.4s" begin="1.4s" repeatCount="indefinite"><mpath href="#f5"/></animateMotion></circle>
+<svg viewBox="0 0 640 262" role="img" aria-labelledby="tlT">
+  <title id="tlT">{{L(
+      "Ücretli lisansın süresi dolduktan sonra son kullanıcı girişleri kesintisiz devam eder; yönetim konsolu 14 günlük ek süre boyunca tam yetkili, ardından salt okunur olur.",
+      "After a paid license expires, end-user sign-ins continue without interruption; the admin console keeps full access for a 14-day grace period, then becomes read-only.")}}</title>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif">
+    <line x1="20" y1="214" x2="620" y2="214" stroke="#C4BAA8"/>
+    <g font-size="15" fill="#61665F">
+      <line x1="40" y1="208" x2="40" y2="220" stroke="#C4BAA8"/><text x="40" y="244" text-anchor="middle">{{L("Başlangıç", "Start")}}</text>
+      <line x1="330" y1="40" x2="330" y2="220" stroke="#1C201E" stroke-dasharray="3 3"/><text x="330" y="244" text-anchor="middle" fill="#1C201E" font-weight="600">{{L("Bitiş tarihi", "Expiry date")}}</text>
+      <line x1="450" y1="40" x2="450" y2="220" stroke="#9C5E25" stroke-dasharray="3 3"/><text x="450" y="244" text-anchor="middle" fill="#9C5E25" font-weight="600">{{L("+14 gün", "+14 days")}}</text>
+    </g>
+    <text x="20" y="60" font-size="16" font-weight="600" fill="#1C201E">{{L("Son kullanıcı girişleri", "End-user sign-ins")}}</text>
+    <rect x="40" y="72" width="580" height="12" rx="6" fill="#2F6B4F"/>
+    <text x="620" y="104" text-anchor="end" font-size="15" fill="#2F6B4F">{{L("kesintisiz devam eder →", "continue uninterrupted →")}}</text>
+    <text x="20" y="146" font-size="16" font-weight="600" fill="#1C201E">{{L("Yönetim konsolu", "Admin console")}}</text>
+    <rect x="40" y="158" width="290" height="12" rx="6" fill="#173F38"/>
+    <rect x="324" y="158" width="126" height="12" fill="#9C5E25" opacity=".75"/>
+    <rect x="450" y="158" width="170" height="12" fill="#D6CEBF"/>
+    <text x="390" y="190" text-anchor="middle" font-size="15" fill="#9C5E25">{{L("ek süre", "grace period")}}</text>
+    <text x="535" y="190" text-anchor="middle" font-size="15" fill="#454B47">{{L("salt okunur", "read-only")}}</text>
+  </g>
 </svg>
 """);
     }

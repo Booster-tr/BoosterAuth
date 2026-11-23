@@ -1,56 +1,116 @@
 @using Booster.Licensing.Portal.Services
-<section class="page-hero">
+<div class="page-head">
     <div class="wrap">
-        <span class="eyebrow" style="color:var(--teal)">İndir</span>
-        <h1 class="reveal">Booster Auth'u kendi bilgisayarınızda çalıştırın</h1>
-        <p class="reveal" style="--d:.08s">Docker Compose kurulum paketi: tüm servisler, PostgreSQL, Redis, Kafka, OpenFGA ve yönetim paneli tek klasörde.</p>
-        <div class="cta reveal" style="justify-content:center;--d:.16s">
-            <a class="btn btn-primary btn-lg" href="/download/@InstallPackage.FileName" data-download>@InstallPackage.FileName indir <span class="arrow">↓</span></a>
-            <a class="btn btn-ghost btn-lg" href="/tr/docs/installation">Ayrıntılı kurulum rehberi</a>
+        <p class="kicker reveal">İndir</p>
+        <div class="page-head-grid" style="margin-top:0;align-items:start">
+            <div>
+                <h1 class="reveal d2">Üç komutla <em>kendi sunucunuzda</em>.</h1>
+                <p class="lede reveal d3" style="margin-top:28px">Docker Compose kurulum paketi; tüm servisler, PostgreSQL, Redis, Kafka, OpenFGA ve yönetim konsolu tek klasörde.
+                    Kurulum betiği bütün parola ve anahtarları sizin sunucunuzda üretir; elle doldurmanız gereken bir gizli değer yoktur.</p>
+            </div>
+            <div class="dl-card reveal d3">
+                <div class="file"><b>@InstallPackage.FileName</b><span>yaklaşık 15 KB</span></div>
+                <a class="btn btn-primary" href="/download/@InstallPackage.FileName" data-download>Paketi indir <span class="arr" aria-hidden="true">↓</span></a>
+                <ul class="facts">
+                    <li>Ücretsiz indirilir; lisansı kurulumdan sonra alırsınız.</li>
+                    <li>Linux, macOS ve Windows üzerinde Docker ile çalışır.</li>
+                    <li>İnternet yalnızca image'ları indirmek için gerekir.</li>
+                </ul>
+            </div>
         </div>
-        <p class="muted small reveal" style="--d:.2s">Ücretsiz · Lisansı kurulumdan sonra alırsınız · Yaklaşık 15 KB</p>
     </div>
-</section>
+</div>
 
-<section class="section">
-    <div class="wrap grid-2" style="align-items:start;gap:3rem">
+<section class="install" aria-labelledby="h-adim" style="margin-top:80px">
+    <div class="wrap inst-grid">
         <div class="reveal">
-            <h2>Dört komutla kurulum</h2>
-            <div class="steps" style="grid-template-columns:1fr;gap:1rem;margin-top:1.5rem">
-                <div class="step"><h3>Paketi açın</h3><p>Zip dosyasını açıp <code>booster-auth</code> klasörüne geçin.</p></div>
-                <div class="step"><h3>Kurulum betiğini çalıştırın</h3><p>Booster Auth adresinizi (ör. <code>auth.firma.com</code>) ve panel adresini sorar; tüm parola ve anahtarları rastgele üretip <code>.env</code> dosyasını yazar.</p></div>
-                <div class="step"><h3>Başlatın</h3><p><code>docker compose up -d</code>. İlk açılışta image'lar indirilir; birkaç dakika sürer.</p></div>
-                <div class="step"><h3>Panele girin ve lisans alın</h3><p><code>admin</code> kullanıcısıyla girin, ilk parolayı değiştirin. <b>Sistem &gt; Lisans</b> ekranındaki <b>Lisans al</b> sizi lisans portalına götürür.</p></div>
-            </div>
+            <p class="kicker">Kurulum</p>
+            <h2 id="h-adim">İndirmeden ilk girişe.</h2>
+            <ol class="steps" style="margin-top:32px">
+                <li><span class="n">Adım 1</span><div><h3>Paketi açın</h3><p>Zip dosyasını açıp <code>booster-auth</code> klasörüne geçin.</p></div></li>
+                <li><span class="n">Adım 2</span><div><h3>Betiği çalıştırın</h3><p>Booster Auth adresinizi (ör. <code>auth.firma.com</code>), HTTPS portunu, konsol portunu ve yönetici e-postasını sorar;
+                    bütün parola ve anahtarları rastgele üretip <code>.env</code> dosyasına yazar.</p></div></li>
+                <li><span class="n">Adım 3</span><div><h3>Başlatın</h3><p><code>docker compose up -d</code>. İlk açılışta image'lar indirilir, veritabanları ve HTTPS sertifikası oluşturulur.</p></div></li>
+                <li><span class="n">Adım 4</span><div><h3>Konsola girin</h3><p><code>http://localhost:3000</code> adresinde <code>admin</code> kullanıcısıyla girin; ilk girişte parolanızı değiştirirsiniz.</p></div></li>
+            </ol>
         </div>
-        <div class="reveal" style="--d:.08s">
-            <div class="terminal">
-                <div class="terminal-bar"><i></i><i></i><i></i></div>
-<pre><span class="c"># Linux / macOS</span>
-<span class="p">$</span> unzip booster-auth.zip &amp;&amp; cd booster-auth
-<span class="p">$</span> ./kurulum.sh
-<span class="p">$</span> docker compose up -d
+        <div class="reveal d2">
+            <div class="term" role="region" aria-label="Linux ve macOS kurulum komutları">
+                <div class="term-bar"><span>Linux / macOS</span><span>bash</span></div>
+<pre><code><span class="p">$ </span>unzip booster-auth.zip &amp;&amp; cd booster-auth
+<span class="p">$ </span>./kurulum.sh
+<span class="ok">.env olusturuldu.</span>
+<span class="p">$ </span>docker compose up -d</code></pre>
+            </div>
+            <div class="term" role="region" aria-label="Windows kurulum komutları">
+                <div class="term-bar"><span>Windows</span><span>PowerShell</span></div>
+<pre><code><span class="p">&gt; </span>Expand-Archive booster-auth.zip .
+<span class="p">&gt; </span>cd booster-auth
+<span class="p">&gt; </span>powershell -ExecutionPolicy Bypass -File .\kurulum.ps1
+<span class="p">&gt; </span>docker compose up -d</code></pre>
+            </div>
+            <p class="hard">Bir gizli değer <code>CHANGE_ME</code> olarak kalırsa sistem başlamaz ve hangi değişkenin eksik olduğunu söyler. Kurulum, örnek değerlerle başlatılamaz.</p>
+        </div>
+    </div>
+</section>
 
-<span class="c"># Windows (PowerShell)</span>
-<span class="p">&gt;</span> Expand-Archive booster-auth.zip .
-<span class="p">&gt;</span> cd booster-auth
-<span class="p">&gt;</span> powershell -ExecutionPolicy Bypass -File .\kurulum.ps1
-<span class="p">&gt;</span> docker compose up -d</pre>
-            </div>
-            <div class="callout info" style="margin-top:1.5rem">
-                <p><b>Yerel deneme.</b> Adresiniz henüz DNS'te yoksa <code>hosts</code> dosyasına <code>127.0.0.1 auth.firma.com</code> satırını ekleyin.
-                    Booster Auth adresi lisansınızdaki domain'lerden biri olmalıdır.</p>
-            </div>
-            <h3 style="margin-top:2rem">Gereksinimler</h3>
-            <ul class="muted">
-                <li>Docker Engine 24+ ve Docker Compose v2 (Windows / macOS: Docker Desktop)</li>
-                <li>En az 4 GB boş bellek, 10 GB disk</li>
-                <li>Kurulumda internet erişimi (image'lar <code>ghcr.io/booster-tr</code> adresinden indirilir)</li>
+<section aria-labelledby="h-sorular">
+    <div class="wrap split">
+        <div class="reveal">
+            <p class="kicker">Kurulum betiği</p>
+            <h2 id="h-sorular">Dört soru, gerisi otomatik.</h2>
+            <p class="prose-2" style="margin-top:20px">Betiğin sorduğu değerler aşağıdadır. Veritabanı, Redis ve OpenFGA parolaları, parola pepper'ı, şifreleme anahtarı ve konsol
+                oturum sırrı sorulmaz; hepsi rastgele üretilir.</p>
+            <div class="callout tip" style="margin-top:24px"><p><b>Yerel deneme.</b> Adresiniz henüz DNS'te yoksa <code>hosts</code> dosyasına
+                <code>127.0.0.1 auth.firma.com</code> satırını ekleyin. Booster Auth adresi lisansınızdaki domain'lerden biri olmalıdır.</p></div>
+        </div>
+        <table class="qa reveal d2">
+            <thead><tr><th scope="col">Soru</th><th scope="col">Örnek</th><th scope="col">Açıklama</th></tr></thead>
+            <tbody>
+                <tr><th scope="row">Booster Auth adresi</th><td><code>auth.firma.com</code></td><td>Uygulamalarınızın giriş için yönleneceği adres; OIDC issuer bundan oluşur.</td></tr>
+                <tr><th scope="row">HTTPS portu</th><td><code>443</code></td><td>443 doluysa ör. <code>8443</code>.</td></tr>
+                <tr><th scope="row">Konsol portu / adresi</th><td><code>3000</code></td><td>Yönetim konsolunun adresi, ör. <code>http://localhost:3000</code>.</td></tr>
+                <tr><th scope="row">Yönetici e-postası</th><td><code>it@@firma.com</code></td><td>İlk yöneticinin e-postası. Kullanıcı adı her zaman <code>admin</code>'dir.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="band" aria-labelledby="h-gerek">
+    <div class="wrap split">
+        <div class="reveal">
+            <p class="kicker">Gereksinimler</p>
+            <h2 id="h-gerek" style="margin-bottom:32px">Tek bir makine yeterli.</h2>
+            <ul class="req">
+                <li><b>Docker</b><span>Docker Engine 24+ ve Docker Compose v2 (Windows / macOS: Docker Desktop)</span></li>
+                <li><b>Bellek</b><span>En az 4 GB boş bellek</span></li>
+                <li><b>Disk</b><span>10 GB</span></li>
+                <li><b>Ağ</b><span>Kurulumda image'lar <code>ghcr.io/booster-tr</code> adresinden indirilir</span></li>
+                <li><b>Pakette</b><span>PostgreSQL, Redis, Kafka ve OpenFGA; ayrıca kurmanız gerekmez</span></li>
             </ul>
-            <h3 style="margin-top:1.5rem">Paketin içeriği</h3>
-            <ul class="muted">
-                @foreach (var f in Model.PackageFiles) { <li><code>booster-auth/@f</code></li> }
+        </div>
+        <div class="reveal d2">
+            <p class="kicker">Paketin içeriği</p>
+            <h2 style="margin-bottom:32px;font-size:clamp(26px,2.6vw,32px)">Açık, okunabilir dosyalar.</h2>
+            <ul class="files">
+                @foreach (var f in Model.PackageFiles)
+                {
+                    <li>booster-auth/@f</li>
+                }
             </ul>
         </div>
     </div>
 </section>
+
+<div class="closing">
+    <div class="wrap closing-inner">
+        <h2 class="reveal">Kurulumun ayrıntıları dokümantasyonda.</h2>
+        <div class="side-cta reveal d2">
+            <p>.env değişkenleri, HTTPS sertifikası, ilk giriş ve lisans etkinleştirme adım adım anlatılır.</p>
+            <div class="cta-row">
+                <a class="btn btn-primary" href="/tr/docs/installation">Kurulum rehberi <span class="arr" aria-hidden="true">→</span></a>
+                <a class="btn btn-ghost" href="/tr/docs/first-steps">İlk yapılandırma</a>
+            </div>
+        </div>
+    </div>
+</div>

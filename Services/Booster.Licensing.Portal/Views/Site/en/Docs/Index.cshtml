@@ -1,28 +1,31 @@
 <h1>Booster Auth documentation</h1>
-<p class="lead">Everything you need to install Booster Auth, configure it and connect your applications. If this is your first time,
-    read in order: concepts first, then installation, then the first configuration.</p>
+<p class="lede">Everything you need to install Booster Auth, configure it and connect your applications. If this is your first visit, read in order:
+    concepts first, then installation, then the first configuration.</p>
 
-<div class="doc-cards">
-    <a href="/en/docs/concepts"><b>1. Core concepts</b><span>What tenants, user pools, applications, roles and permissions are and how they relate.</span></a>
-    <a href="/en/docs/installation"><b>2. Installation</b><span>Download the package, prepare the .env file, <code>docker compose up</code>.</span></a>
-    <a href="/en/docs/first-steps"><b>3. First configuration</b><span>Sign in to the console, create a pool and an application, add users.</span></a>
-    <a href="/en/docs/integration"><b>4. Application integration</b><span>Connect web, SPA, mobile and APIs with OpenID Connect; code samples.</span></a>
-    <a href="/en/docs/authorization"><b>5. Authorization checks</b><span>Check permissions with roles, scopes and the AuthZ API.</span></a>
-    <a href="/en/docs/licensing"><b>6. Licensing</b><span>Trials, purchasing, activation, renewal and transfer.</span></a>
-</div>
+<h2 id="guides">Guides</h2>
+<ul class="doc-index">
+    <li><a href="/en/docs/concepts"><b><small>Getting started</small>Core concepts</b><span>What tenants, user pools, applications, roles and the authorization schema are, and how they relate.</span></a></li>
+    <li><a href="/en/docs/installation"><b><small>Getting started</small>Installation</b><span>Download the package, run the setup script, <code>docker compose up -d</code>. Requirements and HTTPS.</span></a></li>
+    <li><a href="/en/docs/first-steps"><b><small>Guide</small>First configuration</b><span>Console sign-in, creating a pool and an application, adding, inviting and importing users.</span></a></li>
+    <li><a href="/en/docs/integration"><b><small>Guide</small>Application integration</b><span>Connect web, SPA, mobile and API clients with OpenID Connect; endpoints and code samples.</span></a></li>
+    <li><a href="/en/docs/authorization"><b><small>Guide</small>Authorization checks</b><span>Roles, scopes and the AuthZ API to answer “can this user do this?”.</span></a></li>
+    <li><a href="/en/docs/licensing"><b><small>Operations</small>Licensing</b><span>Trial, purchase, activation, license states, renewal and transfer.</span></a></li>
+    <li><a href="/en/docs/operations"><b><small>Operations</small>Operations and troubleshooting</b><span>Updates, backups, e-mail settings and common problems.</span></a></li>
+</ul>
 
 <h2 id="architecture">Architecture at a glance</h2>
-<p>Booster Auth consists of a few services that all run with a single <code>docker compose</code>. Only two doors are open to the outside:</p>
+<p>Booster Auth is made of a few services that all run with a single <code>docker compose</code>. Only two doors are open to the outside: the HTTPS
+    gateway and the admin console. Infrastructure services stay on the internal network.</p>
 <table>
     <thead><tr><th>Component</th><th>Role</th><th>Address</th></tr></thead>
     <tbody>
-        <tr><td><b>Gateway</b></td><td>The single HTTPS entry point; forwards requests to the right service.</td><td><code>https://auth.company.com</code></td></tr>
-        <tr><td><b>IdP</b></td><td>OpenID Connect identity provider: sign-in, registration, tokens.</td><td><code>/idp</code></td></tr>
-        <tr><td><b>Management API</b></td><td>Tenants, pools, applications and roles; licensing.</td><td><code>/management</code></td></tr>
+        <tr><td><b>Gateway</b></td><td>The single HTTPS entry point; routes each request to the right service.</td><td><code>https://auth.company.com</code></td></tr>
+        <tr><td><b>IdP</b></td><td>OpenID Connect identity provider: sign-in, sign-up, tokens.</td><td><code>/idp</code></td></tr>
+        <tr><td><b>Management API</b></td><td>Tenants, pools, applications, roles; licensing.</td><td><code>/management</code></td></tr>
         <tr><td><b>AuthZ</b></td><td>Authorization schema and permission checks (on OpenFGA).</td><td><code>/authz</code></td></tr>
-        <tr><td><b>Admin console</b></td><td>The web UI for administrators.</td><td><code>http://localhost:3000</code></td></tr>
-        <tr><td>Infrastructure</td><td>PostgreSQL, Redis, Kafka, OpenFGA; not exposed.</td><td>-</td></tr>
+        <tr><td><b>Admin console</b></td><td>The web interface for administrators (English / Turkish).</td><td><code>http://localhost:3000</code></td></tr>
+        <tr><td>Infrastructure</td><td>PostgreSQL, Redis, Kafka, OpenFGA; never exposed.</td><td>—</td></tr>
     </tbody>
 </table>
-<div class="callout tip"><p><b>Quick start.</b> If you just want to try it, <a href="/en/download">download the package</a> and follow the four steps on the
-    <a href="/en/docs/installation">installation</a> page; you will be signed in to the console within ten minutes.</p></div>
+<div class="callout tip"><p><b>Quick start.</b> Just want to try it? <a href="/en/download">Download the package</a> and follow the steps on the
+    <a href="/en/docs/installation">Installation</a> page: the script generates the secrets and <code>docker compose up -d</code> starts the system.</p></div>

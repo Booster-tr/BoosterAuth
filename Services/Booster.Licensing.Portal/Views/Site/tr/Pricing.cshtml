@@ -1,68 +1,133 @@
 @using Booster.Licensing.Portal.Services
 @{
     var c = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
-    var featured = Model.Plans.Count > 1 ? Model.Plans[1].Code : null;
 }
-<section class="page-hero">
+<div class="page-head">
     <div class="wrap">
-        <span class="eyebrow" style="color:var(--teal)">Paketler</span>
-        <h1 class="reveal">Sade fiyatlandırma, tüm özellikler dahil</h1>
-        <p class="reveal" style="--d:.08s">Paketler yalnızca kullanıcı, havuz ve uygulama limitlerinde ayrılır. Lisans kurulum başınadır ve yıllıktır;
-            kullanıcı başına aylık ücret yoktur.</p>
-    </div>
-</section>
-
-<section class="section">
-    <div class="wrap">
-        <div class="plans">
-            <article class="plan reveal" data-plan="deneme">
-                <h3>Ücretsiz deneme</h3>
-                <div class="price">0 ₺</div>
-                <p class="muted small">Ürünü kendi ortamınızda deneyin.</p>
-                <ul>
-                    <li>@LicenseIssuer.Defaults.TrialUsers.ToString("N0", c) kullanıcı</li>
-                    <li>@LicenseIssuer.Defaults.TrialPools kullanıcı havuzu</li>
-                    <li>@LicenseIssuer.Defaults.TrialClients uygulama</li>
-                    <li>@LicenseIssuer.Defaults.TrialDays gün</li>
-                </ul>
-                <a class="btn btn-ghost" href="/hesap/satin-al?plan=deneme">Ücretsiz dene</a>
-            </article>
-            @foreach (var (p, i) in Model.Plans.Select((p, i) => (p, i)))
-            {
-                <article class="plan reveal @(p.Code == featured ? "featured" : "")" style="--d:@((i + 1) * 0.06)s" data-plan="@p.Code">
-                    @if (p.Code == featured) { <span class="badge">En çok tercih edilen</span> }
-                    <h3>@p.Name</h3>
-                    <div class="price">@(p.Price > 0 ? $"{p.Price.ToString("N0", c)} {p.Currency}" : "Teklif alın")@if (p.Price > 0) {<small> / @p.DurationMonths ay</small>}</div>
-                    <p class="muted small">Havale / EFT ile ödeme; lisans e-postanıza gelir.</p>
-                    <ul>
-                        <li>@p.MaxUsers.ToString("N0", c) kullanıcı</li>
-                        <li>@p.MaxPools kullanıcı havuzu</li>
-                        <li>@p.MaxClients uygulama</li>
-                        <li>Tüm özellikler</li>
-                    </ul>
-                    <a class="btn @(p.Code == featured ? "btn-primary" : "btn-ghost")" href="/hesap/satin-al?plan=@Uri.EscapeDataString(p.Code)" data-buy="@p.Code">Lisans al</a>
-                </article>
-            }
+        <p class="kicker reveal">Paketler</p>
+        <h1 class="reveal d2">Kurulum başına yıllık lisans. <em>Hepsi bu.</em></h1>
+        <div class="page-head-grid">
+            <p class="lede reveal d3">Paketler yalnızca kullanıcı, havuz ve uygulama limitlerinde ayrışır; her özellik her pakettedir. Kullanıcı başına aylık ücret
+                yoktur ve ücretli lisansın süresi dolsa bile kullanıcılarınızın girişi durmaz.</p>
+            <div class="cta-row reveal d3">
+                <a class="btn btn-ghost" href="/hesap/satin-al?plan=deneme">7 gün ücretsiz deneyin</a>
+                <a class="btn btn-ghost" href="/tr/docs/licensing">Lisans nasıl çalışır?</a>
+            </div>
         </div>
-        <p class="center muted small" style="margin-top:1.5rem">Yönetim paneli kullanıcıları ve yönetim havuzu limitlere dahil değildir.</p>
+    </div>
+</div>
+
+<section aria-labelledby="h-paketler" style="padding-top:72px">
+    <div class="wrap">
+        <h2 id="h-paketler" class="sr">Paket listesi</h2>
+        <table class="plans reveal">
+            <caption>Fiyatlar kurulum başınadır. Ödeme havale / EFT ile yapılır; lisans, ödeme onaylanınca e-postanıza gönderilir.</caption>
+            <thead>
+                <tr><th scope="col">Paket</th><th scope="col">Kullanıcı</th><th scope="col">Havuz</th><th scope="col">Uygulama</th><th scope="col">Süre</th><th scope="col">Fiyat</th><th scope="col"><span class="sr">Satın al</span></th></tr>
+            </thead>
+            <tbody>
+                <tr class="trial" data-plan="deneme">
+                    <th scope="row">Ücretsiz deneme<small>Kendi ortamınızda değerlendirin</small></th>
+                    <td class="num" data-h="Kullanıcı">@LicenseIssuer.Defaults.TrialUsers.ToString("N0", c)</td>
+                    <td class="num" data-h="Havuz">@LicenseIssuer.Defaults.TrialPools</td>
+                    <td class="num" data-h="Uygulama">@LicenseIssuer.Defaults.TrialClients</td>
+                    <td class="num" data-h="Süre">@LicenseIssuer.Defaults.TrialDays gün</td>
+                    <td class="price" data-h="Fiyat">Ücretsiz<small>domain başına bir kez</small></td>
+                    <td class="go"><a class="btn btn-ghost btn-sm" href="/hesap/satin-al?plan=deneme">Denemeyi başlat</a></td>
+                </tr>
+                @foreach (var p in Model.Plans)
+                {
+                    <tr data-plan="@p.Code">
+                        <th scope="row">@p.Name<small>Tüm özellikler dahil</small></th>
+                        <td class="num" data-h="Kullanıcı">@p.MaxUsers.ToString("N0", c)</td>
+                        <td class="num" data-h="Havuz">@p.MaxPools.ToString("N0", c)</td>
+                        <td class="num" data-h="Uygulama">@p.MaxClients.ToString("N0", c)</td>
+                        <td class="num" data-h="Süre">@p.DurationMonths ay</td>
+                        <td class="price" data-h="Fiyat">@if (p.Price > 0)
+                            {
+                                <span>@p.Price.ToString("N0", c) @p.Currency</span><small>kurulum başına</small>
+                            }
+                            else
+                            {
+                                @:Teklif alın
+                            }</td>
+                        <td class="go"><a class="btn btn-primary btn-sm" href="/hesap/satin-al?plan=@Uri.EscapeDataString(p.Code)" data-buy="@p.Code">Lisans al <span class="arr" aria-hidden="true">→</span></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p class="price-note">Yönetim konsolunun kendi kullanıcıları ve yönetim havuzu limitlere dahil değildir.</p>
     </div>
 </section>
 
-<section class="section alt">
+<section class="band" aria-labelledby="h-dahil">
     <div class="wrap">
-        <div class="section-head reveal"><h2>Sık sorulan sorular</h2></div>
-        <div class="faq">
-            <details class="reveal"><summary>Deneme lisansını kimler alabilir?</summary>
-                <p>Firma e-posta adresiyle kayıt olan herkes. Kurulumun domain'i e-posta domain'inizle uyuşmalı ve her domain için bir kez deneme verilir. Ücretsiz e-posta adresleriyle (gmail, outlook vb.) deneme alınamaz.</p></details>
-            <details class="reveal"><summary>Ödeme nasıl yapılır?</summary>
-                <p>Lisans portalında siparişinizi oluşturduğunuzda size bir referans kodu ve havale / EFT bilgileri verilir. Ödeme onaylanınca lisansınız otomatik üretilir ve e-postanıza gönderilir.</p></details>
-            <details class="reveal"><summary>Lisans süresi dolarsa ne olur?</summary>
-                <p>Bitişten sonra ek süre boyunca her şey çalışır: ücretli lisansta @LicenseIssuer.Defaults.PaidGraceDays gün, denemede @LicenseIssuer.Defaults.TrialGraceDays gün. Ardından yönetim paneli salt okunur olur; ücretli lisanslarda son kullanıcı girişleri kesilmez. Deneme lisansında ek süre bitince son kullanıcı girişleri de durur.</p></details>
-            <details class="reveal"><summary>Erken yenilersem kalan günlerim yanar mı?</summary>
+        <div class="sec-head reveal">
+            <div>
+                <p class="kicker">Her pakette</p>
+                <h2 id="h-dahil">Özellik kilidi yok.</h2>
+            </div>
+            <p>Deneme dahil her lisans, ürünün tamamını açar. Büyüdükçe yalnızca limitleri artırırsınız.</p>
+        </div>
+        <ul class="included reveal">
+            <li>OpenID Connect / OAuth 2.0</li>
+            <li>LDAP / Active Directory ile giriş</li>
+            <li>Parolasız giriş (e-posta / SMS kodu)</li>
+            <li>E-posta / SMS ile iki adımlı doğrulama</li>
+            <li>Google, Microsoft, Apple ve diğer sağlayıcılar</li>
+            <li>Genel OpenID Connect ve SAML</li>
+            <li>Yalıtılmış kullanıcı havuzları</li>
+            <li>Roller, kapsamlar ve servis hesapları</li>
+            <li>OpenFGA tabanlı yetki şeması ve AuthZ API</li>
+            <li>Davet ve CSV ile içe aktarma</li>
+            <li>Yetki devri: Sahip / Yönetici / Görüntüleyici</li>
+            <li>Türkçe / İngilizce yönetim konsolu</li>
+        </ul>
+    </div>
+</section>
+
+<section aria-labelledby="h-satin">
+    <div class="wrap lic-grid">
+        <div class="reveal">
+            <p class="kicker">Satın alma</p>
+            <h2 id="h-satin">Sipariş, havale, lisans.</h2>
+            <p class="prose-2">Lisans portalında Booster Auth hesabınızla oturum açarsınız. Portal eksik adımları sırayla tamamlatır: firma bilgileri, kurulum ve sipariş.</p>
+            <ul class="terms">
+                <li><b>Erken yenileme</b><span>Yeni süre mevcut bitiş tarihinin sonuna eklenir; kalan günleriniz yanmaz.</span></li>
+                <li><b>Aktarım</b><span>Sunucu değiştirdiğinizde lisansı yeni kuruluma yılda 3 kez kendiniz aktarırsınız.</span></li>
+                <li><b>Hatırlatma</b><span>Bitişe 30 ve 7 gün kala e-posta gönderilir.</span></li>
+                <li><b>Süre dolunca</b><span>Ücretli lisansta girişler durmaz; konsol @LicenseIssuer.Defaults.PaidGraceDays günlük ek süreden sonra salt okunur olur.</span></li>
+            </ul>
+        </div>
+        <ol class="steps reveal d2">
+            <li><span class="n">Adım 1</span><div><h3>Paketi seçin</h3><p>Bu sayfadan ya da konsoldaki <b>Sistem › Lisans</b> ekranının <b>Lisans al</b> düğmesinden portala geçin.</p></div></li>
+            <li><span class="n">Adım 2</span><div><h3>Siparişi oluşturun</h3><p>Size bir referans kodu (ör. <code>BST-2026-000123</code>) ve havale / EFT bilgileri gösterilir.</p></div></li>
+            <li><span class="n">Adım 3</span><div><h3>Ödemeyi yapın</h3><p>Havale açıklamasına referans kodunu yazın. Ödeme onaylanınca lisans üretilir ve e-postanıza gelir.</p></div></li>
+            <li><span class="n">Adım 4</span><div><h3>Konsola yapıştırın</h3><p><code>BSTR1.</code> ile başlayan anahtarı <b>Sistem › Lisans</b> ekranında etkinleştirin. Yeniden başlatma gerekmez.</p></div></li>
+        </ol>
+    </div>
+</section>
+
+<section class="sec-rule" aria-labelledby="sss">
+    <div class="wrap faq-grid">
+        <div class="reveal">
+            <p class="kicker">Sık sorulanlar</p>
+            <h2 id="sss">Lisans ve ödeme hakkında.</h2>
+        </div>
+        <div class="faq reveal">
+            <details open><summary>Deneme lisansını kimler alabilir?</summary>
+                <p>Kurumsal e-posta adresiyle kayıt olan herkes. Kurulumun domain'i e-posta domain'inizle eşleşmeli; her domain için bir kez deneme verilir.
+                    Ücretsiz e-posta servisleriyle (gmail, outlook vb.) deneme alınamaz.</p></details>
+            <details><summary>Ödeme nasıl yapılır?</summary>
+                <p>Lisans portalında siparişinizi oluşturduğunuzda bir referans kodu ve havale / EFT bilgileri verilir. Ödeme onaylanınca lisansınız üretilir ve e-postanıza gönderilir.</p></details>
+            <details><summary>Lisans süresi dolarsa ne olur?</summary>
+                <p>Bitişten sonra ek süre boyunca her şey çalışır: ücretli lisansta @LicenseIssuer.Defaults.PaidGraceDays gün, denemede @LicenseIssuer.Defaults.TrialGraceDays gün.
+                    Ardından yönetim konsolu salt okunur olur; ücretli lisanslarda son kullanıcı girişleri kesilmez. Deneme lisansında ek süre bitince son kullanıcı girişleri de durur.</p></details>
+            <details><summary>Erken yenilersem kalan günlerim yanar mı?</summary>
                 <p>Hayır. Yeni süre mevcut lisansınızın bitiş tarihine eklenir.</p></details>
-            <details class="reveal"><summary>Sunucumu değiştirirsem ne olur?</summary>
-                <p>Lisansınızı portaldan yeni kurulumunuza kendiniz aktarabilirsiniz; yılda en fazla 3 aktarım hakkı vardır.</p></details>
-            <details class="reveal"><summary>Ürün internete bağlanmak zorunda mı?</summary>
+            <details><summary>Sunucumu değiştirirsem ne olur?</summary>
+                <p>Lisansınızı portaldan yeni kurulumunuza kendiniz aktarırsınız; yılda en fazla 3 aktarım hakkı vardır.</p></details>
+            <details><summary>Ürün internete bağlanmak zorunda mı?</summary>
                 <p>Hayır. Lisans ürün içinde çevrimdışı doğrulanır. İnternet yalnızca kurulumda image'ları indirmek için gerekir.</p></details>
         </div>
     </div>
