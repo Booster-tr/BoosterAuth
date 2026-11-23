@@ -1,0 +1,19 @@
+@model CustomerForm
+@{ ViewData["Title"] = "Yeni müşteri"; }
+<h1>Yeni müşteri</h1>
+<form method="post" class="card form">
+    <div asp-validation-summary="ModelOnly" class="alert"></div>
+    <label>Firma adı <input asp-for="Name" required /></label>
+    <span asp-validation-for="Name" class="field-error"></span>
+    <label>İletişim e-postası <input asp-for="ContactEmail" type="email" required /></label>
+    <span asp-validation-for="ContactEmail" class="field-error"></span>
+    <div class="row">
+        <label>Vergi dairesi <input asp-for="TaxOffice" /></label>
+        <label>Vergi no <input asp-for="TaxNumber" /></label>
+    </div>
+    <label>Adres <textarea asp-for="Address" rows="2"></textarea></label>
+    <div class="actions">
+        <a class="btn btn-ghost" href="/admin/musteriler">Vazgeç</a>
+        <button class="btn btn-primary" type="submit">Kaydet</button>
+    </div>
+</form>

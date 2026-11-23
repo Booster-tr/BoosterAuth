@@ -1,0 +1,19 @@
+@model IssuedLicense
+@{ ViewData["Title"] = "Lisans"; }
+<h1>Lisans</h1>
+<section class="card">
+    <dl class="facts">
+        <dt>Müşteri</dt><dd>@Model.Customer.Name</dd>
+        <dt>Kurulum GUID</dt><dd><code>@Model.InstallationId</code></dd>
+        <dt>Tür / plan</dt><dd>@(Model.Type == "trial" ? "Deneme" : "Ücretli") / @Model.Plan</dd>
+        <dt>Limitler</dt><dd>@Model.MaxUsers kullanıcı, @Model.MaxPools pool, @Model.MaxClients client</dd>
+        <dt>Domain'ler</dt><dd>@string.Join(", ", Model.AllowedDomains)</dd>
+        <dt>Geçerlilik</dt><dd>@Model.IssuedAt.ToString("yyyy-MM-dd") – @Model.ExpiresAt.ToString("yyyy-MM-dd") (+@Model.GraceDays gün ek süre)</dd>
+        <dt>Anahtar</dt><dd><code>@Model.Kid</code></dd>
+        <dt>Üreten</dt><dd>@Model.IssuedBy</dd>
+    </dl>
+    <h2>Lisans token'ı</h2>
+    <p class="muted">Müşteri bu metni ürün panelinde <b>Sistem &gt; Lisans</b> ekranına yapıştırır. Yalnızca yukarıdaki kurulumda çalışır.</p>
+    <pre class="token" id="token">@Model.Token</pre>
+    <button class="btn btn-primary" type="button" data-copy="token">Token'ı kopyala</button>
+</section>

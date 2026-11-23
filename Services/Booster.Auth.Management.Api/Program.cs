@@ -26,6 +26,10 @@ using (var scope = app.Services.CreateScope())
 
     var walkToWinBootstrapper = scope.ServiceProvider.GetRequiredService<WalkToWinBootstrapper>();
     await walkToWinBootstrapper.InitializeAsync(CancellationToken.None);
+
+    // Yalnizca BootstrapOptions.Licensing.Enabled ise (Booster'in kendi kurulumu) bir sey yapar.
+    var licensingBootstrapper = scope.ServiceProvider.GetRequiredService<LicensingBootstrapper>();
+    await licensingBootstrapper.InitializeAsync(CancellationToken.None);
 }
 
 app.Run();

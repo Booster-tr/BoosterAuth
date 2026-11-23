@@ -1,0 +1,27 @@
+@model List<LicenseRow>
+@{ ViewData["Title"] = "Lisanslar"; }
+<div class="page-head">
+    <h1>Lisanslar</h1>
+    <a class="btn btn-primary" href="/admin/lisanslar/yeni">Lisans üret</a>
+</div>
+@if (Model.Count == 0)
+{
+    <p class="muted">Henüz lisans üretilmedi.</p>
+}
+else
+{
+    <table>
+        <thead><tr><th>Müşteri</th><th>Kurulum GUID</th><th>Plan</th><th>Tür</th><th>Üretim</th><th>Bitiş</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var l in Model)
+        {
+            <tr>
+                <td>@l.Customer</td><td><code>@l.InstallationId</code></td><td>@l.Plan</td>
+                <td><span class="tag @(l.Type == "trial" ? "tag-warn" : "tag-ok")">@(l.Type == "trial" ? "Deneme" : "Ücretli")</span></td>
+                <td>@l.IssuedAt.ToString("yyyy-MM-dd")</td><td>@l.ExpiresAt.ToString("yyyy-MM-dd")</td>
+                <td><a class="btn btn-ghost btn-sm" href="/admin/lisanslar/detay?LicenseId=@l.Id">Token</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

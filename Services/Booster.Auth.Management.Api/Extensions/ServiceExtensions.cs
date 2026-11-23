@@ -28,6 +28,7 @@ public static class ServiceExtensions
 
         services.AddScoped<ManagementBootstrapper>();
         services.AddScoped<WalkToWinBootstrapper>();
+        services.AddScoped<LicensingBootstrapper>();
         services.AddScoped<IClientDataCacheStore, ClientDataCacheStore>();
         services.AddScoped<IAccessManager, AccessManager>();
         services.AddScoped<IPrincipalLookupManager, PrincipalLookupManager>();

@@ -1,0 +1,41 @@
+@{
+    var email = User.FindFirst("email")?.Value;
+    var isAdminArea = Context.Request.Path.StartsWithSegments("/admin");
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@(ViewData["Title"] is string t ? $"{t} - " : "")Booster Lisans</title>
+    <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="/">Booster <span>Lisans</span></a>
+    @if (isAdminArea)
+    {
+        <nav class="nav">
+            <a href="/admin">Genel</a>
+            <a href="/admin/musteriler">Müşteriler</a>
+            <a href="/admin/lisanslar">Lisanslar</a>
+        </nav>
+    }
+    <div class="user">
+        @if (email is not null)
+        {
+            <span class="muted">@email</span>
+            <form method="post" action="/cikis"><button class="btn btn-ghost" type="submit">Çıkış</button></form>
+        }
+        else
+        {
+            <a class="btn btn-primary" href="/giris">Giriş yap</a>
+        }
+    </div>
+</header>
+<main class="container">
+    @RenderBody()
+</main>
+<script src="~/js/portal.js" asp-append-version="true"></script>
+</body>
+</html>

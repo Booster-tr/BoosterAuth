@@ -12,6 +12,7 @@ Urun, musteri sunucusunda on-prem calisir ve **cevrimdisi lisansla** acilir. Lis
 
 ## Altin kurallar
 1. **`master`'a dogrudan commit/push YOK.** `claude/<konu>` branch -> PR; kullanici merge eder. Merge = canliya cikis (CI -> GHCR -> gitops -> ArgoCD).
+   **Lisanslama isi istisna:** tum PR'lar `feature/lisanslama` dalina gider. CI yalnizca `master` PR'larinda calistigi icin bu dala merge canliya CIKMAZ. Sistem tamamlaninca dal tek PR ile `master`'a alinir.
 2. **Secret repoya girmez:** kod, log, commit. Cluster Secret'lari elle olusturulur.
 3. Hata metni yazilmaz; mesaj anahtari firlatilir (`BusinessException(...)`). Metinler tr + en olarak SystemMessage seed'inde tutulur.
 4. Id'ler route'ta degil query string'de tasinir (FGA secicileri `query:XId` okur). Silme soft yapilir. Audit alanlari elle set edilmez.
@@ -24,6 +25,7 @@ Urun, musteri sunucusunda on-prem calisir ve **cevrimdisi lisansla** acilir. Lis
 | `Services/Booster.Auth.Management.Api` | Tenant, pool, client, rol, scope, IdP tanimlari | `AuthNDbContext` |
 | `Services/Booster.Auth.Z` | Yetki (OpenFGA) | `AuthZDbContext` |
 | `Gateways/Booster.Auth.YarpGateway` | `/idp`, `/management`, `/authz` | |
+| `Services/Booster.Licensing.Portal` | Lisans portali (MVC, `licensing.appnuraymind.com`): musteri girisi Booster Auth ile, admin ekranlari, lisans uretme. YALNIZCA Booster'in kendi kurulumunda calisir | `LicensingDbContext` (`licensingdb`) |
 | `Services/Booster.{Logging,Notification,SystemMessage}Service` | Yalnizca Booster'in kendi yardimci servisleri | |
 
 Ortak kutuphaneler `Common/` ve `CommonInternal/` altinda. Diger urunlere kopya-yapistir ile gecer.
@@ -36,7 +38,12 @@ Ayri repo YOK; hepsi bu solution icindedir.
 | `Common/Licensing/Booster.Licensing` | Urun ve portal | Token bicimi, `LicensePublicKeys` (gomulu), `LicenseValidator`, `LicenseValidationResult` (`PanelWritable`, `EndUserFlowsAllowed`), `DomainRules`, `LicenseClock` + `ILicenseClockStore` |
 | `Common/Licensing/Booster.Licensing.Signing` | YALNIZCA portal | `LicenseSigningKey` (uretme, imzalama). Urun projeleri bu projeye referans VERMEZ |
 
-Portal imzalama anahtarini ilk acilista kendisi uretir ve `licensingdb`'ye yazar. Elle anahtar islemi yoktur.
+Portal imzalama anahtarini ilk acilista kendisi uretir ve `licensingdb`'ye `ISecretProtector` ile SIFRELI yazar. Elle anahtar islemi yoktur.
+Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
+
+**Portal ayarlari:**
+- Musteri havuzu ve portal client'i `LicensingBootstrapper` (Management + AuthZ) ile kurulur. Varsayilan KAPALI; acmak icin `BootstrapOptions__Licensing__Enabled=true` ve `RedirectUris`. Musteri kurulumlarinda kapali kalir.
+- Admin erisimi `LicensingPortalOptions__AdminEmails__N` listesiyle verilir. E-posta Booster Auth'ta dogrulanmis olmalidir (`email_verified`).
 
 - **Token:** `BSTR1.<payload>.<imza>`.
   - Iki parca da base64url; imza Ed25519 (BouncyCastle) ile atilir ve `"BSTR1." + payload` metnini kapsar.
