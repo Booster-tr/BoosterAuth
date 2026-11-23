@@ -70,6 +70,14 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **Uretim imzalama anahtari:** kid `k2026p`; public key `LicensePublicKeys`'te gomulu. Private key yalnizca cluster secret'inda (`demo/licensing-portal`, `signing-private-key`).
   - Portal ilk acilista DB'de anahtar yoksa `LicensingPortalOptions__InitialSigningKey__{Kid,PrivateKey}` ile ice aktarir; anahtar varsa bu ayar yok sayilir.
   - Rotasyon: portalda yeni anahtar uret, public key'i `LicensePublicKeys`'e EKLE (eskisini silme), urunu yayinla.
+- **Tanitim sitesi (portal icinde):** `/` urun, `/paketler` aktif planlar + deneme, `/indir` kurulum paketi (`SiteController`).
+  - "Lisans al" -> `/hesap/satin-al?plan=<kod>` (`deneme` = ucretsiz deneme). Eksik adimi sirayla tamamlatir ve her adimdan sonra geri doner: firma -> kurulum -> (birden cok kurulumda secim) -> siparis.
+  - Panelin "Lisans al" butonu `/?installationId=` ile gelir: giris -> kurulum formu dolu (kurulum zaten kayitliysa Kurulumlarim).
+- **Musteri kurulum paketi:** `deploy/compose/` (docker-compose, `.env.example`, `init/`, `kurulum.sh|ps1`, `BENIOKU.md`).
+  - Portala gomulu kaynak olarak derlenir; `/indir/booster-auth.zip` zip'i calisma aninda uretir (`InstallPackage`; `.sh` 0755).
+  - `.dockerignore` `.env.*` ve `docker-compose*` dosyalarini dislar; paket dosyalari icin `!deploy/compose/...` istisnalari VAR, silme.
+  - Image'lar `ghcr.io/booster-tr/*` (public, portal haric). Paket WalkToWin ve lisans portali ayarlarini ICERMEZ (yalnizca Booster'in kendi kurulumu).
+  - Paket dosyalari LF olmali (`.gitattributes`); betikler ayrica `tr -d '\r'` ile calistirilir.
 - **Razor:** `action` ozniteligi acikca yazilan POST formlarina `asp-antiforgery="true"` EKLE. Tag helper o durumda CSRF token'ini kendiliginden koymaz; form 400 doner.
 
 - **Token:** `BSTR1.<payload>.<imza>`.

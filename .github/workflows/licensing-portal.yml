@@ -11,6 +11,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     paths:
       - "Services/Booster.Licensing.Portal/**"
+      - "deploy/compose/**"   # portal kurulum paketini (zip) icinde tasir
       - "Common/**"
       - "CommonInternal/**"
       - "docker/**"

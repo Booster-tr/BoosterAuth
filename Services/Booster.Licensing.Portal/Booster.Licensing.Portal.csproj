@@ -26,4 +26,9 @@
 		<ProjectReference Include="..\..\Common\Licensing\Booster.Licensing.Signing\Booster.Licensing.Signing.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<!-- Musteri kurulum paketi (deploy/compose): "/indir" sayfasindan zip olarak indirilir; surumle birlikte gelir. -->
+		<EmbeddedResource Include="../../deploy/compose/**/*" LogicalName="pkg/%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
 </Project>

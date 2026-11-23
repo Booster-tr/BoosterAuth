@@ -7,12 +7,18 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@(ViewData["Title"] is string t ? $"{t} - " : "")Booster Lisans</title>
+    <title>@(ViewData["Title"] is string t ? $"{t} - " : "")Booster Auth</title>
+    <meta name="description" content="Booster Auth: kendi sunucunuzda OpenID Connect kimlik sağlayıcı, kullanıcı ve yetki yönetimi." />
     <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/">Booster <span>Lisans</span></a>
+    <a class="brand" href="/">Booster <span>Auth</span></a>
+    <nav class="nav nav-site">
+        <a href="/">Ürün</a>
+        <a href="/paketler">Paketler</a>
+        <a href="/indir">İndir</a>
+    </nav>
     @if (isAdminArea)
     {
         <nav class="nav">

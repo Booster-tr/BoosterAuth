@@ -61,3 +61,9 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+# Musteri kurulum paketi: Linux betikleri ve compose dosyalari her platformda LF kalmali.
+deploy/compose/*.sh text eol=lf
+deploy/compose/init/*.sh text eol=lf
+deploy/compose/*.yml text eol=lf
+deploy/compose/.env.example text eol=lf

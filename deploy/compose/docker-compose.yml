@@ -1,0 +1,354 @@
+# =============================================================================
+#  Booster Auth - tek makinede kurulum (Docker Compose)
+#
+#  Ilk kurulum:   ./kurulum.sh   (Windows: .\kurulum.ps1)  -> .env olusur
+#  Calistir:      docker compose up -d
+#  Guncelle:      docker compose pull && docker compose up -d
+#  Durdur:        docker compose down        (veri silinmez; veri ./data altinda)
+#
+#  Disariya acilan portlar:
+#    GATEWAY_HTTPS_PORT -> Booster Auth (IdP / API'ler), HTTPS
+#    PANEL_PORT         -> Yonetim paneli
+#  Altyapi (Postgres, Redis, Kafka, OpenFGA) disariya acilmaz.
+#
+#  Ayrintilar: BENIOKU.md
+# =============================================================================
+
+name: ${COMPOSE_PROJECT_NAME:-booster-auth}
+
+x-dotnet-service: &dotnet-service
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+    - /home/app/.aspnet:uid=1654,gid=1654,mode=0700
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+  volumes:
+    - ./pki/trust:/run/booster/trust:ro
+  depends_on: &dotnet-depends
+    booster-init:   { condition: service_completed_successfully }
+    postgres-setup: { condition: service_completed_successfully }
+    redis:          { condition: service_healthy }
+    kafka:          { condition: service_started }
+
+x-dotnet-env: &dotnet-env
+  ASPNETCORE_ENVIRONMENT: Production
+  Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
+  EXTRA_CA_CERTS: /run/booster/trust/ca.crt
+  PostgresSettings__ApplyMigration: "true"
+  RedisCacheOptions__Endpoints: redis:6379
+  RedisCacheOptions__Password: ${REDIS_PASSWORD:?REDIS_PASSWORD .env icinde tanimli olmali (kurulum betigini calistirin)}
+  RedisCacheOptions__Ssl: "false"
+  AmqpSettings__BootstrapServers: kafka:9092
+  FgaSettings__GrpcAddress: http://booster-authz:8081
+  FgaSettings__TimeoutSeconds: "5"
+  FgaSettings__AllowInsecureHttp2: "true"
+  ApiAuthOptions__Authority: ${PUBLIC_URL}/idp
+
+x-grpc-kestrel: &grpc-kestrel
+  Kestrel__Endpoints__Http__Url: http://+:8080
+  Kestrel__Endpoints__Grpc__Url: http://+:8081
+  Kestrel__Endpoints__Grpc__Protocols: Http2
+
+# IdP ve Management ayni hashing ayarlarini kullanmak ZORUNDA. Kurulumdan sonra DEGISTIRMEYIN (parolalar okunamaz).
+x-hashing-env: &hashing-env
+  HashingOptions__MemorySizeKb: "19456"
+  HashingOptions__Iterations: "2"
+  HashingOptions__DegreeOfParallelism: "1"
+  HashingOptions__Pepper: ${HASHING_PEPPER:?HASHING_PEPPER .env icinde tanimli olmali}
+  HashingOptions__EncryptionOptions__ActiveKeyId: key1
+  HashingOptions__EncryptionOptions__Keys__key1: ${HASHING_ENCRYPTION_KEY:?HASHING_ENCRYPTION_KEY .env icinde tanimli olmali}
+
+
+services:
+
+  # ------------------------------------------------------------- hazirlik
+  # Her "up"ta calisir: eksik CA / gateway sertifikasi / IdP imzalama anahtarini uretir, izinleri ayarlar.
+  booster-init:
+    image: alpine:3.20
+    entrypoint: ["sh", "-c", "apk add --no-cache -q bash openssl >/dev/null && tr -d '\\r' < /scripts/init.sh > /tmp/init.sh && exec bash /tmp/init.sh"]
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?PUBLIC_HOST .env icinde tanimli olmali}
+    volumes:
+      - ./init:/scripts:ro
+      - ./pki:/work/pki
+      - ./secrets:/work/secrets
+      - ./data/idp:/work/data/idp
+
+  # ------------------------------------------------------------- postgres
+  postgres:
+    image: postgis/postgis:15-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env icinde tanimli olmali}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - postgres_socket:/var/run/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # Her "up"ta: rol parolasini .env ile esitler, eksik veritabanlarini olusturur.
+  postgres-setup:
+    image: postgis/postgis:15-3.4
+    depends_on:
+      postgres: { condition: service_healthy }
+    entrypoint: ["sh", "-c", "tr -d '\\r' < /scripts/postgres-setup.sh > /tmp/setup.sh && exec bash /tmp/setup.sh"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DATABASES: openfgadb,idpdb,authndb,authzdb,loggingdb,notificationdb,systemmessagedb
+    volumes:
+      - ./init:/scripts:ro
+      - postgres_socket:/var/run/postgresql
+
+  # ------------------------------------------------------------- redis
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=\"$$REDIS_PASSWORD\" redis-cli ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ------------------------------------------------------------- openfga
+  openfga-migrate:
+    image: openfga/openfga:v1.20.0
+    depends_on:
+      postgres-setup: { condition: service_completed_successfully }
+    command: migrate
+    environment: &openfga-datastore
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/openfgadb?sslmode=disable
+
+  openfga:
+    image: openfga/openfga:v1.20.0
+    restart: unless-stopped
+    depends_on:
+      openfga-migrate: { condition: service_completed_successfully }
+    command: run
+    environment:
+      <<: *openfga-datastore
+      OPENFGA_AUTHN_METHOD: preshared
+      OPENFGA_AUTHN_PRESHARED_KEYS: ${OPENFGA_PRESHARED_KEY:?OPENFGA_PRESHARED_KEY .env icinde tanimli olmali}
+      OPENFGA_LOG_FORMAT: json
+      OPENFGA_PLAYGROUND_ENABLED: "false"
+
+  # ------------------------------------------------------------- kafka (tek broker, KRaft)
+  kafka:
+    image: apache/kafka:3.7.0
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: "1"
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: "0"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_LOG_RETENTION_HOURS: "168"
+      KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+  # ###########################################################################
+  #  BOOSTER AUTH SERVISLERI
+  # ###########################################################################
+
+  booster-authz:
+    <<: *dotnet-service
+    image: ghcr.io/booster-tr/booster-auth-authz:${BOOSTER_VERSION:-latest}
+    depends_on:
+      <<: *dotnet-depends
+      openfga: { condition: service_started }
+    environment:
+      <<: [*dotnet-env, *grpc-kestrel]
+      ApiAuthOptions__Audience: ${PUBLIC_URL}/authz
+      PostgresSettings__DatabaseName: authzdb
+      PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=authzdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
+      AmqpSettings__ServiceName: Booster.AuthZ.Service
+      AmqpSettings__GroupId: booster-authz-group
+      FgaOptions__ApiUrl: http://openfga:8080
+      FgaOptions__ApiToken: ${OPENFGA_PRESHARED_KEY}
+      FgaOptions__MaxSchemaTypes: "10"
+      FgaOptions__MaxPermissionsPerType: "10"
+      FgaOptions__MaxSchemaVersions: "5"
+      ManagementSettings__GrpcAddress: http://booster-management-api:8081
+      ManagementSettings__TimeoutSeconds: "5"
+
+  booster-idp:
+    <<: *dotnet-service
+    image: ghcr.io/booster-tr/booster-auth-idp:${BOOSTER_VERSION:-latest}
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./pki/trust:/run/booster/trust:ro
+      - ./secrets:/run/booster/secrets:ro
+      - ./data/idp/dataprotection:/home/app/.aspnet/DataProtection-Keys
+      - ./data/idp/client-logos:/app/wwwroot/client-logos
+    environment:
+      <<: [*dotnet-env, *grpc-kestrel, *hashing-env]
+      ApiAuthOptions__Audience: ${PUBLIC_URL}/idp
+      IdpOptions__Issuer: ${PUBLIC_URL}/idp
+      IdpOptions__SigningKeyId: booster-oidc-key-1
+      IdpOptions__PrivateKeyPem: /run/booster/secrets/idp-signing.pem
+      IdpOptions__ApplicationPeper: ${IDP_APPLICATION_PEPPER:?IDP_APPLICATION_PEPPER .env icinde tanimli olmali}
+      IdpUiOptions__BaseUrl: ${PUBLIC_URL}/idp
+      PostgresSettings__DatabaseName: idpdb
+      PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=idpdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
+      BootstrapOptions__AdminPassword: ${BOOTSTRAP_ADMIN_PASSWORD:?BOOTSTRAP_ADMIN_PASSWORD .env icinde tanimli olmali}
+      BootstrapOptions__AdminEmail: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BootstrapOptions__ManagementClientAudience: ${PUBLIC_URL}/management
+      ManagementSettings__GrpcAddress: http://booster-management-api:8081
+      ManagementSettings__TimeoutSeconds: "5"
+      AmqpSettings__ServiceName: Booster.Idp.Service
+      AmqpSettings__GroupId: booster-idp-group
+
+  booster-management-api:
+    <<: *dotnet-service
+    image: ghcr.io/booster-tr/booster-auth-management-api:${BOOSTER_VERSION:-latest}
+    environment:
+      <<: [*dotnet-env, *grpc-kestrel, *hashing-env]
+      ApiAuthOptions__Audience: ${PUBLIC_URL}/management
+      PostgresSettings__DatabaseName: authndb
+      PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=authndb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
+      BootstrapOptions__AdminPassword: ${BOOTSTRAP_ADMIN_PASSWORD}
+      BootstrapOptions__ManagementClientRedirectUri: ${PANEL_PUBLIC_URL}/api/auth/callback/booster
+      BootstrapOptions__ManagementClientPostLogoutRedirectUri: ${PANEL_PUBLIC_URL}/
+      BootstrapOptions__ManagementClientAudience: ${PUBLIC_URL}/management
+      BootstrapOptions__IdpAudience: ${PUBLIC_URL}/idp
+      BootstrapOptions__AuthZAudience: ${PUBLIC_URL}/authz
+      IdpSettings__GrpcAddress: http://booster-idp:8081
+      IdpSettings__TimeoutSeconds: "5"
+      AmqpSettings__ServiceName: Booster.Management.Service
+      AmqpSettings__GroupId: booster-management-group
+
+  booster-systemmessage:
+    <<: *dotnet-service
+    image: ghcr.io/booster-tr/booster-systemmessage-service:${BOOSTER_VERSION:-latest}
+    environment:
+      <<: *dotnet-env
+      ApiAuthOptions__Audience: ${PUBLIC_URL}/systemmessage
+      PostgresSettings__DatabaseName: systemmessagedb
+      PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=systemmessagedb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
+      AmqpSettings__ServiceName: Booster.SytemMessage.Service
+      AmqpSettings__GroupId: booster-systemmessage-group
+
+  booster-logging:
+    <<: *dotnet-service
+    image: ghcr.io/booster-tr/booster-logging-service:${BOOSTER_VERSION:-latest}
+    environment:
+      <<: *dotnet-env
+      ApiAuthOptions__Audience: ${PUBLIC_URL}/logging
+      PostgresSettings__DatabaseName: loggingdb
+      PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=loggingdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
+      AmqpSettings__ServiceName: Booster.Logging.Service
+      AmqpSettings__GroupId: booster-log-group
+
+  booster-notification:
+    <<: *dotnet-service
+    image: ghcr.io/booster-tr/booster-notification-service:${BOOSTER_VERSION:-latest}
+    environment:
+      <<: *dotnet-env
+      ApiAuthOptions__Audience: ${PUBLIC_URL}/notification
+      PostgresSettings__DatabaseName: notificationdb
+      PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=notificationdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
+      AmqpSettings__ServiceName: Booster.Notification.Service
+      AmqpSettings__GroupId: booster-notification-group
+      # E-posta (kayit dogrulama, davet, sifre sifirlama). Bos birakilirsa e-posta gonderilmez.
+      MailSettings__Sender: ${MAIL_SENDER:-}
+      MailSettings__DisplayName: ${MAIL_DISPLAY_NAME:-Booster Auth}
+      MailSettings__SmtpHost: ${MAIL_SMTP_HOST:-}
+      MailSettings__Port: ${MAIL_PORT:-587}
+      MailSettings__UserName: ${MAIL_USERNAME:-}
+      MailSettings__Password: ${MAIL_PASSWORD:-}
+      MailSettings__EnableSsl: ${MAIL_ENABLE_SSL:-true}
+
+  # Disariya acilan TEK backend kapisi; TLS burada sonlanir.
+  booster-gateway:
+    image: ghcr.io/booster-tr/booster-auth-gateway:${BOOSTER_VERSION:-latest}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/app/.aspnet:uid=1654,gid=1654,mode=0700
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    depends_on:
+      booster-init:           { condition: service_completed_successfully }
+      booster-idp:            { condition: service_started }
+      booster-management-api: { condition: service_started }
+      booster-authz:          { condition: service_started }
+      booster-systemmessage:  { condition: service_started }
+    volumes:
+      - ./pki/tls:/run/booster/tls:ro
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Logging__LogLevel__Default: ${LOG_LEVEL:-Information}
+      Kestrel__Endpoints__Http__Url: http://+:8080
+      Kestrel__Endpoints__Https__Url: https://+:${GATEWAY_HTTPS_PORT:-443}
+      Kestrel__Endpoints__Https__Certificate__Path: /run/booster/tls/server.crt
+      Kestrel__Endpoints__Https__Certificate__KeyPath: /run/booster/tls/server.key
+      ReverseProxy__Clusters__idp_cluster__Destinations__destination1__Address: http://booster-idp:8080
+      ReverseProxy__Clusters__management_cluster__Destinations__destination1__Address: http://booster-management-api:8080
+      ReverseProxy__Clusters__authz_cluster__Destinations__destination1__Address: http://booster-authz:8080
+      ReverseProxy__Clusters__systemmessage_cluster__Destinations__destination1__Address: http://booster-systemmessage:8080
+    ports:
+      - "${PUBLIC_BIND_IP:-0.0.0.0}:${GATEWAY_HTTPS_PORT:-443}:${GATEWAY_HTTPS_PORT:-443}"
+    networks:
+      default:
+        # Issuer (${PUBLIC_URL}/idp) container'lardan da ayni adresle erisilsin.
+        aliases:
+          - ${PUBLIC_HOST}
+
+  booster-management-panel:
+    image: ghcr.io/booster-tr/booster-management-panel:${BOOSTER_VERSION:-latest}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache:uid=1000,gid=1000
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    depends_on:
+      booster-gateway: { condition: service_started }
+    volumes:
+      - ./pki/trust:/run/booster/trust:ro
+    environment:
+      NODE_EXTRA_CA_CERTS: /run/booster/trust/ca.crt
+      APP_URL: ${PANEL_PUBLIC_URL}
+      OIDC_ISSUER: ${PUBLIC_URL}/idp
+      OIDC_CLIENT_ID: management
+      OIDC_REDIRECT_URI: ${PANEL_PUBLIC_URL}/api/auth/callback/booster
+      OIDC_POST_LOGOUT_REDIRECT: ${PANEL_PUBLIC_URL}/
+      OIDC_SCOPES: openid profile email offline_access booster:panel
+      SESSION_SECRET: ${PANEL_SESSION_SECRET:?PANEL_SESSION_SECRET .env icinde tanimli olmali}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-}
+      BACKEND_URL: http://booster-gateway:8080
+      SERVICE_STATUS_ENDPOINTS: Gateway=http://booster-gateway:8080,IdP=http://booster-idp:8080,Management API=http://booster-management-api:8080,AuthZ=http://booster-authz:8080,Logging=http://booster-logging:8080,Notification=http://booster-notification:8080,System Message=http://booster-systemmessage:8080
+      IDP_RESOURCE: ${PUBLIC_URL}/idp
+      AUTHZ_RESOURCE: ${PUBLIC_URL}/authz
+      MANAGEMENT_RESOURCE: ${PUBLIC_URL}/management
+      # "Lisans al" butonu: lisans portali (kurulum kimligi ile)
+      LICENSING_PORTAL_URL: ${LICENSING_PORTAL_URL:-https://licensing.appnuraymind.com}
+    ports:
+      - "${PUBLIC_BIND_IP:-0.0.0.0}:${PANEL_PORT:-3000}:3000"
+
+volumes:
+  postgres_socket:
+  kafka_data:

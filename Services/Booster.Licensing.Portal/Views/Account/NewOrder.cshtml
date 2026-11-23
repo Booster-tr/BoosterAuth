@@ -34,7 +34,7 @@
 <div class="stats">
     @foreach (var p in Model)
     {
-        <form method="post" class="stat" data-plan="@p.Code">
+        <form method="post" class="stat @(string.Equals(ViewBag.SelectedPlan as string, p.Code, StringComparison.OrdinalIgnoreCase) ? "stat-selected" : "")" data-plan="@p.Code">
             <input type="hidden" name="installationId" value="@inst.InstallationId" />
             <input type="hidden" name="planId" value="@p.Id" />
             <b>@p.Name</b>

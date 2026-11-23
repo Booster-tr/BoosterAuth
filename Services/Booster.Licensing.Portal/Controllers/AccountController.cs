@@ -33,6 +33,34 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
     public async Task<IActionResult> Index(CancellationToken ct) =>
         await CurrentCustomerAsync(ct) is null ? Redirect("/hesap/firma") : Redirect("/hesap/kurulumlar");
 
+    /// <summary>Deneme (Paketler sayfasindaki "Ucretsiz dene") icin ozel plan kodu.</summary>
+    public const string TrialPlan = "deneme";
+
+    /// <summary>
+    /// Sitedeki "Lisans al" / "Ucretsiz dene" butonlari buraya gelir (giris zorunlu; Booster Auth'a yonlenir).
+    /// Eksik adimi sirayla tamamlatir, her adimdan sonra buraya doner: firma -> kurulum -> (kurulum secimi) ->
+    /// secilen planin siparis ekrani. Deneme icin son adim Kurulumlarim (deneme butonu oradadir).
+    /// </summary>
+    [HttpGet("satin-al")]
+    public async Task<IActionResult> Buy(string? plan, Guid? installationId, CancellationToken ct)
+    {
+        plan = string.IsNullOrWhiteSpace(plan) ? null : plan.Trim().ToLowerInvariant();
+        var self = $"/hesap/satin-al?plan={Uri.EscapeDataString(plan ?? "")}";
+        var c = await CurrentCustomerAsync(ct);
+        if (c is null) return Redirect($"/hesap/firma?returnUrl={Uri.EscapeDataString(self)}");
+        if (c.Installations.Count == 0) return Redirect($"/hesap/kurulumlar/yeni?returnUrl={Uri.EscapeDataString(self)}");
+        if (plan is null || plan == TrialPlan) return Redirect("/hesap/kurulumlar");
+
+        var inst = installationId is { } g ? c.Installations.SingleOrDefault(i => i.InstallationId == g) : null;
+        if (inst is null && c.Installations.Count == 1) inst = c.Installations.Single();
+        if (inst is null)
+        {
+            ViewBag.Plan = plan;
+            return View("ChooseInstallation", c.Installations.OrderBy(i => i.Label).ToList());
+        }
+        return Redirect($"/hesap/siparis/yeni?InstallationId={inst.InstallationId}&plan={Uri.EscapeDataString(plan)}");
+    }
+
     // ---------------------------------------------------------------- Firma
 
     [HttpGet("firma")]
@@ -48,6 +76,7 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
     [HttpPost("firma")]
     public async Task<IActionResult> Company(CompanyForm form, string? returnUrl, CancellationToken ct)
     {
+        ViewBag.ReturnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null;
         if (!ModelState.IsValid) return View(form);
 
         var c = await CurrentCustomerAsync(ct);
@@ -82,16 +111,27 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
     }
 
     [HttpGet("kurulumlar/yeni")]
-    public async Task<IActionResult> NewInstallation(Guid? installationId, CancellationToken ct)
+    public async Task<IActionResult> NewInstallation(Guid? installationId, string? returnUrl, CancellationToken ct)
     {
-        if (await CurrentCustomerAsync(ct) is null)
-            return Redirect($"/hesap/firma?returnUrl={Uri.EscapeDataString($"/hesap/kurulumlar/yeni?installationId={installationId}")}");
+        returnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null;
+        var c = await CurrentCustomerAsync(ct);
+        if (c is null)
+        {
+            var back = $"/hesap/kurulumlar/yeni?installationId={installationId}" + (returnUrl is null ? "" : $"&returnUrl={Uri.EscapeDataString(returnUrl)}");
+            return Redirect($"/hesap/firma?returnUrl={Uri.EscapeDataString(back)}");
+        }
+        // Paneldeki "Lisans al" butonu zaten kayitli bir kurulumla gelirse formu tekrar gosterme.
+        if (installationId is { } g && c.Installations.Any(i => i.InstallationId == g))
+            return Redirect(returnUrl ?? "/hesap/kurulumlar");
+        ViewBag.ReturnUrl = returnUrl;
         return View(new InstallationForm { InstallationId = installationId });
     }
 
     [HttpPost("kurulumlar/yeni")]
-    public async Task<IActionResult> NewInstallation(InstallationForm form, CancellationToken ct)
+    public async Task<IActionResult> NewInstallation(InstallationForm form, string? returnUrl, CancellationToken ct)
     {
+        returnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null;
+        ViewBag.ReturnUrl = returnUrl;
         var c = await CurrentCustomerAsync(ct);
         if (c is null) return Redirect("/hesap/firma");
 
@@ -114,7 +154,7 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
             Domains = domains,
         });
         await db.SaveChangesAsync(ct);
-        return Redirect("/hesap/kurulumlar");
+        return Redirect(returnUrl ?? "/hesap/kurulumlar");
     }
 
     // ---------------------------------------------------------------- Deneme
@@ -185,13 +225,15 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
     // ---------------------------------------------------------------- Siparis (satin alma / yenileme / yukseltme)
 
     [HttpGet("siparis/yeni")]
-    public async Task<IActionResult> NewOrder([FromQuery(Name = "InstallationId")] Guid installationId, CancellationToken ct)
+    public async Task<IActionResult> NewOrder([FromQuery(Name = "InstallationId")] Guid installationId, string? plan, CancellationToken ct)
     {
         var c = await CurrentCustomerAsync(ct);
         var inst = c?.Installations.SingleOrDefault(i => i.InstallationId == installationId);
         if (c is null || inst is null) return NotFound();
 
         ViewBag.Installation = inst;
+        // Paketler sayfasinda secilen plan (vurgulanir).
+        ViewBag.SelectedPlan = plan?.Trim().ToLowerInvariant();
         ViewBag.Current = await db.IssuedLicenses.AsNoTracking()
             .Where(l => l.InstallationId == installationId && l.Type == "paid" && l.TransferredToLicenseId == null && l.ExpiresAt > DateTimeOffset.UtcNow)
             .OrderByDescending(l => l.ExpiresAt).FirstOrDefaultAsync(ct);

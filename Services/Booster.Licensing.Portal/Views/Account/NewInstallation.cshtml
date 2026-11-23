@@ -2,6 +2,7 @@
 @{ ViewData["Title"] = "Kurulum ekle"; }
 <h1>Kurulum ekle</h1>
 <form method="post" class="card form">
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
     <div asp-validation-summary="ModelOnly" class="alert"></div>
     <label>Kurulum kimliği (GUID) <small class="muted">Booster Auth yönetim paneli → Sistem &gt; Lisans</small>
         <input asp-for="InstallationId" placeholder="00000000-0000-0000-0000-000000000000" required />
