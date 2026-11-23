@@ -55,6 +55,9 @@ public record GetByIdClientResponse(
 {
     /// <summary>Havuzda tanımlı kapsamlar: izin verilen kapsamlar bunlar arasından seçilir.</summary>
     public IReadOnlyList<ClientPoolScopeResponse> PoolScopes { get; init; } = [];
+
+    /// <summary>Havuzun redirect politikasina UYMAYAN mevcut adresler (politika sonradan acildiysa). Yalnizca uyari.</summary>
+    public IReadOnlyList<string> RedirectPolicyViolations { get; init; } = [];
 }
 
 public record ClientScopeResponse(string Scope);
@@ -79,7 +82,9 @@ public class GetByIdClientQueryHandler(
 
         return client!.Adapt<GetByIdClientResponse>() with
         {
-            PoolScopes = client.UserPool.ScopeDefinitions.Adapt<List<ClientPoolScopeResponse>>()
+            PoolScopes = client.UserPool.ScopeDefinitions.Adapt<List<ClientPoolScopeResponse>>(),
+            RedirectPolicyViolations = Booster.Auth.Management.Api.Features.UserPools.Policies.RedirectPolicyChecker.Violations(
+                client.UserPool.Policy.Redirect, client.RedirectUris.Concat(client.PostLogoutRedirectUris))
         };
     }
 }

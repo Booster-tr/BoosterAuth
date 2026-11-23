@@ -747,6 +747,27 @@ namespace Booster.Auth.Management.Api.Migrations
                                         .HasForeignKey("UserPoolPolicyUserPoolId");
                                 });
 
+                            b1.OwnsOne("Booster.Auth.Management.Api.Features._base.Entities.RedirectPolicy", "Redirect", b2 =>
+                                {
+                                    b2.Property<Guid>("UserPoolPolicyUserPoolId");
+
+                                    b2.Property<bool>("AllowCustomSchemes");
+
+                                    b2.Property<bool>("AllowTestHosts");
+
+                                    b2.PrimitiveCollection<string>("AllowedDomains")
+                                        .IsRequired();
+
+                                    b2.Property<bool>("Enabled");
+
+                                    b2.HasKey("UserPoolPolicyUserPoolId");
+
+                                    b2.ToTable("UserPools");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("UserPoolPolicyUserPoolId");
+                                });
+
                             b1.OwnsOne("Booster.Auth.Management.Api.Features._base.Entities.RegistrationPolicy", "Registration", b2 =>
                                 {
                                     b2.Property<Guid>("UserPoolPolicyUserPoolId");
@@ -793,6 +814,8 @@ namespace Booster.Auth.Management.Api.Migrations
 
                             b1.Navigation("Password")
                                 .IsRequired();
+
+                            b1.Navigation("Redirect");
 
                             b1.Navigation("Registration")
                                 .IsRequired();
