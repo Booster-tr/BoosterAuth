@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Management.Api.Features._base;
@@ -44,7 +46,9 @@ public readonly record struct CreateUserPoolResponse(Guid Id);
 public class CreateUserPoolCommandHandler(
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
     IAsyncRepository<Tenant, AuthNDbContext> tenantRepository,
-    IAccessManager accessManager)
+    IAccessManager accessManager,
+    AuthNDbContext db,
+    ILicenseLimitService licenseLimits)
     : ICommandHandler<CreateUserPoolCommand, CreateUserPoolResponse>
 {
     public async Task<CreateUserPoolResponse> ExecuteAsync(CreateUserPoolCommand command, CancellationToken ct)
@@ -60,8 +64,17 @@ public class CreateUserPoolCommandHandler(
         pool.Status = EntityStatus.Active;
         pool.Policy = new UserPoolPolicy();
 
-        await userPoolRepository.AddAsync(pool, ct);
-        await userPoolRepository.SaveChangesAsync(ct);
+        // Lisans limiti: sayim + ekleme ayni transaction ve kilit altinda (ayni anda iki istek son yeri alamaz).
+        // Yonetim havuzu sayilmaz; silinmisler (soft delete) sorgu filtresiyle zaten disarida.
+        await using (var tx = await db.Database.BeginTransactionAsync(ct))
+        {
+            await licenseLimits.EnsureCanCreateAsync(db, LicensedResource.Pools,
+                c => db.Set<UserPool>().CountAsync(p => p.Id != AuthConstants.ManagementPoolId, c), ct);
+
+            await userPoolRepository.AddAsync(pool, ct);
+            await userPoolRepository.SaveChangesAsync(ct);
+            await tx.CommitAsync(ct);
+        }
 
         await accessManager.LinkParentAsync(
             AuthConstants.PoolType, pool.Id, AuthConstants.TenantType, pool.TenantId, ct);

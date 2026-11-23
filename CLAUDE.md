@@ -71,7 +71,18 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Kullanici, pool ve client olusturan TUM yollar bu kontrolden gecer.
   - Hata kodlari: `LICENSE_LIMIT_USERS`, `LICENSE_LIMIT_POOLS`, `LICENSE_LIMIT_CLIENTS`.
   - Mevcut kayitlar limit asimindan ASLA etkilenmez.
-  - Self-servis kayitta son kullaniciya teknik detay gosterilmez; genel bir "kayit su an kapali" mesaji cikar.
+  - Self-servis kayitta son kullaniciya teknik detay gosterilmez; genel bir "kayit su an kapali" mesaji cikar (`LICENSE_REGISTRATION_CLOSED`).
+  - **Uygulama:** `CommonInternal/.../Licensing/LicenseLimitService`.
+    - Cagiran ACIK bir transaction icinde olmalidir. Servis `pg_advisory_xact_lock` alir, sayar ve doluysa reddeder; ekleme + commit kilit altinda yapilir. Boylece ayni anda iki istek son yeri alamaz.
+    - Kullanicilar icin `EndUserFactory.RunWithinUserLimitAsync`; pool ve client icin `CreateUserPool` / `CreateClient` ornektir.
+  - **Kontrol eden yollar:**
+    - Kullanici: self-servis kayit, federasyon ilk girisi, panelden ekleme, CSV ice aktarma.
+    - Pool: `POST userpools`. Client: `POST clients`.
+    - Muaf olanlar: bootstrapper'lar, admin seeder ve servis hesaplari (kullanici sayilmaz).
+  - **Sayim:** yonetim havuzu ve silinmisler HARIC; pasif ve askidakiler DAHIL.
+  - Gecerli lisans yokken deneme varsayilanlari uygulanir: 100 / 1 / 3.
+  - Durum bilinemiyorsa (Management'a ulasilamiyor) limit UYGULANMAZ.
+  - Kullanim: `GET management/system/license/usage`. 30 sn onbellek yalnizca gosterim icindir.
 - **Client redirect URI'leri lisansla kisitlanmaz.** Bunun yerine pool ayarlarinda ayri bir "izin verilen redirect domain'leri" politikasi bulunur (varsayilan kapali).
 
 ### Lisans calisma zamani (nerede ne var)
@@ -95,7 +106,8 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 ## Kullanici ekleme ve davet (IdP)
 - **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).
   - Panelden ekleme (`POST pools/users`) ve CSV ice aktarma (`POST pools/users/import`) bunu kullanir.
-  - Faz 1.5'te limit kontrolu buraya eklenir; self-servis kayit ve federasyon ilk girisi de bu sinifa tasinir. Yeni bir kullanici olusturma yolu yazarken BU SINIFI KULLAN.
+  - Self-servis kayit ve federasyon ilk girisi kendi kayitlarini olusturur ama limit kontrolunu `EndUserFactory.RunWithinUserLimitAsync` ile yapar.
+  - Yeni bir kullanici olusturma yolu yazarken BU SINIFI KULLAN; aksi halde yol lisans limitini atlar.
 - **Davet:** `InvitationManager`.
   - Baglanti `/idp/ui/invite?token=`; 1 gun gecerli ve tek kullanimlik.
   - Yeniden gonderilen davet (`POST pools/users/invite`) eskisini gecersiz kilar.

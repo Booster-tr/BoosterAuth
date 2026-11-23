@@ -71,14 +71,19 @@ public class CreatePoolUserCommandHandler(
         if (await factory.EmailExistsAsync(email, ct))
             throw new ValidationException([new ValidationFailure(nameof(cmd.Email), IdpMessageKeys.IdentifierAlreadyExists)]);
 
-        var principal = await factory.CreateInvitedAsync(pool, cmd.DisplayName, email, ct);
+        Guid principalId = default;
+        await factory.RunWithinUserLimitAsync(async c =>
+        {
+            var principal = await factory.CreateInvitedAsync(pool, cmd.DisplayName, email, c);
 
-        if (cmd.SendInvitation)
-            await invitations.SendAsync(principal, cmd.UserPoolId, ct);
+            if (cmd.SendInvitation)
+                await invitations.SendAsync(principal, cmd.UserPoolId, c);
 
-        // Kullanici ve davet olayi (outbox) AYNI islemde kaydedilir.
-        await principalRepository.SaveChangesAsync(ct);
+            // Kullanici ve davet olayi (outbox) AYNI islemde kaydedilir.
+            await principalRepository.SaveChangesAsync(c);
+            principalId = principal.Id;
+        }, ct);
 
-        return new CreatePoolUserResponse(principal.Id, cmd.SendInvitation);
+        return new CreatePoolUserResponse(principalId, cmd.SendInvitation);
     }
 }

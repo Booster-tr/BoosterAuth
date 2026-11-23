@@ -16,4 +16,9 @@ message LicenseStatusMessage {
   bool is_trial = 2;
   bool panel_writable = 3;
   bool end_user_flows_allowed = 4;
+  // Uygulanan limitler (lisans yoksa deneme varsayilanlari). limits_known=false: limit uygulanmaz.
+  bool limits_known = 5;
+  int32 max_users = 6;
+  int32 max_pools = 7;
+  int32 max_clients = 8;
 }

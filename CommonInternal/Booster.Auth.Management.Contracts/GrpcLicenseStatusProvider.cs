@@ -1,5 +1,6 @@
 using Booster.Auth.Management.Grpc;
 using Booster.Licensing.Runtime;
+using Booster.Licensing.Tokens;
 using Booster.Licensing.Validation;
 
 namespace Booster.Auth.Management.Contracts;
@@ -34,7 +35,8 @@ public sealed class GrpcLicenseStatusProvider(LicenseStatusService.LicenseStatus
         {
             var r = await client.GetStatusAsync(new GetLicenseStatusRequest(),
                 deadline: DateTime.UtcNow.Add(CallTimeout), cancellationToken: ct);
-            _last = new LicenseStatusSnapshot((LicenseState)r.State, r.IsTrial, r.PanelWritable, r.EndUserFlowsAllowed);
+            _last = new LicenseStatusSnapshot((LicenseState)r.State, r.IsTrial, r.PanelWritable, r.EndUserFlowsAllowed,
+                r.LimitsKnown ? new LicenseLimits(r.MaxUsers, r.MaxPools, r.MaxClients) : null);
             _fetchedAt = DateTimeOffset.UtcNow;
             return _last;
         }

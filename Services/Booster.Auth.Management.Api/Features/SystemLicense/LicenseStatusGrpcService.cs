@@ -18,6 +18,10 @@ public sealed class LicenseStatusGrpcService(LicenseService license) : LicenseSt
             IsTrial = s.IsTrial,
             PanelWritable = s.PanelWritable,
             EndUserFlowsAllowed = s.EndUserFlowsAllowed,
+            LimitsKnown = s.Limits is not null,
+            MaxUsers = s.Limits?.Users ?? 0,
+            MaxPools = s.Limits?.Pools ?? 0,
+            MaxClients = s.Limits?.Clients ?? 0,
         };
     }
 }
