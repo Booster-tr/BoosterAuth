@@ -56,7 +56,7 @@ public class RedirectPolicy
     /// <summary>localhost, *.local, *.internal ve IP adresleri (gelistirme ortamlari).</summary>
     public bool AllowTestHosts { get; set; } = true;
 
-    /// <summary>Mobil uygulama adresleri (walktowin://...). Domain tasimadiklari icin domain ile kontrol edilemezler.</summary>
+    /// <summary>Mobil uygulama adresleri (ornekapp://...). Domain tasimadiklari icin domain ile kontrol edilemezler.</summary>
     public bool AllowCustomSchemes { get; set; } = true;
 }
 

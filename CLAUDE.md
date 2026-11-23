@@ -80,7 +80,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **Musteri kurulum paketi:** `deploy/compose/` (docker-compose, `.env.example`, `init/`, `kurulum.sh|ps1`, `BENIOKU.md`).
   - Portala gomulu kaynak olarak derlenir; `/indir/booster-auth.zip` zip'i calisma aninda uretir (`InstallPackage`; `.sh` 0755).
   - `.dockerignore` `.env.*` ve `docker-compose*` dosyalarini dislar; paket dosyalari icin `!deploy/compose/...` istisnalari VAR, silme.
-  - Image'lar `ghcr.io/booster-tr/*` (public, portal haric). Paket WalkToWin ve lisans portali ayarlarini ICERMEZ (yalnizca Booster'in kendi kurulumu).
+  - Image'lar `ghcr.io/booster-tr/*` (public, portal haric). Paket lisans portali ayarlarini ICERMEZ (yalnizca Booster'in kendi kurulumu).
   - Paket dosyalari LF olmali (`.gitattributes`); betikler ayrica `tr -d '\r'` ile calistirilir.
 - **Razor:** `action` ozniteligi acikca yazilan POST formlarina `asp-antiforgery="true"` EKLE. Tag helper o durumda CSRF token'ini kendiliginden koymaz; form 400 doner.
 

@@ -16,7 +16,7 @@ namespace Booster.Auth.Management.Api.Bootstrappers;
 /// YALNIZCA <c>BootstrapOptions.Licensing.Enabled</c> true ise calisir (Booster'in kendi kurulumu).
 /// Musteri on-prem kurulumlarinda varsayilan kapali oldugu icin hicbir sey olusmaz.
 /// </para>
-/// WalkToWinBootstrapper ile ayni desen: sabit kimlikler, idempotent. Ayarlarda olup client'ta eksik olan
+/// ManagementBootstrapper ile ayni desen: sabit kimlikler, idempotent. Ayarlarda olup client'ta eksik olan
 /// yonlendirme adresleri eklenir, mevcutlar silinmez.
 /// AuthZ tarafindaki owner/parent iliskileri Booster.Auth.Z/LicensingBootstrapper ile yazilir.
 /// </summary>

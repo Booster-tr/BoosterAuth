@@ -31,7 +31,6 @@ public static class ServiceExtensions
         services.AddHashing(hashingOptions);
 
         services.AddScoped<ManagementBootstrapper>();
-        services.AddScoped<WalkToWinBootstrapper>();
         services.AddScoped<LicensingBootstrapper>();
 
         // Lisans: sahibi bu servis. Dogrulama tamamen cevrimdisi; yalnizca koda gomulu public key'ler.
