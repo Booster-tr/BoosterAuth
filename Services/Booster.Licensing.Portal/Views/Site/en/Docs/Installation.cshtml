@@ -27,14 +27,14 @@ cd booster-auth</pre></div>
     password and key at random and writes <code>.env</code>.</p>
 <div class="code"><span class="lbl">Linux / macOS</span><pre>./setup.sh</pre></div>
 <div class="code"><span class="lbl">Windows</span><pre>powershell -ExecutionPolicy Bypass -File .\setup.ps1</pre></div>
-<p>The script asks for the following (its prompts are in Turkish):</p>
+<p>The script asks for the following:</p>
 <table>
     <thead><tr><th>Prompt</th><th>Example</th><th>Meaning</th></tr></thead>
     <tbody>
-        <tr><td>Booster Auth adresi (address)</td><td><code>auth.company.com</code></td><td>Where your applications send users to sign in; the OIDC issuer is built from it.</td></tr>
-        <tr><td>HTTPS portu (port)</td><td><code>443</code></td><td>Use e.g. <code>8443</code> if 443 is taken.</td></tr>
-        <tr><td>Panel portu / adresi (console port / address)</td><td><code>3000</code> · <code>http://localhost:3000</code></td><td>The admin console address.</td></tr>
-        <tr><td>Yönetici e-postası (admin e-mail)</td><td><code>it@@company.com</code></td><td>The first administrator's e-mail.</td></tr>
+        <tr><td>Booster Auth address (host)</td><td><code>auth.company.com</code></td><td>Where your applications send users to sign in; the OIDC issuer is built from it.</td></tr>
+        <tr><td>HTTPS port</td><td><code>443</code></td><td>Use e.g. <code>8443</code> if 443 is taken.</td></tr>
+        <tr><td>Management panel port / address</td><td><code>3000</code> · <code>http://localhost:3000</code></td><td>The admin console address.</td></tr>
+        <tr><td>Administrator e-mail</td><td><code>it@@company.com</code></td><td>The first administrator's e-mail.</td></tr>
     </tbody>
 </table>
 <h3>Filling it in by hand</h3>
@@ -79,6 +79,9 @@ docker compose ps</pre></div>
     <li><b>Trial:</b> add <code>pki/trust/ca.crt</code> to your operating system as a trusted root certificate, or accept the warning.</li>
     <li><b>Production:</b> put a reverse proxy (nginx, Traefik, Cloudflare Tunnel) with your own certificate in front, or replace
         <code>pki/tls/server.crt</code> and <code>server.key</code> with your own certificate.</li>
+    <li><b>Your own certificate:</b> the installation only renews the certificate it generated itself (signed by the local CA). It never touches a
+        certificate you put there; if it does not contain the address (<code>PUBLIC_HOST</code>) or expires within 30 days, a warning is written to
+        the log at start-up. Renewing it is up to you: put the new files in <code>pki/tls/</code> and run <code>docker compose restart booster-gateway</code>.</li>
 </ul>
 <p><b>Client IP behind a proxy:</b> by default the gateway trusts no forwarding header and uses the connection address (rate limiting,
     session list). If a load balancer or reverse proxy sits in front, set its network in <code>.env</code> so the real client IP is read:

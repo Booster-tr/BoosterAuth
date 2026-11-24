@@ -1,0 +1,9 @@
+@{
+    var en = ViewData["En"] is true;
+    ViewData["Title"] = en ? "Page not found" : "Sayfa bulunamadı";
+}
+<section class="card">
+    <h1>@(en ? "Page not found" : "Sayfa bulunamadı")</h1>
+    <p>@(en ? "The address may be wrong or the page may have moved." : "Adres yanlış olabilir ya da sayfa taşınmış olabilir.")</p>
+    <p><a href="@(en ? "/en" : "/tr")">@(en ? "Go to the home page" : "Ana sayfaya dön")</a></p>
+</section>

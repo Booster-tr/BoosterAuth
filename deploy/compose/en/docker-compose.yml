@@ -38,7 +38,7 @@ x-dotnet-env: &dotnet-env
   EXTRA_CA_CERTS: /run/booster/trust/ca.crt
   PostgresSettings__ApplyMigration: "true"
   RedisCacheOptions__Endpoints: redis:6379
-  RedisCacheOptions__Password: ${REDIS_PASSWORD:?REDIS_PASSWORD .env icinde tanimli olmali (kurulum betigini calistirin)}
+  RedisCacheOptions__Password: ${REDIS_PASSWORD:?REDIS_PASSWORD must be set in .env (run the setup script)}
   RedisCacheOptions__Ssl: "false"
   AmqpSettings__BootstrapServers: kafka:9092
   FgaSettings__GrpcAddress: http://booster-authz:8081
@@ -56,9 +56,9 @@ x-hashing-env: &hashing-env
   HashingOptions__MemorySizeKb: "19456"
   HashingOptions__Iterations: "2"
   HashingOptions__DegreeOfParallelism: "1"
-  HashingOptions__Pepper: ${HASHING_PEPPER:?HASHING_PEPPER .env icinde tanimli olmali}
+  HashingOptions__Pepper: ${HASHING_PEPPER:?HASHING_PEPPER must be set in .env (run the setup script)}
   HashingOptions__EncryptionOptions__ActiveKeyId: key1
-  HashingOptions__EncryptionOptions__Keys__key1: ${HASHING_ENCRYPTION_KEY:?HASHING_ENCRYPTION_KEY .env icinde tanimli olmali}
+  HashingOptions__EncryptionOptions__Keys__key1: ${HASHING_ENCRYPTION_KEY:?HASHING_ENCRYPTION_KEY must be set in .env (run the setup script)}
 
 
 services:
@@ -69,7 +69,7 @@ services:
     image: alpine:3.20
     entrypoint: ["sh", "-c", "apk add --no-cache -q bash openssl >/dev/null && tr -d '\\r' < /scripts/init.sh > /tmp/init.sh && exec bash /tmp/init.sh"]
     environment:
-      PUBLIC_HOST: ${PUBLIC_HOST:?PUBLIC_HOST .env icinde tanimli olmali}
+      PUBLIC_HOST: ${PUBLIC_HOST:?PUBLIC_HOST must be set in .env (run the setup script)}
       # Only for the "CHANGE_ME" check (init.sh): the system does not start with the template placeholder.
       CHECK_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       CHECK_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
@@ -91,7 +91,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env icinde tanimli olmali}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env (run the setup script)}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
@@ -148,7 +148,7 @@ services:
     environment:
       <<: *openfga-datastore
       OPENFGA_AUTHN_METHOD: preshared
-      OPENFGA_AUTHN_PRESHARED_KEYS: ${OPENFGA_PRESHARED_KEY:?OPENFGA_PRESHARED_KEY .env icinde tanimli olmali}
+      OPENFGA_AUTHN_PRESHARED_KEYS: ${OPENFGA_PRESHARED_KEY:?OPENFGA_PRESHARED_KEY must be set in .env (run the setup script)}
       OPENFGA_LOG_FORMAT: json
       OPENFGA_PLAYGROUND_ENABLED: "false"
 
@@ -216,11 +216,11 @@ services:
       IdpOptions__Issuer: ${PUBLIC_URL}/idp
       IdpOptions__SigningKeyId: booster-oidc-key-1
       IdpOptions__PrivateKeyPem: /run/booster/secrets/idp-signing.pem
-      IdpOptions__ApplicationPeper: ${IDP_APPLICATION_PEPPER:?IDP_APPLICATION_PEPPER .env icinde tanimli olmali}
+      IdpOptions__ApplicationPeper: ${IDP_APPLICATION_PEPPER:?IDP_APPLICATION_PEPPER must be set in .env (run the setup script)}
       IdpUiOptions__BaseUrl: ${PUBLIC_URL}/idp
       PostgresSettings__DatabaseName: idpdb
       PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=idpdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
-      BootstrapOptions__AdminPassword: ${BOOTSTRAP_ADMIN_PASSWORD:?BOOTSTRAP_ADMIN_PASSWORD .env icinde tanimli olmali}
+      BootstrapOptions__AdminPassword: ${BOOTSTRAP_ADMIN_PASSWORD:?BOOTSTRAP_ADMIN_PASSWORD must be set in .env (run the setup script)}
       BootstrapOptions__AdminEmail: ${BOOTSTRAP_ADMIN_EMAIL:-}
       BootstrapOptions__ManagementClientAudience: ${PUBLIC_URL}/management
       ManagementSettings__GrpcAddress: http://booster-management-api:8081
@@ -348,7 +348,7 @@ services:
       OIDC_REDIRECT_URI: ${PANEL_PUBLIC_URL}/api/auth/callback/booster
       OIDC_POST_LOGOUT_REDIRECT: ${PANEL_PUBLIC_URL}/
       OIDC_SCOPES: openid profile email offline_access booster:panel
-      SESSION_SECRET: ${PANEL_SESSION_SECRET:?PANEL_SESSION_SECRET .env icinde tanimli olmali}
+      SESSION_SECRET: ${PANEL_SESSION_SECRET:?PANEL_SESSION_SECRET must be set in .env (run the setup script)}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-}
       BACKEND_URL: http://booster-gateway:8080
       SERVICE_STATUS_ENDPOINTS: Gateway=http://booster-gateway:8080,IdP=http://booster-idp:8080,Management API=http://booster-management-api:8080,AuthZ=http://booster-authz:8080,Logging=http://booster-logging:8080,Notification=http://booster-notification:8080,System Message=http://booster-systemmessage:8080

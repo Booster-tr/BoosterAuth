@@ -93,7 +93,7 @@ app.MapGet("/orders", () => "...")
 <table>
     <thead><tr><th>Token</th><th>Claims</th></tr></thead>
     <tbody>
-        <tr><td>Access token</td><td><code>sub</code>, <code>aud</code>, <code>azp</code>, <code>scope</code>, <code>role</code> (one per role), <code>sid</code>, <code>principal_type</code></td></tr>
+        <tr><td>Access token</td><td><code>sub</code>, <code>aud</code>, <code>azp</code>, <code>scope</code>, <code>role</code> (a string for one role, an array for several), <code>sid</code>, <code>principal_type</code>, <code>actor</code> (pool id). <code>azp</code> is the application's internal id (GUID); the ID token's <code>aud</code> is the <code>client_id</code>.</td></tr>
         <tr><td>ID token (only if <code>openid</code> is requested)</td><td><code>sub</code>, <code>nonce</code>, <code>auth_time</code>; <code>name</code> only with
             <code>profile</code>, <code>email</code> and <code>email_verified</code> only with the <code>email</code> scope</td></tr>
         <tr><td><code>/idp/me</code></td><td><code>sub</code>, <code>name</code>, <code>email</code>, <code>email_verified</code>, <code>userpool</code></td></tr>

@@ -33,7 +33,7 @@ cd booster-auth</pre></div>
     <tbody>
         <tr><td>Booster Auth adresi</td><td><code>auth.firma.com</code></td><td>Uygulamalarınızın giriş için yönleneceği adres; OIDC issuer bundan oluşur.</td></tr>
         <tr><td>HTTPS portu</td><td><code>443</code></td><td>443 doluysa ör. <code>8443</code>.</td></tr>
-        <tr><td>Konsol portu / adresi</td><td><code>3000</code> · <code>http://localhost:3000</code></td><td>Yönetim konsolunun adresi.</td></tr>
+        <tr><td>Yönetim paneli portu / adresi</td><td><code>3000</code> · <code>http://localhost:3000</code></td><td>Yönetim konsolunun adresi.</td></tr>
         <tr><td>Yönetici e-postası</td><td><code>it@@firma.com</code></td><td>İlk yöneticinin e-postası.</td></tr>
     </tbody>
 </table>
@@ -78,6 +78,9 @@ docker compose ps</pre></div>
     <li><b>Deneme:</b> <code>pki/trust/ca.crt</code> dosyasını işletim sisteminize güvenilir kök sertifika olarak ekleyin ya da uyarıyı geçin.</li>
     <li><b>Üretim:</b> önüne kendi sertifikanızla bir reverse proxy (nginx, Traefik, Cloudflare Tunnel) koyun ya da <code>pki/tls/server.crt</code> ve
         <code>server.key</code> dosyalarını kendi sertifikanızla değiştirin.</li>
+    <li><b>Kendi sertifikanız:</b> kurulum yalnızca kendi ürettiği (yerel CA imzalı) sertifikayı yeniler. Sizin koyduğunuz sertifikaya hiç dokunmaz;
+        adresi (<code>PUBLIC_HOST</code>) içermiyorsa ya da süresi 30 gün içinde doluyorsa açılışta loga uyarı yazar. Yenilemek sizdedir: yeni
+        dosyaları <code>pki/tls/</code>'e koyup <code>docker compose restart booster-gateway</code> çalıştırın.</li>
 </ul>
 <p><b>Proxy arkasında istemci IP'si:</b> gateway varsayılan olarak hiçbir yönlendirme başlığına güvenmez ve bağlantı adresini kullanır (hız
     sınırı, oturum listesi). Önünde yük dengeleyici ya da reverse proxy varsa gerçek istemci IP'sinin okunması için ağını <code>.env</code>'e

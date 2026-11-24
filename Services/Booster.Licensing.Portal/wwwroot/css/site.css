@@ -355,7 +355,7 @@ section{padding:120px 0}
 .foot-h{font:500 12px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#8D928B;margin:0 0 16px}
 .foot ul{list-style:none;margin:0;padding:0}
 .foot li{padding:4px 0}
-.foot a{text-decoration:none;color:#DCDFD9}
+.foot a{text-decoration:none;color:#DCDFD9;overflow-wrap:anywhere}
 .foot a:hover{color:#fff}
 .foot .brand{color:#fff}
 .foot .brand small{color:#8D928B}

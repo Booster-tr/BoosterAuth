@@ -44,4 +44,22 @@ public sealed class HomeController : Controller
 
     [HttpGet("/hata")]
     public IActionResult Error() => View();
+
+    /// <summary>
+    /// Bulunamayan adresler (UseStatusCodePagesWithReExecute). Dil istenen adresten secilir (/en/... Ingilizce); once
+    /// bos govdeli 404 donuyordu.
+    /// </summary>
+    [HttpGet("/bulunamadi")]
+    public IActionResult NotFoundPage()
+    {
+        var feature = HttpContext.Features.Get<Microsoft.AspNetCore.Diagnostics.IStatusCodeReExecuteFeature>();
+        Response.StatusCode = feature?.OriginalStatusCode ?? StatusCodes.Status404NotFound;
+
+        // Yalnizca 404 "bulunamadi"dir; govdesiz baska hatalar (400 vb.) genel hata ekranini gosterir.
+        if (Response.StatusCode != StatusCodes.Status404NotFound)
+            return View("Error");
+
+        ViewData["En"] = (feature?.OriginalPath ?? string.Empty).StartsWith("/en", StringComparison.OrdinalIgnoreCase);
+        return View("NotFound");
+    }
 }
