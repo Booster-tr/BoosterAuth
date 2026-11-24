@@ -12,7 +12,7 @@
         <tr><td>redirect_uri</td><td>A URI registered on the application, e.g. <code>https://app.company.com/callback</code></td></tr>
         <tr><td>Flow</td><td>Authorization Code + PKCE (<code>S256</code> required; the implicit flow is not supported)</td></tr>
         <tr><td>Scopes</td><td><code>openid profile email offline_access</code> + custom scopes allowed for the application. A custom scope is put in the
-            token only if the <b>user holds it</b>; scopes granted to the user are added even if not requested.</td></tr>
+            token only if the <b>user or one of their roles holds it</b>; the user's (and their roles') scopes are added even if not requested.</td></tr>
         <tr><td>resource (optional)</td><td>The target API (audience) of the token, e.g. <code>https://api.company.com</code>; it must be one of the
             application's allowed APIs. Without it the audience is the IdP itself (<code>https://auth.company.com/idp</code>); that token works with <code>/idp/me</code>.</td></tr>
         <tr><td>prompt (optional)</td><td><code>login</code>: sign in again even with a session. <code>create</code>: sign-up screen. <code>none</code>: no screen

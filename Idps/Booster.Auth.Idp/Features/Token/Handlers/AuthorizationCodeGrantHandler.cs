@@ -61,17 +61,18 @@ public sealed class AuthorizationCodeGrantHandler(
         if (principal.Status != PrincipalStatus.Active)
             throw new BusinessException(IdpMessageKeys.InvalidGrant);
 
-        var roles = await roleRepository.Query()
+        var roleRows = await roleRepository.Query()
             .Where(r => r.PrincipalId == principal.Id)
-            .Select(r => r.RoleName)
+            .Select(r => new { r.RoleId, r.RoleName })
             .ToListAsync(ct);
+        var roles = roleRows.Select(r => r.RoleName).ToList();
 
         var principalScopes = await scopeRepository.Query()
             .Where(s => s.PrincipalId == principal.Id)
             .Select(s => s.Scope)
             .ToListAsync(ct);
 
-        var grantedScope = TokenGrantRules.BuildScope(authCode.Scope, principalScopes);
+        var grantedScope = TokenGrantRules.BuildScope(authCode.Scope, principalScopes, roleRows.Select(r => r.RoleId), client);
 
         var finalScope = ApplyRequestedScope(grantedScope, request.Scope);
 

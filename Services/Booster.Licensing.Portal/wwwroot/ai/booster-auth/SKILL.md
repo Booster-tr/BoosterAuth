@@ -19,7 +19,7 @@ Replace `https://auth.company.com` with the customer's Booster Auth address; ask
 | Userinfo | `/idp/me` |
 | Logout | `/idp/logout` |
 | Flow | Authorization Code + PKCE. `code_challenge_method=S256` is REQUIRED; implicit flow is not supported. |
-| Scopes | `openid profile email offline_access` + custom scopes allowed for the application. A custom scope is in the token only if the user holds it; scopes granted to the user are added even if not requested. |
+| Scopes | `openid profile email offline_access` + custom scopes allowed for the application. A custom scope is in the token only if the user or one of their roles holds it; the user's and their roles' scopes are added even if not requested. |
 | Audience | Pass `resource=<API address>`; it becomes the access token's `aud`. It must be in the application's allowed APIs (else `invalid_target`). Without `resource` the audience is the IdP itself (`<issuer>`, e.g. `https://auth.company.com/idp`), which `/idp/me` accepts. |
 
 - The user pool is selected by the `client_id`; there is no pool parameter.

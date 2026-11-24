@@ -13,7 +13,7 @@
 </table>
 
 <h2 id="roles">Roles and scopes</h2>
-<p>The roles and scopes granted to the user are written into the access token. After validating the token, your API looks at the claims:</p>
+<p>The user's roles, the scopes granted to the user and the scopes of their roles are written into the access token. After validating the token, your API looks at the claims:</p>
 <div class="code"><span class="lbl">Access token (excerpt)</span><pre>{
   "sub": "6f1c…",
   "aud": "https://api.company.com",
@@ -21,8 +21,7 @@
   "role": ["manager", "auditor"]
 }</pre></div>
 <p><code>role</code> is a string when the user has one role (<code>"role": "manager"</code>) and an array when there are several; handle both
-    (ASP.NET Core with <code>MapInboundClaims = false</code> produces one claim per role either way). A role's scope list is not carried into the
-    token; scopes are granted to the user separately.</p>
+    (ASP.NET Core with <code>MapInboundClaims = false</code> produces one claim per role either way). The scopes of the user's roles are added to <code>scope</code> as well.</p>
 
 <h2 id="schema">Authorization schema (ReBAC)</h2>
 <p>On the <b>Authorization Schema</b> screen in the pool menu:</p>

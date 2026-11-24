@@ -62,6 +62,13 @@ public static class ClientDataMapper
 
         message.Login.AllowedIdentifiers.AddRange(source.Login.AllowedIdentifiers.Select(i => (int)i));
 
+        foreach (var rs in source.RoleScopes)
+        {
+            var item = new RoleScopesMessage { RoleId = rs.RoleId.ToString() };
+            item.Scopes.AddRange(rs.Scopes);
+            message.RoleScopes.Add(item);
+        }
+
         message.DefaultRoles.AddRange(source.DefaultRoles.Select(r => new DefaultRoleMessage
         {
             RoleId = r.RoleId.ToString(),
@@ -136,6 +143,7 @@ public static class ClientDataMapper
                     Required = message.Mfa.Required,
                     AllowedMethods = (MfaMethod)message.Mfa.AllowedMethods
                 },
+            RoleScopes = [.. message.RoleScopes.Select(r => new RoleScopesData { RoleId = Guid.Parse(r.RoleId), Scopes = [.. r.Scopes] })],
             DefaultRoles = [.. message.DefaultRoles.Select(r => new DefaultRoleData
             {
                 RoleId = Guid.Parse(r.RoleId),

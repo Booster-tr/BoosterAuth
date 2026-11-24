@@ -30,6 +30,9 @@ public sealed record ClientData
 
     public required IReadOnlyList<DefaultRoleData> DefaultRoles { get; init; }
 
+    /// <summary>Havuzdaki rol -> kapsam eslemesi; token kapsamina kullanicinin rollerinin kapsamlari eklenir.</summary>
+    public IReadOnlyList<RoleScopesData> RoleScopes { get; init; } = [];
+
     public IReadOnlyList<FederationProviderData> FederationProviders { get; init; } = [];
 
     // required DEGIL: eski bir Management surumu alani gondermezse MFA kapali
@@ -43,6 +46,12 @@ public sealed record MfaPolicyData
     public bool Required { get; init; }
 
     public MfaMethod AllowedMethods { get; init; } = MfaMethod.None;
+}
+
+public sealed record RoleScopesData
+{
+    public required Guid RoleId { get; init; }
+    public required IReadOnlyList<string> Scopes { get; init; }
 }
 
 public sealed record DefaultRoleData
