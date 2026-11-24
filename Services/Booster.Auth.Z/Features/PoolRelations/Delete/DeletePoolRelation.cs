@@ -54,7 +54,7 @@ public class DeletePoolRelationCommandHandler(IPoolStoreProvider poolStoreProvid
         try
         {
             await relationManager.DeleteAsync(
-                store.StoreId, $"{command.SubjectType}:{command.SubjectId}", command.Relation, @object, ct);
+                store.StoreId, $"{command.SubjectType}:{command.SubjectId}", command.Relation, @object, store.ActiveModelId, ct);
         }
         catch (FgaApiValidationError)
         {

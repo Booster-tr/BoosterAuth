@@ -30,6 +30,10 @@ public static partial class SchemaValidator
         if (SystemSchema.IsSystemPool(poolId))
             issues.AddRange(SystemSchema.MissingProtected(definition));
 
+        // Bos sema canliya alinirsa havuzdaki tum kontroller "iliski semaya uymuyor" diye reddedilir.
+        if (types.Count == 0)
+            issues.Add(new("no_types"));
+
         if (types.Count > options.MaxSchemaTypes)
             issues.Add(new("too_many_types", Value: options.MaxSchemaTypes.ToString()));
 

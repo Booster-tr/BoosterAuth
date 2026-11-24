@@ -116,9 +116,14 @@ public class IdpMessageKeys
     public const string UiTextKeyUnknown = "idp.ui_text_key_unknown";
     public const string UiTextInvalid = "idp.ui_text_invalid";
     public const string LanguageNotSupported = "idp.language_not_supported";
-    public const string ManagementPoolUserDeleteNotAllowed = "idp.management_pool_user_delete_not_allowed";
+    public const string CannotDeleteSelf = "idp.cannot_delete_self";
+    public const string CannotDeleteLastAdmin = "idp.cannot_delete_last_admin";
+    public const string CannotSuspendSelf = "idp.cannot_suspend_self";
+    public const string CannotSuspendLastAdmin = "idp.cannot_suspend_last_admin";
+    public const string PrincipalStatusInvalid = "idp.principal_status_invalid";
 
     // --- Havuz API'leri (uygulama backend'i, servis hesabi token'i) ------------
     public const string PoolApiCallerNotAllowed = "idp.pool_api_caller_not_allowed";
+    public const string PoolApiRelationTooLow = "idp.pool_api_relation_too_low";
     public const string PoolApiRelationRejected = "idp.pool_api_relation_rejected";
 }

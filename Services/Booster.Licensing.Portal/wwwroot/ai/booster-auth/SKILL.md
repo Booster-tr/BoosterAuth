@@ -111,7 +111,8 @@ grant_type=client_credentials&client_id=management&service_account_key=<key>&ser
 - Token `aud` wrong -> pass `resource` when requesting the token; it must be in the application's allowed APIs. Without it `aud` is the IdP itself.
 - Using a user token for `/idp/apis/*` -> `403`. Use a service account token from a backend.
 - Using the application's own `client_id` for the service account token -> `invalid_service_account`. Use `client_id=management`.
-- `403` with a service account token -> its permission is not enough (e.g. a viewer granting roles) or it is suspended.
+- `403` with a service account token -> `code: idp.pool_api_relation_too_low` means its permission is not enough (e.g. a viewer granting roles); `idp.pool_api_caller_not_allowed` means it is not a service account token or the account is suspended.
+- Relation writes / deletes are idempotent: writing an existing relation or deleting a missing one succeeds, so retries are safe.
 - Expecting a new role in an existing token -> refresh or sign in again.
 - Logout without `client_id` / `id_token_hint` -> user is not returned to the app.
 

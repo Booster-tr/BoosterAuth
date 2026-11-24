@@ -54,7 +54,7 @@ public class WriteRelationsCommandHandler(
             .Select(t => new TupleInput(t.User, t.Relation, t.Object))
             .ToList();
 
-        await relationManager.WriteBatchAsync(mapping.StoreId, tuples, ct);
+        await relationManager.WriteBatchAsync(mapping.StoreId, tuples, mapping.ActiveModelId, ct);
 
         return new WriteRelationsResponse(tuples.Count);
     }

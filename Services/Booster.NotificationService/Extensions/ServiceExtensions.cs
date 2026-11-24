@@ -1,3 +1,4 @@
+using Booster.NotificationService.Features._amqp.Consumers.PrincipalDeleted;
 using Booster.Amqp.Constants;
 using Booster.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Amqp.Events;
@@ -65,6 +66,7 @@ public static class ServiceExtensions
                 rider.AddLogProducer();
 
                 rider.AddConsumer<NotificationRequestedEventConsumer>();
+                rider.AddConsumer<PrincipalDeletedEventConsumer>();
             },
             configureKafka: (cfg, context) =>
             {
@@ -75,6 +77,12 @@ public static class ServiceExtensions
                     TopicDef.NotificationRequestedEventTopic,
                     amqpSettings.GroupId,
                     e => e.AddConsumer<NotificationRequestedEvent, NotificationRequestedEventConsumer, NotificationDbContext>(context));
+
+                // Silinen hesabin bildirim kayitlarini temizler (kisisel veri).
+                cfg.TopicEndpoint<string, PrincipalDeletedEvent>(
+                    PrincipalTopics.PrincipalDeleted,
+                    amqpSettings.GroupId,
+                    e => e.AddConsumer<PrincipalDeletedEvent, PrincipalDeletedEventConsumer, NotificationDbContext>(context));
             });
 
         return services;

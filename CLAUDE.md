@@ -175,6 +175,15 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **Yasal metin baglantilari:** kok-goreli baglantiya `IdpUiOptions.PathPrefix` eklenir (`/kvkk` -> `/idp/kvkk`).
 - **Cikis:** `logout_all` yalnizca kullaniciya ait `id_token_hint` ile ya da POST ile uygulanir.
 
+## Yonetim kurallari (2026-11 E2E turu)
+- **Kullanici durumu:** `PUT idp/pools/users/status` (Active / Suspended). Askiya alma oturum ve yenileme token'larini hemen kapatir; kayit, rol ve iliskiler kalir.
+- **Panel kullanicilari** (yonetim havuzu) silinebilir / askiya alinabilir; kisi kendini ve son `admin`'i silemez / askiya alamaz.
+- **Silinen kullanicinin iliskileri:** AuthZ `ReadRelations` yalnizca kullaniciyla cagrilirsa modeldeki her tip icin okur (OpenFGA tip ister). Silme `PrincipalDeletedEvent` (`auth-principal-deleted-topic`) yayinlar; Notification o kullanicinin bildirim kayitlarini siler.
+- **FGA yazma / silme idempotent** (`FgaRelationManager`: on_duplicate / on_missing = ignore).
+- **Sema:** tip icermeyen sema canliya alinamaz (`no_types`).
+- **Sayfalama:** `PageSize` 1..500 (`common.page_size_invalid`); sorgu dizesinden `-raw` filtresi kabul edilmez, alan adlari tanimlayici olmali.
+- **Rolun kapsam listesi token'a TASINMAZ** (RoleScope IdP'de yok); token'a kullaniciya verilen kapsamlar girer. Dokuman buna gore yazili.
+
 ## Kullanici ekleme ve davet (IdP)
 - **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).
   - Panelden ekleme (`POST pools/users`) ve CSV ice aktarma (`POST pools/users/import`) bunu kullanir.

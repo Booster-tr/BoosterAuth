@@ -69,6 +69,7 @@ POST https://auth.company.com/idp/apis/relations/check
 <ul>
     <li>Format is <code>type:id</code>; for a user set use <code>type:id#relation</code> (e.g. <code>team:sales#member</code>).</li>
     <li>At most 100 tuples per request. A request that does not match the schema is rejected with <code>400</code>.</li>
+    <li>Writes and deletes are <b>idempotent</b>: writing an existing relation or deleting a missing one is not an error; requests can be retried safely.</li>
 </ul>
 
 <h2 id="errors">Errors</h2>
@@ -76,7 +77,9 @@ POST https://auth.company.com/idp/apis/relations/check
     <thead><tr><th>Status</th><th>Reason</th></tr></thead>
     <tbody>
         <tr><td><code>401</code></td><td>No token, expired token, or <code>resource</code> is not the IdP address</td></tr>
-        <tr><td><code>403</code></td><td>The token does not belong to a service account (e.g. a user token), the account is suspended, or its permission is not enough</td></tr>
+        <tr><td><code>403</code></td><td><code>idp.pool_api_caller_not_allowed</code>: the token does not belong to a service account (e.g. a user token) or the
+            account is suspended. <code>idp.pool_api_relation_too_low</code>: the account's access is not enough for this operation (read and check: viewer,
+            roles / scopes: manager, writing relations: grant manager).</td></tr>
         <tr><td><code>400</code></td><td>A role / scope not defined in the pool, an unknown user, or a relation that does not match the schema</td></tr>
     </tbody>
 </table>

@@ -54,11 +54,15 @@ john@@company.com,John,Smith</pre></div>
 <p>Invitation links are valid for <b>1 day</b> and can be used once; resending an invitation invalidates the previous link. When the invitation
     is accepted, the user sets a password and the e-mail is marked as verified. LDAP / Active Directory users do not need to be added: their
     accounts are created on first sign-in.</p>
+<p>You can <b>suspend</b> a user (sign-in and token refresh stop at once and open sessions are closed; roles and permissions are kept and the user can
+    be reactivated) or <b>delete</b> them (the record is anonymized; password, roles, sessions, authorization relations and sent notification records
+    are removed). The same applies to console users; only you cannot delete or suspend yourself or the last administrator.</p>
 
 <h2 id="roles">5. Roles and scopes</h2>
 <ol>
     <li>On the <b>Scopes</b> screen, define your API's permissions, e.g. <code>orders:read</code>, <code>orders:write</code>.</li>
-    <li>On the <b>Roles</b> screen, create a role (e.g. <code>manager</code>) and add scopes to it.</li>
-    <li>Assign roles to users, or set the pool's <b>default roles</b>.</li>
+    <li>On the <b>Roles</b> screen, create a role (e.g. <code>manager</code>).</li>
+    <li>Assign roles and scopes to users, or set the pool's <b>default roles and scopes</b>.</li>
 </ol>
-<p>Roles appear in the token as the <code>role</code> claim and scopes as <code>scope</code>. Next: <a href="/en/docs/integration">connect your application</a>.</p>
+<p>Roles appear in the token as the <code>role</code> claim and the scopes granted to the user as <code>scope</code>. A role's scope list is not
+    carried into the token; grant the scope to the user as well. Next: <a href="/en/docs/integration">connect your application</a>.</p>

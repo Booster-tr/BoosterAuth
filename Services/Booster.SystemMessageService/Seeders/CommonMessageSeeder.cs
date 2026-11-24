@@ -34,6 +34,7 @@ public class CommonMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<Comm
         new(ValidationErrors.NotEmptyError, "Zorunlu alan", "Bu alan boş bırakılamaz.", "Required field", "This field cannot be empty."),
         new(ValidationErrors.NotNullOrEmptyError, "Zorunlu alan", "Bu alan zorunludur.", "Required field", "This field is required."),
         new(ValidationErrors.MaxLengthError, "Uzunluk", "Girilen değer izin verilen uzunluğu aşıyor.", "Length", "The value exceeds the allowed length."),
+        new(ValidationErrors.PageSizeInvalid, "Sayfalama", "Sayfa boyutu 1 ile 500 arasında olmalıdır.", "Paging", "Page size must be between 1 and 500."),
 
         // --- İzolasyon damgalama (IsolationInterceptor) ---
         new(IsolationMessageKeys.InvalidIsolation, "Bağlam", "İşlem için havuz bağlamı belirlenemedi.", "Context", "The pool context for this operation could not be determined."),

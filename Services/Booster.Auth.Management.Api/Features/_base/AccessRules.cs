@@ -21,6 +21,26 @@ public static class AccessRules
             .WithMessage(AuthNMessageKeys.InvalidRelation);
 }
 
+/// <summary>
+/// Geri alma parametreleri sorgudan gelir; eksik ya da gecersiz deger 400 olmali (once bos Guid / bos iliski AuthZ'ye
+/// gidip 500 donuyordu, or. parametreler govdeye yazildiginda).
+/// </summary>
+public static class RevokeParams
+{
+    public static void Ensure(Guid principalId, string relation)
+    {
+        var failures = new List<FluentValidation.Results.ValidationFailure>();
+        if (principalId == Guid.Empty)
+            failures.Add(new("PrincipalId", ValidationErrors.NotEmptyError));
+        if (string.IsNullOrWhiteSpace(relation))
+            failures.Add(new("Relation", ValidationErrors.NotEmptyError));
+        else if (!AccessRules.Assignable.Contains(relation, StringComparer.OrdinalIgnoreCase))
+            failures.Add(new("Relation", AuthNMessageKeys.InvalidRelation));
+        if (failures.Count > 0)
+            throw new FluentValidation.ValidationException(failures);
+    }
+}
+
 public readonly record struct AccessChangeResponse(Guid PrincipalId, string Relation);
 
 public record AccessListResponse(IReadOnlyList<AccessItemResponse> Items, string? ContinuationToken);

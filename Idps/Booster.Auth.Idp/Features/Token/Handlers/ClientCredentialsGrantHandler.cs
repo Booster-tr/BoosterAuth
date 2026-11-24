@@ -1,3 +1,5 @@
+using Booster.Auth.Idp.Options;
+using Booster.Auth.Idp.Features.Token.Handlers._base;
 ﻿using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Idp.Stores.PrincipalStores;
@@ -24,6 +26,7 @@ public sealed class ClientCredentialsGrantHandler(
     IAsyncRepository<PrincipalRole, IdpDbContext> roleRepository,
     IAsyncRepository<PrincipalScope, IdpDbContext> scopeRepository,
     ISimpleHasher simpleHasher,
+    IdpOptions idpOptions,
     IRequestContextAccessor requestContextAccessor) : IGrantTypeHandler
 {
     public OAuthGrantType GrantType => OAuthGrantType.ClientCredentials;
@@ -70,7 +73,7 @@ public sealed class ClientCredentialsGrantHandler(
         var finalScope = ApplyRequestedScope(grantedScope, request.Scope);
 
         var (accessToken, expiresIn) = tokenService.CreateAccessToken(
-            audience: request.Resource ?? string.Empty,
+            audience: TokenGrantRules.ResolveAudience(request.Resource, null, client, idpOptions.Issuer),
             subject: principal.Id,
             azp: serviceAccount.Key,
             scope: finalScope,

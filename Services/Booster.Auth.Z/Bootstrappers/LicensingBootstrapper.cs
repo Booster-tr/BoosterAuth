@@ -56,6 +56,6 @@ public sealed class LicensingBootstrapper(
         }
 
         if (missing.Count > 0)
-            await relationManager.WriteBatchAsync(store.StoreId, missing, ct);
+            await relationManager.WriteBatchAsync(store.StoreId, missing, store.ActiveModelId, ct);
     }
 }

@@ -48,6 +48,8 @@ public class RevokeUserPoolAccessCommandHandler(
 {
     public async Task<AccessChangeResponse> ExecuteAsync(RevokeUserPoolAccessCommand command, CancellationToken ct)
     {
+        RevokeParams.Ensure(command.PrincipalId, command.Relation);
+
         // Owner yetkisini yalnızca owner geri alabilir.
         if (string.Equals(command.Relation, AuthConstants.OwnerRelation, StringComparison.OrdinalIgnoreCase))
         {

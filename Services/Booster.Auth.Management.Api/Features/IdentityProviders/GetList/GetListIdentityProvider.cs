@@ -77,6 +77,12 @@ public class GetListIdentityProviderQueryHandler(
             size: command.PageRequest.PageSize,
             cancellationToken: ct);
 
-        return data.MapListModel<IdentityProvider, GetListIdentityProviderResponse>(command);
+        var list = data.MapListModel<IdentityProvider, GetListIdentityProviderResponse>(command);
+
+        // Secret disari verilmez; yalnizca kayitli olup olmadigi. Panel "bos birakirsan mevcut secret korunur" der.
+        // Esleme kaynaksiz oldugu icin hep false geliyordu.
+        var withSecret = data.Items.Where(p => !string.IsNullOrEmpty(p.ClientSecretEncrypted)).Select(p => p.Id).ToHashSet();
+        list.Items = list.Items.Select(i => i with { HasClientSecret = withSecret.Contains(i.Id) }).ToList();
+        return list;
     }
 }
