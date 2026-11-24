@@ -102,7 +102,11 @@ public class PasswordlessLoginController(
             await new VerifyPasswordlessLoginValidator().ValidateAndThrowAsync(command, ct);
             var result = await command.ExecuteAsync(ct);
 
-            cookieManager.Set(Response, result.SessionToken, result.ExpiresAt);
+            // Havuz MFA (ya da dogrulama adimi) istiyorsa oturum henuz acilmadi.
+            if (result.RequiresChallenge)
+                return Redirect(uiOptions.GetLoginChallengeUrl(command.InteractionKey));
+
+            cookieManager.Set(Response, result.SessionToken!, result.ExpiresAt!.Value);
 
             return Redirect(uiOptions.GetAuthorizeUrl(command.InteractionKey));
         }

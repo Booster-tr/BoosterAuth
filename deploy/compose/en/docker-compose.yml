@@ -317,6 +317,8 @@ services:
       ReverseProxy__Clusters__management_cluster__Destinations__destination1__Address: http://booster-management-api:8080
       ReverseProxy__Clusters__authz_cluster__Destinations__destination1__Address: http://booster-authz:8080
       ReverseProxy__Clusters__systemmessage_cluster__Destinations__destination1__Address: http://booster-systemmessage:8080
+      ClientIp__TrustedNetworks__0: ${TRUSTED_PROXY_NETWORK:-}
+      ClientIp__Header: ${CLIENT_IP_HEADER:-X-Forwarded-For}
     ports:
       - "${PUBLIC_BIND_IP:-0.0.0.0}:${GATEWAY_HTTPS_PORT:-443}:${GATEWAY_HTTPS_PORT:-443}"
     networks:

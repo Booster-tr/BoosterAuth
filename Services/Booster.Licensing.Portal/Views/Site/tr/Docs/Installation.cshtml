@@ -79,6 +79,10 @@ docker compose ps</pre></div>
     <li><b>Üretim:</b> önüne kendi sertifikanızla bir reverse proxy (nginx, Traefik, Cloudflare Tunnel) koyun ya da <code>pki/tls/server.crt</code> ve
         <code>server.key</code> dosyalarını kendi sertifikanızla değiştirin.</li>
 </ul>
+<p><b>Proxy arkasında istemci IP'si:</b> gateway varsayılan olarak hiçbir yönlendirme başlığına güvenmez ve bağlantı adresini kullanır (hız
+    sınırı, oturum listesi). Önünde yük dengeleyici ya da reverse proxy varsa gerçek istemci IP'sinin okunması için ağını <code>.env</code>'e
+    yazın: <code>TRUSTED_PROXY_NETWORK=10.0.0.0/8</code> (proxy'nin adres aralığı). Cloudflare arkasında ayrıca
+    <code>CLIENT_IP_HEADER=CF-Connecting-IP</code>. Güvenilmeyen adreslerden gelen başlıklar yok sayılır; istemci IP'sini taklit edemez.</p>
 
 <h2 id="ilk-giris">5. İlk giriş</h2>
 <p>Konsola <b><code>admin</code></b> kullanıcı adı ve kurulum betiğinin gösterdiği ilk parolayla girin. İlk girişte yeni bir parola belirlemeniz

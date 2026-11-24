@@ -1,3 +1,4 @@
+using Booster.Auth.Z.Managers.QueryAccess;
 using Booster.Auth.Common.Internal.Extensions;
 using Booster.Auth.Z.Bootstrappers;
 using Booster.Auth.Z.Features._base;
@@ -21,6 +22,7 @@ public static class ServiceExtensions
         services.AddScoped<IPoolStoreProvider, PoolStoreProvider>();
 
         services.AddScoped<ILookupManager, LookupManager>();
+        services.AddScoped<QueryCallerGuard>();
 
         services.AddScoped<ManagementBootstrapper>();
         services.AddScoped<LicensingBootstrapper>();

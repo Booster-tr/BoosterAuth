@@ -1,3 +1,4 @@
+using Booster.Auth.Z.Managers.QueryAccess;
 using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Managers.LookupManagers;
 using Booster.ExceptionManager.Abstraction.Constants;
@@ -36,11 +37,16 @@ public record LookupResponse(IReadOnlyList<LookupTupleResponse> Results);
 
 public readonly record struct LookupTupleResponse(string User, string Relation, string Object);
 
-public class LookupByUserCommandHandler(ILookupManager lookupManager)
+public class LookupByUserCommandHandler(
+    QueryCallerGuard guard,
+    ILookupManager lookupManager)
     : ICommandHandler<LookupByUserCommand, LookupResponse>
 {
     public async Task<LookupResponse> ExecuteAsync(LookupByUserCommand command, CancellationToken ct)
     {
+        // Govdedeki havuzu sorgulama yetkisi (bkz. QueryCallerGuard).
+        await guard.EnsureAsync(command.IsolationId, ct);
+
         var results = await lookupManager.LookupByUserAsync(
             command.IsolationId, command.User, command.ObjectType, command.Relation, ct);
 

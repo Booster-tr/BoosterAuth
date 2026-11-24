@@ -14,7 +14,7 @@ Urun, musteri sunucusunda on-prem calisir ve **cevrimdisi lisansla** acilir. Lis
 1. **`master`'a dogrudan commit/push YOK.** `claude/<konu>` branch -> PR; kullanici merge eder. Merge = canliya cikis (CI -> GHCR -> gitops -> ArgoCD).
    **Lisanslama isi istisna:** tum PR'lar `feature/lisanslama` dalina gider. CI yalnizca `master` PR'larinda calistigi icin bu dala merge canliya CIKMAZ. Sistem tamamlaninca dal tek PR ile `master`'a alinir.
 2. **Secret repoya girmez:** kod, log, commit. Cluster Secret'lari elle olusturulur.
-3. Hata metni yazilmaz; mesaj anahtari firlatilir (`BusinessException(...)`). Metinler tr + en olarak SystemMessage seed'inde tutulur.
+3. Hata metni yazilmaz; mesaj anahtari firlatilir (`BusinessException(...)`). Metinler tr + en olarak SystemMessage seed'inde tutulur. Seed YALNIZCA eksik anahtari ekler (panelden duzeltilen metin ezilmesin): var olan bir metni degistirmek kurulu sistemlere YANSIMAZ; anlam degisiyorsa yeni anahtar ac.
 4. Id'ler route'ta degil query string'de tasinir (FGA secicileri `query:XId` okur). Silme soft yapilir. Audit alanlari elle set edilmez.
 5. Servis surumu `appsettings.json` `"Version"` alaninda tutulur. Davranis degisikligi = surum artisi.
 
@@ -150,6 +150,17 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Yalnizca deneme lisansi Restricted iken kapatir (`LICENSE_SERVICE_UNAVAILABLE`).
   - Yonetim havuzu her zaman aciktir, cunku yonetici yeni lisansi yapistirabilmeli.
 - **Hata kodu:** is kurali hatalari ProblemDetails'te `code` alaniyla da doner. Bu alan mesaj anahtaridir; panel metne degil koda bakar.
+
+## Guvenlik kurallari (2026-11 E2E turu)
+- **Panel uclari yalnizca yonetim havuzunun token'i:** panel scope'u (`booster:panel`) isteyen her uc `actor` = yonetim havuzu ister (`CommonInternal/.../Authorization/PanelActorHandler`, FGA'dan ONCE calisir, ret sonrasi diger handler'lar calismaz). Rol/scope kontrolu yalnizca token'daki ifadeye baktigi ve FGA deposunu `actor`'dan sectigi icin musteri havuzu kendi `admin` rolu / `pool` tipiyle yonetim uclarina ulasabiliyordu.
+- **AuthZ sorgu uclari** (`check`, `batch-check`, `lookup/*`): govdedeki `isolationId` token'i veren havuz olmali; yonetim havuzu token'i (panel kullanicisi, servis hesabi) o havuzda `viewer` olmali (`QueryCallerGuard`, `authz.query_not_allowed`).
+- **Token exchange:** konu token'i istemcinin havuzundan (`actor`) ve bu istemciye verilmis (`azp`) olmali; servis hesabi token'inda hesap aktif olmali. Yeni token konu token'indan uzun yasamaz; istemcide izinli olmayan kapsamlar tasinmaz.
+- **Uygulama adresleri** (`ClientUriRules`): yonlendirme adresi mutlak, `#` yok, `javascript:` / `data:` / `file:` vb. yasak; mobil ozel sema serbest. Audience tam http(s) adresi.
+- **Parolasiz giris + MFA:** kodun gittigi kanal MFA'da kullanilmaz; diger kanal yoksa giris reddedilir (`idp.mfa_second_channel_unavailable`).
+- **Federasyon state'i tarayiciya bagli:** challenge `booster_fed_binding` cerezini (etkilesim anahtari, SameSite=None) yazar; donuste esit degilse `federation_state_invalid`.
+- **Hesabim mevcut parola:** girisle ayni sayac ve kilit (havuz `MaxFailedAttempts` / `LockoutSeconds`).
+- **Istemci IP'si:** gateway basliga yalnizca `ClientIp:TrustedNetworks` icindeki proxy'den gelirse guvenir (`ClientIpResolver`; compose `TRUSTED_PROXY_NETWORK`, `CLIENT_IP_HEADER`) ve arka servislere `X-Forwarded-For`'u **Set** eder. Arka servisler ozel ag araliklarindan gelen `X-Forwarded-For/Proto`'yu uygular (`UseBoosterServices`). **Booster'in kendi kurulumu (Cloudflare):** `ClientIp__Header=CF-Connecting-IP` ve `ClientIp__TrustedNetworks__0=<cloudflared pod araligi>` verilmezse tum istekler tek IP'den gorunur.
+- **IdP guvenlik basliklari:** CSP (`'self'`, Swagger haric; `form-action` YOK cunku giris formu redirect_uri'ye 302 ile gider), nosniff, Referrer-Policy; HSTS `X-Forwarded-Proto` sayesinde calisir. Gorunumlerde satir ici `style=` / `<script>` YAZMA.
 
 ## Kullanici ekleme ve davet (IdP)
 - **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).

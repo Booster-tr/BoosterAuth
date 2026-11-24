@@ -43,10 +43,27 @@ builder.Services.AddGrpc();
 
 var app = builder.Build();
 
+app.UseBoosterServices();
+
+// UseBoosterServices X-Forwarded-Proto'yu uyguladiktan SONRA: istek https gorunmezse HSTS eklenmez.
 if (!app.Environment.IsDevelopment())
     app.UseHsts();
 
-app.UseBoosterServices();
+// Guvenlik basliklari (tum IdP yanitlari). CSP: sayfalar yalnizca IdP'nin kendi script / stil / resimlerini yukler;
+// yasal metne gomulu dis resim (takip pikseli) ya da araya sizan bir script calismaz. form-action YOK: giris formu
+// uygulamanin redirect_uri'sine (baska origin) 302 ile gider, form-action bunu engellerdi.
+app.Use((context, next) =>
+{
+    var headers = context.Response.Headers;
+    // Swagger UI satir ici script kullanir; CSP onu bozmasin.
+    if (!context.Request.Path.StartsWithSegments("/swagger"))
+        headers["Content-Security-Policy"] =
+            "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; " +
+            "object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
+    headers.XContentTypeOptions = "nosniff";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    return next(context);
+});
 
 app.UseRequestLocalization();
 

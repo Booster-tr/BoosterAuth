@@ -5,7 +5,8 @@ using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.PasswordlessBased;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.PasswordlessBased.Models;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Idp.Stores.InteractionKeyStores.Models;
-using Booster.Auth.Idp.Stores.SessionStores;
+using Booster.Auth.Idp.Managers.LoginChallengeManagers;
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Caching.Abstraction;
 using Booster.ExceptionManager.Abstraction.Constants;
@@ -19,7 +20,8 @@ public sealed class VerifyPasswordlessLoginHandler(
     ISecureCacheStore<InteractionStateData> interactionStore,
     IClientDataStore clientDataStore,
     IProviderFactory providerFactory,
-    ISessionStore sessionStore,
+    ILocalUserStore userStore,
+    ILoginChallengeManager loginChallengeManager,
     IRequestContextAccessor requestContextAccessor)
     : ICommandHandler<VerifyPasswordlessLoginCommand, VerifyPasswordlessLoginResult>
 {
@@ -58,22 +60,23 @@ public sealed class VerifyPasswordlessLoginHandler(
         if (!result.Succeeded)
             throw Invalid(nameof(VerifyPasswordlessLoginCommand.Code), MapFailure(result.FailureReason));
 
-        var (session, token) = await sessionStore.CreateAsync(
-            principalId: Guid.Parse(result.PrincipalId!),
-            clientId: client.ClientId,
-            ttl: TimeSpan.FromSeconds(client.Session.RefreshTokenTtlSeconds),
-            deviceName: null,
-            userAgent: cmd.UserAgent,
-            ipAddress: cmd.IpAddress,
-            authMethod: provider.ProviderType,
-            ct: ct);
+        // Kod birinci adimi kanitladi; oturum havuzun dogrulama / MFA adimlarindan sonra acilir. MFA, kodun gittigi
+        // kanal disindaki kanaldan istenir (bkz. LoginChallengeManager.BeginAsync).
+        var user = await userStore.GetByIdAsync(Guid.Parse(result.PrincipalId!), ct)
+            ?? throw Invalid(nameof(VerifyPasswordlessLoginCommand.Code), IdpMessageKeys.LoginCodeInvalid);
 
-        return new VerifyPasswordlessLoginResult
-        {
-            SessionToken = token,
-            ExpiresAt = session.ExpiresAt
-        };
+        var outcome = await loginChallengeManager.BeginAsync(
+            cmd.InteractionKey, client, user,
+            authMethod: provider.ProviderType,
+            passwordLogin: true,
+            cmd.UserAgent, cmd.IpAddress, ct,
+            provenChannel: provider.ProviderType == PhoneCodeType ? ChallengeChannel.Sms : ChallengeChannel.Email);
+
+        return new VerifyPasswordlessLoginResult { SessionToken = outcome.SessionToken, ExpiresAt = outcome.ExpiresAt };
     }
+
+    // Saglayici projesine referans vermemek icin tip adi burada (PhoneCodeProvider.Type).
+    private const string PhoneCodeType = "phone_code";
 
     private static string MapFailure(string? reason) => reason switch
     {
@@ -99,8 +102,11 @@ public sealed class VerifyPasswordlessLoginCommand : ICommand<VerifyPasswordless
 
 public sealed class VerifyPasswordlessLoginResult
 {
-    public required string SessionToken { get; init; }
-    public required DateTimeOffset ExpiresAt { get; init; }
+    /// <summary>Null ise oturum acilmadi; kullanici dogrulama / MFA adimina yonlendirilir.</summary>
+    public string? SessionToken { get; init; }
+    public DateTimeOffset? ExpiresAt { get; init; }
+
+    public bool RequiresChallenge => SessionToken is null;
 }
 
 public sealed class VerifyPasswordlessLoginValidator : Validator<VerifyPasswordlessLoginCommand>

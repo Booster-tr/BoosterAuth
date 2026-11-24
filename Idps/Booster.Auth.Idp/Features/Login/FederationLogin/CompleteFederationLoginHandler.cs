@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
@@ -41,6 +43,14 @@ public sealed class CompleteFederationLoginHandler(
     {
         var state = await stateStore.ConsumeAsync(cmd.State, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.FederationStateInvalid);
+
+        // State sunucuda; tarayiciya bagli degildi. Saldirganin kendi donus adresi (code + state) kurbanin tarayicisinda
+        // acilinca kurban saldirganin hesabiyla oturum aciyordu (giris CSRF). Baslatan tarayici etkilesim anahtarini
+        // cerezde tasir; esit degilse reddedilir.
+        if (string.IsNullOrEmpty(cmd.BrowserBinding)
+            || !CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(cmd.BrowserBinding), Encoding.UTF8.GetBytes(state.InteractionKey)))
+            throw new AuthorizeException(IdpMessageKeys.FederationStateInvalid);
 
         var client = await clientDataStore.GetByClientKeyAsync(state.ClientKey, ct)
             ?? throw new AuthorizeException(IdpMessageKeys.ClientNotFound);
@@ -259,6 +269,9 @@ public enum FederationOutcome
 public sealed class CompleteFederationLoginCommand : ICommand<CompleteFederationLoginResult>
 {
     public string State { get; set; } = default!;
+
+    /// <summary>Akisi baslatan tarayicinin cerezi (etkilesim anahtari); bkz. ExternalLoginController.</summary>
+    public string? BrowserBinding { get; set; }
 
     public IReadOnlyDictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
 

@@ -4,6 +4,9 @@ using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var clientIpOptions = builder.Configuration.GetSection("ClientIp").Get<ClientIpOptions>() ?? new ClientIpOptions();
+var clientIp = new ClientIpResolver(clientIpOptions);
+
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .AddTransforms(transformContext =>
@@ -29,7 +32,7 @@ builder.Services.AddRateLimiter(options =>
         // 2. IP bazlı: Aynı IP saniyede en fazla 25 istek
         PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
             RateLimitPartition.GetFixedWindowLimiter(
-                Ipv6Helper.Get(ctx),
+                ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                 _ => new FixedWindowRateLimiterOptions { PermitLimit = 25, Window = TimeSpan.FromSeconds(1) })),
 
         // 3. Genel eşzamanlılık: Tüm gateway için en fazla 300 eşzamanlı istek
@@ -40,6 +43,13 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+// Once gercek istemci IP'si: hiz siniri ve arka servislere giden X-Forwarded-For bunu kullanir (bkz. ClientIpResolver).
+app.Use((context, next) =>
+{
+    context.Connection.RemoteIpAddress = clientIp.Resolve(context);
+    return next(context);
+});
 
 app.UseRateLimiter();
 

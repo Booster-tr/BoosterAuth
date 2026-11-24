@@ -1,3 +1,4 @@
+using Booster.Auth.Z.Managers.QueryAccess;
 using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
@@ -38,6 +39,7 @@ public record BatchCheckPermissionsResponse(IReadOnlyList<BatchCheckResultRespon
 public readonly record struct BatchCheckResultResponse(string CorrelationId, bool Allowed);
 
 public class BatchCheckPermissionsCommandHandler(
+    QueryCallerGuard guard,
     IPoolStoreProvider poolStoreProvider,
     FgaRelationManager relationManager)
     : ICommandHandler<BatchCheckPermissionsCommand, BatchCheckPermissionsResponse>
@@ -45,6 +47,9 @@ public class BatchCheckPermissionsCommandHandler(
     public async Task<BatchCheckPermissionsResponse> ExecuteAsync(
         BatchCheckPermissionsCommand command, CancellationToken ct)
     {
+        // Govdedeki havuzu sorgulama yetkisi (bkz. QueryCallerGuard).
+        await guard.EnsureAsync(command.IsolationId, ct);
+
         var mapping = await poolStoreProvider.GetRequiredByPoolIdAsync(command.IsolationId, ct);
 
         var checks = command.Checks

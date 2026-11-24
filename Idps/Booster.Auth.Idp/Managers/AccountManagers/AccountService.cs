@@ -420,13 +420,42 @@ public sealed class AccountService(
             return;
 
         using var scope = requestContextAccessor.BeginSystemContext(ctx.Client.IsolationId);
-        var hash = await db.LocalCredentials.AsNoTracking()
-            .Where(c => c.PrincipalId == ctx.Principal.Id)
-            .Select(c => c.PasswordHash)
-            .FirstOrDefaultAsync(ct);
+        var credential = await db.LocalCredentials
+            .FirstOrDefaultAsync(c => c.PrincipalId == ctx.Principal.Id, ct);
 
-        if (hash is null || string.IsNullOrEmpty(currentPassword) || !passwordHasher.Verify(currentPassword, hash))
-            throw Invalid("CurrentPassword", IdpMessageKeys.CurrentPasswordInvalid);
+        // Giris ekraniyla ayni kilit: oturum cerezini ele geciren biri bu alanda parolayi deneme yanilmayla
+        // bulamasin. Sayac ve kilit girisle ortaktir (havuzun MaxFailedAttempts / LockoutSeconds politikasi).
+        if (credential?.LockedUntil is { } lockedUntil && lockedUntil > DateTimeOffset.UtcNow)
+            throw Invalid("CurrentPassword", IdpMessageKeys.AccountLocked);
+
+        if (credential is not null && !string.IsNullOrEmpty(currentPassword)
+            && passwordHasher.Verify(currentPassword, credential.PasswordHash))
+        {
+            if (credential.FailedAttemptCount != 0 || credential.LockedUntil is not null)
+                await SaveLockoutAsync(credential, 0, null, ct);
+            return;
+        }
+
+        if (credential is not null)
+        {
+            var failed = credential.FailedAttemptCount + 1;
+            var locked = failed >= ctx.Client.Login.MaxFailedAttempts;
+            await SaveLockoutAsync(credential, failed,
+                locked ? DateTimeOffset.UtcNow.AddSeconds(ctx.Client.Login.LockoutSeconds) : null, ct);
+
+            if (locked)
+                throw Invalid("CurrentPassword", IdpMessageKeys.AccountLocked);
+        }
+
+        throw Invalid("CurrentPassword", IdpMessageKeys.CurrentPasswordInvalid);
+    }
+
+    private async Task SaveLockoutAsync(LocalCredential credential, int failedCount, DateTimeOffset? lockedUntil, CancellationToken ct)
+    {
+        credential.FailedAttemptCount = failedCount;
+        credential.LockedUntil = lockedUntil;
+        await db.SaveChangesAsync(ct);
+        await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(credential.PrincipalId), ct);
     }
 
     /// <summary>Oturumlari ve yenileme token'larini iptal eder (kaydetmez). Cagiran sistem baglaminda olmalidir.</summary>

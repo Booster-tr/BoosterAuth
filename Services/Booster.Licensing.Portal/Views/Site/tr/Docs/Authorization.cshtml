@@ -37,6 +37,10 @@
 <p>Uygulamanız (genellikle arka ucunuz) AuthZ API'ye bir Bearer token ile istek atar. Token'ın audience değeri
     <code>https://auth.firma.com/authz</code> olmalıdır; bunun için uygulamanın izin verilen API'lerine AuthZ adresini ekleyin ve token isterken
     <code>resource</code> olarak verin. Token yalnızca <b>çağıranı</b> doğrular; sorgulanan kullanıcı istek gövdesindedir.</p>
+<p><b>Hangi havuz sorgulanabilir:</b> <code>isolationId</code> token'ı veren havuz olmalıdır (o havuzun bir kullanıcısının erişim token'ı).
+    Başka havuzun token'ı <code>403</code> (<code>authz.query_not_allowed</code>) ile reddedilir. Konsol kullanıcıları ve havuz servis hesapları
+    (yönetim havuzu) bir havuzu ancak o havuzda en az <b>görüntüleme</b> yetkileri varsa sorgulayabilir. Kural <code>check</code>,
+    <code>batch-check</code> ve tüm <code>lookup</code> uçları için geçerlidir.</p>
 <div class="code"><span class="lbl">İzin kontrolü</span><pre>POST https://auth.firma.com/authz/check
 Authorization: Bearer &lt;erişim token'ı&gt;
 Content-Type: application/json

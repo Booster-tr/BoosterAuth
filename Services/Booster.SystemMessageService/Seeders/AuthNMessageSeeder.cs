@@ -58,6 +58,7 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.ClientGrantTypeRequired, "Uygulama", "En az bir grant tipi seçmelisiniz.", "Client", "At least one grant type is required."),
         new(AuthNMessageKeys.ClientRedirectUriRequired, "Uygulama", "Yönlendirme adresi zorunludur.", "Client", "A redirect URI is required."),
         new(AuthNMessageKeys.ClientRedirectUriInvalid, "Uygulama", "Geçersiz yönlendirme adresi.", "Client", "Invalid redirect URI."),
+        new(AuthNMessageKeys.ClientAudienceInvalid, "Uygulama", "İzin verilen API adresi tam bir http(s) adresi olmalı (ör. https://api.firma.com); # ve sorgu parametresi içeremez.", "Client", "An allowed API must be a full http(s) URL (e.g. https://api.company.com) without # or query parameters."),
 
         // --- Token scope politikası ---
 
