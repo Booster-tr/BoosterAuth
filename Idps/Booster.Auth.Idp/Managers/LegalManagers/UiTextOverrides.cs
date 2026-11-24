@@ -21,6 +21,10 @@ public sealed class UiTextOverrides(IServiceScopeFactory scopeFactory, ILogger<U
 
     public string? Find(string key, CultureInfo culture)
     {
+        // Eskiden her anahtar degistirilebiliyordu; o donemden kalan kayitlar artik uygulanmaz (silinmez).
+        if (!Features.SystemLegal.UiTextDefaults.IsCustomizable(key))
+            return null;
+
         if (DateTimeOffset.UtcNow - _loadedAt > RefreshAfter && Interlocked.Exchange(ref _refreshing, 1) == 0)
             _ = Task.Run(async () =>
             {

@@ -14,7 +14,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Booster.Auth.Idp.Features.SystemLegal;
 
-// Giris ekranlarindaki yazilar: kaynak dosyadaki her anahtar kurulum genelinde degistirilebilir (UiText).
+// Giris ekranlarindaki tanitim yazilari (UiText): yalnizca UiTextDefaults.IsCustomizable anahtarlari kurulum genelinde
+// degistirilebilir. Buton, hata, cerez cubugu gibi standart yazilar kaynak dosyada sabittir.
 
 public record UiTextItem(string Key, string DefaultTr, string DefaultEn, string? Tr, string? En);
 
@@ -40,6 +41,7 @@ public class GetUiTextsEndpoint(IdpDbContext db) : EndpointWithoutRequest<IReadO
         var en = UiTextDefaults.For("en-us");
 
         var items = tr.Keys.Union(en.Keys)
+            .Where(UiTextDefaults.IsCustomizable)
             .Order(StringComparer.Ordinal)
             .Select(k => new UiTextItem(k, tr.GetValueOrDefault(k, ""), en.GetValueOrDefault(k, ""), Find(k, "tr-tr"), Find(k, "en-us")))
             .ToList();
@@ -68,7 +70,7 @@ public class SetUiTextEndpoint(IdpDbContext db, UiTextOverrides cache) : Endpoin
         var language = LegalDocumentKeys.NormalizeLanguage(req.LanguageCode);
         var defaults = UiTextDefaults.For(language);
 
-        if (!defaults.TryGetValue(req.Key, out var defaultValue))
+        if (!UiTextDefaults.IsCustomizable(req.Key) || !defaults.TryGetValue(req.Key, out var defaultValue))
             throw new BusinessException(IdpMessageKeys.UiTextKeyUnknown);
         if (!UiTextDefaults.SameFormatArguments(defaultValue, req.Value))
             throw new BusinessException(IdpMessageKeys.UiTextInvalid);
@@ -171,6 +173,16 @@ public static partial class UiTextDefaults
             return Cache[language] = values;
         }
     }
+
+    /// <summary>
+    /// Kurulumun degistirebilecegi anahtarlar: giris ekranlarinin tanitim paneli (ust baslik, her ekranin baslik / aciklamasi)
+    /// ve marka adi gecen guvenlik notu. Musteri kendi kurum diliyle ve markasiyla anlatabilsin diye. Digerleri standarttir.
+    /// <c>Layout.Footnote</c> ("Bu sayfa Booster Auth tarafindan sunulmaktadir") bilincli olarak DISARIDADIR.
+    /// </summary>
+    public static bool IsCustomizable(string key) =>
+        key is "Layout.Eyebrow" or "Layout.SecureNote"
+        || key.EndsWith(".BrandHeadline", StringComparison.Ordinal)
+        || key.EndsWith(".BrandLead", StringComparison.Ordinal);
 
     /// <summary>Degisiklik varsayilandaki {0}, {1} ... yer tutucularinin aynisini icermeli.</summary>
     public static bool SameFormatArguments(string defaultValue, string value)
