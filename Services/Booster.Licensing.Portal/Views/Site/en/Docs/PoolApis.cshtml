@@ -1,0 +1,82 @@
+<h1>Pool APIs</h1>
+<p class="lede">When a user signs up, the pool's default roles and scopes are granted automatically. To grant access by your own business rules
+    (e.g. a "premium" role for paying users), write relations to the authorization schema and check permissions, call these APIs from your
+    backend.</p>
+
+<div class="callout"><p><b>Backend only.</b> These endpoints require the token of a <b>service account</b> created for the pool. Never put the service account secret in a
+    mobile or browser app; requests made with a user token are rejected with <code>403</code>.</p></div>
+
+<h2 id="token">1. Service account and token</h2>
+<p>Create a service account on the pool's <b>Service Accounts</b> screen in the panel. The permission you choose decides what it can do:</p>
+<table>
+    <thead><tr><th>Permission</th><th>Allowed</th></tr></thead>
+    <tbody>
+        <tr><td>Viewer</td><td>Read a user's roles and scopes, check relations (<code>check</code>)</td></tr>
+        <tr><td>Manager</td><td>The above + grant / revoke roles and scopes</td></tr>
+        <tr><td>Grant manager</td><td>What a viewer can do + write / delete relations</td></tr>
+    </tbody>
+</table>
+<p>If you need both, create two service accounts. Request the token with Booster Auth's built-in <code>management</code> application
+    (service accounts belong to it):</p>
+<div class="code"><span class="lbl">HTTP</span><pre>POST https://auth.company.com/idp/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&amp;client_id=management
+&amp;service_account_key=SA_KEY
+&amp;service_account_secret=SA_SECRET
+&amp;resource=https://auth.company.com/idp</pre></div>
+<p>The pool is not sent in the request: it is the pool the service account was created for. A service account cannot touch another pool's
+    users. Suspending or deleting the account in the panel invalidates its tokens immediately.</p>
+
+<h2 id="access">2. User roles and scopes</h2>
+<table>
+    <thead><tr><th>Request</th><th>Description</th></tr></thead>
+    <tbody>
+        <tr><td><code>GET /idp/apis/users/{userId}/access</code></td><td>The user's roles (<code>id</code>, <code>key</code>) and scopes</td></tr>
+        <tr><td><code>POST /idp/apis/users/{userId}/access/grant</code></td><td>Adds roles and scopes; existing ones are skipped</td></tr>
+        <tr><td><code>POST /idp/apis/users/{userId}/access/revoke</code></td><td>Removes roles and scopes; missing ones are skipped</td></tr>
+    </tbody>
+</table>
+<div class="code"><span class="lbl">Granting a role and a scope</span><pre>POST https://auth.company.com/idp/apis/users/3f1c.../access/grant
+Authorization: Bearer &lt;service account token&gt;
+Content-Type: application/json
+
+{ "roleIds": ["9b2e..."], "scopes": ["orders:write"] }</pre></div>
+<ul>
+    <li><code>userId</code> is the <code>sub</code> value in the user's tokens.</li>
+    <li>Only roles and scopes defined in the pool can be granted. Role IDs are shown on the pool's <b>Roles</b> screen in the panel.</li>
+    <li>The response is the user's current roles and scopes. The change appears in the user's <b>next</b> token.</li>
+</ul>
+
+<h2 id="relations">3. Relations (authorization schema)</h2>
+<p>Relations are written to the pool's own authorization schema (see <a href="/en/docs/authorization">Authorization checks</a>). The type and
+    relation must be defined in the schema.</p>
+<table>
+    <thead><tr><th>Request</th><th>Body</th><th>Response</th></tr></thead>
+    <tbody>
+        <tr><td><code>POST /idp/apis/relations</code></td><td><code>{ "tuples": [{ "user", "relation", "object" }] }</code></td><td><code>{ "affectedCount" }</code></td></tr>
+        <tr><td><code>POST /idp/apis/relations/delete</code></td><td>Same</td><td><code>{ "affectedCount" }</code></td></tr>
+        <tr><td><code>POST /idp/apis/relations/check</code></td><td><code>{ "user", "relation", "object" }</code></td><td><code>{ "allowed" }</code></td></tr>
+    </tbody>
+</table>
+<div class="code"><span class="lbl">Writing and checking a relation</span><pre>POST https://auth.company.com/idp/apis/relations
+{ "tuples": [ { "user": "user:3f1c...", "relation": "editor", "object": "document:42" } ] }
+
+POST https://auth.company.com/idp/apis/relations/check
+{ "user": "user:3f1c...", "relation": "viewer", "object": "document:42" }
+→ { "allowed": true }   // if editor includes viewer in the schema</pre></div>
+<ul>
+    <li>Format is <code>type:id</code>; for a user set use <code>type:id#relation</code> (e.g. <code>team:sales#member</code>).</li>
+    <li>At most 100 tuples per request. A request that does not match the schema is rejected with <code>400</code>.</li>
+</ul>
+
+<h2 id="errors">Errors</h2>
+<table>
+    <thead><tr><th>Status</th><th>Reason</th></tr></thead>
+    <tbody>
+        <tr><td><code>401</code></td><td>No token, expired token, or <code>resource</code> is not the IdP address</td></tr>
+        <tr><td><code>403</code></td><td>The token does not belong to a service account (e.g. a user token), the account is suspended, or its permission is not enough</td></tr>
+        <tr><td><code>400</code></td><td>A role / scope not defined in the pool, an unknown user, or a relation that does not match the schema</td></tr>
+    </tbody>
+</table>

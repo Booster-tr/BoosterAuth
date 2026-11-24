@@ -56,8 +56,9 @@ Content-Type: application/json
         <tr><td><code>POST /authz/lookup/by-user</code></td><td>Records a user can access.</td></tr>
         <tr><td><code>POST /authz/lookup/by-object</code></td><td>Users who can access a record.</td></tr>
         <tr><td><code>POST /authz/lookup/my-access</code></td><td>A user's access across the given types.</td></tr>
-        <tr><td><code>POST / DELETE /authz/relations</code></td><td>Add / remove relations (e.g. link a document to a folder).</td></tr>
+        <tr><td><code>POST / DELETE /authz/relations</code></td><td>Add / remove relations; for the management panel. To write relations from your
+            application, use the <a href="/en/docs/pool-apis">Pool APIs</a>.</td></tr>
     </tbody>
 </table>
-<div class="callout tip"><p><b>Tip.</b> When a record is created (e.g. a new document), write its owner and folder from your back end with
-    <code>/authz/relations</code>; every later check is computed from these relations.</p></div>
+<div class="callout tip"><p><b>Tip.</b> When a record is created (e.g. a new document), write its owner and folder from your back end with a service account via
+    <a href="/en/docs/pool-apis"><code>/idp/apis/relations</code></a>; every later check is computed from these relations.</p></div>

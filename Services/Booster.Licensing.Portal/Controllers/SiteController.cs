@@ -42,7 +42,7 @@ public sealed class SiteController(LicensingDbContext db, InstallPackage package
         if (page == SiteCatalog.Pricing || page == SiteCatalog.Home)
             model = model with { Plans = await db.Plans.AsNoTracking().Where(p => p.IsActive).OrderBy(p => p.SortOrder).ToListAsync(ct) };
         if (page == SiteCatalog.Download)
-            model = model with { PackageFiles = InstallPackage.Files };
+            model = model with { PackageFiles = InstallPackage.Files(lang) };
         return View($"~/Views/Site/{lang}/{page.View}.cshtml", model);
     }
 
@@ -54,13 +54,20 @@ public sealed class SiteController(LicensingDbContext db, InstallPackage package
     public IActionResult OldDownload() => RedirectPermanent("/tr/download");
 
     // ---------------------------------------------------------------- kurulum paketi
-    [HttpGet("/indir/" + InstallPackage.FileName)]
-    [HttpGet("/download/" + InstallPackage.FileName)]
-    public IActionResult DownloadZip()
+    /// <summary>Paket sitenin o anki dilinde (betikler, README, yorumlar).</summary>
+    [HttpGet("/{lang:regex(^(tr|en)$)}/download/" + InstallPackage.FileName)]
+    public IActionResult DownloadZip(string lang)
     {
         Response.Headers.CacheControl = "no-cache";
-        return File(package.Zip, "application/zip", InstallPackage.FileName);
+        return File(package.Zip(lang), "application/zip", InstallPackage.FileName);
     }
+
+    // Eski adresler: /indir Turkce sayfadan geliyordu; /download tarayici diline gore.
+    [HttpGet("/indir/" + InstallPackage.FileName)]
+    public IActionResult OldDownloadZipTr() => DownloadZip("tr");
+
+    [HttpGet("/download/" + InstallPackage.FileName)]
+    public IActionResult OldDownloadZip() => DownloadZip(SiteCatalog.PreferredLanguage(Request.Headers.AcceptLanguage));
 
     // ---------------------------------------------------------------- SEO
     [HttpGet("/robots.txt")]

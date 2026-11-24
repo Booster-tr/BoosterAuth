@@ -95,18 +95,51 @@ app.MapGet("/orders", () => "...")
 <p>Erişim token'ı varsayılan olarak 15 dakika, yenileme token'ı 14 gün geçerlidir; süreler havuzun oturum politikasından değiştirilir.</p>
 
 <h2 id="servis">Sunucudan sunucuya (servis hesabı)</h2>
-<p>İnsan kullanıcı olmadan çalışan servisler için havuzda bir <b>servis hesabı</b> oluşturun; anahtar ve sır yalnızca bir kez gösterilir.
-    Uygulamada <i>Client Credentials</i> grant türü açık olmalıdır.</p>
+<p>İnsan kullanıcı olmadan çalışan servisler için havuzun <b>Servis Hesapları</b> ekranından bir servis hesabı oluşturun; anahtar ve sır yalnızca bir kez
+    gösterilir. Token Booster Auth'un yerleşik <code>management</code> uygulamasıyla alınır; <code>resource</code>, o uygulamanın izinli API'lerinden biri olmalıdır.
+    Servis hesabıyla havuzun kullanıcılarına rol / kapsam verme ve ilişki yazma için bkz. <a href="/tr/docs/pool-apis">Havuz API'leri</a>.</p>
 <div class="code"><span class="lbl">HTTP</span><pre>POST https://auth.firma.com/idp/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
-&amp;client_id=acme-worker
+&amp;client_id=management
 &amp;service_account_key=SA_ANAHTARI
 &amp;service_account_secret=SA_SIRRI
-&amp;resource=https://api.firma.com</pre></div>
+&amp;resource=https://auth.firma.com/idp</pre></div>
 <p>Yanıtta yalnızca erişim token'ı döner; ID token ve yenileme token'ı verilmez.</p>
+
+<h2 id="yontem-gizleme">Giriş ekranında yöntem gizleme</h2>
+<p>Aynı uygulama farklı platformlarda farklı giriş seçenekleri gösterebilir; örneğin Android uygulamanızda "Apple ile giriş" butonu
+    görünmesin. <code>/idp/authorize</code> isteğine <code>hidden_providers</code> parametresini ekleyin:</p>
+<div class="code"><span class="lbl">Yetkilendirme isteği</span><pre>https://auth.firma.com/idp/authorize?client_id=acme-mobile&amp;response_type=code
+  &amp;redirect_uri=...&amp;scope=openid%20profile&amp;code_challenge=...&amp;code_challenge_method=S256
+  &amp;hidden_providers=apple,phone_code</pre></div>
+<table>
+    <thead><tr><th>Değer</th><th>Gizlenen</th></tr></thead>
+    <tbody>
+        <tr><td><code>apple</code>, <code>google</code>, <code>microsoft</code>, <code>github</code>, ...</td><td>O türdeki tüm dış kimlik sağlayıcı butonları</td></tr>
+        <tr><td>Sağlayıcı anahtarı (ör. <code>kurum-sso</code>)</td><td>Yalnızca o sağlayıcı</td></tr>
+        <tr><td><code>email_code</code> / <code>phone_code</code></td><td>E-posta / SMS koduyla parolasız giriş</td></tr>
+    </tbody>
+</table>
+<p>Değerler virgül ya da boşlukla ayrılır, büyük/küçük harf duyarsızdır. Parametre yalnızca ekranı daraltır; havuzda kapalı bir yöntemi açmaz
+    ve bir güvenlik kuralı değildir.</p>
+
+<h2 id="apple">Apple ile giriş</h2>
+<p>Havuzun <b>Kimlik Sağlayıcılar</b> ekranında Apple ekleyin:</p>
+<ul>
+    <li><b>client_id:</b> Apple Developer'daki <i>Services ID</i> (ör. <code>com.firma.web</code>).</li>
+    <li><b>team_id</b> ve <b>key_id:</b> Apple Developer hesabınızın ekip kimliği ve "Sign in with Apple" anahtarının kimliği.</li>
+    <li><b>Gizli anahtar:</b> indirdiğiniz <code>.p8</code> dosyasının içeriği (<code>-----BEGIN PRIVATE KEY-----</code> ile başlar). Booster Auth
+        Apple'ın istediği kısa ömürlü client secret'ı bu anahtarla her girişte kendisi üretir.</li>
+    <li>Apple'da <i>Return URL</i> olarak <code>https://auth.firma.com/idp/ui/external/callback</code> adresini kaydedin.</li>
+</ul>
+<p>Apple kullanıcının adını yalnızca ilk girişte gönderir; Booster Auth bunu hesaba kaydeder. Kullanıcı e-postasını gizlerse
+    <code>@@privaterelay.appleid.com</code> uzantılı bir adres gelir.</p>
 
 <h2 id="cikis">Çıkış</h2>
 <p>Kullanıcıyı <code>/idp/logout</code> adresine yönlendirin; oturum kapatılır ve uygulamada kayıtlı çıkış sonrası adrese dönülür. OIDC
     kütüphaneleri bunu <code>signoutRedirect()</code> gibi bir çağrıyla yapar.</p>
+<p>Uygulamaya dönülmesi için istekte <code>post_logout_redirect_uri</code> ile birlikte <code>client_id</code> ya da <code>id_token_hint</code>
+    bulunmalıdır. ASP.NET Core'da <code>SaveTokens</code> kapalıysa ikisi de gönderilmez; <code>OnRedirectToIdentityProviderForSignOut</code>
+    olayında <code>context.ProtocolMessage.ClientId</code> değerini atayın.</p>

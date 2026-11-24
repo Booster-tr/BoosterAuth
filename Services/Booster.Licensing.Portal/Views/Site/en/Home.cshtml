@@ -18,7 +18,7 @@
                 <p>The setup script asks a few questions and generates every password and key on your own server. Docker Compose does the rest.</p>
                 <ol class="quick">
                     <li><span>Get</span><code>booster-auth.zip</code></li>
-                    <li><span>Prepare</span><code>./kurulum.sh</code></li>
+                    <li><span>Prepare</span><code>./setup.sh</code></li>
                     <li><span>Start</span><code>docker compose up -d</code></li>
                     <li><span>Sign in</span><code>localhost:3000 · admin</code></li>
                 </ol>
@@ -247,7 +247,7 @@
 <span class="p">$ </span>unzip booster-auth.zip &amp;&amp; cd booster-auth
 
 <span class="c"># 2. A few prompts (in Turkish); every secret is generated</span>
-<span class="p">$ </span>./kurulum.sh
+<span class="p">$ </span>./setup.sh
 <span class="q">Booster Auth adresi (host) [auth.firma.com]:</span> <span class="a">auth.company.com</span>
 <span class="q">HTTPS portu [443]:</span>
 <span class="q">Yonetim paneli portu [3000]:</span>
@@ -302,7 +302,7 @@
             <h2 id="faq">Questions we hear during evaluations.</h2>
         </div>
         <div class="faq reveal">
-            <details open><summary>How long does installation take?</summary><p>Running <code>./kurulum.sh</code> takes as long as answering a few prompts. Then
+            <details open><summary>How long does installation take?</summary><p>Running <code>./setup.sh</code> takes as long as answering a few prompts. Then
                 <code>docker compose up -d</code> pulls the images and starts the services; how long that takes depends mostly on your connection. There
                 are no passwords or keys to fill in by hand.</p></details>
             <details><summary>Can our Active Directory users sign in?</summary><p>Yes. On the pool's Identity Providers screen you define the LDAP /

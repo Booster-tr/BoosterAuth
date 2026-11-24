@@ -10,7 +10,7 @@
             </div>
             <div class="dl-card reveal d3">
                 <div class="file"><b>@InstallPackage.FileName</b><span>about 15 KB</span></div>
-                <a class="btn btn-primary" href="/download/@InstallPackage.FileName" data-download>Download the package <span class="arr" aria-hidden="true">↓</span></a>
+                <a class="btn btn-primary" href="/en/download/@InstallPackage.FileName" data-download>Download the package <span class="arr" aria-hidden="true">↓</span></a>
                 <ul class="facts">
                     <li>Free to download; you get the license after installing.</li>
                     <li>Runs with Docker on Linux, macOS and Windows.</li>
@@ -38,7 +38,7 @@
             <div class="term" role="region" aria-label="Linux and macOS installation commands">
                 <div class="term-bar"><span>Linux / macOS</span><span>bash</span></div>
 <pre><code><span class="p">$ </span>unzip booster-auth.zip &amp;&amp; cd booster-auth
-<span class="p">$ </span>./kurulum.sh
+<span class="p">$ </span>./setup.sh
 <span class="ok">.env olusturuldu.</span>
 <span class="p">$ </span>docker compose up -d</code></pre>
             </div>
@@ -46,7 +46,7 @@
                 <div class="term-bar"><span>Windows</span><span>PowerShell</span></div>
 <pre><code><span class="p">&gt; </span>Expand-Archive booster-auth.zip .
 <span class="p">&gt; </span>cd booster-auth
-<span class="p">&gt; </span>powershell -ExecutionPolicy Bypass -File .\kurulum.ps1
+<span class="p">&gt; </span>powershell -ExecutionPolicy Bypass -File .\setup.ps1
 <span class="p">&gt; </span>docker compose up -d</code></pre>
             </div>
             <p class="hard">If a secret is still <code>CHANGE_ME</code>, the system refuses to start and names the missing variable. An installation cannot

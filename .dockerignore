@@ -45,5 +45,5 @@ docker/*
 !docker/entrypoint.sh
 
 # Musteri kurulum paketindeki sablon .env DEGILDIR; portal image'ina gomulur (/indir).
-!deploy/compose/.env.example
-!deploy/compose/docker-compose.yml
+!deploy/compose/*/.env.example
+!deploy/compose/*/docker-compose.yml

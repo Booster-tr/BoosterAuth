@@ -4,6 +4,7 @@ using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 
 namespace Booster.Auth.Idp.Providers.Apple;
 
@@ -31,12 +32,44 @@ public sealed class AppleProvider(IHttpClientFactory httpClientFactory)
         }
     }
 
+    /// <summary>
+    /// Apple adi id_token'a koymaz; yalnizca ILK giriste form_post govdesindeki "user" JSON'unda gonderir.
+    /// </summary>
+    public override async Task<FederationResult> HandleCallbackAsync(
+        FederationCallback callback, ProviderConfig config, CancellationToken ct)
+    {
+        var result = await base.HandleCallbackAsync(callback, config, ct);
+
+        if (!result.Succeeded || !string.IsNullOrEmpty(result.Identity!.DisplayName) || callback.Value("user") is not { } user)
+            return result;
+
+        try
+        {
+            using var json = JsonDocument.Parse(user);
+            if (!json.RootElement.TryGetProperty("name", out var name))
+                return result;
+
+            var fullName = string.Join(' ', new[] { "firstName", "lastName" }
+                .Select(p => name.TryGetProperty(p, out var v) ? v.GetString()?.Trim() : null)
+                .Where(v => !string.IsNullOrEmpty(v)));
+
+            return string.IsNullOrEmpty(fullName)
+                ? result
+                : FederationResult.Success(result.Identity with { DisplayName = fullName });
+        }
+        catch (JsonException)
+        {
+            return result;
+        }
+    }
+
     protected override Task<string?> ResolveClientSecretAsync(ProviderConfig config, CancellationToken ct)
     {
         var teamId = Setting(config, FederationSettings.TeamId);
         var keyId = Setting(config, FederationSettings.KeyId);
         var clientId = Setting(config, FederationSettings.ClientId);
-        var privateKeyPem = Setting(config, FederationSettings.PrivateKeyPem);
+        // Panel Apple'in .p8 anahtarini "client_secret" alaninda saklar.
+        var privateKeyPem = Setting(config, FederationSettings.PrivateKeyPem) ?? Setting(config, FederationSettings.ClientSecret);
 
         if (teamId is null || keyId is null || clientId is null || privateKeyPem is null)
             return Task.FromResult<string?>(null);

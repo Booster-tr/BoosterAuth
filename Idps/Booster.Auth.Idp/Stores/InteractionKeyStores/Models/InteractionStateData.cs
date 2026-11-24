@@ -37,7 +37,26 @@ public sealed class InteractionStateData
     /// </summary>
     public string? AccountReturnUrl { get; init; }
 
+    /// <summary>
+    /// /authorize'daki <c>hidden_providers</c>: giris ekraninda gosterilmeyecek yontemler. Saglayici tipi ("apple"),
+    /// saglayici anahtari ya da "email_code" / "phone_code". Yalnizca ekrani daraltir; yetki kurali degildir.
+    /// </summary>
+    public List<string> HiddenProviders { get; init; } = [];
+
     public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
+
+    public bool IsHidden(params string?[] names)
+        => names.Any(n => n is not null && HiddenProviders.Contains(n, StringComparer.OrdinalIgnoreCase));
+
+    /// <summary>Virgul ya da bosluk ayrilmis liste; en fazla 20 deger.</summary>
+    public static List<string> ParseProviderList(string? value)
+        => string.IsNullOrWhiteSpace(value)
+            ? []
+            : value.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(v => v.Length <= 100)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(20)
+                .ToList();
 }
 
 //Login sonrası

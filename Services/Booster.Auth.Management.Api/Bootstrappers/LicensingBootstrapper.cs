@@ -102,7 +102,7 @@ public sealed class LicensingBootstrapper(
             // Portal yalnizca kimligi (id_token) kullanir, baska bir API cagirmaz.
             AllowedGrantTypes = OAuthGrantType.AuthorizationCode | OAuthGrantType.RefreshToken,
             RedirectUris = Distinct(Options.RedirectUris),
-            PostLogoutRedirectUris = Distinct(Options.PostLogoutRedirectUris),
+            PostLogoutRedirectUris = Distinct(PostLogoutUris),
             AllowedAudiences = Distinct([bootstrapOptions.IdpAudience]),
 
             // Birinci taraf uygulama: musteriye ayrica onay ekrani gosterilmez.
@@ -137,7 +137,7 @@ public sealed class LicensingBootstrapper(
             return;
 
         var redirectAdded = AddMissing(client.RedirectUris, Options.RedirectUris);
-        var logoutAdded = AddMissing(client.PostLogoutRedirectUris, Options.PostLogoutRedirectUris);
+        var logoutAdded = AddMissing(client.PostLogoutRedirectUris, PostLogoutUris);
 
         if (!redirectAdded && !logoutAdded)
             return;
@@ -146,6 +146,15 @@ public sealed class LicensingBootstrapper(
         await clientRepository.SaveChangesAsync(ct);
         await clientDataCacheStore.InvalidateClientAsync(client.ClientKey, ct);
     }
+
+    /// <summary>
+    /// Ayardaki cikis adresleri + her ".../signin-oidc" giris adresinin ".../signout-callback-oidc" karsiligi. Portalin
+    /// .NET OIDC handler'i cikista bu adrese doner; ayarda unutulursa kullanici IdP'nin "cikis yapildi" ekraninda kaliyordu.
+    /// </summary>
+    private IEnumerable<string> PostLogoutUris
+        => Options.PostLogoutRedirectUris.Concat(Options.RedirectUris
+            .Where(u => u.TrimEnd('/').EndsWith("/signin-oidc", StringComparison.OrdinalIgnoreCase))
+            .Select(u => u.TrimEnd('/')[..^"/signin-oidc".Length] + "/signout-callback-oidc"));
 
     private static bool AddMissing(List<string> target, IEnumerable<string> desired)
     {

@@ -1,0 +1,81 @@
+<h1>Havuz API'leri</h1>
+<p class="lede">Kullanıcı kayıt olduğunda havuzun varsayılan rol ve kapsamları otomatik verilir. Uygulamanızın kendi iş kurallarına göre
+    (ör. ödeme yapan kullanıcıya "premium" rolü) yetki vermesi, yetki şemasına ilişki yazması ve yetki sorgulaması için bu API'leri
+    backend'inizden çağırırsınız.</p>
+
+<div class="callout"><p><b>Yalnızca backend.</b> Bu uçlar havuz için açılmış bir <b>servis hesabının</b> token'ını ister. Servis hesabının sırrını mobil ya da
+    tarayıcı uygulamasına koymayın; kullanıcı token'ıyla çağrılan istekler <code>403</code> ile reddedilir.</p></div>
+
+<h2 id="token">1. Servis hesabı ve token</h2>
+<p>Panelde havuzun <b>Servis Hesapları</b> ekranından bir servis hesabı oluşturun. Seçtiğiniz yetki, hesabın neler yapabileceğini belirler:</p>
+<table>
+    <thead><tr><th>Yetki</th><th>İzin verilenler</th></tr></thead>
+    <tbody>
+        <tr><td>Görüntüleyici</td><td>Kullanıcının rol ve kapsamlarını okuma, ilişki sorgulama (<code>check</code>)</td></tr>
+        <tr><td>Yönetici</td><td>Yukarıdakiler + kullanıcıya rol ve kapsam verme / kaldırma</td></tr>
+        <tr><td>Yetki yöneticisi</td><td>Görüntüleyicinin yapabildikleri + ilişki yazma / silme</td></tr>
+    </tbody>
+</table>
+<p>İki işi birden yapacaksanız iki ayrı servis hesabı açın. Token'ı Booster Auth'un yerleşik <code>management</code> uygulamasıyla isteyin
+    (servis hesapları bu uygulamaya aittir):</p>
+<div class="code"><span class="lbl">HTTP</span><pre>POST https://auth.firma.com/idp/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&amp;client_id=management
+&amp;service_account_key=SA_ANAHTARI
+&amp;service_account_secret=SA_SIRRI
+&amp;resource=https://auth.firma.com/idp</pre></div>
+<p>İşlem yapılacak havuz istekte gönderilmez: servis hesabının açıldığı havuzdur. Bir servis hesabı başka bir havuzun kullanıcısına dokunamaz.
+    Panelden askıya alınan ya da silinen hesabın elindeki token da hemen geçersiz olur.</p>
+
+<h2 id="erisim">2. Kullanıcı rol ve kapsamları</h2>
+<table>
+    <thead><tr><th>İstek</th><th>Açıklama</th></tr></thead>
+    <tbody>
+        <tr><td><code>GET /idp/apis/users/{kullaniciId}/access</code></td><td>Kullanıcının rolleri (<code>id</code>, <code>key</code>) ve kapsamları</td></tr>
+        <tr><td><code>POST /idp/apis/users/{kullaniciId}/access/grant</code></td><td>Rol ve kapsam ekler; zaten olanlar atlanır</td></tr>
+        <tr><td><code>POST /idp/apis/users/{kullaniciId}/access/revoke</code></td><td>Rol ve kapsam kaldırır; olmayanlar atlanır</td></tr>
+    </tbody>
+</table>
+<div class="code"><span class="lbl">Rol ve kapsam verme</span><pre>POST https://auth.firma.com/idp/apis/users/3f1c.../access/grant
+Authorization: Bearer &lt;servis hesabı token'ı&gt;
+Content-Type: application/json
+
+{ "roleIds": ["9b2e..."], "scopes": ["orders:write"] }</pre></div>
+<ul>
+    <li><code>kullaniciId</code>, kullanıcının token'larındaki <code>sub</code> değeridir.</li>
+    <li>Yalnızca havuzda tanımlı roller ve kapsamlar verilebilir. Rol kimliklerini panelde havuzun <b>Roller</b> ekranında görürsünüz.</li>
+    <li>Yanıt, kullanıcının güncel rol ve kapsamlarıdır. Değişiklik kullanıcının <b>bir sonraki</b> token'ında görünür.</li>
+</ul>
+
+<h2 id="iliskiler">3. İlişkiler (yetki şeması)</h2>
+<p>İlişkiler havuzun kendi yetki şemasına yazılır (bkz. <a href="/tr/docs/authorization">Yetki kontrolü</a>). Tip ve ilişki şemada tanımlı olmalıdır.</p>
+<table>
+    <thead><tr><th>İstek</th><th>Gövde</th><th>Yanıt</th></tr></thead>
+    <tbody>
+        <tr><td><code>POST /idp/apis/relations</code></td><td><code>{ "tuples": [{ "user", "relation", "object" }] }</code></td><td><code>{ "affectedCount" }</code></td></tr>
+        <tr><td><code>POST /idp/apis/relations/delete</code></td><td>Aynı</td><td><code>{ "affectedCount" }</code></td></tr>
+        <tr><td><code>POST /idp/apis/relations/check</code></td><td><code>{ "user", "relation", "object" }</code></td><td><code>{ "allowed" }</code></td></tr>
+    </tbody>
+</table>
+<div class="code"><span class="lbl">İlişki yazma ve sorgulama</span><pre>POST https://auth.firma.com/idp/apis/relations
+{ "tuples": [ { "user": "user:3f1c...", "relation": "editor", "object": "document:42" } ] }
+
+POST https://auth.firma.com/idp/apis/relations/check
+{ "user": "user:3f1c...", "relation": "viewer", "object": "document:42" }
+→ { "allowed": true }   // şemada editor, viewer'ı kapsıyorsa</pre></div>
+<ul>
+    <li>Biçim <code>tip:kimlik</code>; kullanıcı kümesi için <code>tip:kimlik#ilişki</code> (ör. <code>team:satis#member</code>).</li>
+    <li>Tek istekte en fazla 100 tuple. Şemaya uymayan istek <code>400</code> ile reddedilir.</li>
+</ul>
+
+<h2 id="hatalar">Hatalar</h2>
+<table>
+    <thead><tr><th>Durum</th><th>Neden</th></tr></thead>
+    <tbody>
+        <tr><td><code>401</code></td><td>Token yok, süresi dolmuş ya da <code>resource</code> IdP adresi değil</td></tr>
+        <tr><td><code>403</code></td><td>Token bir servis hesabına ait değil (ör. kullanıcı token'ı), hesap askıda ya da işlem için yetkisi yetersiz</td></tr>
+        <tr><td><code>400</code></td><td>Havuzda tanımsız rol / kapsam, bulunamayan kullanıcı ya da şemaya uymayan ilişki</td></tr>
+    </tbody>
+</table>

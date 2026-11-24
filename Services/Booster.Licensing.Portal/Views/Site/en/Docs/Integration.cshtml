@@ -95,18 +95,52 @@ app.MapGet("/orders", () => "...")
 <p>By default access tokens live 15 minutes and refresh tokens 14 days; change them in the pool's session policy.</p>
 
 <h2 id="service">Server to server (service account)</h2>
-<p>For services that run without a human user, create a <b>service account</b> in the pool; its key and secret are shown only once. The
-    application must have the <i>Client Credentials</i> grant type enabled.</p>
+<p>For services that run without a human user, create a service account on the pool's <b>Service Accounts</b> screen; its key and secret are
+    shown only once. The token is requested with Booster Auth's built-in <code>management</code> application; <code>resource</code> must be one of
+    that application's allowed APIs. To grant roles / scopes to the pool's users and write relations with a service account, see
+    <a href="/en/docs/pool-apis">Pool APIs</a>.</p>
 <div class="code"><span class="lbl">HTTP</span><pre>POST https://auth.company.com/idp/token
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials
-&amp;client_id=acme-worker
+&amp;client_id=management
 &amp;service_account_key=SA_KEY
 &amp;service_account_secret=SA_SECRET
-&amp;resource=https://api.company.com</pre></div>
+&amp;resource=https://auth.company.com/idp</pre></div>
 <p>The response contains only an access token; no ID token or refresh token is issued.</p>
+
+<h2 id="hide-methods">Hiding sign-in methods</h2>
+<p>The same application can show different sign-in options on different platforms; for example, no "Sign in with Apple" button in your
+    Android app. Add the <code>hidden_providers</code> parameter to the <code>/idp/authorize</code> request:</p>
+<div class="code"><span class="lbl">Authorization request</span><pre>https://auth.company.com/idp/authorize?client_id=acme-mobile&amp;response_type=code
+  &amp;redirect_uri=...&amp;scope=openid%20profile&amp;code_challenge=...&amp;code_challenge_method=S256
+  &amp;hidden_providers=apple,phone_code</pre></div>
+<table>
+    <thead><tr><th>Value</th><th>Hides</th></tr></thead>
+    <tbody>
+        <tr><td><code>apple</code>, <code>google</code>, <code>microsoft</code>, <code>github</code>, ...</td><td>Every external identity provider button of that type</td></tr>
+        <tr><td>A provider key (e.g. <code>corp-sso</code>)</td><td>Only that provider</td></tr>
+        <tr><td><code>email_code</code> / <code>phone_code</code></td><td>Passwordless sign-in with an e-mail / SMS code</td></tr>
+    </tbody>
+</table>
+<p>Values are separated by commas or spaces and are case-insensitive. The parameter only narrows the screen; it never enables a method that is
+    turned off in the pool and is not a security rule.</p>
+
+<h2 id="apple">Sign in with Apple</h2>
+<p>Add Apple on the pool's <b>Identity Providers</b> screen:</p>
+<ul>
+    <li><b>client_id:</b> the <i>Services ID</i> from Apple Developer (e.g. <code>com.company.web</code>).</li>
+    <li><b>team_id</b> and <b>key_id:</b> your Apple Developer team ID and the ID of the "Sign in with Apple" key.</li>
+    <li><b>Secret key:</b> the contents of the downloaded <code>.p8</code> file (starts with <code>-----BEGIN PRIVATE KEY-----</code>). Booster Auth
+        uses it to generate the short-lived client secret Apple requires on every sign-in.</li>
+    <li>Register <code>https://auth.company.com/idp/ui/external/callback</code> as the <i>Return URL</i> at Apple.</li>
+</ul>
+<p>Apple sends the user's name only on the first sign-in; Booster Auth stores it on the account. If the user hides their e-mail, an address
+    ending in <code>@@privaterelay.appleid.com</code> is received.</p>
 
 <h2 id="logout">Logout</h2>
 <p>Redirect the user to <code>/idp/logout</code>; the session is closed and the user returns to the post-logout URI registered on the
     application. OIDC libraries do this with a call like <code>signoutRedirect()</code>.</p>
+<p>To return to the application, the request must carry <code>client_id</code> or <code>id_token_hint</code> together with
+    <code>post_logout_redirect_uri</code>. ASP.NET Core sends neither when <code>SaveTokens</code> is off; set
+    <code>context.ProtocolMessage.ClientId</code> in the <code>OnRedirectToIdentityProviderForSignOut</code> event.</p>

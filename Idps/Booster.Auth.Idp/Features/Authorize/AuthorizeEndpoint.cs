@@ -104,7 +104,8 @@ public class AuthorizeEndpoint(
             State = req.State,
             Nonce = req.Nonce,
             CodeChallenge = req.CodeChallenge!,
-            Resource = req.Resource
+            Resource = req.Resource,
+            HiddenProviders = InteractionStateData.ParseProviderList(req.HiddenProviders)
         };
 
         var key = await interactionStore.StoreAsync(interaction, InteractionTtl, ct);
@@ -238,6 +239,9 @@ public record AuthorizeRequest
     [BindFrom("resource")] public string? Resource { get; init; }
     [BindFrom("interaction_key")] public string? InteractionKey { get; init; }
     [BindFrom("prompt")] public string? Prompt { get; init; }
+
+    /// <summary>Giris ekraninda gosterilmeyecek yontemler (or. "apple" Android'de). Bkz. InteractionStateData.HiddenProviders.</summary>
+    [BindFrom("hidden_providers")] public string? HiddenProviders { get; init; }
 }
 
 public class AuthorizeValidator : Validator<AuthorizeRequest>
