@@ -4,6 +4,7 @@ using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
+using OpenFga.Sdk.Exceptions;
 
 namespace Booster.Auth.Z.Grpc;
 
@@ -17,13 +18,13 @@ public sealed class AuthorizationGrpcService(
     {
         var (storeId, modelId) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
 
-        var allowed = await relationManager.CheckAsync(
+        var allowed = await RejectInvalidAsync(() => relationManager.CheckAsync(
             storeId,
             request.User,
             request.Relation,
             request.Object,
             modelId,
-            context.CancellationToken);
+            context.CancellationToken));
 
         return new CheckResponse { Allowed = allowed };
     }
@@ -105,7 +106,7 @@ public sealed class AuthorizationGrpcService(
 
         var tuples = ToTuples(request);
 
-        await relationManager.WriteBatchAsync(storeId, tuples, context.CancellationToken);
+        await RejectInvalidAsync(() => relationManager.WriteBatchAsync(storeId, tuples, context.CancellationToken));
 
         return new WriteRelationsResponse { AffectedCount = tuples.Count };
     }
@@ -117,9 +118,22 @@ public sealed class AuthorizationGrpcService(
 
         var tuples = ToTuples(request);
 
-        await relationManager.DeleteBatchAsync(storeId, tuples, context.CancellationToken);
+        await RejectInvalidAsync(() => relationManager.DeleteBatchAsync(storeId, tuples, context.CancellationToken));
 
         return new WriteRelationsResponse { AffectedCount = tuples.Count };
+    }
+
+    /// <summary>Semaya uymayan tuple / tip: Unknown yerine InvalidArgument (cagiran 400'e cevirebilsin).</summary>
+    private static async Task<T> RejectInvalidAsync<T>(Func<Task<T>> call)
+    {
+        try { return await call(); }
+        catch (FgaApiValidationError ex) { throw new RpcException(new Status(StatusCode.InvalidArgument, ex.Message)); }
+    }
+
+    private static async Task RejectInvalidAsync(Func<Task> call)
+    {
+        try { await call(); }
+        catch (FgaApiValidationError ex) { throw new RpcException(new Status(StatusCode.InvalidArgument, ex.Message)); }
     }
 
     private static List<TupleInput> ToTuples(WriteRelationsRequest request)

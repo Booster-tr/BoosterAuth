@@ -80,6 +80,13 @@ builder.Services
         o.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         o.NonceCookie.SameSite = SameSiteMode.Lax;
         o.NonceCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        // Cikista .NET client_id gondermez (SaveTokens kapali oldugu icin id_token_hint de yok); Booster Auth
+        // uygulamayi bilemeyince portala donmez, kullaniciyi kendi "cikis yapildi" ekraninda birakirdi.
+        o.Events.OnRedirectToIdentityProviderForSignOut = ctx =>
+        {
+            ctx.ProtocolMessage.ClientId = portal.ClientId;
+            return Task.CompletedTask;
+        };
     });
 
 builder.Services.AddAuthorizationBuilder()
@@ -114,7 +121,11 @@ app.UseForwardedHeaders(forwarded);
 
 app.UseExceptionHandler("/hata");
 app.UseBoosterMessaging();
-app.UseStaticFiles();
+// AI dosyalari (/llms.txt, /ai/booster-auth/SKILL.md): .md varsayilan olarak sunulmaz.
+var contentTypes = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+contentTypes.Mappings[".md"] = "text/markdown; charset=utf-8";
+contentTypes.Mappings[".txt"] = "text/plain; charset=utf-8";
+app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = contentTypes });
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -3,7 +3,7 @@
     same steps work for a trial on your laptop.</p>
 
 <div class="code"><span class="lbl">In short · Linux / macOS</span><pre>unzip booster-auth.zip &amp;&amp; cd booster-auth
-./kurulum.sh
+./setup.sh
 docker compose up -d</pre></div>
 
 <h2 id="requirements">Requirements</h2>
@@ -25,8 +25,8 @@ cd booster-auth</pre></div>
 <h2 id="env">2. Run the setup script</h2>
 <p>All settings live in the <code>.env</code> file. The easiest way to create it is the setup script: it asks for your addresses, generates every
     password and key at random and writes <code>.env</code>.</p>
-<div class="code"><span class="lbl">Linux / macOS</span><pre>./kurulum.sh</pre></div>
-<div class="code"><span class="lbl">Windows</span><pre>powershell -ExecutionPolicy Bypass -File .\kurulum.ps1</pre></div>
+<div class="code"><span class="lbl">Linux / macOS</span><pre>./setup.sh</pre></div>
+<div class="code"><span class="lbl">Windows</span><pre>powershell -ExecutionPolicy Bypass -File .\setup.ps1</pre></div>
 <p>The script asks for the following (its prompts are in Turkish):</p>
 <table>
     <thead><tr><th>Prompt</th><th>Example</th><th>Meaning</th></tr></thead>

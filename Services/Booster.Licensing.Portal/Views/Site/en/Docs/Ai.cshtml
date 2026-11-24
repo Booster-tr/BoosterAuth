@@ -1,0 +1,24 @@
+<h1>Integrating with AI</h1>
+<p class="lede">If you build the integration with an AI coding assistant such as Claude, Cursor or Copilot, we provide two ready-made files that
+    describe Booster Auth correctly. The assistant learns the endpoints, the required PKCE setting, the pool APIs and common mistakes from them.</p>
+
+<h2 id="skill">Claude skill file</h2>
+<p>The <a href="/ai/booster-auth/SKILL.md">SKILL.md</a> file is in Claude's <i>skill</i> format: Claude loads it automatically when you ask for
+    anything related to Booster Auth.</p>
+<div class="code"><span class="lbl">Claude Code — for a project</span><pre>mkdir -p .claude/skills/booster-auth
+curl -o .claude/skills/booster-auth/SKILL.md https://licensing.appnuraymind.com/ai/booster-auth/SKILL.md</pre></div>
+<ul>
+    <li><b>For all your projects:</b> put the file at <code>~/.claude/skills/booster-auth/SKILL.md</code>.</li>
+    <li><b>Claude app (claude.ai):</b> upload the <code>booster-auth</code> folder as a zip under <i>Settings &gt; Capabilities</i>.</li>
+    <li><b>Other assistants:</b> add the file's contents to the assistant's rules / instructions file (e.g. <code>AGENTS.md</code>, <code>.cursor/rules</code>).</li>
+</ul>
+<p>You can replace <code>https://auth.company.com</code> in the file with your own Booster Auth address; otherwise the assistant asks you for it.</p>
+
+<h2 id="llms">llms.txt</h2>
+<p><a href="/llms.txt">/llms.txt</a> is a short summary in the <a href="https://llmstxt.org" rel="noopener">llms.txt</a> format: it lists the key rules
+    and the addresses of the documentation pages. Assistants with web access read it and follow the relevant pages.</p>
+<div class="code"><span class="lbl">Example prompt</span><pre>Read https://licensing.appnuraymind.com/llms.txt. Add Booster Auth sign-in to my Next.js app;
+my Booster Auth address is https://auth.company.com and the client_id is "acme-web".</pre></div>
+
+<div class="callout"><p><b>Secrets.</b> Do not paste values such as a service account secret into the chat; have the assistant read them from
+    environment variables.</p></div>

@@ -111,6 +111,10 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.AccountDeletionConfirmRequired, "Onay", "Devam etmek için hesabınızın kalıcı olarak silineceğini onaylayın.", "Confirmation", "Confirm that your account will be permanently deleted to continue."),
         new(IdpMessageKeys.AccountUnavailable, "Hesap", "Hesap sayfası bu uygulama için kullanılamıyor.", "Account", "The account page is not available for this application."),
 
+        // --- Havuz API'leri ---
+        new(IdpMessageKeys.PoolApiCallerNotAllowed, "Yetki", "Bu uç yalnızca havuzun servis hesabı token'ı ile çağrılabilir.", "Authorization", "This endpoint can only be called with a pool service account token."),
+        new(IdpMessageKeys.PoolApiRelationRejected, "İlişki", "İlişki havuzun yetki şemasına uymuyor.", "Relation", "The relation does not match the pool's authorization schema."),
+
         // --- Panelden kullanıcı ekleme / içe aktarma / davet ---
         new(IdpMessageKeys.InvitationInvalid, "Davet", "Bu davet bağlantısı geçersiz ya da süresi dolmuş. Yöneticinizden yeni bir davet isteyin.", "Invitation", "This invitation link is invalid or has expired. Ask your administrator for a new invitation."),
         new(IdpMessageKeys.InvitationNotPending, "Davet", "Bu kullanıcı parolasını zaten belirlemiş; davet gönderilemez.", "Invitation", "This user has already set a password; an invitation cannot be sent."),

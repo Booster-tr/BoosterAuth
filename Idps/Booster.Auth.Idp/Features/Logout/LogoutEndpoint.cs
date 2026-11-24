@@ -3,6 +3,7 @@ using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Features._base.Enums;
 using Booster.Auth.Idp.Managers.CookieManagers;
+using Booster.Auth.Idp.Managers.KeyManagers;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Stores.ClientStores;
 using Booster.Auth.Idp.Stores.SessionStores;
@@ -11,6 +12,8 @@ using Booster.Caching.Abstraction;
 using Booster.Database.Repositories;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Booster.Auth.Idp.Features.Logout;
 
@@ -22,7 +25,8 @@ public class LogoutEndpoint(
     IAsyncRepository<RefreshToken, IdpDbContext> refreshTokenRepository,
     ICacheService cacheService,
     IRequestContextAccessor requestContextAccessor,
-    IdpUiOptions uiOptions) : Endpoint<LogoutRequest>
+    IdpUiOptions uiOptions,
+    OidcKeyService keyService) : Endpoint<LogoutRequest>
 {
     public override void Configure()
     {
@@ -89,10 +93,13 @@ public class LogoutEndpoint(
     {
         var fallback = uiOptions.GetErrorUrl(IdpMessageKeys.LoggedOut);
 
-        if (string.IsNullOrEmpty(req.ClientKey) || string.IsNullOrEmpty(req.PostLogoutRedirectUri))
+        // OIDC'de client_id istege bagli; yoksa id_token_hint'in aud'u kullanilir (or. .NET OIDC handler).
+        var clientKey = string.IsNullOrEmpty(req.ClientKey) ? ClientKeyFromIdToken(req.IdTokenHint) : req.ClientKey;
+
+        if (string.IsNullOrEmpty(clientKey) || string.IsNullOrEmpty(req.PostLogoutRedirectUri))
             return fallback;
 
-        var client = await clientDataStore.GetByClientKeyAsync(req.ClientKey, ct);
+        var client = await clientDataStore.GetByClientKeyAsync(clientKey, ct);
         if (client is null)
             return fallback;
 
@@ -109,6 +116,30 @@ public class LogoutEndpoint(
             : $"{builder.Query.TrimStart('?')}&{state}";
 
         return builder.ToString();
+    }
+
+    /// <summary>Imza bizim anahtarimizla dogrulanir; suresi dolmus ipucu gecerlidir (OIDC RP-Initiated Logout).</summary>
+    private string? ClientKeyFromIdToken(string? idTokenHint)
+    {
+        if (string.IsNullOrEmpty(idTokenHint))
+            return null;
+
+        try
+        {
+            new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(idTokenHint, new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = false,
+                IssuerSigningKeys = keyService.GetValidationKeys()
+            }, out var token);
+
+            return ((JwtSecurityToken)token).Audiences.FirstOrDefault();
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     private Task RedirectAsync(string url)

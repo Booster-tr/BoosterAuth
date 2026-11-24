@@ -1,0 +1,24 @@
+<h1>AI ile entegrasyon</h1>
+<p class="lede">Entegrasyonu Claude, Cursor ya da Copilot gibi bir AI kodlama asistanıyla yapıyorsanız, asistana Booster Auth'u doğru anlatan iki hazır
+    dosya sunuyoruz. Asistan uç noktaları, zorunlu PKCE ayarını, havuz API'lerini ve sık yapılan hataları bu dosyalardan öğrenir.</p>
+
+<h2 id="skill">Claude skill dosyası</h2>
+<p><a href="/ai/booster-auth/SKILL.md">SKILL.md</a> dosyası Claude'un <i>skill</i> biçimindedir: Claude, Booster Auth ile ilgili bir iş istediğinizde
+    dosyayı kendiliğinden yükler.</p>
+<div class="code"><span class="lbl">Claude Code — proje için</span><pre>mkdir -p .claude/skills/booster-auth
+curl -o .claude/skills/booster-auth/SKILL.md https://licensing.appnuraymind.com/ai/booster-auth/SKILL.md</pre></div>
+<ul>
+    <li><b>Tüm projeleriniz için:</b> dosyayı <code>~/.claude/skills/booster-auth/SKILL.md</code> konumuna koyun.</li>
+    <li><b>Claude uygulaması (claude.ai):</b> <i>Ayarlar &gt; Yetenekler</i> bölümünden <code>booster-auth</code> klasörünü zip olarak yükleyin.</li>
+    <li><b>Diğer asistanlar:</b> dosyanın içeriğini asistanın kural / talimat dosyasına (ör. <code>AGENTS.md</code>, <code>.cursor/rules</code>) ekleyin.</li>
+</ul>
+<p>Dosyadaki <code>https://auth.company.com</code> adresini kendi Booster Auth adresinizle değiştirebilirsiniz; değiştirmezseniz asistan adresi size sorar.</p>
+
+<h2 id="llms">llms.txt</h2>
+<p><a href="/llms.txt">/llms.txt</a>, <a href="https://llmstxt.org" rel="noopener">llms.txt</a> standardında kısa bir özettir: temel kuralları ve
+    dokümantasyon sayfalarının adreslerini içerir. Web'e erişebilen asistanlar bu adresi okuyarak ilgili sayfalara gider.</p>
+<div class="code"><span class="lbl">Asistana örnek istek</span><pre>https://licensing.appnuraymind.com/llms.txt adresini oku. Next.js uygulamama Booster Auth ile
+giriş ekle; Booster Auth adresim https://auth.firma.com, client_id "acme-web".</pre></div>
+
+<div class="callout"><p><b>Gizli değerler.</b> Servis hesabı sırrı gibi değerleri asistanla sohbete yapıştırmayın; ortam değişkeninden okunacak şekilde
+    yazdırın.</p></div>

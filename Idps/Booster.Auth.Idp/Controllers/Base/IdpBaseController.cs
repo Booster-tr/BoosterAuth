@@ -31,13 +31,16 @@ public class IdpBaseController : Controller
         return client;
     }
 
+    /// <summary>ResolveClientAsync'in okudugu interaction; giris ekranindaki gizli yontemler icin.</summary>
+    protected InteractionStateData? Interaction { get; private set; }
+
     protected void SetClientLogo(ClientData? client)
         => ViewData[ClientLogoUrlKey] = client is null
             ? null
             : HttpContext.RequestServices.GetRequiredService<IClientLogoStore>().Find(client.ClientId)?.RelativeUrl;
 
    
-    private static async Task<ClientData?> FindClientAsync(
+    private async Task<ClientData?> FindClientAsync(
         ISecureCacheStore<InteractionStateData> interactionStore,
         IClientDataStore clientDataStore,
         string interactionKey,
@@ -50,6 +53,7 @@ public class IdpBaseController : Controller
         if (interaction is null)
             return null;
 
+        Interaction = interaction;
         return await clientDataStore.GetByClientKeyAsync(interaction.ClientKey, ct);
     }
 
@@ -61,13 +65,15 @@ public class IdpBaseController : Controller
         {
 
             if (client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.EmailCode)
-                && client.Login.AllowedIdentifiers.Contains(IdentifierType.Email))
+                && client.Login.AllowedIdentifiers.Contains(IdentifierType.Email)
+                && Interaction?.IsHidden("email_code") != true)
             {
                 methods.Add(new PasswordlessMethod("email_code", "Login.Passwordless.Email"));
             }
 
             if (client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.PhoneCode)
-                && client.Login.AllowedIdentifiers.Contains(IdentifierType.Phone))
+                && client.Login.AllowedIdentifiers.Contains(IdentifierType.Phone)
+                && Interaction?.IsHidden("phone_code") != true)
             {
                 methods.Add(new PasswordlessMethod("phone_code", "Login.Passwordless.Phone"));
             }
@@ -84,6 +90,7 @@ public class IdpBaseController : Controller
             : client.FederationProviders
                 // LDAP buton degil: parola formu dizinle dogrular.
                 .Where(p => !string.Equals(p.ProviderType, Booster.Auth.Ldap.LdapSettings.ProviderType, StringComparison.OrdinalIgnoreCase))
+                .Where(p => Interaction?.IsHidden(p.ProviderType, p.Key) != true)
                 .Select(p => new FederationMethod(p.Key, p.ProviderType, p.DisplayName))
                 .ToList();
 

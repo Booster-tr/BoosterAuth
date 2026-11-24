@@ -1,0 +1,29 @@
+# Booster Auth
+
+> Booster Auth is self-hosted identity and access management: a standard OpenID Connect provider with isolated user pools, roles,
+> scopes, LDAP / Active Directory sign-in, MFA and OpenFGA-based authorization. Installed on the customer's own server with Docker Compose.
+
+Key facts for integrating an application:
+
+- Issuer: `https://<booster-auth-host>/idp` (same for every pool; the pool is selected by `client_id`).
+- Flow: Authorization Code + PKCE with `code_challenge_method=S256` (required). No implicit flow.
+- Pass `resource=<api address>` to set the access token audience. Access token claims: `sub`, `aud`, `scope`, `role`, `actor` (pool id).
+- `hidden_providers=apple,phone_code` on `/idp/authorize` hides sign-in methods (e.g. Apple on Android).
+- Logout: `/idp/logout` with `post_logout_redirect_uri` and `client_id` or `id_token_hint`.
+- Backends grant roles / scopes and write / check authorization relations via `/idp/apis/*` with the token of a service account created
+  for the pool (client_credentials with `client_id=management`, `resource=https://<booster-auth-host>/idp`).
+
+## Docs
+
+- [Ready-made Claude skill (SKILL.md)](https://licensing.appnuraymind.com/ai/booster-auth/SKILL.md): everything above with examples and common mistakes
+- [Application integration (OIDC)](https://licensing.appnuraymind.com/en/docs/integration): endpoints, PKCE, tokens, hidden sign-in methods, Apple, logout
+- [Pool APIs](https://licensing.appnuraymind.com/en/docs/pool-apis): grant roles and scopes, write and check relations from a backend
+- [Authorization checks](https://licensing.appnuraymind.com/en/docs/authorization): roles, scopes, ReBAC schema, AuthZ API
+- [My account](https://licensing.appnuraymind.com/en/docs/account): end-user self-service page
+- [Core concepts](https://licensing.appnuraymind.com/en/docs/concepts): tenants, pools, applications, roles, scopes
+
+## Optional
+
+- [Installation](https://licensing.appnuraymind.com/en/docs/installation)
+- [LDAP / Active Directory](https://licensing.appnuraymind.com/en/docs/ldap)
+- [Operations](https://licensing.appnuraymind.com/en/docs/operations)

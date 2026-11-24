@@ -77,8 +77,9 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Animasyon: `.reveal` + `wwwroot/js/site.js` (IntersectionObserver; 2,5 sn emniyet; reduced-motion). Hesap/admin ekranlari `_Layout` ile, yalnizca Turkce.
   - "Lisans al" -> `/hesap/satin-al?plan=<kod>` (`deneme` = ucretsiz deneme). Eksik adimi sirayla tamamlatir ve her adimdan sonra geri doner: firma -> kurulum -> (birden cok kurulumda secim) -> siparis.
   - Panelin "Lisans al" butonu `/?installationId=` ile gelir: giris -> kurulum formu dolu (kurulum zaten kayitliysa Kurulumlarim).
-- **Musteri kurulum paketi:** `deploy/compose/` (docker-compose, `.env.example`, `init/`, `kurulum.sh|ps1`, `BENIOKU.md`).
-  - Portala gomulu kaynak olarak derlenir; `/indir/booster-auth.zip` zip'i calisma aninda uretir (`InstallPackage`; `.sh` 0755).
+- **Musteri kurulum paketi:** dil basina `deploy/compose/tr/` (`kurulum.sh|ps1`, `BENIOKU.md`) ve `deploy/compose/en/` (`setup.sh|ps1`, `README.md`); ikisinde de docker-compose, `.env.example`, `init/`.
+  - Portala gomulu kaynak olarak derlenir; `/{tr|en}/download/booster-auth.zip` zip'i sitenin dilinde calisma aninda uretir (`InstallPackage`; `.sh` 0755).
+  - Bir dosyayi degistirince DIGER dildekini de degistir. `docker-compose.yml` yorum disinda iki dilde ayni olmak ZORUNDA; degilse zip uretilmez (`EnsureSameCompose`).
   - `.dockerignore` `.env.*` ve `docker-compose*` dosyalarini dislar; paket dosyalari icin `!deploy/compose/...` istisnalari VAR, silme.
   - Image'lar `ghcr.io/booster-tr/*` (public, portal haric). Paket lisans portali ayarlarini ICERMEZ (yalnizca Booster'in kendi kurulumu).
   - Paket dosyalari LF olmali (`.gitattributes`); betikler ayrica `tr -d '\r'` ile calistirilir.
@@ -174,6 +175,15 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Management kapsam ad degisikligi / silme -> `ScopeDefinitionChangedEvent`; rol anahtar degisikligi / silme -> `RoleChangedEvent` (`PoolDefinitionTopics`). IdP tuketicileri kopyalari gunceller / siler.
   - `PublishOrLogAsync`: Kafka hatasi loglanir; olay kaybolursa kopya bayat kalir. Verilmis token'lar suresi dolana kadar eski haliyle gecerlidir.
   - `RoleScope` IdP'ye tasinmaz; rolun kapsam listesi degisikligi senkron gerektirmez.
+- **Havuz API'leri (`Idps/Booster.Auth.Idp/Apis/`, `/idp/apis/*`):** musteri uygulamasinin backend'i icin; panel uclari (`pools/...`, `/authz/relations`) panel scope'u ister, bunlar istemez.
+  - Cagiran YALNIZCA panelde acilan havuz servis hesabi: YONETIM havuzunda Machine principal (`OwnerPoolId` = hedef havuz), token `client_id=management` + `resource=<PUBLIC_URL>/idp`. Havuz `OwnerPoolId`'den; istekte havuz alinmaz (`PoolApiCaller`).
+  - Yonetim grafigindeki iliski uygulanir (panel uclariyla ayni): okuma + `check` -> viewer, rol/kapsam grant/revoke -> manager, iliski yazma/silme -> grant_manager. Askiya alinan hesabin token'i hemen 403.
+  - Kullanici rol/kapsam: `GET .../access`, `POST .../access/grant|revoke` (havuz tanimlariyla dogrulanir). Iliskiler: `POST apis/relations`, `/delete`, `/check` (AuthZ gRPC, havuzun kendi store'u).
+  - Panel scope'u tasimadigi icin `LicenseGuard` bu uclari kisitlamaz.
+- **`hidden_providers`** (`/authorize`): giris ekraninda gizlenecek saglayici tipi / anahtari ya da `email_code` / `phone_code`. `InteractionStateData.HiddenProviders`; yalnizca ekran, yetki kurali degil.
+- **Apple:** panel `.p8` anahtarini `client_secret` alaninda saklar; `AppleProvider` once `private_key_pem`, yoksa `client_secret` okur. Ad yalnizca ilk giriste form `user` JSON'unda gelir.
+- **Cikis:** `/idp/logout` istemciyi `client_id`'den, yoksa imzasi dogrulanan `id_token_hint`'in `aud`'undan bulur.
+- **AI dosyalari:** portal `wwwroot/llms.txt` ve `wwwroot/ai/booster-auth/SKILL.md`. Entegrasyon davranisi degisirse (uc, parametre, token) bunlari da guncelle.
 
 ## Komutlar
 ```bash

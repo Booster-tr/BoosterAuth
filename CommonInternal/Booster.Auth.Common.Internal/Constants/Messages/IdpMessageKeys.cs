@@ -109,4 +109,8 @@ public class IdpMessageKeys
     public const string AccountDeletionDisabled = "idp.account_deletion_disabled";
     public const string AccountDeletionConfirmRequired = "idp.account_deletion_confirm_required";
     public const string AccountUnavailable = "idp.account_unavailable";
+
+    // --- Havuz API'leri (uygulama backend'i, servis hesabi token'i) ------------
+    public const string PoolApiCallerNotAllowed = "idp.pool_api_caller_not_allowed";
+    public const string PoolApiRelationRejected = "idp.pool_api_relation_rejected";
 }
