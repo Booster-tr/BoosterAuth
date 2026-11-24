@@ -24,17 +24,21 @@ public sealed class LoginChallengeViewModel
     /// <summary>Kod az önce (yeniden) gönderildi; ekran bunu duyurur.</summary>
     public bool Resent { get; private set; }
 
+    /// <summary>Yeniden gonderim istendi ama bekleme suresi dolmadi; kod gonderilmedi.</summary>
+    public bool ResendWait { get; private set; }
+
     /// <summary>Kaynak dosyadaki anahtar öneki: "Challenge.VerifyEmail", "Challenge.Mfa" ...</summary>
     public string TextKey => $"Challenge.{Step}";
 
-    public static LoginChallengeViewModel From(string interactionKey, LoginChallengeView view, bool resent) => new()
+    public static LoginChallengeViewModel From(string interactionKey, LoginChallengeView view, bool resent, bool resendWait = false) => new()
     {
         InteractionKey = interactionKey,
         Step = view.Step,
         Channel = view.Channel,
         MaskedTarget = view.MaskedTarget,
         MfaChannels = view.MfaChannels,
-        Resent = resent
+        Resent = resent || resendWait,
+        ResendWait = resendWait
     };
 }
 

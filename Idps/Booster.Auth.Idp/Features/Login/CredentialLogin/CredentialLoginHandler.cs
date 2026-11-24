@@ -56,7 +56,7 @@ public sealed class CredentialLoginHandler(
         if (ldap is not null)
         {
             using var ldapScope = requestContextAccessor.BeginSystemContext(client.IsolationId);
-            var candidate = await userStore.FindAsync(cmd.Identifier, client.Login.AllowedIdentifiers, ct);
+            var candidate = await userStore.FindAsync(cmd.Identifier, client.Login.AllowedIdentifiers, ct, client.Login.DefaultCountryCode);
             var localAllowed = client.Login.AllowedLoginProviders.HasFlag(LoginProviderType.Local);
             if (candidate is null || !candidate.HasPassword || !localAllowed)
             {
@@ -81,7 +81,7 @@ public sealed class CredentialLoginHandler(
 
         using var scope = requestContextAccessor.BeginSystemContext(client.IsolationId);
 
-        var user = await userStore.FindAsync(cmd.Identifier, client.Login.AllowedIdentifiers, ct);
+        var user = await userStore.FindAsync(cmd.Identifier, client.Login.AllowedIdentifiers, ct, client.Login.DefaultCountryCode);
         if (user is null || !user.IsActive)
             throw Invalid(IdpMessageKeys.InvalidCredentials);
 
@@ -168,7 +168,14 @@ public sealed class CredentialLoginHandler(
     }
 
     private static ProviderConfig BuildConfig(string providerType, ClientData client)
-        => new() { ProviderKey = providerType, ProviderType = providerType, IsolationId = client.IsolationId, IsActive = true };
+        => new()
+        {
+            ProviderKey = providerType, ProviderType = providerType, IsolationId = client.IsolationId, IsActive = true,
+            // Telefonla giriste ulke kodsuz numara bu kodla tamamlanir (IdentifierNormalizer).
+            Settings = string.IsNullOrWhiteSpace(client.Login.DefaultCountryCode)
+                ? new Dictionary<string, string>()
+                : new Dictionary<string, string> { ["default_country_code"] = client.Login.DefaultCountryCode }
+        };
 
     private static ValidationException Invalid(string messageKey)
         => new([new ValidationFailure(string.Empty, messageKey)]);

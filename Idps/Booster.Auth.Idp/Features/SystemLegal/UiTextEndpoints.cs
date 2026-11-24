@@ -102,6 +102,7 @@ public class SetUiTextValidator : Validator<SetUiTextRequest>
 {
     public SetUiTextValidator()
     {
+        RuleFor(x => x.LanguageCode).Must(LegalDocumentKeys.IsSupportedLanguage).WithMessage(IdpMessageKeys.LanguageNotSupported);
         RuleFor(x => x.Key).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
         RuleFor(x => x.Value).NotEmpty().WithMessage(ValidationErrors.NotEmptyError)
             .MaximumLength(4000).WithMessage(ValidationErrors.MaxLengthError)

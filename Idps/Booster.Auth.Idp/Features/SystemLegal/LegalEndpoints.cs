@@ -138,6 +138,7 @@ public class UpdateLegalDocumentValidator : Validator<UpdateLegalDocumentRequest
 {
     public UpdateLegalDocumentValidator()
     {
+        RuleFor(x => x.LanguageCode).Must(LegalDocumentKeys.IsSupportedLanguage).WithMessage(IdpMessageKeys.LanguageNotSupported);
         RuleFor(x => x.Title).NotEmpty().WithMessage(ValidationErrors.NotEmptyError)
             .MaximumLength(300).WithMessage(ValidationErrors.MaxLengthError);
         RuleFor(x => x.Summary).MaximumLength(1000).WithMessage(ValidationErrors.MaxLengthError);

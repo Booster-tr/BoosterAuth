@@ -1,3 +1,4 @@
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Features._base;
@@ -30,6 +31,9 @@ public sealed class ForgotPasswordHandler(
     Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService ldapLogin) : ICommandHandler<ForgotPasswordCommand>
 {
     private static readonly TimeSpan ResetCodeTtl = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan ExpiredCodeGrace = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan SendWindow = TimeSpan.FromMinutes(15);
+    private const int MaxSendsPerWindow = 5;
 
     public async Task ExecuteAsync(ForgotPasswordCommand cmd, CancellationToken ct)
     {
@@ -43,7 +47,7 @@ public sealed class ForgotPasswordHandler(
 
         using var scope = requestContextAccessor.BeginSystemContext(client.IsolationId);
 
-        var principal = await FindPrincipalAsync(identifier, client.Login.AllowedIdentifiers, ct);
+        var principal = await FindPrincipalAsync(identifier, client.Login.AllowedIdentifiers, client.Login.DefaultCountryCode, ct);
 
         if (principal is null || principal.Status != PrincipalStatus.Active)
             return;
@@ -55,8 +59,18 @@ public sealed class ForgotPasswordHandler(
         if (target is null)
             return;
 
+        // Kullanici basina gonderim siniri (15 dakikada en fazla 5). Once kullanici basina TEK bekleyen kod vardi:
+        // baska sekme / cihazdaki sifirlama kod alamiyor, adresi bilen biri de kurbanin sifirlamasini engelleyebiliyordu.
+        var now = DateTimeOffset.UtcNow;
         var pendingKey = PasswordResetKeys.Pending(client.IsolationId, principal.Id);
-        if (await resetStore.GetAsync(pendingKey, ct) is not null)
+        var window = await resetStore.GetAsync(pendingKey, ct);
+        if (window is null || window.ExpiresAt <= now)
+            window = new PasswordResetData
+            {
+                PrincipalId = principal.Id, IsolationId = client.IsolationId, ClientKey = client.ClientKey,
+                CodeHash = string.Empty, ExpiresAt = now.Add(SendWindow)
+            };
+        if (window.AttemptCount >= MaxSendsPerWindow)
             return;
 
         var code = GenerateCode();
@@ -70,9 +84,11 @@ public sealed class ForgotPasswordHandler(
             ExpiresAt = DateTimeOffset.UtcNow.Add(ResetCodeTtl)
         };
 
-        await resetStore.StoreAsync(PasswordResetKeys.ForInteraction(cmd.InteractionKey), reset, ResetCodeTtl, ct);
+        // Onbellek kod suresinden uzun: suresi dolan kod "hatali" degil "suresi doldu" desin.
+        await resetStore.StoreAsync(PasswordResetKeys.ForInteraction(cmd.InteractionKey), reset, ResetCodeTtl + ExpiredCodeGrace, ct);
 
-        await resetStore.StoreAsync(pendingKey, reset, ResetCodeTtl, ct);
+        // Sayac: AttemptCount = penceredeki gonderim sayisi.
+        await resetStore.StoreAsync(pendingKey, window with { AttemptCount = window.AttemptCount + 1 }, window.ExpiresAt - now, ct);
 
         await eventBus.PublishAsync(new NotificationRequestedEvent
         {
@@ -93,9 +109,10 @@ public sealed class ForgotPasswordHandler(
     }
 
     private async Task<Principal?> FindPrincipalAsync(
-        string identifier, IReadOnlyList<IdentifierType> allowed, CancellationToken ct)
+        string identifier, IReadOnlyList<IdentifierType> allowed, string? defaultCountryCode, CancellationToken ct)
     {
-        var normalized = identifier.ToLowerInvariant();
+        var normalized = IdentifierNormalizer.Email(identifier);
+        var phone = IdentifierNormalizer.Phone(identifier, defaultCountryCode) ?? identifier;
 
         var query = principalRepository.Query().AsNoTracking();
 
@@ -107,13 +124,13 @@ public sealed class ForgotPasswordHandler(
 
         if (allowed.Contains(IdentifierType.Username))
         {
-            var byUserName = await query.FirstOrDefaultAsync(p => p.UserName == identifier, ct);
+            var byUserName = await query.FirstOrDefaultAsync(p => p.UserName == normalized, ct);
             if (byUserName is not null) return byUserName;
         }
 
         if (allowed.Contains(IdentifierType.Phone))
         {
-            var byPhone = await query.FirstOrDefaultAsync(p => p.PhoneNumber == identifier, ct);
+            var byPhone = await query.FirstOrDefaultAsync(p => p.PhoneNumber == phone, ct);
             if (byPhone is not null) return byPhone;
         }
 
@@ -154,6 +171,6 @@ public sealed class ForgotPasswordValidator : Validator<ForgotPasswordCommand>
     public ForgotPasswordValidator()
     {
         RuleFor(x => x.InteractionKey).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-        RuleFor(x => x.Identifier).NotEmpty().MaximumLength(320).WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.Identifier).NotEmpty().WithMessage(ValidationErrors.NotEmptyError).MaximumLength(320).WithMessage(ValidationErrors.MaxLengthError);
     }
 }

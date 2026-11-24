@@ -41,8 +41,8 @@ public interface ILoginChallengeManager
 
     Task<LoginOutcome> VerifyAsync(string interactionKey, ClientData client, string code, CancellationToken ct);
 
-    /// <summary>Kodu yeniden gönderir. Bekleme süresi dolmadıysa sessizce hiçbir şey yapmaz.</summary>
-    Task ResendAsync(string interactionKey, ClientData client, CancellationToken ct);
+    /// <summary>Kodu yeniden gonderir. Bekleme suresi dolmadiysa gondermez ve false doner (ekran "bekleyin" der).</summary>
+    Task<bool> ResendAsync(string interactionKey, ClientData client, CancellationToken ct);
 
     /// <summary>MFA adımında kanal değiştirir (e-posta ↔ SMS) ve yeni kanala kod gönderir.</summary>
     Task SelectChannelAsync(string interactionKey, ClientData client, ChallengeChannel channel, CancellationToken ct);
@@ -61,6 +61,9 @@ public sealed class LoginChallengeManager(
     private static readonly TimeSpan ChallengeLifetime = TimeSpan.FromMinutes(15);
 
     private static readonly TimeSpan CodeLifetime = TimeSpan.FromMinutes(5);
+
+    /// <summary>Suresi dolan kod bu kadar daha tutulur; kullaniciya "hatali" degil "suresi doldu" denebilsin.</summary>
+    private static readonly TimeSpan ExpiredCodeGrace = TimeSpan.FromMinutes(10);
 
     /// <summary>"Kodu yeniden gönder" en erken bu kadar sonra yeni kod üretir.</summary>
     private static readonly TimeSpan ResendCooldown = TimeSpan.FromSeconds(60);
@@ -146,11 +149,15 @@ public sealed class LoginChallengeManager(
         {
             // Deneme sınırı dolunca kod yakılır: 6 haneli kodu kaba kuvvetle
             // bulmak 5 denemede pratik olarak imkânsızdır.
+            // Kod yakilinca kullaniciya "tekrar deneyin" denmez: yeni kod istemesi gerekir.
             if (record.AttemptCount + 1 >= MaxAttempts)
+            {
                 await codeStore.RemoveAsync(codeKey, ct);
-            else
+                throw InvalidCode(IdpMessageKeys.LoginCodeAttemptsExceeded);
+            }
+
                 await codeStore.StoreAsync(codeKey, record with { AttemptCount = record.AttemptCount + 1 },
-                    record.ExpiresAt - DateTimeOffset.UtcNow, ct);
+                    record.ExpiresAt - DateTimeOffset.UtcNow + ExpiredCodeGrace, ct);
 
             throw InvalidCode(IdpMessageKeys.LoginCodeInvalid);
         }
@@ -185,15 +192,16 @@ public sealed class LoginChallengeManager(
         return LoginOutcome.Challenge();
     }
 
-    public async Task ResendAsync(string interactionKey, ClientData client, CancellationToken ct)
+    public async Task<bool> ResendAsync(string interactionKey, ClientData client, CancellationToken ct)
     {
         var challenge = await RequireAsync(interactionKey, client, ct);
 
         var existing = await codeStore.GetAsync(CodeKey(interactionKey, challenge), ct);
         if (existing is not null && existing.ExpiresAt - CodeLifetime + ResendCooldown > DateTimeOffset.UtcNow)
-            return;
+            return false;
 
         await SendCodeAsync(interactionKey, client, challenge, ct);
+        return true;
     }
 
     public async Task SelectChannelAsync(
@@ -249,7 +257,7 @@ public sealed class LoginChallengeManager(
             Target = target,
             CodeHash = codeHasher.Hash(code),
             ExpiresAt = expiresAt
-        }, CodeLifetime, ct);
+        }, CodeLifetime + ExpiredCodeGrace, ct);
 
         await eventBus.PublishAsync(new NotificationRequestedEvent
         {

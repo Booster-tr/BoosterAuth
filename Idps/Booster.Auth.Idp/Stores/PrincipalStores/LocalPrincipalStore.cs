@@ -31,7 +31,8 @@ public sealed class LocalPrincipalStore(
     public async Task<LocalUser?> FindAsync(
         string identifier,
         IReadOnlyList<IdentifierType> identifierTypes,
-        CancellationToken ct)
+        CancellationToken ct,
+        string? defaultCountryCode = null)
     {
         if (identifierTypes.Count == 0 || string.IsNullOrWhiteSpace(identifier))
             return null;
@@ -39,11 +40,11 @@ public sealed class LocalPrincipalStore(
         var isolation = requestContextAccessor.Context().Isolation;
 
         return await cacheService.GetOrSetAsync(
-            FindKey(isolation, identifierTypes, identifier),
+            FindKey(isolation, identifierTypes, $"{identifier.Trim().ToLowerInvariant()}|{defaultCountryCode}"),
             async (context, token) =>
             {
                 var principal = await principalRepository.GetAsync(
-                    predicate: BuildPredicate(identifier, identifierTypes),
+                    predicate: BuildPredicate(identifier, identifierTypes, defaultCountryCode),
                     include: q => q.Include(p => p.LocalCredential!),
                     enableTracking: false,
                     cancellationToken: token);
@@ -127,12 +128,16 @@ public sealed class LocalPrincipalStore(
     }
 
     private static Expression<Func<Principal, bool>> BuildPredicate(
-        string identifier, IReadOnlyList<IdentifierType> types)
+        string identifier, IReadOnlyList<IdentifierType> types, string? defaultCountryCode)
     {
+        var userName = IdentifierNormalizer.UserName(identifier);
+        var email = IdentifierNormalizer.Email(identifier);
+        var phone = IdentifierNormalizer.Phone(identifier, defaultCountryCode) ?? identifier.Trim();
+
         return p =>
-            (types.Contains(IdentifierType.Username) && p.UserName == identifier) ||
-            (types.Contains(IdentifierType.Email) && p.Email == identifier) ||
-            (types.Contains(IdentifierType.Phone) && p.PhoneNumber == identifier);
+            (types.Contains(IdentifierType.Username) && p.UserName == userName) ||
+            (types.Contains(IdentifierType.Email) && p.Email == email) ||
+            (types.Contains(IdentifierType.Phone) && p.PhoneNumber == phone);
     }
 
     private static LocalUser ToLocalUser(Principal principal)

@@ -11,8 +11,14 @@
         <tr><td>client_id</td><td>The application's client key, e.g. <code>acme-web</code></td></tr>
         <tr><td>redirect_uri</td><td>A URI registered on the application, e.g. <code>https://app.company.com/callback</code></td></tr>
         <tr><td>Flow</td><td>Authorization Code + PKCE (<code>S256</code> required; the implicit flow is not supported)</td></tr>
-        <tr><td>Scopes</td><td><code>openid profile email offline_access</code> + scopes allowed for the application</td></tr>
-        <tr><td>resource (optional)</td><td>The target API (audience) of the token, e.g. <code>https://api.company.com</code></td></tr>
+        <tr><td>Scopes</td><td><code>openid profile email offline_access</code> + custom scopes allowed for the application. A custom scope is put in the
+            token only if the <b>user holds it</b>; scopes granted to the user are added even if not requested.</td></tr>
+        <tr><td>resource (optional)</td><td>The target API (audience) of the token, e.g. <code>https://api.company.com</code>; it must be one of the
+            application's allowed APIs. Without it the audience is the IdP itself (<code>https://auth.company.com/idp</code>); that token works with <code>/idp/me</code>.</td></tr>
+        <tr><td>prompt (optional)</td><td><code>login</code>: sign in again even with a session. <code>create</code>: sign-up screen. <code>none</code>: no screen
+            is shown; without a session the app gets <code>error=login_required</code>, if consent is needed <code>error=consent_required</code>.</td></tr>
+        <tr><td>max_age (optional)</td><td>Seconds. If the user's last sign-in is older, sign-in is required again; <code>auth_time</code> in the
+            ID token is the real sign-in time.</td></tr>
     </tbody>
 </table>
 <div class="callout"><p><b>One issuer.</b> The issuer is the same for all pools (<code>/idp</code>); the pool a user signs in to is determined by
@@ -88,11 +94,28 @@ app.MapGet("/orders", () => "...")
     <thead><tr><th>Token</th><th>Claims</th></tr></thead>
     <tbody>
         <tr><td>Access token</td><td><code>sub</code>, <code>aud</code>, <code>azp</code>, <code>scope</code>, <code>role</code> (one per role), <code>sid</code>, <code>principal_type</code></td></tr>
-        <tr><td>ID token</td><td><code>sub</code>, <code>name</code>, <code>email</code>, <code>email_verified</code>, <code>nonce</code>, <code>auth_time</code></td></tr>
+        <tr><td>ID token (only if <code>openid</code> is requested)</td><td><code>sub</code>, <code>nonce</code>, <code>auth_time</code>; <code>name</code> only with
+            <code>profile</code>, <code>email</code> and <code>email_verified</code> only with the <code>email</code> scope</td></tr>
         <tr><td><code>/idp/me</code></td><td><code>sub</code>, <code>name</code>, <code>email</code>, <code>email_verified</code>, <code>userpool</code></td></tr>
     </tbody>
 </table>
 <p>By default access tokens live 15 minutes and refresh tokens 14 days; change them in the pool's session policy.</p>
+<p>Each time a refresh token is used, roles and scopes are read from the user's <b>current</b> record: access an administrator removes is gone
+    from the next refreshed token. A suspended user cannot refresh.</p>
+
+<h2 id="errors">Errors</h2>
+<p>The <b>token endpoint</b> returns the standard OAuth 2.0 error body (RFC 6749): <code>error</code> (<code>invalid_request</code>,
+    <code>invalid_client</code>, <code>invalid_grant</code>, <code>invalid_scope</code>, <code>invalid_target</code>, <code>unsupported_grant_type</code>),
+    <code>error_description</code> (in the request language) and Booster Auth's own <code>code</code> (message key).</p>
+<p>The <b>authorization endpoint</b> returns errors to the application's <code>redirect_uri</code> with <code>error</code> and <code>state</code>:
+    <code>invalid_scope</code>, <code>invalid_target</code> (resource not allowed), <code>login_required</code> / <code>consent_required</code>
+    (<code>prompt=none</code>), <code>access_denied</code> (the user denied on the consent screen). If the client or address cannot be validated, an
+    error page is shown.</p>
+
+<h2 id="consent">Consent screen</h2>
+<p>If <b>Require user consent</b> is on for the application, the user sees the requested scopes at first sign-in and allows them; the consent is saved
+    and not asked again for the same scopes. If the application asks for a new scope, the screen appears again. On deny the application gets
+    <code>error=access_denied</code>. Consents can be revoked in the console on the application's <b>Consents</b> screen.</p>
 
 <h2 id="service">Server to server (service account)</h2>
 <p>For services that run without a human user, create a service account on the pool's <b>Service Accounts</b> screen; its key and secret are
@@ -144,3 +167,5 @@ grant_type=client_credentials
 <p>To return to the application, the request must carry <code>client_id</code> or <code>id_token_hint</code> together with
     <code>post_logout_redirect_uri</code>. ASP.NET Core sends neither when <code>SaveTokens</code> is off; set
     <code>context.ProtocolMessage.ClientId</code> in the <code>OnRedirectToIdentityProviderForSignOut</code> event.</p>
+<p><code>logout_all=true</code> ends <b>all</b> of the user's sessions; it is applied only together with an <code>id_token_hint</code> of that
+    user (so another site cannot sign the user out everywhere). Without the hint only the current session ends.</p>

@@ -1,3 +1,4 @@
+using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Caching.Abstraction;
@@ -16,7 +17,7 @@ public sealed record LegalPage(
     IReadOnlyList<LegalMarkdown.Heading> Headings);
 
 /// <summary>Yasal metinler ve kurum bilgileri: okuma (onbellekli) ve degisiklik sonrasi onbellek temizligi.</summary>
-public sealed class LegalContentService(IdpDbContext db, ICacheService cache)
+public sealed class LegalContentService(IdpDbContext db, ICacheService cache, IdpUiOptions uiOptions)
 {
     public const string CacheTag = "legal";
     private static readonly TimeSpan Ttl = TimeSpan.FromMinutes(10);
@@ -36,7 +37,7 @@ public sealed class LegalContentService(IdpDbContext db, ICacheService cache)
                 return null;
 
             var placeholders = Placeholders(await GetProfileAsync(token), t.LanguageCode);
-            var rendered = LegalMarkdown.Render(t.Content, placeholders);
+            var rendered = LegalMarkdown.Render(t.Content, placeholders, uiOptions.PathPrefix);
 
             return new LegalPage(key, t.LanguageCode,
                 LegalMarkdown.ReplacePlain(t.Title, placeholders),

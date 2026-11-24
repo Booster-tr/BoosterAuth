@@ -55,7 +55,8 @@ public sealed class RegisterHandler(
         if (!string.Equals(cmd.Password, cmd.PasswordConfirm, StringComparison.Ordinal))
             throw Invalid(nameof(RegisterCommand.PasswordConfirm), IdpMessageKeys.PasswordsDoNotMatch);
 
-        var userName = string.IsNullOrWhiteSpace(cmd.UserName) ? null : cmd.UserName.Trim();
+        // Kullanici adi kucuk harfle saklanir: "Ali" ile "ali" iki ayri hesap olamaz (IdentifierNormalizer).
+        var userName = string.IsNullOrWhiteSpace(cmd.UserName) ? null : IdentifierNormalizer.UserName(cmd.UserName);
         var email = string.IsNullOrWhiteSpace(cmd.Email) ? null : cmd.Email.Trim().ToLowerInvariant();
         var phone = CombinePhone(cmd.PhoneCountry, cmd.Phone);
 
@@ -240,7 +241,7 @@ public sealed class RegisterValidator : Validator<RegisterCommand>
     public RegisterValidator()
     {
         RuleFor(x => x.InteractionKey).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-        RuleFor(x => x.DisplayName).NotEmpty().MaximumLength(300).WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.DisplayName).NotEmpty().WithMessage(ValidationErrors.NotEmptyError).MaximumLength(300).WithMessage(ValidationErrors.MaxLengthError);
 
         RuleFor(x => x.Email)
             .MaximumLength(320).EmailAddress()

@@ -1,3 +1,5 @@
+using Booster.Auth.Idp.Features.Token.Handlers._base;
+using Booster.Auth.Idp.Options;
 ﻿using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Constants;
@@ -27,7 +29,8 @@ public class AuthorizeEndpoint(
     ISecureCacheStore<AuthorizationCodeData> codeStore,
     ISessionCookieManager cookieManager,
     IdpUiOptions uiOptions,
-    EndUserLicenseGate licenseGate) : Endpoint<AuthorizeRequest>
+    EndUserLicenseGate licenseGate,
+    IdpOptions idpOptions) : Endpoint<AuthorizeRequest>
 {
     private static readonly TimeSpan InteractionTtl = TimeSpan.FromMinutes(30);
     private static readonly TimeSpan CodeTtl = TimeSpan.FromMinutes(2);
@@ -70,8 +73,20 @@ public class AuthorizeEndpoint(
 
         var session = IsLoginPrompt(req) ? null : await ResolveSessionAsync(client, ct);
 
+        // max_age: oturum istenen sureden eskiyse yeniden giris (OIDC Core 3.1.2.1). Giristen sonra etkilesimle
+        // geri gelindiginde oturum yeni oldugu icin gecer.
+        if (session is not null && interaction.MaxAge is { } maxAge
+            && session.CreatedTime < DateTimeOffset.UtcNow.AddSeconds(-maxAge))
+            session = null;
+
+        // prompt=none: ekran gosterilmez; giris ya da izin gerekiyorsa uygulamaya hata doner (sessiz SSO kontrolu).
+        var silent = IsNonePrompt(req);
+
         if (session is null)
         {
+            if (silent)
+                throw new AuthorizeRedirectException("login_required", interaction.RedirectUri, interaction.State);
+
             await RedirectAsync(uiOptions.GetLoginUrl(interactionKey));
             return;
         }
@@ -79,6 +94,9 @@ public class AuthorizeEndpoint(
         if (client.RequireConsent &&
             !await HasValidConsentAsync(session.PrincipalId, client.ClientId, interaction.Scope, ct))
         {
+            if (silent)
+                throw new AuthorizeRedirectException("consent_required", interaction.RedirectUri, interaction.State);
+
             await RedirectAsync(uiOptions.GetConsentUrl(client.ClientKey, interaction.Scope, interactionKey));
             return;
         }
@@ -105,6 +123,7 @@ public class AuthorizeEndpoint(
             Nonce = req.Nonce,
             CodeChallenge = req.CodeChallenge!,
             Resource = req.Resource,
+            MaxAge = req.MaxAge,
             HiddenProviders = InteractionStateData.ParseProviderList(req.HiddenProviders)
         };
 
@@ -136,7 +155,7 @@ public class AuthorizeEndpoint(
         return client;
     }
 
-    private static void ValidateProtocol(InteractionStateData interaction, ClientData client)
+    private void ValidateProtocol(InteractionStateData interaction, ClientData client)
     {
         if (string.IsNullOrEmpty(interaction.CodeChallenge))
             throw new AuthorizeRedirectException("invalid_request", interaction.RedirectUri, interaction.State,
@@ -150,6 +169,12 @@ public class AuthorizeEndpoint(
         if (!requested.All(s => OidcScopes.IsStandard(s) || client.AllowedScopes.Contains(s, StringComparer.Ordinal)))
             throw new AuthorizeRedirectException("invalid_scope", interaction.RedirectUri, interaction.State,
                 "istenen scope istemci için izinli değil");
+
+        // resource (RFC 8707) uygulamanin izinli API'lerinden biri ya da IdP'nin kendisi olmali.
+        if (!string.IsNullOrWhiteSpace(interaction.Resource)
+            && !TokenGrantRules.IsAllowed(interaction.Resource, client, idpOptions.Issuer))
+            throw new AuthorizeRedirectException("invalid_target", interaction.RedirectUri, interaction.State,
+                "resource bu uygulama icin izinli degil");
     }
 
     private async Task<Session?> ResolveSessionAsync(ClientData client, CancellationToken ct)
@@ -168,10 +193,12 @@ public class AuthorizeEndpoint(
 
     private async Task<bool> HasValidConsentAsync(Guid principalId, Guid clientId, string requestedScope, CancellationToken ct)
     {
+        // Istek anonim (havuz baglami yok): havuz filtresi kaydi eliyordu, izin her giriste yeniden soruluyordu.
+        // Kayit kullanici + istemciyle tekildir; filtre gerekmez.
         var consent = await consentRepository.GetAsync(
             predicate: c => c.PrincipalId == principalId && c.ClientId == clientId && c.DeletedTime == null,
             enableTracking: false,
-            withoutGlobalFilter: false,
+            withoutGlobalFilter: true,
             cancellationToken: ct);
 
         if (consent is null)
@@ -200,7 +227,8 @@ public class AuthorizeEndpoint(
             Scope = interaction.Scope,
             Nonce = interaction.Nonce,
             CodeChallenge = interaction.CodeChallenge,
-            CodeChallengeMethod = "S256"
+            CodeChallengeMethod = "S256",
+            AuthTime = session.CreatedTime
         };
 
         var code = await codeStore.StoreAsync(codeData, CodeTtl, ct);
@@ -224,6 +252,9 @@ public class AuthorizeEndpoint(
 
     private static bool IsLoginPrompt(AuthorizeRequest req)
         => string.Equals(req.Prompt, "login", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsNonePrompt(AuthorizeRequest req)
+        => string.Equals(req.Prompt, "none", StringComparison.OrdinalIgnoreCase);
 }
 
 public record AuthorizeRequest
@@ -239,6 +270,7 @@ public record AuthorizeRequest
     [BindFrom("resource")] public string? Resource { get; init; }
     [BindFrom("interaction_key")] public string? InteractionKey { get; init; }
     [BindFrom("prompt")] public string? Prompt { get; init; }
+    [BindFrom("max_age")] public int? MaxAge { get; init; }
 
     /// <summary>Giris ekraninda gosterilmeyecek yontemler (or. "apple" Android'de). Bkz. InteractionStateData.HiddenProviders.</summary>
     [BindFrom("hidden_providers")] public string? HiddenProviders { get; init; }
@@ -252,10 +284,10 @@ public class AuthorizeValidator : Validator<AuthorizeRequest>
         {
             RuleFor(x => x.ClientKey).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
             RuleFor(x => x.RedirectUri).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-            RuleFor(x => x.ResponseType).NotEmpty().Equal("code", StringComparer.OrdinalIgnoreCase).WithMessage(IdpMessageKeys.UnsupportedResponseType);
+            RuleFor(x => x.ResponseType).NotEmpty().WithMessage(ValidationErrors.NotEmptyError).Equal("code", StringComparer.OrdinalIgnoreCase).WithMessage(IdpMessageKeys.UnsupportedResponseType);
             RuleFor(x => x.Scope).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
             RuleFor(x => x.CodeChallenge).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-            RuleFor(x => x.CodeChallengeMethod).NotEmpty().Equal("S256", StringComparer.OrdinalIgnoreCase).WithMessage(IdpMessageKeys.UnsupportedCodeChallengeType);
+            RuleFor(x => x.CodeChallengeMethod).NotEmpty().WithMessage(ValidationErrors.NotEmptyError).Equal("S256", StringComparer.OrdinalIgnoreCase).WithMessage(IdpMessageKeys.UnsupportedCodeChallengeType);
         });
     }
 }

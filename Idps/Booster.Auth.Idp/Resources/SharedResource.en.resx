@@ -323,7 +323,7 @@
     <value>Your account password is marked to be changed at first sign-in. You may not be able to reuse previous passwords; your organization's policy decides.</value>
   </data>
   <data name="Consent.PageTitle" xml:space="preserve">
-    <value>Grant access</value>
+    <value>Authorization request: {0}</value>
   </data>
   <data name="Consent.Allow" xml:space="preserve">
     <value>Allow</value>
@@ -957,5 +957,89 @@
   </data>
   <data name="Deleted.Text" xml:space="preserve">
     <value>Your details have been deleted and you have been signed out everywhere. You can sign up again later if you wish.</value>
+  </data>
+  <data name="Consent.BrandHeadline" xml:space="preserve">
+    <value>You decide which app can access what.</value>
+  </data>
+  <data name="Consent.BrandLead" xml:space="preserve">
+    <value>Before you allow, you see what the app will be able to access.</value>
+  </data>
+  <data name="Consent.Heading" xml:space="preserve">
+    <value>{0} wants to access your account</value>
+  </data>
+  <data name="Consent.Subtitle" xml:space="preserve">
+    <value>If you continue, {0} will get the permissions below.</value>
+  </data>
+  <data name="Consent.SignedInAs" xml:space="preserve">
+    <value>You are signed in as {0}.</value>
+  </data>
+  <data name="Consent.SwitchAccount" xml:space="preserve">
+    <value>Switch account</value>
+  </data>
+  <data name="Consent.ScopesTitle" xml:space="preserve">
+    <value>{0} will be able to:</value>
+  </data>
+  <data name="Consent.Required" xml:space="preserve">
+    <value>Required</value>
+  </data>
+  <data name="Consent.Optional" xml:space="preserve">
+    <value>Optional</value>
+  </data>
+  <data name="Consent.TrustHint" xml:space="preserve">
+    <value>Only allow apps you know and trust.</value>
+  </data>
+  <data name="Consent.AllowBusy" xml:space="preserve">
+    <value>Allowing…</value>
+  </data>
+  <data name="Consent.DenyBusy" xml:space="preserve">
+    <value>Denying…</value>
+  </data>
+  <data name="Consent.DenyHint" xml:space="preserve">
+    <value>If you deny, no access is granted.</value>
+  </data>
+  <data name="Consent.DenyHintHost" xml:space="preserve">
+    <value>If you deny, no access is granted and you are returned to {0}.</value>
+  </data>
+  <data name="Consent.Scope.openid.Title" xml:space="preserve">
+    <value>Your identity</value>
+  </data>
+  <data name="Consent.Scope.openid.Desc" xml:space="preserve">
+    <value>Shares the unique user ID that identifies you. Required to sign in.</value>
+  </data>
+  <data name="Consent.Scope.profile.Title" xml:space="preserve">
+    <value>Your profile</value>
+  </data>
+  <data name="Consent.Scope.profile.Desc" xml:space="preserve">
+    <value>Sees basic profile information such as your name.</value>
+  </data>
+  <data name="Consent.Scope.email.Title" xml:space="preserve">
+    <value>Your e-mail address</value>
+  </data>
+  <data name="Consent.Scope.email.Desc" xml:space="preserve">
+    <value>Sees your e-mail address and whether it is verified. Does not send e-mail on your behalf.</value>
+  </data>
+  <data name="Consent.Scope.offline_access.Title" xml:space="preserve">
+    <value>Continuous access</value>
+  </data>
+  <data name="Consent.Scope.offline_access.Desc" xml:space="preserve">
+    <value>Keeps access while you are not using the app, so you do not have to sign in every time.</value>
+  </data>
+  <data name="Consent.Scope.Unknown.Desc" xml:space="preserve">
+    <value>This app asks for an additional permission. If you are not sure what it means, do not allow it.</value>
+  </data>
+  <data name="Challenge.Mfa.SubtitleSms" xml:space="preserve">
+    <value>To finish signing in, enter the 6-digit code we sent by SMS to {0}.</value>
+  </data>
+  <data name="Challenge.ResentSms" xml:space="preserve">
+    <value>A new code was sent to {0}.</value>
+  </data>
+  <data name="Challenge.ResendWait" xml:space="preserve">
+    <value>Please wait a moment before requesting a new code; the last code is still valid.</value>
+  </data>
+  <data name="Validation.Required" xml:space="preserve">
+    <value>This field cannot be empty.</value>
+  </data>
+  <data name="Validation.Invalid" xml:space="preserve">
+    <value>The value is not valid.</value>
   </data>
 </root>

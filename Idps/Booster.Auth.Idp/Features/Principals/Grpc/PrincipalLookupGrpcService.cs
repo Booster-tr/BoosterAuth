@@ -1,3 +1,4 @@
+using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -31,7 +32,8 @@ public sealed class PrincipalLookupGrpcService(
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Tanımlayıcı geçersiz."));
 
         var type = (IdentifierType)request.IdentifierType;
-        var identifier = request.Identifier;
+        // Kayitlarla ayni bicim: e-posta ve kullanici adi kucuk harf (IdentifierNormalizer).
+        var identifier = type == IdentifierType.Phone ? request.Identifier.Trim() : IdentifierNormalizer.Email(request.Identifier);
 
         using var _ = requestContextAccessor.BeginSystemContext(isolation);
 

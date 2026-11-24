@@ -5,10 +5,13 @@ namespace Booster.Auth.Idp.Providers.Abstractions.Stores;
 
 public interface ILocalUserStore
 {
+    /// <summary>Kimlik <see cref="IdentifierNormalizer"/> ile bicimlenip aranir; telefonda ulke kodsuz numaraya
+    /// <paramref name="defaultCountryCode"/> eklenir.</summary>
     Task<LocalUser?> FindAsync(
         string identifier,
         IReadOnlyList<IdentifierType> identifierTypes,
-        CancellationToken ct);
+        CancellationToken ct,
+        string? defaultCountryCode = null);
 
     Task<LocalUser?> GetByIdAsync(Guid id, CancellationToken ct);
 

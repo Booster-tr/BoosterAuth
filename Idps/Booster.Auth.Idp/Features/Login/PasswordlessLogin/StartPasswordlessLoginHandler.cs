@@ -122,6 +122,6 @@ public sealed class StartPasswordlessLoginValidator : Validator<StartPasswordles
     {
         RuleFor(x => x.InteractionKey).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
         RuleFor(x => x.ProviderType).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-        RuleFor(x => x.Identifier).NotEmpty().MaximumLength(320).WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.Identifier).NotEmpty().WithMessage(ValidationErrors.NotEmptyError).MaximumLength(320).WithMessage(ValidationErrors.MaxLengthError);
     }
 }

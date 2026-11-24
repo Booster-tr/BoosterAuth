@@ -25,7 +25,8 @@ public sealed class LocalProvider(
         IReadOnlyList<IdentifierType> allowedIdentifiers,
         CancellationToken ct)
     {
-        var user = await userStore.FindAsync(request.Identifier, allowedIdentifiers, ct);
+        var user = await userStore.FindAsync(request.Identifier, allowedIdentifiers, ct,
+            config.Settings.TryGetValue("default_country_code", out var cc) ? cc : null);
 
         if (user is null || !user.IsActive)
             return IdentityResult.Fail("invalid_credentials");

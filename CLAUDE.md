@@ -162,6 +162,19 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **Istemci IP'si:** gateway basliga yalnizca `ClientIp:TrustedNetworks` icindeki proxy'den gelirse guvenir (`ClientIpResolver`; compose `TRUSTED_PROXY_NETWORK`, `CLIENT_IP_HEADER`) ve arka servislere `X-Forwarded-For`'u **Set** eder. Arka servisler ozel ag araliklarindan gelen `X-Forwarded-For/Proto`'yu uygular (`UseBoosterServices`). **Booster'in kendi kurulumu (Cloudflare):** `ClientIp__Header=CF-Connecting-IP` ve `ClientIp__TrustedNetworks__0=<cloudflared pod araligi>` verilmezse tum istekler tek IP'den gorunur.
 - **IdP guvenlik basliklari:** CSP (`'self'`, Swagger haric; `form-action` YOK cunku giris formu redirect_uri'ye 302 ile gider), nosniff, Referrer-Policy; HSTS `X-Forwarded-Proto` sayesinde calisir. Gorunumlerde satir ici `style=` / `<script>` YAZMA.
 
+## IdP akis kurallari (2026-11 E2E turu)
+- **Token kapsami** (`TokenGrantRules.BuildScope`): istenen standart OIDC kapsamlari + kullanicinin TASIDIGI kapsamlar. Ozel kapsami istemek yetmez. Yonetim havuzunda `booster:panel` varsayilan kapsamdir; admin icin `AdminBootstrapper` eksikse ekler.
+- **Audience** (`TokenGrantRules.ResolveAudience`): token istegindeki `resource`, yoksa authorize'daki, o da yoksa issuer (`/idp`). Issuer disi her audience uygulamanin `AllowedAudiences`'inda olmali (`invalid_target`).
+- **Refresh:** rol / kapsam her yenilemede guncel kayittan okunur; aktif olmayan kullanici yenileyemez.
+- **prompt=none / max_age / auth_time:** `AuthorizeEndpoint`; `auth_time` = oturumun `CreatedTime`'i (kod verisinde `AuthTime`). ID token yalnizca `openid` ile; `name` / `email` kapsama bagli.
+- **Token hatalari:** `/token` yaniti RFC 6749 `error` / `error_description` (+ `code`) tasir (`OAuthErrors`). `/authorize` dogrulama hatasi hata sayfasina gider.
+- **Izin ekrani:** `ConsentController` (`/ui/consent`); kapsam etkilesimden okunur, "allow" disi her POST ret (`access_denied`).
+- **Kodlar:** her etkilesim kendi kodunu alir; kullanici basina 15 dakikada en fazla 5 gonderim (parolasiz giris, sifre sifirlama). Onbellek kod suresinden 10 dk uzun tutulur (suresi doldu mesaji icin). Kod yakilinca `login_code_attempts_exceeded`.
+- **Kimlik bicimi** (`IdentifierNormalizer`): e-posta ve kullanici adi kucuk harf; telefon havuzun `DefaultCountryCode`'u ile E.164. Kayit, arama, sifre sifirlama ayni kurali kullanir.
+- **Dil:** `BeginSystemContext` istegin dilini korur (bildirimler secili dilde gider). Sayfa hata dili `CurrentUICulture`. Dogrulama hatalari tum servislerde istisna isleyicisinden gecer (cevrilir).
+- **Yasal metin baglantilari:** kok-goreli baglantiya `IdpUiOptions.PathPrefix` eklenir (`/kvkk` -> `/idp/kvkk`).
+- **Cikis:** `logout_all` yalnizca kullaniciya ait `id_token_hint` ile ya da POST ile uygulanir.
+
 ## Kullanici ekleme ve davet (IdP)
 - **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).
   - Panelden ekleme (`POST pools/users`) ve CSV ice aktarma (`POST pools/users/import`) bunu kullanir.

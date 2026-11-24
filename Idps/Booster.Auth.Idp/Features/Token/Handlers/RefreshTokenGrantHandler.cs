@@ -1,3 +1,6 @@
+using Booster.Auth.Idp.Options;
+using Booster.Auth.Idp.Features.Token.Handlers._base;
+using Booster.Auth.Database.Models.Enums;
 ﻿using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Idp.Stores.PrincipalStores;
@@ -27,6 +30,9 @@ public sealed class RefreshTokenGrantHandler(
     ISimpleHasher simpleHasher,
     IAsyncRepository<RefreshToken, IdpDbContext> refreshTokenRepository,
     IAsyncRepository<Session, IdpDbContext> sessionRepository,
+    IAsyncRepository<PrincipalRole, IdpDbContext> roleRepository,
+    IAsyncRepository<PrincipalScope, IdpDbContext> scopeRepository,
+    IdpOptions idpOptions,
     IRequestContextAccessor requestContextAccessor) : IGrantTypeHandler
 {
     public OAuthGrantType GrantType => OAuthGrantType.RefreshToken;
@@ -67,17 +73,31 @@ public sealed class RefreshTokenGrantHandler(
         var principal = await principalStore.GetByIdAsync(stored.PrincipalId, ct)
             ?? throw new BusinessException(IdpMessageKeys.PrincipalNotFound);
 
-        var scopeString = ApplyRequestedScope(stored.GrantedScopes, request.Scope);
+        // Askiya alinan / devre disi kullanici yenileyemez.
+        if (principal.Status != PrincipalStatus.Active)
+            throw new BusinessException(IdpMessageKeys.SessionInvalid);
 
-        var roles = string.IsNullOrWhiteSpace(stored.GrantedRoles)
-            ? Array.Empty<string>()
-            : stored.GrantedRoles.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        // Rol ve kapsamlar her yenilemede GUNCEL kayittan okunur: yoneticinin aldigi yetki ya da silinen rol / kapsam
+        // yenilenen token'a tasinmaz (once ilk girisin kopyasi suresiz tasiniyordu). Iki indeksli sorgu; yenileme
+        // zaten token satirini okuyup yazdigi icin ek yuk kucuktur.
+        var roles = await roleRepository.Query()
+            .Where(r => r.PrincipalId == principal.Id)
+            .Select(r => r.RoleName)
+            .ToListAsync(ct);
+
+        var principalScopes = await scopeRepository.Query()
+            .Where(s => s.PrincipalId == principal.Id)
+            .Select(s => s.Scope)
+            .ToListAsync(ct);
+
+        var current = TokenGrantRules.BuildScope(stored.GrantedScopes, principalScopes);
+        var scopeString = ApplyRequestedScope(current, request.Scope);
 
         var accessTtl = client.Session.AccessTokenTtlSeconds;
         var refreshTtl = client.Session.RefreshTokenTtlSeconds;
 
         var (accessToken, expiresIn) = tokenService.CreateAccessToken(
-            audience: request.Resource ?? string.Empty,
+            audience: TokenGrantRules.ResolveAudience(request.Resource, null, client, idpOptions.Issuer),
             subject: principal.Id,
             azp: client.ClientId.ToString(),
             scope: scopeString,
@@ -87,7 +107,7 @@ public sealed class RefreshTokenGrantHandler(
             actor: stored.IsolationId.ToString(),
             sessionId: session.Id);
 
-        var newRefreshString = await RotateAsync(stored, session, refreshTtl, ct);
+        var newRefreshString = await RotateAsync(stored, session, refreshTtl, current, roles, ct);
 
         return new TokenResponse
         {
@@ -113,7 +133,8 @@ public sealed class RefreshTokenGrantHandler(
         return string.Join(' ', requested);
     }
 
-    private async Task<string> RotateAsync(RefreshToken current, Session session, int refreshTtl, CancellationToken ct)
+    private async Task<string> RotateAsync(RefreshToken current, Session session, int refreshTtl,
+        string grantedScopes, IReadOnlyList<string> roles, CancellationToken ct)
     {
         var newToken = GenerateToken();
         var newEntity = new RefreshToken
@@ -123,8 +144,8 @@ public sealed class RefreshTokenGrantHandler(
             SessionId = current.SessionId,
             ClientId = current.ClientId,
             TokenHash = simpleHasher.Hash(newToken),
-            GrantedScopes = current.GrantedScopes,
-            GrantedRoles = current.GrantedRoles,
+            GrantedScopes = grantedScopes,
+            GrantedRoles = string.Join(' ', roles),
             ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(refreshTtl),
             CreatedTime = DateTimeOffset.UtcNow
         };

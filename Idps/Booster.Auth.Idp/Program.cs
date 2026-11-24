@@ -11,9 +11,30 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-builder.Services.AddControllersWithViews()
+// MVC'nin varsayilan dogrulama metinleri Ingilizce ("The Password field is required."): Turkce ekranda Ingilizce cikiyordu.
+// Zorunluluk FluentValidation kurallarindadir (cevrilen mesaj anahtarlari); ortuk Required kapatilir, kalan model
+// baglama metinleri kaynak dosyadan gelir.
+builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
     .AddViewLocalization()
     .AddViewOptions(options => options.HtmlHelperOptions.ClientValidationEnabled = false);
+
+builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
+    .Configure<Microsoft.Extensions.Localization.IStringLocalizerFactory>((options, factory) =>
+    {
+        var t = factory.Create(typeof(Booster.Auth.Idp.SharedResource));
+        var m = options.ModelBindingMessageProvider;
+        m.SetValueMustNotBeNullAccessor(_ => t["Validation.Required"]);
+        m.SetMissingBindRequiredValueAccessor(_ => t["Validation.Required"]);
+        m.SetMissingKeyOrValueAccessor(() => t["Validation.Required"]);
+        m.SetMissingRequestBodyRequiredValueAccessor(() => t["Validation.Required"]);
+        m.SetAttemptedValueIsInvalidAccessor((_, _) => t["Validation.Invalid"]);
+        m.SetNonPropertyAttemptedValueIsInvalidAccessor(_ => t["Validation.Invalid"]);
+        m.SetUnknownValueIsInvalidAccessor(_ => t["Validation.Invalid"]);
+        m.SetNonPropertyUnknownValueIsInvalidAccessor(() => t["Validation.Invalid"]);
+        m.SetValueIsInvalidAccessor(_ => t["Validation.Invalid"]);
+        m.SetValueMustBeANumberAccessor(_ => t["Validation.Invalid"]);
+        m.SetNonPropertyValueMustBeANumberAccessor(() => t["Validation.Invalid"]);
+    });
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {

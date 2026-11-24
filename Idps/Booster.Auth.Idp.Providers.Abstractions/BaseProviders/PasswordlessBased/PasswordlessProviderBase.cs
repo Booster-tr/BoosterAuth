@@ -19,6 +19,14 @@ public abstract class PasswordlessProviderBase(
 
     protected virtual int MaxAttempts => 5;
 
+    /// <summary>Kullanici basina gonderim penceresi ve pencerede en fazla gonderim (bkz. StartAsync).</summary>
+    protected virtual TimeSpan SendWindow => TimeSpan.FromMinutes(15);
+
+    protected virtual int MaxSendsPerWindow => 5;
+
+    /// <summary>Suresi dolan kod bu kadar daha tutulur; kullaniciya "suresi doldu" denebilsin.</summary>
+    protected static readonly TimeSpan ExpiredCodeGrace = TimeSpan.FromMinutes(10);
+
     public abstract string ProviderType { get; }
 
     public abstract IdentifierType IdentifierType { get; }
@@ -52,11 +60,22 @@ public abstract class PasswordlessProviderBase(
         if (string.IsNullOrWhiteSpace(target))
             return PasswordlessStartResult.Fail(PasswordlessFailures.NoDeliveryTarget);
 
-        var pendingKey = PendingKey(config.IsolationId, principal.Id);
-        var pending = await codeStore.GetAsync(pendingKey, ct);
+        // Ayni etkilesimde kod zaten gitti ve gecerli: yeniden gondermek yerine ayni ekran (form iki kez gonderildi).
+        var current = await codeStore.GetAsync(CacheKey(request.ChallengeKey), ct);
+        if (current is not null && current.PrincipalId == principal.Id && current.ExpiresAt > DateTimeOffset.UtcNow)
+            return PasswordlessStartResult.AlreadySent(principal.Id, target, current.ExpiresAt);
 
-        if (pending is not null && pending.ExpiresAt > DateTimeOffset.UtcNow)
-            return PasswordlessStartResult.AlreadySent(principal.Id, target, pending.ExpiresAt);
+        // Kullanici basina gonderim siniri. Once kullanici basina TEK bekleyen kod vardi: ikinci sekme / cihaz kod
+        // alamiyor, adresi bilen biri de kodu surekli tazeleyerek kurbanin girisini engelleyebiliyordu. Artik her
+        // etkilesim kendi kodunu alir; yalnizca pencere icindeki gonderim sayisi sinirlidir (e-posta / SMS bombardimani).
+        var pendingKey = PendingKey(config.IsolationId, principal.Id);
+        var window = await codeStore.GetAsync(pendingKey, ct);
+        var now = DateTimeOffset.UtcNow;
+        if (window is null || window.ExpiresAt <= now)
+            window = new PasswordlessCode { PrincipalId = principal.Id, Target = target, CodeHash = string.Empty, ExpiresAt = now.Add(SendWindow) };
+
+        if (window.AttemptCount >= MaxSendsPerWindow)
+            return PasswordlessStartResult.Fail(PasswordlessFailures.TooManyRequests);
 
         var code = GenerateCode();
         var expiresAt = DateTimeOffset.UtcNow.Add(CodeLifetime);
@@ -69,9 +88,11 @@ public abstract class PasswordlessProviderBase(
             ExpiresAt = expiresAt
         };
 
-        await codeStore.StoreAsync(CacheKey(request.ChallengeKey), record, CodeLifetime, ct);
+        // Onbellek suresi kod suresinden UZUN: suresi dolan kod "hatali" degil "suresi doldu" desin.
+        await codeStore.StoreAsync(CacheKey(request.ChallengeKey), record, CodeLifetime + ExpiredCodeGrace, ct);
 
-        await codeStore.StoreAsync(pendingKey, record, CodeLifetime, ct);
+        // Sayac: AttemptCount = penceredeki gonderim sayisi, ExpiresAt = pencerenin sonu.
+        await codeStore.StoreAsync(pendingKey, window with { AttemptCount = window.AttemptCount + 1 }, window.ExpiresAt - now, ct);
 
         return PasswordlessStartResult.Success(principal.Id, target, code, expiresAt);
     }
@@ -96,8 +117,9 @@ public abstract class PasswordlessProviderBase(
 
         if (!codeHasher.Verify(request.Code.Trim(), record.CodeHash))
         {
-            await RegisterFailedAttemptAsync(key, config.IsolationId, record, ct);
-            return IdentityResult.Fail(PasswordlessFailures.CodeInvalid);
+            // Kod yakildiysa kullaniciya "tekrar deneyin" degil "yeni kod isteyin" denir.
+            var burned = await RegisterFailedAttemptAsync(key, config.IsolationId, record, ct);
+            return IdentityResult.Fail(burned ? PasswordlessFailures.AttemptsExceeded : PasswordlessFailures.CodeInvalid);
         }
 
         await ConsumeAsync(key, config.IsolationId, record.PrincipalId, ct);
@@ -115,20 +137,21 @@ public abstract class PasswordlessProviderBase(
             claims: principal.Claims);
     }
 
-    private async Task RegisterFailedAttemptAsync(
+    private async Task<bool> RegisterFailedAttemptAsync(
         string key, Guid isolationId, PasswordlessCode record, CancellationToken ct)
     {
         if (record.AttemptCount + 1 >= MaxAttempts)
         {
             await ConsumeAsync(key, isolationId, record.PrincipalId, ct);
-            return;
+            return true;
         }
 
         await codeStore.StoreAsync(
             key,
             record with { AttemptCount = record.AttemptCount + 1 },
-            CodeLifetime,
+            record.ExpiresAt - DateTimeOffset.UtcNow + ExpiredCodeGrace,
             ct);
+        return false;
     }
 
     private string CacheKey(string challengeKey) => $"{ProviderType}:{challengeKey}";
@@ -140,7 +163,6 @@ public abstract class PasswordlessProviderBase(
     private async Task ConsumeAsync(string key, Guid isolationId, Guid principalId, CancellationToken ct)
     {
         await codeStore.RemoveAsync(key, ct);
-        await codeStore.RemoveAsync(PendingKey(isolationId, principalId), ct);
     }
 
     private static string GenerateCode()
@@ -155,4 +177,6 @@ public static class PasswordlessFailures
     public const string NoDeliveryTarget = "no_delivery_target";
     public const string CodeInvalid = "code_invalid";
     public const string CodeExpired = "code_expired";
+    public const string TooManyRequests = "too_many_requests";
+    public const string AttemptsExceeded = "attempts_exceeded";
 }

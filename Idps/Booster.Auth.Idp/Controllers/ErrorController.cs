@@ -9,6 +9,9 @@ namespace Booster.Auth.Idp.Controllers;
 [AllowAnonymous]
 public class ErrorController : IdpBaseController
 {
+    // Yonlendirmeler IdpUiOptions.ErrorPath (/ui/error) adresine gider; route uyusmadigi icin kullanici bos 401 sayfasi
+    // goruyordu. /error eski baglantilar icin kalir.
+    [HttpGet("/ui/error")]
     [HttpGet("/error")]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public IActionResult Index(
