@@ -1,0 +1,53 @@
+@using Booster.Licensing.Portal.Site
+<div class="page-head">
+    <div class="wrap">
+        <p class="kicker reveal">Yardım</p>
+        <h1 class="reveal d2">Bir sorun mu var? <em>Bize ulaşın.</em></h1>
+        <p class="lede reveal d3" style="margin-top:28px">Kurulum, lisans ve uygulama entegrasyonu ile ilgili sorularınız için destek ekibimize telefon ya da
+            e-posta ile ulaşabilirsiniz.</p>
+
+        <div class="help-grid">
+            <div class="dl-card help-card reveal d3">
+                <div class="file"><b>@SiteCatalog.SupportPhone</b><span>Telefon</span></div>
+                <a class="btn btn-primary" href="@SiteCatalog.SupportPhoneHref">Ara <span class="arr" aria-hidden="true">→</span></a>
+                <ul class="facts">
+                    <li>Acil durumlar ve kurulum sırasında takıldığınız adımlar için.</li>
+                </ul>
+            </div>
+            <div class="dl-card help-card reveal d3">
+                <div class="file"><b>@SiteCatalog.SupportEmail</b><span>E-posta</span></div>
+                <a class="btn btn-primary" href="mailto:@SiteCatalog.SupportEmail">E-posta gönder <span class="arr" aria-hidden="true">→</span></a>
+                <ul class="facts">
+                    <li>Lisans, sipariş ve teknik sorular için; ekran görüntüsü ve log ekleyebilirsiniz.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section aria-labelledby="h-talep" style="margin-top:80px">
+    <div class="wrap">
+        <p class="kicker reveal">Daha hızlı çözüm için</p>
+        <h2 id="h-talep" class="reveal">Talebinizde bunları belirtin.</h2>
+        <ol class="help-steps reveal d2">
+            <li><b>Kurulum kimliği:</b> yönetim panelinde <i>Sistem &gt; Lisans</i> ekranında görünen GUID.</li>
+            <li><b>Sürüm:</b> panelde <i>Sistem &gt; Servis Durumu</i> ekranındaki sürüm bilgisi.</li>
+            <li><b>Ne oldu:</b> yaptığınız işlem, aldığınız hata mesajı ve hatanın görüldüğü saat.</li>
+            <li><b>Loglar:</b> ilgili servisin logu, ör. <code>docker compose logs --since 1h booster-idp</code>.</li>
+        </ol>
+        <p class="reveal d2" style="margin-top:24px">Parola, lisans anahtarı ya da servis hesabı sırrı gibi gizli değerleri talebinize eklemeyin.</p>
+    </div>
+</section>
+
+<div class="closing">
+    <div class="wrap closing-inner">
+        <h2 class="reveal">Cevabı dokümantasyonda olabilir.</h2>
+        <div class="side-cta reveal d2">
+            <p>Kurulum, lisans, uygulama entegrasyonu ve sık karşılaşılan sorunların çözümleri adım adım anlatılır.</p>
+            <div class="cta-row">
+                <a class="btn btn-primary" href="/tr/docs/operations">Sorun giderme <span class="arr" aria-hidden="true">→</span></a>
+                <a class="btn btn-ghost" href="/tr/docs">Dokümantasyon</a>
+            </div>
+        </div>
+    </div>
+</div>
