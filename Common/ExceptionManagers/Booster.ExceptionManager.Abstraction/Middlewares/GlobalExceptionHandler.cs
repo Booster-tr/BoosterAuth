@@ -1,7 +1,7 @@
 ﻿using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using Booster.ExceptionManager.Abstraction.Translations;
-using Booster.Logging.Abstraction;
+using Microsoft.Extensions.Logging;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +23,8 @@ public class GlobalExceptionHandler : IExceptionHandler
         var scope = httpContext.RequestServices;
         var translationService = scope.GetRequiredService<ITranslationManager>();
 
-        var logWriter = scope.GetService<ILogWriter>();
+        // Standart ILogger: OpenTelemetry ile disari gider (trace_id ile iliskili), konsola da yazilir.
+        var logger = scope.GetRequiredService<ILoggerFactory>().CreateLogger("Booster.Errors");
         // CorrelationMiddleware id'yi bu başlığa yazar; ondan önce patlayan istekte başlık yoktur.
         var correlationId = httpContext.Request.Headers[HeaderConstants.CorrelationIdHeaderName].ToString();
         if (string.IsNullOrEmpty(correlationId))
@@ -90,22 +91,11 @@ public class GlobalExceptionHandler : IExceptionHandler
         }
 
         
-        if (logWriter is not null)
-        {
-            var logParameters = new Dictionary<string, string?>
-            {
-                ["CorrelationId"] = correlationId,
-                ["IpAddress"] = ipAddress,
-                ["ServiceName"] = ServiceName,
-                ["Path"] = httpContext.Request.Path,
-                ["StatusCode"] = statusCode.ToString()
-            };
-
-            if (statusCode == StatusCodes.Status500InternalServerError)
-                await logWriter.LogErrorAsync(errorMessage, exception, logParameters, cancellationToken);
-            else
-                await logWriter.LogWarningAsync(errorMessage, logParameters, cancellationToken);
-        }
+        // 500 gercek ariza (Error + istisna), digerleri cagiranin hatasi (Warning, istisna yigini yok).
+        logger.Log(statusCode == StatusCodes.Status500InternalServerError ? LogLevel.Error : LogLevel.Warning,
+            statusCode == StatusCodes.Status500InternalServerError ? exception : null,
+            "{Message} status={StatusCode} path={Path} code={ErrorCode} correlation={CorrelationId} service={ServiceName} ip={IpAddress}",
+            errorMessage, statusCode, httpContext.Request.Path.Value, (exception as BusinessException)?.Message, correlationId, ServiceName, ipAddress);
 
 
         var problemDetails = new ProblemDetails

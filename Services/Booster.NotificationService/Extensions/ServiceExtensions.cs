@@ -1,3 +1,6 @@
+using Booster.NotificationService.Infrastructures.Retention;
+using Booster.Hashing.Extensions;
+using Booster.Hashing.Options;
 using Booster.NotificationService.Features._amqp.Consumers.PrincipalDeleted;
 using Booster.Amqp.Constants;
 using Booster.Amqp.Extensions;
@@ -7,7 +10,6 @@ using Booster.Auth.Common.Internal.Extensions;
 using Booster.Common.Extensions.ServiceExtensions;
 using Booster.ExceptionManager.Abstraction.Extensions;
 using Booster.ExceptionManager.WithCacheProvider.Extensions;
-using Booster.Logging.BoosterAmqp.Extensions;
 using Booster.NotificationService.Features._amqp.Consumers.NotificationRequested;
 using Booster.NotificationService.Features._base;
 using Booster.NotificationService.Infrastructures.Senders;
@@ -30,6 +32,11 @@ public static class ServiceExtensions
         services.AddKafka(configuration);
 
         services.AddScoped<NotificationBootstrapper>();
+
+        // Gonderim kaydindaki alici ve icerik sifrelenir (IdP / Management ile ayni anahtar: HASHING_ENCRYPTION_KEY).
+        var hashingOptions = services.AddSettings<HashingOptions>(configuration);
+        services.AddHashing(hashingOptions);
+        services.AddHostedService<NotificationRetentionService>();
 
         return services;
     }
@@ -55,16 +62,11 @@ public static class ServiceExtensions
         var amqpSettings = services.AddSettings<AmqpSettings>(configuration);
 
         services.AddBoosterCorrelationContext();
-        services.AddAmqpLogger();
 
         services.AddKafkaBus<NotificationDbContext>(
             amqpSettings,
             configureRider: rider =>
             {
-                // Log yazan her servis producer kaydını yapmalı; yoksa
-                // ITopicProducer çözülemez ve yazma anında patlar.
-                rider.AddLogProducer();
-
                 rider.AddConsumer<NotificationRequestedEventConsumer>();
                 rider.AddConsumer<PrincipalDeletedEventConsumer>();
             },

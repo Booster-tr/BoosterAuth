@@ -49,6 +49,7 @@ cd booster-auth</pre></div>
         <tr><td><code>HASHING_PEPPER</code>, <code>HASHING_ENCRYPTION_KEY</code> (base64, 32 bytes), <code>IDP_APPLICATION_PEPPER</code></td><td>Password and secret encryption keys. <b>Never change them after installation</b>; existing passwords would become unreadable.</td></tr>
         <tr><td><code>PANEL_SESSION_SECRET</code></td><td>Signs the console's session cookies.</td></tr>
         <tr><td><code>MAIL_*</code></td><td>Optional SMTP settings (verification, invitation and password reset e-mails).</td></tr>
+        <tr><td><code>OPENOBSERVE_ADMIN_EMAIL</code>, <code>OPENOBSERVE_ADMIN_PASSWORD</code>, <code>OTEL_ENDPOINT</code>, <code>COMPOSE_PROFILES</code></td><td>Log and monitoring UI (OpenObserve). UI sign-in and the services' log shipping use the <b>same</b> e-mail / password; change the password only here (at least 8 characters with upper and lower case letters, a digit and a special character). The setup script generates it and shows it at the end. <code>OTEL_HEADERS</code> is only for your own OTLP receiver. See <a href="/en/docs/operations#logs">Operations › Logs</a>.</td></tr>
         <tr><td><code>BOOSTER_VERSION</code></td><td>Image version; default <code>latest</code>.</td></tr>
     </tbody>
 </table>

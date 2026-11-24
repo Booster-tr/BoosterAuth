@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 ﻿using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -12,7 +13,8 @@ namespace Booster.Auth.Idp.Stores.SessionStores;
 public sealed class SessionStore(
     IAsyncRepository<Session, IdpDbContext> sessionRepository,
     ICacheService cacheService,
-    ISimpleHasher simpleHasher) : ISessionStore
+    ISimpleHasher simpleHasher,
+    AuditLog audit) : ISessionStore
 {
     private static readonly TimeSpan CacheTtl = TimeSpan.FromMinutes(5);
 
@@ -46,6 +48,9 @@ public sealed class SessionStore(
 
         await sessionRepository.AddAsync(session, ct);
         await sessionRepository.SaveChangesAsync(ct);
+
+        // Her basarili giris (parola, LDAP, kod, federasyon, kayit, davet) tek noktadan denetim kaydina.
+        audit.Success("auth.signin", new AuditEntry(PrincipalId: principalId, PoolId: session.IsolationId, ClientId: clientId, Method: authMethod));
 
         return (session, token);
     }

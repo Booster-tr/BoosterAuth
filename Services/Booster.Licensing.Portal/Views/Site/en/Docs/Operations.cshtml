@@ -6,11 +6,44 @@
     <thead><tr><th>Task</th><th>Command</th></tr></thead>
     <tbody>
         <tr><td>Status</td><td><code>docker compose ps</code></td></tr>
-        <tr><td>Logs</td><td><code>docker compose logs -f booster-idp</code></td></tr>
+        <tr><td>Logs</td><td>OpenObserve: <code>http://&lt;server&gt;:5080</code> (<a href="#logs">below</a>) or <code>docker compose logs -f booster-idp</code></td></tr>
         <tr><td>Stop (data is kept)</td><td><code>docker compose down</code></td></tr>
         <tr><td>Apply a settings change</td><td>Edit <code>.env</code>, then <code>docker compose up -d</code></td></tr>
     </tbody>
 </table>
+
+<h2 id="logs">Logs, monitoring and audit records</h2>
+<p>Services send their logs, traces and metrics to <b>OpenObserve</b> with OpenTelemetry. Open the UI in a browser on the local network:
+    <code>http://&lt;server&gt;:5080</code> (<code>OPENOBSERVE_PORT</code>). Sign in with <code>OPENOBSERVE_ADMIN_EMAIL</code> and
+    <code>OPENOBSERVE_ADMIN_PASSWORD</code> from <code>.env</code>; the setup script generates the password and shows it at the end. Services write with the same e-mail / password; change the password only in <code>.env</code> and run <code>docker compose up -d</code>. Do not expose this port to the internet.</p>
+<table>
+    <thead><tr><th>Stream</th><th>Content</th><th>Retention</th></tr></thead>
+    <tbody>
+        <tr><td><code>booster</code></td><td>Operational logs (warnings, errors, info): filter by service, level, <code>trace_id</code>.</td>
+            <td><code>LOG_RETENTION_DAYS</code> (default 30 days)</td></tr>
+        <tr><td><code>audit</code></td><td>Audit records: who did what, when and from where (below).</td>
+            <td>We recommend 2 years: in the UI <b>Streams › audit › Settings › Data retention</b> = 730</td></tr>
+    </tbody>
+</table>
+<p>The <b>Traces</b> menu shows a request's path gateway → IdP → Management → AuthZ and the duration of each step; the <code>trace_id</code> on a log
+    line takes you to its trace.</p>
+<h3>Audit records</h3>
+<ul>
+    <li><b>Authentication:</b> successful sign-in (with method: password, LDAP, e-mail / SMS code, external provider), failed sign-in and its reason, account
+        lockout, wrong verification / two-step code, sign-out and sign-out everywhere, refresh token reuse (a sign of a stolen token).</li>
+    <li><b>Account:</b> password reset and change, e-mail / phone change, signing out other sessions, invitation accepted, account deletion, suspend / activate,
+        consent granted / denied.</li>
+    <li><b>Administration:</b> every change made in the console or with a service account (users, roles, scopes, applications, pools, tenants, permissions,
+        legal texts, license) and reads of screens with personal data (user list, sessions, consents).</li>
+</ul>
+<p>A record contains the person's id (<code>sub</code>), pool / application id, IP address, browser and outcome. <b>E-mail, phone, name, password, codes and
+    tokens are never written</b>; for an attempt with an unknown user name the value entered is kept only as a keyed digest. E-mails, phones, tokens and codes in
+    operational logs are masked before they are sent. Audit records contain personal data such as IP addresses, so restrict access to the OpenObserve
+    administrator and set the retention according to your organization's personal data retention and deletion policy.</p>
+<p><b>Notification records:</b> the recipient and content of sent e-mails / SMS are stored encrypted in the database and deleted after 30 days.</p>
+<p><b>Turning it off or sending to your own system:</b> to turn OpenObserve off, empty <code>COMPOSE_PROFILES</code> and <code>OTEL_ENDPOINT</code> in
+    <code>.env</code>; logs then stay only in <code>docker compose logs</code>. To send to your own OTLP/HTTP receiver (Grafana, Elastic, Datadog …), set
+    <code>OTEL_ENDPOINT</code> and <code>OTEL_HEADERS</code> to its address and credentials.</p>
 
 <h2 id="updates">Updates</h2>
 <div class="code"><pre>docker compose pull

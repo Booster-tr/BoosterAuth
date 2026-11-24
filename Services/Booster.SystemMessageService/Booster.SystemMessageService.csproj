@@ -23,7 +23,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Common\Amqp\Booster.Amqp\Booster.Amqp.csproj" />
-		<ProjectReference Include="..\..\Common\Logging\Booster.Logging.BoosterAmqp\Booster.Logging.BoosterAmqp.csproj" />
 		<ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
 		<ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.WithCacheProvider\Booster.ExceptionManager.WithCacheProvider.csproj" />
 		<ProjectReference Include="..\..\CommonInternal\Booster.Auth.Common.Internal\Booster.Auth.Common.Internal.csproj" />

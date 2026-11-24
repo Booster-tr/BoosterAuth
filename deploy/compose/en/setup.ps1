@@ -38,6 +38,7 @@ $panelPort  = Ask "Management panel port" "3000"
 $panelUrl   = Ask "Management panel address" "http://localhost:$panelPort"
 $adminEmail = Ask "Administrator e-mail" "admin@booster.local"
 $adminPass  = AdminPassword
+$o2Pass     = "Bo-9" + (Hex 16)   # OpenObserve guclu parola ister (buyuk + kucuk harf, rakam, ozel karakter)
 
 $values = [ordered]@{
     PUBLIC_HOST              = $publicHost
@@ -54,6 +55,7 @@ $values = [ordered]@{
     HASHING_ENCRYPTION_KEY   = B64 32
     IDP_APPLICATION_PEPPER   = Hex 32
     PANEL_SESSION_SECRET     = Hex 32
+    OPENOBSERVE_ADMIN_PASSWORD = $o2Pass
 }
 
 $lines = Get-Content .env.example
@@ -75,6 +77,10 @@ Write-Host ""
 Write-Host "Management panel sign-in (you will be asked to set a new password on first sign-in):"
 Write-Host "  user name        : admin   (e-mail: $adminEmail)"
 Write-Host "  initial password : $adminPass"
+Write-Host ""
+Write-Host "Logs and monitoring UI (OpenObserve, local network): http://<server>:5080"
+Write-Host "  e-mail   : admin@booster.local"
+Write-Host "  password : $o2Pass   (.env: OPENOBSERVE_ADMIN_PASSWORD)"
 Write-Host ""
 Write-Host "Next step:"
 Write-Host "  docker compose up -d"

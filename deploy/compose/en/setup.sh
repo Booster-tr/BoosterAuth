@@ -38,9 +38,11 @@ if [ "$ADMIN_EMAIL" = "admin@booster.local" ]; then BOOTSTRAP_ADMIN_EMAIL=""; fi
 BOOTSTRAP_ADMIN_PASSWORD=$(admin_password)
 POSTGRES_PASSWORD=$(hex 24); REDIS_PASSWORD=$(hex 24); OPENFGA_PRESHARED_KEY=$(hex 24)
 HASHING_PEPPER=$(hex 32); HASHING_ENCRYPTION_KEY=$(b64 32); IDP_APPLICATION_PEPPER=$(hex 32); PANEL_SESSION_SECRET=$(hex 32)
+# OpenObserve guclu parola ister (buyuk + kucuk harf, rakam, ozel karakter): sabit onek + rastgele.
+OPENOBSERVE_ADMIN_PASSWORD="Bo-9$(hex 16)"
 
 # These keys in .env.example are filled from the variables above (indirect expansion: ${!key}).
-KEYS=" PUBLIC_HOST GATEWAY_HTTPS_PORT PUBLIC_URL PANEL_PORT PANEL_PUBLIC_URL BOOTSTRAP_ADMIN_EMAIL BOOTSTRAP_ADMIN_PASSWORD POSTGRES_PASSWORD REDIS_PASSWORD OPENFGA_PRESHARED_KEY HASHING_PEPPER HASHING_ENCRYPTION_KEY IDP_APPLICATION_PEPPER PANEL_SESSION_SECRET "
+KEYS=" PUBLIC_HOST GATEWAY_HTTPS_PORT PUBLIC_URL PANEL_PORT PANEL_PUBLIC_URL BOOTSTRAP_ADMIN_EMAIL BOOTSTRAP_ADMIN_PASSWORD POSTGRES_PASSWORD REDIS_PASSWORD OPENFGA_PRESHARED_KEY HASHING_PEPPER HASHING_ENCRYPTION_KEY IDP_APPLICATION_PEPPER PANEL_SESSION_SECRET OPENOBSERVE_ADMIN_PASSWORD "
 
 umask 077
 tr -d '\r' < .env.example | while IFS= read -r line; do
@@ -61,6 +63,10 @@ echo
 echo "Management panel sign-in (you will be asked to set a new password on first sign-in):"
 echo "  user name        : admin   (e-mail: $ADMIN_EMAIL)"
 echo "  initial password : $BOOTSTRAP_ADMIN_PASSWORD"
+echo
+echo "Logs and monitoring UI (OpenObserve, local network): http://<server>:5080"
+echo "  e-mail   : admin@booster.local"
+echo "  password : $OPENOBSERVE_ADMIN_PASSWORD   (.env: OPENOBSERVE_ADMIN_PASSWORD)"
 echo
 echo "Next step:"
 echo "  docker compose up -d"

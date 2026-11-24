@@ -21,7 +21,8 @@ using Booster.Database.Postgres.Extensions;
 using Booster.Database.Postgres.Settings;
 using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Extensions;
-using Booster.Logging.BoosterAmqp.Extensions;
+using Booster.Observability;
+using Booster.Auth.Common.Internal.Auditing;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -54,6 +55,12 @@ public static class ServiceExtensions
         services.AddBoosterRedisCache(redisOptions);
 
         services.AddProblemDetails();
+
+        // Log + trace + metrik (OpenTelemetry). OTLP adresi yoksa yalnizca konsol (bkz. Booster.Observability).
+        services.AddBoosterObservability(configuration,
+            System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name ?? "booster");
+        services.AddHttpContextAccessor();
+        services.AddSingleton<AuditLog>();
 
         return services;
     }
@@ -124,6 +131,9 @@ public static class ServiceExtensions
         app.UseBoosterAuthentication();
         app.UseBoosterAuthorization();
 
+        // Panel / servis hesabi yazma islemleri ve kisisel veri okumalari denetim kaydina (AdminAuditMiddleware).
+        app.UseMiddleware<AdminAuditMiddleware>();
+
         app.UseFastEndpoints(c =>
         {
             // Lisans kisitliyken panel yazma isteklerini reddeder; son kullanici akislarina dokunmaz (LicenseGuard).
@@ -159,16 +169,11 @@ public static class ServiceExtensions
         var amqpSettings = services.AddSettings<AmqpSettings>(configuration);
 
         services.AddBoosterCorrelationContext();
-        services.AddAmqpLogger();
 
         services.AddKafkaBus<TContext>(
             amqpSettings,
             configureConsumers,
-            rider =>
-            {
-                rider.AddLogProducer();
-                configureRider?.Invoke(rider);
-            },
+            rider => configureRider?.Invoke(rider),
             configureKafka);
 
         return services;

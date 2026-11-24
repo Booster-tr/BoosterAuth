@@ -1,3 +1,4 @@
+using Booster.Observability;
 using Booster.Auth.YarpGateway;
 using System.Threading.RateLimiting;
 using Yarp.ReverseProxy.Transforms;
@@ -6,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 var clientIpOptions = builder.Configuration.GetSection("ClientIp").Get<ClientIpOptions>() ?? new ClientIpOptions();
 var clientIp = new ClientIpResolver(clientIpOptions);
+
+// Log + trace + metrik (OpenTelemetry). Trace burada baslar ve arka servislere traceparent ile gecer.
+builder.Services.AddBoosterObservability(builder.Configuration, "Booster.Auth.YarpGateway");
 
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))

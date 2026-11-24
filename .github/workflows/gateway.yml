@@ -11,6 +11,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     paths:
       - "Gateways/Booster.Auth.YarpGateway/**"
+      - "Common/Observability/**"
       - "docker/**"
       - ".github/workflows/_build-image.yml"
       - ".github/workflows/gateway.yml"

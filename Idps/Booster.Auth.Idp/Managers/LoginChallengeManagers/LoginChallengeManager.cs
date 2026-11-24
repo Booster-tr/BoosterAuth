@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using System.Security.Cryptography;
 using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Database.Models;
@@ -55,7 +56,8 @@ public sealed class LoginChallengeManager(
     ILocalUserStore userStore,
     ISessionStore sessionStore,
     IRequestContextAccessor requestContextAccessor,
-    IEventBus eventBus) : ILoginChallengeManager
+    IEventBus eventBus,
+    AuditLog audit) : ILoginChallengeManager
 {
     /// <summary>Yarım girişin ömrü: süresi dolarsa kullanıcı parolayı yeniden girer.</summary>
     private static readonly TimeSpan ChallengeLifetime = TimeSpan.FromMinutes(15);
@@ -137,12 +139,12 @@ public sealed class LoginChallengeManager(
 
         var record = await codeStore.GetAsync(codeKey, ct);
         if (record is null || record.PrincipalId != challenge.PrincipalId)
-            throw InvalidCode(IdpMessageKeys.LoginCodeInvalid);
+            throw AuditedInvalid(IdpMessageKeys.LoginCodeInvalid, challenge);
 
         if (record.ExpiresAt <= DateTimeOffset.UtcNow)
         {
             await codeStore.RemoveAsync(codeKey, ct);
-            throw InvalidCode(IdpMessageKeys.LoginCodeExpired);
+            throw AuditedInvalid(IdpMessageKeys.LoginCodeExpired, challenge);
         }
 
         if (!codeHasher.Verify(code.Trim(), record.CodeHash))
@@ -153,13 +155,13 @@ public sealed class LoginChallengeManager(
             if (record.AttemptCount + 1 >= MaxAttempts)
             {
                 await codeStore.RemoveAsync(codeKey, ct);
-                throw InvalidCode(IdpMessageKeys.LoginCodeAttemptsExceeded);
+                throw AuditedInvalid(IdpMessageKeys.LoginCodeAttemptsExceeded, challenge);
             }
 
                 await codeStore.StoreAsync(codeKey, record with { AttemptCount = record.AttemptCount + 1 },
                     record.ExpiresAt - DateTimeOffset.UtcNow + ExpiredCodeGrace, ct);
 
-            throw InvalidCode(IdpMessageKeys.LoginCodeInvalid);
+            throw AuditedInvalid(IdpMessageKeys.LoginCodeInvalid, challenge);
         }
 
         await codeStore.RemoveAsync(codeKey, ct);
@@ -327,6 +329,14 @@ public sealed class LoginChallengeManager(
         => channel == ChallengeChannel.Sms ? user.PhoneNumber : user.Email;
 
     /// <summary>Her adım/kanal kendi kodunu tutar; e-posta kodu SMS adımında geçmez.</summary>
+    /// <summary>Kod hatasi denetim kaydina (MFA kaba kuvvet denemeleri gorunur olsun), sonra kullaniciya hata.</summary>
+    private ValidationException AuditedInvalid(string messageKey, LoginChallengeData challenge)
+    {
+        audit.Failure($"auth.{challenge.CurrentStep.ToString().ToLowerInvariant()}", new AuditEntry(
+            PrincipalId: challenge.PrincipalId, ClientId: challenge.ClientId, Reason: messageKey, Method: challenge.CurrentChannel.ToString()));
+        return InvalidCode(messageKey);
+    }
+
     private static string CodeKey(string interactionKey, LoginChallengeData challenge)
         => $"login-challenge:{challenge.CurrentStep}:{challenge.CurrentChannel}:{interactionKey}";
 

@@ -18,7 +18,8 @@ public static class EventBusExtensions
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "{EventType} Kafka'ya gönderilemedi: {@Event}", typeof(T).Name, message);
+            // Olayin icerigi YAZILMAZ: bildirim olaylari alici adresi ve tek kullanimlik kod tasir (KVKK).
+            logger.LogError(ex, "{EventType} Kafka'ya gönderilemedi.", typeof(T).Name);
         }
     }
 }

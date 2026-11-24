@@ -49,6 +49,7 @@ cd booster-auth</pre></div>
         <tr><td><code>HASHING_PEPPER</code>, <code>HASHING_ENCRYPTION_KEY</code> (base64, 32 bayt), <code>IDP_APPLICATION_PEPPER</code></td><td>Parola ve gizli veri şifreleme anahtarları. <b>Kurulumdan sonra değiştirmeyin</b>; mevcut parolalar okunamaz olur.</td></tr>
         <tr><td><code>PANEL_SESSION_SECRET</code></td><td>Konsol oturum çerezlerinin imzası.</td></tr>
         <tr><td><code>MAIL_*</code></td><td>İsteğe bağlı SMTP ayarları (kayıt doğrulama, davet, şifre sıfırlama e-postaları).</td></tr>
+        <tr><td><code>OPENOBSERVE_ADMIN_EMAIL</code>, <code>OPENOBSERVE_ADMIN_PASSWORD</code>, <code>OTEL_ENDPOINT</code>, <code>COMPOSE_PROFILES</code></td><td>Log ve izleme arayüzü (OpenObserve). Arayüz girişi ve servislerin log gönderimi <b>aynı</b> e-posta / parolayı kullanır; parolayı yalnızca burada değiştirin (en az 8 karakter; büyük, küçük harf, rakam ve özel karakter). Kurulum betiği parolayı üretir ve sonda gösterir. <code>OTEL_HEADERS</code> yalnızca kendi OTLP alıcınız içindir. Bkz. <a href="/tr/docs/operations#loglar">İşletim › Loglar</a>.</td></tr>
         <tr><td><code>BOOSTER_VERSION</code></td><td>Image sürümü; varsayılan <code>latest</code>.</td></tr>
     </tbody>
 </table>

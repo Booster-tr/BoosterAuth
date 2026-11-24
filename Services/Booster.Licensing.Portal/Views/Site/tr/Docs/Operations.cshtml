@@ -6,11 +6,44 @@
     <thead><tr><th>İşlem</th><th>Komut</th></tr></thead>
     <tbody>
         <tr><td>Durum</td><td><code>docker compose ps</code></td></tr>
-        <tr><td>Loglar</td><td><code>docker compose logs -f booster-idp</code></td></tr>
+        <tr><td>Loglar</td><td>OpenObserve: <code>http://&lt;sunucu&gt;:5080</code> (<a href="#loglar">aşağıda</a>) ya da <code>docker compose logs -f booster-idp</code></td></tr>
         <tr><td>Durdurma (veri silinmez)</td><td><code>docker compose down</code></td></tr>
         <tr><td>Ayar değişikliğini uygulama</td><td><code>.env</code>'yi düzenleyip <code>docker compose up -d</code></td></tr>
     </tbody>
 </table>
+
+<h2 id="loglar">Loglar, izleme ve denetim kayıtları</h2>
+<p>Servisler log, trace ve metriklerini OpenTelemetry ile <b>OpenObserve</b>'e gönderir. Arayüz yerel ağdan tarayıcıyla açılır:
+    <code>http://&lt;sunucu&gt;:5080</code> (<code>OPENOBSERVE_PORT</code>). Giriş bilgileri <code>.env</code>'deki
+    <code>OPENOBSERVE_ADMIN_EMAIL</code> ve <code>OPENOBSERVE_ADMIN_PASSWORD</code>'dur; kurulum betiği parolayı üretir ve kurulum sonunda gösterir. Servisler de aynı e-posta / parolayla yazar; parolayı yalnızca <code>.env</code>'de değiştirip <code>docker compose up -d</code> çalıştırın. Port internete açılmamalıdır.</p>
+<table>
+    <thead><tr><th>Akış</th><th>İçerik</th><th>Saklama</th></tr></thead>
+    <tbody>
+        <tr><td><code>booster</code></td><td>İşletim logları (uyarı, hata, bilgi): servis, seviye, <code>trace_id</code> ile filtrelenir.</td>
+            <td><code>LOG_RETENTION_DAYS</code> (varsayılan 30 gün)</td></tr>
+        <tr><td><code>audit</code></td><td>Denetim kayıtları: kim, ne zaman, nereden, neyi yaptı (aşağıda).</td>
+            <td>Önerimiz 2 yıl: arayüzde <b>Streams › audit › Settings › Data retention</b> = 730</td></tr>
+    </tbody>
+</table>
+<p><b>Traces</b> menüsünde bir isteğin gateway → IdP → Management → AuthZ yolu ve her adımın süresi görünür; log satırındaki
+    <code>trace_id</code> ile ilgili trace'e geçilir.</p>
+<h3>Denetim kayıtları</h3>
+<ul>
+    <li><b>Kimlik doğrulama:</b> başarılı giriş (yöntemle: parola, LDAP, e-posta / SMS kodu, dış sağlayıcı), başarısız giriş ve nedeni, hesap kilitlenmesi,
+        hatalı doğrulama / iki adımlı kodu, çıkış ve tüm cihazlardan çıkış, yenileme token'ının tekrar kullanılması (çalıntı token belirtisi).</li>
+    <li><b>Hesap:</b> parola sıfırlama ve değişikliği, e-posta / telefon değişikliği, diğer oturumları kapatma, davet kabulü, hesap silme, askıya alma / etkinleştirme,
+        izin (onay) verme / reddetme.</li>
+    <li><b>Yönetim:</b> konsoldan ya da servis hesabıyla yapılan her değişiklik (kullanıcı, rol, kapsam, uygulama, havuz, firma, yetki, yasal metin, lisans) ve
+        kişisel veri içeren ekranların okunması (kullanıcı listesi, oturumlar, izinler).</li>
+</ul>
+<p>Kayıtta kişi kimliği (<code>sub</code>), havuz / uygulama kimliği, IP adresi, tarayıcı bilgisi ve sonuç bulunur. <b>E-posta, telefon, ad, parola, kod ve
+    token yazılmaz</b>; bilinmeyen bir kullanıcı adıyla denemede girilen değer yalnızca anahtarlı özet olarak tutulur. İşletim loglarındaki e-posta, telefon,
+    token ve kodlar gönderilmeden önce maskelenir. Denetim kayıtları IP adresi gibi kişisel veri içerdiğinden erişimi OpenObserve yöneticisiyle sınırlı
+    tutun; saklama süresini kurumunuzun kişisel veri saklama ve imha politikasına göre belirleyin.</p>
+<p><b>Bildirim kayıtları:</b> gönderilen e-posta / SMS'in alıcısı ve içeriği veritabanında şifreli saklanır ve 30 gün sonra silinir.</p>
+<p><b>Kapatmak ya da kendi sisteminize göndermek:</b> OpenObserve'ü kapatmak için <code>.env</code>'de <code>COMPOSE_PROFILES</code> ve
+    <code>OTEL_ENDPOINT</code>'i boşaltın; loglar yalnızca <code>docker compose logs</code>'ta kalır. Kendi OTLP/HTTP alıcınıza (Grafana, Elastic, Datadog …)
+    göndermek için <code>OTEL_ENDPOINT</code> ve <code>OTEL_HEADERS</code>'ı onun adresi ve kimliğiyle doldurun.</p>
 
 <h2 id="guncelleme">Güncelleme</h2>
 <div class="code"><pre>docker compose pull

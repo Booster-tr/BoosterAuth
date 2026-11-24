@@ -3,14 +3,9 @@ using Booster.Auth.Idp.Options;
 using Booster.ExceptionManager.Abstraction.Constants;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using Booster.ExceptionManager.Abstraction.Translations;
-using Booster.Logging.Abstraction;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-
-// Microsoft.Extensions.Logging.LogLevel ImplicitUsings ile geliyor; hangisi
-// kastedildigi acik olsun diye takma ad veriliyor.
-using LogLevel = Booster.Logging.Abstraction.LogLevel;
 
 namespace Booster.Auth.Idp.Managers.ExceptionManagers;
 
@@ -28,7 +23,7 @@ public sealed class IdpExceptionHandler(
         HttpContext Http,
         Exception Exception,
         ITranslationManager Translator,
-        ILogWriter? LogWriter,
+        ILogger Logger,
         string Lang);
 
     /// <summary>Log kaydinda hatanin hangi servisten geldigi gorunsun diye.</summary>
@@ -43,7 +38,7 @@ public sealed class IdpExceptionHandler(
 
         // GetService, GetRequiredService DEGIL: AMQP logger kayitli degilse
         // hata isleyicinin kendisi patlamamali — o an zaten bir hata isleniyor.
-        var error = new ErrorContext(httpContext, exception, translationManager, scope.GetService<ILogWriter>(), lang);
+        var error = new ErrorContext(httpContext, exception, translationManager, scope.GetRequiredService<ILoggerFactory>().CreateLogger("Booster.Errors"), lang);
 
         switch (exception)
         {
@@ -128,26 +123,17 @@ public sealed class IdpExceptionHandler(
     /// yazılsalardı doğrulama hataları gerçek arızaları gürültüye boğardı.
     /// </para>
     /// </summary>
-    private static async Task LogAsync(
+    private static Task LogAsync(
         ErrorContext e, LogLevel level, string detail, int status, CancellationToken ct)
     {
-        if (e.LogWriter is null)
-            return;
-
         var ctx = e.Http;
-
-        var properties = new Dictionary<string, string?>
-        {
-            // CorrelationMiddleware id'yi istek basligina yazar; isleyici o ara katmanin
-            // disinda calistigi icin AsyncLocal degerini goremez, basliktan okur.
-            ["CorrelationId"] = ctx.Request.Headers[HeaderConstants.CorrelationIdHeaderName].ToString(),
-            ["IpAddress"] = ctx.Connection.RemoteIpAddress?.ToString(),
-            ["ServiceName"] = ServiceName,
-            ["Path"] = ctx.Request.Path,
-            ["StatusCode"] = status.ToString()
-        };
-
-        await e.LogWriter.LogAsync(level, detail, level >= LogLevel.Error ? e.Exception : null, properties, ct);
+        // Standart ILogger: OpenTelemetry ile trace_id'ye bagli gider; 500 disindakiler cagiranin hatasidir (Warning).
+        e.Logger.Log(level, level >= LogLevel.Error ? e.Exception : null,
+            "{Detail} status={StatusCode} path={Path} correlation={CorrelationId} service={ServiceName} ip={IpAddress}",
+            detail, status, ctx.Request.Path.Value,
+            ctx.Request.Headers[HeaderConstants.CorrelationIdHeaderName].ToString(), ServiceName,
+            ctx.Connection.RemoteIpAddress?.ToString());
+        return Task.CompletedTask;
     }
 
     private static async Task WriteProblemAsync(
