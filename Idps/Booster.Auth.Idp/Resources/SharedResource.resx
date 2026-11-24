@@ -331,6 +331,12 @@
   <data name="Consent.Deny" xml:space="preserve">
     <value>Reddet</value>
   </data>
+  <data name="Error.BrandHeadline" xml:space="preserve">
+    <value>Güvenliğiniz her zaman önce gelir.</value>
+  </data>
+  <data name="Error.BrandLead" xml:space="preserve">
+    <value>Emin olamadığımız hiçbir isteği tamamlamayız. Bu ekranı gördüyseniz hesabınıza bir şey olmadı.</value>
+  </data>
   <data name="Error.PageTitle" xml:space="preserve">
     <value>Bir sorun oluştu</value>
   </data>

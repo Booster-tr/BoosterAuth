@@ -331,6 +331,12 @@
   <data name="Consent.Deny" xml:space="preserve">
     <value>Deny</value>
   </data>
+  <data name="Error.BrandHeadline" xml:space="preserve">
+    <value>Your security always comes first.</value>
+  </data>
+  <data name="Error.BrandLead" xml:space="preserve">
+    <value>We never complete a request we cannot verify. If you are seeing this screen, nothing has happened to your account.</value>
+  </data>
   <data name="Error.PageTitle" xml:space="preserve">
     <value>Something went wrong</value>
   </data>
