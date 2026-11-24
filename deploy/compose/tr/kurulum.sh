@@ -40,12 +40,9 @@ POSTGRES_PASSWORD=$(hex 24); REDIS_PASSWORD=$(hex 24); OPENFGA_PRESHARED_KEY=$(h
 HASHING_PEPPER=$(hex 32); HASHING_ENCRYPTION_KEY=$(b64 32); IDP_APPLICATION_PEPPER=$(hex 32); PANEL_SESSION_SECRET=$(hex 32)
 # OpenObserve guclu parola ister (buyuk + kucuk harf, rakam, ozel karakter): sabit onek + rastgele.
 OPENOBSERVE_ADMIN_PASSWORD="Bo-9$(hex 16)"
-# OpenObserve OTLP kimligi: "Authorization=Basic base64(e-posta:parola)" (servisler log gonderirken kullanir).
-OTEL_HEADERS="Authorization=Basic $(printf '%s' "admin@booster.local:$OPENOBSERVE_ADMIN_PASSWORD" | base64 | tr -d '
-')"
 
 # .env.example'daki bu anahtarlar yukaridaki degiskenlerle doldurulur (dolayli erisim: ${!key}).
-KEYS=" PUBLIC_HOST GATEWAY_HTTPS_PORT PUBLIC_URL PANEL_PORT PANEL_PUBLIC_URL BOOTSTRAP_ADMIN_EMAIL BOOTSTRAP_ADMIN_PASSWORD POSTGRES_PASSWORD REDIS_PASSWORD OPENFGA_PRESHARED_KEY HASHING_PEPPER HASHING_ENCRYPTION_KEY IDP_APPLICATION_PEPPER PANEL_SESSION_SECRET OPENOBSERVE_ADMIN_PASSWORD OTEL_HEADERS "
+KEYS=" PUBLIC_HOST GATEWAY_HTTPS_PORT PUBLIC_URL PANEL_PORT PANEL_PUBLIC_URL BOOTSTRAP_ADMIN_EMAIL BOOTSTRAP_ADMIN_PASSWORD POSTGRES_PASSWORD REDIS_PASSWORD OPENFGA_PRESHARED_KEY HASHING_PEPPER HASHING_ENCRYPTION_KEY IDP_APPLICATION_PEPPER PANEL_SESSION_SECRET OPENOBSERVE_ADMIN_PASSWORD "
 
 umask 077
 tr -d '\r' < .env.example | while IFS= read -r line; do
@@ -66,6 +63,10 @@ echo
 echo "Yonetim paneli girisi (ilk giriste yeni parola belirlemeniz istenir):"
 echo "  kullanici adi : admin   (e-posta: $ADMIN_EMAIL)"
 echo "  ilk parola    : $BOOTSTRAP_ADMIN_PASSWORD"
+echo
+echo "Log ve izleme arayuzu (OpenObserve, yerel ag): http://<sunucu>:5080"
+echo "  e-posta : admin@booster.local"
+echo "  parola  : $OPENOBSERVE_ADMIN_PASSWORD   (.env: OPENOBSERVE_ADMIN_PASSWORD)"
 echo
 echo "Sonraki adim:"
 echo "  docker compose up -d"

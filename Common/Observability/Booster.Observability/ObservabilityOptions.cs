@@ -12,6 +12,15 @@ public sealed class ObservabilityOptions
     /// <summary>OTLP basliklari "ad=deger,ad2=deger2"; or. <c>Authorization=Basic ...</c>.</summary>
     public string? OtlpHeaders { get; set; }
 
+    /// <summary>
+    /// OpenObserve kullanici adi / parolasi. Verilirse "Authorization: Basic" basligi bunlardan uretilir; boylece servisler
+    /// OpenObserve ile AYNI degerleri kullanir (.env'de tek yer: OPENOBSERVE_ADMIN_EMAIL / OPENOBSERVE_ADMIN_PASSWORD).
+    /// OtlpHeaders'ta Authorization varsa o kullanilir (baska bir OTLP alicisi).
+    /// </summary>
+    public string? OtlpUser { get; set; }
+
+    public string? OtlpPassword { get; set; }
+
     /// <summary>Isletim loglarinin akisi (kisa saklama).</summary>
     public string LogStream { get; set; } = "booster";
 

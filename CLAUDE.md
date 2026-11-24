@@ -193,7 +193,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Son kullanici: oturum acilisi (`SessionStore.CreateAsync`), giris hatasi / kilit, kod hatalari, sifre sifirlama / degistirme, e-posta / telefon degisikligi, hesap silme / askiya alma, cikis, onay, davet, refresh tekrar kullanimi. Yeni bir guvenlik olayi eklerken `AuditLog` kullan.
 - **Bildirim kayitlari:** Target ve Body `ISecretProtector` ile sifreli (Notification servisi `HashingOptions` alir), 30 gun sonra silinir (`NotificationRetentionService`, `NotificationRetentionDays`).
 - **Eski log hatti (Kafka -> LoggingService -> loggingdb) KALDIRILDI.** `ILogWriter` yok; standart `ILogger` kullan.
-- **Kurulum paketi:** `openobserve` servisi `observability` profilinde (`COMPOSE_PROFILES`), arayuz `OPENOBSERVE_PORT` (yerel ag). Kurulum betigi `OPENOBSERVE_ADMIN_PASSWORD` ve `OTEL_HEADERS` uretir.
+- **Kurulum paketi:** `openobserve` servisi `observability` profilinde (`COMPOSE_PROFILES`), arayuz `OPENOBSERVE_PORT` (yerel ag). Servisler OpenObserve'a arayuzle AYNI e-posta / parolayla yazar (`Observability__OtlpUser` / `OtlpPassword` = `OPENOBSERVE_ADMIN_EMAIL` / `OPENOBSERVE_ADMIN_PASSWORD`); parola tek yerde, `.env`. Kurulum betigi uretir ve sonda gosterir. `OTEL_HEADERS` yalnizca baska OTLP alicisi icin.
 
 ## Kullanici ekleme ve davet (IdP)
 - **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).

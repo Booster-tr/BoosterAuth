@@ -15,7 +15,7 @@
 <h2 id="loglar">Loglar, izleme ve denetim kayıtları</h2>
 <p>Servisler log, trace ve metriklerini OpenTelemetry ile <b>OpenObserve</b>'e gönderir. Arayüz yerel ağdan tarayıcıyla açılır:
     <code>http://&lt;sunucu&gt;:5080</code> (<code>OPENOBSERVE_PORT</code>). Giriş bilgileri <code>.env</code>'deki
-    <code>OPENOBSERVE_ADMIN_EMAIL</code> ve <code>OPENOBSERVE_ADMIN_PASSWORD</code>'dur; kurulum betiği parolayı üretir. Port internete açılmamalıdır.</p>
+    <code>OPENOBSERVE_ADMIN_EMAIL</code> ve <code>OPENOBSERVE_ADMIN_PASSWORD</code>'dur; kurulum betiği parolayı üretir ve kurulum sonunda gösterir. Servisler de aynı e-posta / parolayla yazar; parolayı yalnızca <code>.env</code>'de değiştirip <code>docker compose up -d</code> çalıştırın. Port internete açılmamalıdır.</p>
 <table>
     <thead><tr><th>Akış</th><th>İçerik</th><th>Saklama</th></tr></thead>
     <tbody>

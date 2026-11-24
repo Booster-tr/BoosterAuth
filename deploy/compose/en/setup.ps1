@@ -56,7 +56,6 @@ $values = [ordered]@{
     IDP_APPLICATION_PEPPER   = Hex 32
     PANEL_SESSION_SECRET     = Hex 32
     OPENOBSERVE_ADMIN_PASSWORD = $o2Pass
-    OTEL_HEADERS             = "Authorization=Basic " + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("admin@booster.local:$o2Pass"))
 }
 
 $lines = Get-Content .env.example
@@ -78,6 +77,10 @@ Write-Host ""
 Write-Host "Management panel sign-in (you will be asked to set a new password on first sign-in):"
 Write-Host "  user name        : admin   (e-mail: $adminEmail)"
 Write-Host "  initial password : $adminPass"
+Write-Host ""
+Write-Host "Logs and monitoring UI (OpenObserve, local network): http://<server>:5080"
+Write-Host "  e-mail   : admin@booster.local"
+Write-Host "  password : $o2Pass   (.env: OPENOBSERVE_ADMIN_PASSWORD)"
 Write-Host ""
 Write-Host "Next step:"
 Write-Host "  docker compose up -d"

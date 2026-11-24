@@ -15,7 +15,7 @@
 <h2 id="logs">Logs, monitoring and audit records</h2>
 <p>Services send their logs, traces and metrics to <b>OpenObserve</b> with OpenTelemetry. Open the UI in a browser on the local network:
     <code>http://&lt;server&gt;:5080</code> (<code>OPENOBSERVE_PORT</code>). Sign in with <code>OPENOBSERVE_ADMIN_EMAIL</code> and
-    <code>OPENOBSERVE_ADMIN_PASSWORD</code> from <code>.env</code>; the setup script generates the password. Do not expose this port to the internet.</p>
+    <code>OPENOBSERVE_ADMIN_PASSWORD</code> from <code>.env</code>; the setup script generates the password and shows it at the end. Services write with the same e-mail / password; change the password only in <code>.env</code> and run <code>docker compose up -d</code>. Do not expose this port to the internet.</p>
 <table>
     <thead><tr><th>Stream</th><th>Content</th><th>Retention</th></tr></thead>
     <tbody>

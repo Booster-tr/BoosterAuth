@@ -56,7 +56,6 @@ $values = [ordered]@{
     IDP_APPLICATION_PEPPER   = Hex 32
     PANEL_SESSION_SECRET     = Hex 32
     OPENOBSERVE_ADMIN_PASSWORD = $o2Pass
-    OTEL_HEADERS             = "Authorization=Basic " + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("admin@booster.local:$o2Pass"))
 }
 
 $lines = Get-Content .env.example
@@ -78,6 +77,10 @@ Write-Host ""
 Write-Host "Yonetim paneli girisi (ilk giriste yeni parola belirlemeniz istenir):"
 Write-Host "  kullanici adi : admin   (e-posta: $adminEmail)"
 Write-Host "  ilk parola    : $adminPass"
+Write-Host ""
+Write-Host "Log ve izleme arayuzu (OpenObserve, yerel ag): http://<sunucu>:5080"
+Write-Host "  e-posta : admin@booster.local"
+Write-Host "  parola  : $o2Pass   (.env: OPENOBSERVE_ADMIN_PASSWORD)"
 Write-Host ""
 Write-Host "Sonraki adim:"
 Write-Host "  docker compose up -d"

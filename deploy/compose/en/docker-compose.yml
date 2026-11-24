@@ -48,6 +48,8 @@ x-dotnet-env: &dotnet-env
   # Logs, traces and metrics (OpenTelemetry). Empty OTEL_ENDPOINT = only 'docker compose logs'.
   Observability__OtlpEndpoint: ${OTEL_ENDPOINT:-}
   Observability__OtlpHeaders: ${OTEL_HEADERS:-}
+  Observability__OtlpUser: ${OPENOBSERVE_ADMIN_EMAIL:-}
+  Observability__OtlpPassword: ${OPENOBSERVE_ADMIN_PASSWORD:-}
 
 x-grpc-kestrel: &grpc-kestrel
   Kestrel__Endpoints__Http__Url: http://+:8080
@@ -313,6 +315,8 @@ services:
       ClientIp__Header: ${CLIENT_IP_HEADER:-X-Forwarded-For}
       Observability__OtlpEndpoint: ${OTEL_ENDPOINT:-}
       Observability__OtlpHeaders: ${OTEL_HEADERS:-}
+      Observability__OtlpUser: ${OPENOBSERVE_ADMIN_EMAIL:-}
+      Observability__OtlpPassword: ${OPENOBSERVE_ADMIN_PASSWORD:-}
     ports:
       - "${PUBLIC_BIND_IP:-0.0.0.0}:${GATEWAY_HTTPS_PORT:-443}:${GATEWAY_HTTPS_PORT:-443}"
     networks:

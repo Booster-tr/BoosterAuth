@@ -30,6 +30,12 @@ public static class ObservabilityExtensions
         var options = configuration.GetSection("Observability").Get<ObservabilityOptions>() ?? new ObservabilityOptions();
         var endpoint = (options.OtlpEndpoint ?? configuration["OTEL_EXPORTER_OTLP_ENDPOINT"])?.Trim().TrimEnd('/');
         var headers = options.OtlpHeaders ?? configuration["OTEL_EXPORTER_OTLP_HEADERS"];
+        if (!string.IsNullOrWhiteSpace(options.OtlpUser) && !string.IsNullOrWhiteSpace(options.OtlpPassword)
+            && (headers is null || !headers.Contains("Authorization=", StringComparison.OrdinalIgnoreCase)))
+        {
+            var basic = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{options.OtlpUser}:{options.OtlpPassword}"));
+            headers = string.IsNullOrWhiteSpace(headers) ? $"Authorization=Basic {basic}" : $"{headers},Authorization=Basic {basic}";
+        }
         var enabled = !string.IsNullOrEmpty(endpoint);
         var version = configuration["Version"] ?? "unknown";
 
