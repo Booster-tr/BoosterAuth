@@ -29,14 +29,14 @@
                 <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6" />
                 <path d="m6.75 10.25 2.25 2.25 4.25-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
-            <p class="auth-alert__text" style="margin-top:0">@notice</p>
+            <p class="auth-alert__text auth-alert__text--flush">@notice</p>
         </div>
     }
 
     @if (Model.DirectoryManaged)
     {
         <div class="auth-alert auth-alert--info">
-            <p class="auth-alert__text" style="margin-top:0">@T["Account.DirectoryNote"]</p>
+            <p class="auth-alert__text auth-alert__text--flush">@T["Account.DirectoryNote"]</p>
         </div>
     }
 

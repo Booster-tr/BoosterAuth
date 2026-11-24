@@ -24,6 +24,8 @@ public class ExternalLoginController(
     ISecureCacheStore<InteractionStateData> interactionStore,
     IClientDataStore clientDataStore) : IdpBaseController
 {
+    private const string BindingCookie = "booster_fed_binding";
+
     [HttpGet("/ui/external/challenge")]
     public async Task<IActionResult> Challenge(
         [FromQuery(Name = "interaction_key")] string interactionKey,
@@ -46,6 +48,17 @@ public class ExternalLoginController(
             await new StartFederationLoginValidator().ValidateAndThrowAsync(command, ct);
 
             var result = await command.ExecuteAsync(ct);
+
+            // Donus bu tarayicida mi bitiyor: state bu degere baglanir (bkz. CompleteFederationLoginHandler).
+            // SameSite=None: Apple ve SAML donusu baska siteden POST ile gelir; Lax cerez o istekte gonderilmez.
+            Response.Cookies.Append(BindingCookie, interactionKey, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Path = Request.PathBase.HasValue ? Request.PathBase.Value : "/",
+                MaxAge = TimeSpan.FromMinutes(30)
+            });
 
             return Redirect(result.RedirectUrl);
         }
@@ -83,11 +96,13 @@ public class ExternalLoginController(
         {
             State = state,
             Parameters = parameters,
+            BrowserBinding = Request.Cookies[BindingCookie],
             UserAgent = Request.Headers.UserAgent,
             IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
         };
 
         var result = await command.ExecuteAsync(ct);
+        Response.Cookies.Delete(BindingCookie, new CookieOptions { Path = Request.PathBase.HasValue ? Request.PathBase.Value : "/", Secure = true, SameSite = SameSiteMode.None });
 
         // E-posta zaten yerel bir hesapta: oturum AÇILMAZ, kullanıcı durumu
         // anlatan ekrana gönderilir.

@@ -102,11 +102,15 @@ public class UpdateClientValidator : Validator<UpdateClientCommand>
             .WithMessage(AuthNMessageKeys.ClientRedirectUriRequired);
 
         RuleForEach(x => x.RedirectUris)
-            .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
+            .Must(ClientUriRules.IsValidRedirectUri)
             .WithMessage(AuthNMessageKeys.ClientRedirectUriInvalid);
 
         RuleForEach(x => x.PostLogoutRedirectUris)
-            .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
+            .Must(ClientUriRules.IsValidRedirectUri)
             .WithMessage(AuthNMessageKeys.ClientRedirectUriInvalid);
+
+        RuleForEach(x => x.AllowedAudiences)
+            .Must(ClientUriRules.IsValidAudience)
+            .WithMessage(AuthNMessageKeys.ClientAudienceInvalid);
     }
 }

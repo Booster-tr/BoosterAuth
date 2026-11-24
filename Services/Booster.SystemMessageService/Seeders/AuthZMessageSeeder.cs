@@ -26,6 +26,7 @@ public class AuthZMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthZ
         new(AuthZMessageKeys.SchemaLimitExceeded, "Yetkilendirme", "Kaynak tipi ya da tip başına yetki sınırı aşıldı.", "Authorization", "The resource type or permissions-per-type limit was exceeded."),
         new(AuthZMessageKeys.SchemaVersionLimitReached, "Yetkilendirme", "Sürüm sınırına ulaşıldı. Yeni sürüm için kullanılmayan bir sürümü silin.", "Authorization", "The version limit was reached. Delete an unused version to create a new one."),
         new(AuthZMessageKeys.PoolRelationNotAllowed, "Yetkilendirme", "Yayındaki şema bu ilişkiye izin vermiyor: tip, yetki ya da atanan taraf uyuşmuyor.", "Authorization", "The live schema does not allow this relation: the type, permission or assignee does not match."),
+        new(AuthZMessageKeys.QueryNotAllowed, "Yetkilendirme", "Bu havuzun yetkilerini sorgulama izniniz yok. Token'ı bu havuz vermiş olmalı ya da havuzda görüntüleme yetkiniz olmalı.", "Authorization", "You may not query this pool's permissions. The token must be issued by this pool, or you must have view access to the pool."),
         new(AuthZMessageKeys.PoolRelationRejected, "Yetkilendirme", "İlişki yazılamadı; zaten var olabilir.", "Authorization", "The relation could not be written; it may already exist."),
         new(AuthZMessageKeys.PoolRelationNotFound, "Yetkilendirme", "Silinecek ilişki bulunamadı.", "Authorization", "The relation to delete was not found."),
     ];

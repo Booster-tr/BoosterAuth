@@ -80,6 +80,10 @@ docker compose ps</pre></div>
     <li><b>Production:</b> put a reverse proxy (nginx, Traefik, Cloudflare Tunnel) with your own certificate in front, or replace
         <code>pki/tls/server.crt</code> and <code>server.key</code> with your own certificate.</li>
 </ul>
+<p><b>Client IP behind a proxy:</b> by default the gateway trusts no forwarding header and uses the connection address (rate limiting,
+    session list). If a load balancer or reverse proxy sits in front, set its network in <code>.env</code> so the real client IP is read:
+    <code>TRUSTED_PROXY_NETWORK=10.0.0.0/8</code> (the proxy's address range). Behind Cloudflare also set
+    <code>CLIENT_IP_HEADER=CF-Connecting-IP</code>. Headers from untrusted addresses are ignored, so clients cannot fake their IP.</p>
 
 <h2 id="first-sign-in">5. First sign-in</h2>
 <p>Sign in to the console with the username <b><code>admin</code></b> and the initial password shown by the setup script; you will be asked to set

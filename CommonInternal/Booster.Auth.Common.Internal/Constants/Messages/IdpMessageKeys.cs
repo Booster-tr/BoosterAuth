@@ -59,6 +59,7 @@ public class IdpMessageKeys
     // --- Giriş doğrulaması (e-posta/telefon doğrulama, MFA) ------------------
     public const string LoginChallengeExpired = "idp.login_challenge_expired";
     public const string MfaMethodUnavailable = "idp.mfa_method_unavailable";
+    public const string MfaSecondChannelUnavailable = "idp.mfa_second_channel_unavailable";
 
 
     // --- Federasyon ---------------------------------------------------------

@@ -1,3 +1,4 @@
+using Booster.Auth.Z.Managers.QueryAccess;
 using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Features._base;
 using Booster.Auth.Z.Features.Lookup.MyAccess;
@@ -32,11 +33,16 @@ public record ObjectAccessCommand(
     string User,
     string Object) : ICommand<ObjectAccessResponse>;
 
-public class ObjectAccessCommandHandler(ILookupManager lookupManager)
+public class ObjectAccessCommandHandler(
+    QueryCallerGuard guard,
+    ILookupManager lookupManager)
     : ICommandHandler<ObjectAccessCommand, ObjectAccessResponse>
 {
     public async Task<ObjectAccessResponse> ExecuteAsync(ObjectAccessCommand command, CancellationToken ct)
     {
+        // Govdedeki havuzu sorgulama yetkisi (bkz. QueryCallerGuard).
+        await guard.EnsureAsync(command.IsolationId, ct);
+
         var result = await lookupManager.LookupObjectAccessAsync(
             command.IsolationId, command.User, command.Object, ct);
 

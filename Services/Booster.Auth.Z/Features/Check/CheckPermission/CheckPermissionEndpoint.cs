@@ -1,3 +1,4 @@
+using Booster.Auth.Z.Managers.QueryAccess;
 using Booster.Auth.Common.Internal.Licensing;
 using Booster.Auth.Z.Stores.PoolStores;
 using Booster.Authorization.Relational.Fga;
@@ -36,12 +37,16 @@ public record CheckPermissionCommand(
 public readonly record struct CheckPermissionResponse(bool Allowed);
 
 public class CheckPermissionCommandHandler(
+    QueryCallerGuard guard,
     IPoolStoreProvider poolStoreProvider,
     FgaRelationManager relationManager)
     : ICommandHandler<CheckPermissionCommand, CheckPermissionResponse>
 {
     public async Task<CheckPermissionResponse> ExecuteAsync(CheckPermissionCommand command, CancellationToken ct)
     {
+        // Govdedeki havuzu sorgulama yetkisi (bkz. QueryCallerGuard).
+        await guard.EnsureAsync(command.IsolationId, ct);
+
         var mapping = await poolStoreProvider.GetRequiredByPoolIdAsync(command.IsolationId, ct);
 
         var allowed = await relationManager.CheckAsync(

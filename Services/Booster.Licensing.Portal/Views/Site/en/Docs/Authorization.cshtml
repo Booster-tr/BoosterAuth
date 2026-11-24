@@ -37,6 +37,10 @@
 <p>Your application (usually your back end) calls the AuthZ API with a Bearer token. The token's audience must be
     <code>https://auth.company.com/authz</code>: add the AuthZ address to the application's allowed APIs and pass it as <code>resource</code> when
     requesting the token. The token only authenticates the <b>caller</b>; the user being checked is in the request body.</p>
+<p><b>Which pool can be queried:</b> <code>isolationId</code> must be the pool that issued the token (an access token of one of that pool's
+    users). A token from another pool is rejected with <code>403</code> (<code>authz.query_not_allowed</code>). Console users and pool service
+    accounts (management pool) can query a pool only if they have at least <b>viewer</b> access to it. This applies to <code>check</code>,
+    <code>batch-check</code> and all <code>lookup</code> endpoints.</p>
 <div class="code"><span class="lbl">Permission check</span><pre>POST https://auth.company.com/authz/check
 Authorization: Bearer &lt;access token&gt;
 Content-Type: application/json

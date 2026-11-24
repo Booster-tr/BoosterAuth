@@ -53,6 +53,7 @@ public class AuthNMessageKeys
     public const string ClientGrantTypeRequired = "authn.client_grant_type_required";
     public const string ClientRedirectUriRequired = "authn.client_redirect_uri_required";
     public const string ClientRedirectUriInvalid = "authn.client_redirect_uri_invalid";
+    public const string ClientAudienceInvalid = "authn.client_audience_invalid";
 
     // --- Token scope policy ---
 

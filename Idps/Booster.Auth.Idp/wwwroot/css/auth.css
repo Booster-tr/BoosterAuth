@@ -557,6 +557,11 @@
     line-height: 1.375rem;
 }
 
+/* Basliksiz uyarida metin ustten bosluk almaz (satir ici style yerine: CSP style-src 'self'). */
+.auth-alert__text--flush {
+    margin-top: 0;
+}
+
 .auth-alert--error {
     color: var(--color-danger-text);
     background-color: var(--color-danger-surface);

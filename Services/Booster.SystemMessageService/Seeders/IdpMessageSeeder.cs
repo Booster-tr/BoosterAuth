@@ -78,6 +78,7 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         // --- Giriş doğrulaması (e-posta/telefon doğrulama, MFA) ---
         new(IdpMessageKeys.LoginChallengeExpired, "Doğrulama", "Doğrulama süresi doldu. Lütfen yeniden giriş yapın.", "Verification", "The verification has expired. Please sign in again."),
         new(IdpMessageKeys.MfaMethodUnavailable, "İki adımlı doğrulama", "Hesabınızda iki adımlı doğrulama kodu gönderilebilecek bir e-posta ya da telefon yok. Lütfen yöneticinize başvurun.", "Two-step verification", "Your account has no email address or phone number to send a two-step verification code to. Please contact your administrator."),
+        new(IdpMessageKeys.MfaSecondChannelUnavailable, "İki adımlı doğrulama", "Bu uygulama iki adımlı doğrulama istiyor ve hesabınızda kodun gittiği kanal dışında ikinci bir kanal (e-posta ya da telefon) yok. Lütfen parolanızla giriş yapın.", "Two-step verification", "This application requires two-step verification and your account has no second channel (email or phone) besides the one the code was sent to. Please sign in with your password."),
 
         // --- Federasyon (dış sağlayıcıyla giriş) ---
         new(IdpMessageKeys.FederationProviderNotFound, "Sağlayıcı", "Bu giriş yöntemi tanımlı değil ya da kapatılmış.", "Provider", "This sign-in method is not configured or has been disabled."),

@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.HttpOverrides;
+using Booster.Auth.Common.Internal.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Booster.Amqp.Constants;
 using Booster.Amqp.Extensions;
 using Booster.Auth.Manager.Extensions;
@@ -57,6 +60,18 @@ public static class ServiceExtensions
 
     public static WebApplication UseBoosterServices(this WebApplication app)
     {
+        // Gateway istemcinin gercek IP'sini ve https bilgisini X-Forwarded-* ile iletir (YarpGateway ClientIpResolver;
+        // istemcinin yazdigi basligi ezer). Arka servisler yalnizca ic agdan (gateway) erisilir: ozel ag
+        // araliklarina guvenilir. Bu olmadan oturumlara gateway'in IP'si yaziliyor, HSTS de hic eklenmiyordu.
+        var forwarded = new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+            ForwardLimit = 1
+        };
+        foreach (var network in new[] { "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "127.0.0.0/8", "::1/128", "fc00::/7" })
+            forwarded.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(network));
+        app.UseForwardedHeaders(forwarded);
+
         app.UseBoosterExceptionHandler();
         app.UseHttpsRedirection();
 
@@ -86,6 +101,11 @@ public static class ServiceExtensions
         services.AddBoosterAuthentication(apiAuthOptions);
 
         services.AddBoosterAuthZGrpcClient(fgaSettings);
+        // Panel uclari yalnizca yonetim havuzu token'ini kabul eder (bkz. PanelActorHandler). FGA handler'indan ONCE
+        // kaydedilir ve ret sonrasi diger handler'lar calismaz: yoksa FGA, musterinin deposunda olmayan tipi sorup
+        // 403 yerine 500 donuyordu.
+        services.AddSingleton<IAuthorizationHandler, PanelActorHandler>();
+        services.Configure<AuthorizationOptions>(o => o.InvokeHandlersAfterFailure = false);
         services.AddBoosterAuthorization();
 
         services.AddFastEndpoints();

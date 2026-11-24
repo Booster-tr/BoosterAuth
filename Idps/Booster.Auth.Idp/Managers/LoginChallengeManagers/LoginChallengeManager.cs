@@ -24,13 +24,18 @@ public interface ILoginChallengeManager
     /// gönderip yarım girişi saklar.
     /// </summary>
     /// <param name="passwordLogin">
-    /// Yalnızca parola ile girişte MFA istenir. Parolasız giriş zaten bir
-    /// sahiplik kanıtıdır (kod e-postaya/SMS'e gider); federasyonda ikinci
-    /// adım dış sağlayıcının sorumluluğundadır.
+    /// Parola (yerel / LDAP) ve parolasız kodla girişte havuzun MFA politikası uygulanır. Kayıt sonrası
+    /// doğrulamada ve federasyonda uygulanmaz (federasyonda ikinci adım dış sağlayıcının sorumluluğundadır).
+    /// </param>
+    /// <param name="provenChannel">
+    /// Parolasız girişte kodun gittiği kanal. Birinci adımı bu kanal kanıtladığı için MFA'da kullanılmaz; ikinci
+    /// adım diğer kanaldan istenir, kanal kalmazsa giriş reddedilir. Aksi halde MFA zorunluyken tek kodla oturum
+    /// açılıyordu.
     /// </param>
     Task<LoginOutcome> BeginAsync(
         string interactionKey, ClientData client, LocalUser user, string authMethod,
-        bool passwordLogin, string? userAgent, string? ipAddress, CancellationToken ct);
+        bool passwordLogin, string? userAgent, string? ipAddress, CancellationToken ct,
+        ChallengeChannel? provenChannel = null);
 
     Task<LoginChallengeView?> GetAsync(string interactionKey, ClientData client, CancellationToken ct);
 
@@ -64,7 +69,8 @@ public sealed class LoginChallengeManager(
 
     public async Task<LoginOutcome> BeginAsync(
         string interactionKey, ClientData client, LocalUser user, string authMethod,
-        bool passwordLogin, string? userAgent, string? ipAddress, CancellationToken ct)
+        bool passwordLogin, string? userAgent, string? ipAddress, CancellationToken ct,
+        ChallengeChannel? provenChannel = null)
     {
         var steps = new List<LoginStep>();
 
@@ -75,7 +81,7 @@ public sealed class LoginChallengeManager(
             steps.Add(LoginStep.VerifyPhone);
 
         var mfaChannels = passwordLogin && client.Mfa.Required
-            ? ResolveMfaChannels(client.Mfa.AllowedMethods, user)
+            ? ResolveMfaChannels(client.Mfa.AllowedMethods, user, provenChannel)
             : [];
 
         // MFA, doğrulama adımı aynı girişte yapılmış olsa bile AYRI bir adımdır:
@@ -287,15 +293,19 @@ public sealed class LoginChallengeManager(
     /// <summary>
     /// Havuzun izin verdiği ve kullanıcının hedefi olan kanallar (e-posta, SMS).
     /// </summary>
-    private static List<ChallengeChannel> ResolveMfaChannels(MfaMethod allowed, LocalUser user)
+    private static List<ChallengeChannel> ResolveMfaChannels(MfaMethod allowed, LocalUser user, ChallengeChannel? provenChannel)
     {
         var channels = new List<ChallengeChannel>(2);
 
-        if (allowed.HasFlag(MfaMethod.Email) && !string.IsNullOrEmpty(user.Email))
+        if (allowed.HasFlag(MfaMethod.Email) && !string.IsNullOrEmpty(user.Email) && provenChannel != ChallengeChannel.Email)
             channels.Add(ChallengeChannel.Email);
 
-        if (allowed.HasFlag(MfaMethod.Sms) && !string.IsNullOrEmpty(user.PhoneNumber))
+        if (allowed.HasFlag(MfaMethod.Sms) && !string.IsNullOrEmpty(user.PhoneNumber) && provenChannel != ChallengeChannel.Sms)
             channels.Add(ChallengeChannel.Sms);
+
+        // Parolasız girişte kodun gittiği kanal dışında kanal kalmadı: ikinci adım yapılamaz, kullanıcı parolayla girmeli.
+        if (channels.Count == 0 && provenChannel is not null && (allowed & (MfaMethod.Email | MfaMethod.Sms)) != 0)
+            throw Invalid(IdpMessageKeys.MfaSecondChannelUnavailable);
 
         // Havuz e-posta/SMS ile MFA istiyor ama kullanıcının o kanalda adresi yok:
         // MFA'yı atlamak politikayı delmek olurdu; giriş reddedilir.

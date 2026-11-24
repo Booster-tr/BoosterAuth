@@ -20,6 +20,7 @@ public class AuthZMessageKeys
     public const string SchemaLimitExceeded = "authz.schema_limit_exceeded";
     public const string SchemaVersionLimitReached = "authz.schema_version_limit_reached";
     public const string PoolRelationNotAllowed = "authz.pool_relation_not_allowed";
+    public const string QueryNotAllowed = "authz.query_not_allowed";
     public const string PoolRelationRejected = "authz.pool_relation_rejected";
     public const string PoolRelationNotFound = "authz.pool_relation_not_found";
 }
