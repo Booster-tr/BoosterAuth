@@ -45,6 +45,9 @@ x-dotnet-env: &dotnet-env
   FgaSettings__TimeoutSeconds: "5"
   FgaSettings__AllowInsecureHttp2: "true"
   ApiAuthOptions__Authority: ${PUBLIC_URL}/idp
+  # Logs, traces and metrics (OpenTelemetry). Empty OTEL_ENDPOINT = only 'docker compose logs'.
+  Observability__OtlpEndpoint: ${OTEL_ENDPOINT:-}
+  Observability__OtlpHeaders: ${OTEL_HEADERS:-}
 
 x-grpc-kestrel: &grpc-kestrel
   Kestrel__Endpoints__Http__Url: http://+:8080
@@ -111,7 +114,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DATABASES: openfgadb,idpdb,authndb,authzdb,loggingdb,notificationdb,systemmessagedb
+      POSTGRES_DATABASES: openfgadb,idpdb,authndb,authzdb,notificationdb,systemmessagedb
     volumes:
       - ./init:/scripts:ro
       - postgres_socket:/var/run/postgresql
@@ -258,22 +261,11 @@ services:
       AmqpSettings__ServiceName: Booster.SytemMessage.Service
       AmqpSettings__GroupId: booster-systemmessage-group
 
-  booster-logging:
-    <<: *dotnet-service
-    image: ghcr.io/booster-tr/booster-logging-service:${BOOSTER_VERSION:-latest}
-    environment:
-      <<: *dotnet-env
-      ApiAuthOptions__Audience: ${PUBLIC_URL}/logging
-      PostgresSettings__DatabaseName: loggingdb
-      PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=loggingdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
-      AmqpSettings__ServiceName: Booster.Logging.Service
-      AmqpSettings__GroupId: booster-log-group
-
   booster-notification:
     <<: *dotnet-service
     image: ghcr.io/booster-tr/booster-notification-service:${BOOSTER_VERSION:-latest}
     environment:
-      <<: *dotnet-env
+      <<: [*dotnet-env, *hashing-env]
       ApiAuthOptions__Audience: ${PUBLIC_URL}/notification
       PostgresSettings__DatabaseName: notificationdb
       PostgresSettings__ConnectionString: Host=postgres;Port=5432;Database=notificationdb;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD};Pooling=true;Gss Encryption Mode=Disable;
@@ -319,6 +311,8 @@ services:
       ReverseProxy__Clusters__systemmessage_cluster__Destinations__destination1__Address: http://booster-systemmessage:8080
       ClientIp__TrustedNetworks__0: ${TRUSTED_PROXY_NETWORK:-}
       ClientIp__Header: ${CLIENT_IP_HEADER:-X-Forwarded-For}
+      Observability__OtlpEndpoint: ${OTEL_ENDPOINT:-}
+      Observability__OtlpHeaders: ${OTEL_HEADERS:-}
     ports:
       - "${PUBLIC_BIND_IP:-0.0.0.0}:${GATEWAY_HTTPS_PORT:-443}:${GATEWAY_HTTPS_PORT:-443}"
     networks:
@@ -326,6 +320,23 @@ services:
         # So containers reach the issuer (${PUBLIC_URL}/idp) at the same address.
         aliases:
           - ${PUBLIC_HOST}
+
+  # Log and tracing UI (OpenObserve). In the browser: http://<server>:${OPENOBSERVE_PORT}. Enabled with COMPOSE_PROFILES=observability.
+  openobserve:
+    image: openobserve/openobserve:v1.2.0
+    restart: unless-stopped
+    profiles: [observability]
+    security_opt: [no-new-privileges:true]
+    environment:
+      ZO_ROOT_USER_EMAIL: ${OPENOBSERVE_ADMIN_EMAIL:-admin@booster.local}
+      ZO_ROOT_USER_PASSWORD: ${OPENOBSERVE_ADMIN_PASSWORD:-}
+      ZO_DATA_DIR: /data
+      ZO_COMPACT_DATA_RETENTION_DAYS: ${LOG_RETENTION_DAYS:-30}
+      ZO_TELEMETRY: "false"
+    volumes:
+      - ./data/openobserve:/data
+    ports:
+      - "${PUBLIC_BIND_IP:-0.0.0.0}:${OPENOBSERVE_PORT:-5080}:5080"
 
   booster-management-panel:
     image: ghcr.io/booster-tr/booster-management-panel:${BOOSTER_VERSION:-latest}
@@ -351,7 +362,7 @@ services:
       SESSION_SECRET: ${PANEL_SESSION_SECRET:?PANEL_SESSION_SECRET must be set in .env (run the setup script)}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-}
       BACKEND_URL: http://booster-gateway:8080
-      SERVICE_STATUS_ENDPOINTS: Gateway=http://booster-gateway:8080,IdP=http://booster-idp:8080,Management API=http://booster-management-api:8080,AuthZ=http://booster-authz:8080,Logging=http://booster-logging:8080,Notification=http://booster-notification:8080,System Message=http://booster-systemmessage:8080
+      SERVICE_STATUS_ENDPOINTS: Gateway=http://booster-gateway:8080,IdP=http://booster-idp:8080,Management API=http://booster-management-api:8080,AuthZ=http://booster-authz:8080,Notification=http://booster-notification:8080,System Message=http://booster-systemmessage:8080
       IDP_RESOURCE: ${PUBLIC_URL}/idp
       AUTHZ_RESOURCE: ${PUBLIC_URL}/authz
       MANAGEMENT_RESOURCE: ${PUBLIC_URL}/management

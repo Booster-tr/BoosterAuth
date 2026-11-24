@@ -38,6 +38,7 @@ $panelPort  = Ask "Yonetim paneli portu" "3000"
 $panelUrl   = Ask "Yonetim paneli adresi" "http://localhost:$panelPort"
 $adminEmail = Ask "Yonetici e-postasi" "admin@booster.local"
 $adminPass  = AdminPassword
+$o2Pass     = "Bo-9" + (Hex 16)   # OpenObserve guclu parola ister (buyuk + kucuk harf, rakam, ozel karakter)
 
 $values = [ordered]@{
     PUBLIC_HOST              = $publicHost
@@ -54,6 +55,8 @@ $values = [ordered]@{
     HASHING_ENCRYPTION_KEY   = B64 32
     IDP_APPLICATION_PEPPER   = Hex 32
     PANEL_SESSION_SECRET     = Hex 32
+    OPENOBSERVE_ADMIN_PASSWORD = $o2Pass
+    OTEL_HEADERS             = "Authorization=Basic " + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("admin@booster.local:$o2Pass"))
 }
 
 $lines = Get-Content .env.example

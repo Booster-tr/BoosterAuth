@@ -26,7 +26,7 @@ Urun, musteri sunucusunda on-prem calisir ve **cevrimdisi lisansla** acilir. Lis
 | `Services/Booster.Auth.Z` | Yetki (OpenFGA) | `AuthZDbContext` |
 | `Gateways/Booster.Auth.YarpGateway` | `/idp`, `/management`, `/authz` | |
 | `Services/Booster.Licensing.Portal` | Lisans portali (MVC, `licensing.appnuraymind.com`): musteri girisi Booster Auth ile, admin ekranlari, lisans uretme. YALNIZCA Booster'in kendi kurulumunda calisir | `LicensingDbContext` (`licensingdb`) |
-| `Services/Booster.{Logging,Notification,SystemMessage}Service` | Yalnizca Booster'in kendi yardimci servisleri | |
+| `Services/Booster.{Notification,SystemMessage}Service` | Yardimci servisler (bildirim, mesaj katalogu) | |
 
 Ortak kutuphaneler `Common/` ve `CommonInternal/` altinda. Diger urunlere kopya-yapistir ile gecer.
 
@@ -183,6 +183,17 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **Sema:** tip icermeyen sema canliya alinamaz (`no_types`).
 - **Sayfalama:** `PageSize` 1..500 (`common.page_size_invalid`); sorgu dizesinden `-raw` filtresi kabul edilmez, alan adlari tanimlayici olmali.
 - **Rol kapsamlari token'a girer:** Management uygulama verisiyle (gRPC `role_scopes`) havuzun rol -> kapsam eslemesini gonderir; `TokenGrantRules.BuildScope` kullanicinin rollerinin kapsamlarini ekler. Rol / kapsam kaydedilince havuz onbellegi temizlenir, yeni token'lara hemen yansir.
+
+## Gozlemlenebilirlik, log ve denetim (KVKK)
+- **Kurulum:** `Common/Observability/Booster.Observability` (`AddBoosterObservability`): OpenTelemetry log + trace + metrik, OTLP/HTTP. `AddBoosterServices` (tum .NET servisleri) ve gateway cagirir. Ayar: `Observability__OtlpEndpoint` (or. `http://openobserve:5080/api/default`), `Observability__OtlpHeaders`; bossa yalnizca konsol.
+- **Akislar:** isletim loglari `booster`, denetim kayitlari `audit` (logger kategorisi `Booster.Audit`); OpenObserve `stream-name` basligiyla ayirir. Oneri: isletim 30 gun, denetim 2 yil (stream ayari).
+- **Maskeleme:** `SensitiveDataRedactor` disa aktarmadan once e-posta, telefon, JWT, `password=/token=/code=` vb. gizler. Bu son savunma hattidir: kodda kisisel veri LOGLAMA (olay govdesi, e-posta, kod, token). FusionCache / EF Core / ASP.NET Core / MassTransit loglari Warning.
+- **Denetim kaydi:** `CommonInternal/.../Auditing/AuditLog` (`Success` / `Failure`, `AuditEntry`). Kisi kimligi (sub), havuz, uygulama, IP, tarayici, sonuc; e-posta / telefon / ad / parola / kod / token YAZILMAZ; bilinmeyen kimlik HMAC ozeti (`IdpOptions.ApplicationPeper`).
+  - Yonetim: `AdminAuditMiddleware` panel scope'lu ya da servis hesabi token'iyla her degisikligi ve kisisel veri okuyan panel uclarini (`/pools/users`, `/clients/sessions` ...) yazar; govde yazilmaz, yalnizca sorgudaki ...Id parametreleri.
+  - Son kullanici: oturum acilisi (`SessionStore.CreateAsync`), giris hatasi / kilit, kod hatalari, sifre sifirlama / degistirme, e-posta / telefon degisikligi, hesap silme / askiya alma, cikis, onay, davet, refresh tekrar kullanimi. Yeni bir guvenlik olayi eklerken `AuditLog` kullan.
+- **Bildirim kayitlari:** Target ve Body `ISecretProtector` ile sifreli (Notification servisi `HashingOptions` alir), 30 gun sonra silinir (`NotificationRetentionService`, `NotificationRetentionDays`).
+- **Eski log hatti (Kafka -> LoggingService -> loggingdb) KALDIRILDI.** `ILogWriter` yok; standart `ILogger` kullan.
+- **Kurulum paketi:** `openobserve` servisi `observability` profilinde (`COMPOSE_PROFILES`), arayuz `OPENOBSERVE_PORT` (yerel ag). Kurulum betigi `OPENOBSERVE_ADMIN_PASSWORD` ve `OTEL_HEADERS` uretir.
 
 ## Kullanici ekleme ve davet (IdP)
 - **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).

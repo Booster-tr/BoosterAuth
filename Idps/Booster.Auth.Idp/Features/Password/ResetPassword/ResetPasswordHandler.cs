@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -32,7 +33,8 @@ public sealed class ResetPasswordHandler(
     IPasswordHasher passwordHasher,
     ISimpleHasher simpleHasher,
     ICacheService cacheService,
-    IRequestContextAccessor requestContextAccessor) : ICommandHandler<ResetPasswordCommand, ResetPasswordResult>
+    IRequestContextAccessor requestContextAccessor,
+    AuditLog audit) : ICommandHandler<ResetPasswordCommand, ResetPasswordResult>
 {
     public async Task<ResetPasswordResult> ExecuteAsync(ResetPasswordCommand cmd, CancellationToken ct)
     {
@@ -103,6 +105,8 @@ public sealed class ResetPasswordHandler(
         await ConsumeAsync(cmd.InteractionKey, reset, ct);
 
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(reset.PrincipalId), ct);
+
+        audit.Success("account.password_reset", new AuditEntry(PrincipalId: reset.PrincipalId, PoolId: reset.IsolationId));
 
         return new ResetPasswordResult { InteractionKey = cmd.InteractionKey };
     }

@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -26,7 +27,8 @@ public class LogoutEndpoint(
     ICacheService cacheService,
     IRequestContextAccessor requestContextAccessor,
     IdpUiOptions uiOptions,
-    OidcKeyService keyService) : Endpoint<LogoutRequest>
+    OidcKeyService keyService,
+    AuditLog audit) : Endpoint<LogoutRequest>
 {
     public override void Configure()
     {
@@ -49,6 +51,8 @@ public class LogoutEndpoint(
             var logoutAll = req.LogoutAll
                 && (HttpMethods.IsPost(HttpContext.Request.Method) || SubjectFromIdToken(req.IdTokenHint) == session.PrincipalId.ToString());
             await RevokeAsync(session, logoutAll, ct);
+            audit.Success(logoutAll ? "auth.signout_all" : "auth.signout",
+                new AuditEntry(PrincipalId: session.PrincipalId, PoolId: session.IsolationId, ClientId: session.ClientId));
         }
 
         cookieManager.Clear(HttpContext.Response);

@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Idp.Features.Token.Handlers._base;
 using Booster.Auth.Database.Models.Enums;
@@ -33,7 +34,8 @@ public sealed class RefreshTokenGrantHandler(
     IAsyncRepository<PrincipalRole, IdpDbContext> roleRepository,
     IAsyncRepository<PrincipalScope, IdpDbContext> scopeRepository,
     IdpOptions idpOptions,
-    IRequestContextAccessor requestContextAccessor) : IGrantTypeHandler
+    IRequestContextAccessor requestContextAccessor,
+    AuditLog audit) : IGrantTypeHandler
 {
     public OAuthGrantType GrantType => OAuthGrantType.RefreshToken;
 
@@ -58,6 +60,9 @@ public sealed class RefreshTokenGrantHandler(
         if (stored.RevokedAt is not null)
         {
             await RevokeAllSessionTokensAsync(stored.SessionId, ct);
+            // Calinti token belirtisi: oturumun tum token'lari iptal edildi.
+            audit.Failure("token.refresh_reuse", new AuditEntry(PrincipalId: stored.PrincipalId, ClientId: client.ClientId,
+                Reason: IdpMessageKeys.RefreshTokenReuseDetected, Target: $"session:{stored.SessionId}"));
             throw new BusinessException(IdpMessageKeys.RefreshTokenReuseDetected);
         }
 

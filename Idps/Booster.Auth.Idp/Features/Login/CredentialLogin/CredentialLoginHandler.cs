@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 ﻿using Booster.Auth.Idp.Constants;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -39,6 +40,8 @@ public sealed class CredentialLoginHandler(
     ICacheService cacheService,
     ISecureCacheStore<ForcedPasswordChangeData> forcedChangeStore,
     IRequestContextAccessor requestContextAccessor,
+    AuditLog audit,
+    Booster.Auth.Idp.Options.IdpOptions idpOptions,
     Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService ldapLogin) : ICommandHandler<CredentialLoginCommand, CredentialLoginResult>
 {
     public async Task<CredentialLoginResult> ExecuteAsync(CredentialLoginCommand cmd, CancellationToken ct)
@@ -83,10 +86,21 @@ public sealed class CredentialLoginHandler(
 
         var user = await userStore.FindAsync(cmd.Identifier, client.Login.AllowedIdentifiers, ct, client.Login.DefaultCountryCode);
         if (user is null || !user.IsActive)
+        {
+            // Girilen kimlik duz metin yazilmaz (KVKK); ayni kimlikle tekrar eden denemeler ozetten eslestirilir. Ozet
+            // uygulamaya ozel gizli degerle (HMAC) alinir: duz SHA-256 tahmin edilebilir e-postalarla geri cozulebilirdi.
+            audit.Failure("auth.signin", new AuditEntry(PrincipalId: user?.Id, PoolId: client.IsolationId, ClientId: client.ClientId,
+                Reason: user is null ? "unknown_identifier" : "inactive", Method: cmd.ProviderType,
+                IdentifierHash: user is null ? IdentifierDigest(cmd.Identifier) : null));
             throw Invalid(IdpMessageKeys.InvalidCredentials);
+        }
 
         if (user.LockedUntil is { } lockedUntil && lockedUntil > DateTimeOffset.UtcNow)
+        {
+            audit.Failure("auth.signin", new AuditEntry(PrincipalId: user.Id, PoolId: client.IsolationId, ClientId: client.ClientId,
+                Reason: IdpMessageKeys.AccountLocked, Method: cmd.ProviderType));
             throw Invalid(IdpMessageKeys.AccountLocked);
+        }
 
         var result = await provider.AuthenticateAsync(
             new CredentialRequest(cmd.Identifier, cmd.Password),
@@ -97,6 +111,8 @@ public sealed class CredentialLoginHandler(
         if (!result.Succeeded)
         {
             await HandleFailedAttemptAsync(user, client.Login, ct);
+            audit.Failure("auth.signin", new AuditEntry(PrincipalId: user.Id, PoolId: client.IsolationId, ClientId: client.ClientId,
+                Reason: IdpMessageKeys.InvalidCredentials, Method: cmd.ProviderType));
             throw Invalid(IdpMessageKeys.InvalidCredentials);
         }
 
@@ -129,6 +145,11 @@ public sealed class CredentialLoginHandler(
         return new CredentialLoginResult { SessionToken = outcome.SessionToken, ExpiresAt = outcome.ExpiresAt };
     }
 
+    private string IdentifierDigest(string identifier)
+        => Convert.ToHexString(System.Security.Cryptography.HMACSHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes(idpOptions.ApplicationPeper),
+            System.Text.Encoding.UTF8.GetBytes(identifier.Trim().ToLowerInvariant())))[..16];
+
     private async Task HandleFailedAttemptAsync(LocalUser user, LoginPolicyData policy, CancellationToken ct)
     {
         var newCount = user.FailedAttemptCount + 1;
@@ -136,6 +157,9 @@ public sealed class CredentialLoginHandler(
             ? DateTimeOffset.UtcNow.AddSeconds(policy.LockoutSeconds)
             : null;
         await UpdateLockoutAsync(user.Id, newCount, lockedUntil, ct);
+
+        if (lockedUntil is not null)
+            audit.Success("account.locked", new AuditEntry(PrincipalId: user.Id, Reason: $"{newCount} hatali deneme"));
     }
 
     private async Task HandleSuccessfulAuthAsync(LocalUser user, string password, CancellationToken ct)

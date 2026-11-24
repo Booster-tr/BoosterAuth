@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
 using Booster.Auth.Idp.Providers.Abstractions;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.Models;
@@ -22,6 +23,7 @@ public sealed class VerifyPasswordlessLoginHandler(
     IProviderFactory providerFactory,
     ILocalUserStore userStore,
     ILoginChallengeManager loginChallengeManager,
+    AuditLog audit,
     IRequestContextAccessor requestContextAccessor)
     : ICommandHandler<VerifyPasswordlessLoginCommand, VerifyPasswordlessLoginResult>
 {
@@ -58,7 +60,11 @@ public sealed class VerifyPasswordlessLoginHandler(
             ct);
 
         if (!result.Succeeded)
-            throw Invalid(nameof(VerifyPasswordlessLoginCommand.Code), MapFailure(result.FailureReason));
+        {
+            audit.Failure("auth.passwordless", new AuditEntry(PoolId: client.IsolationId, ClientId: client.ClientId,
+                Reason: MapFailure(result.FailureReason), Method: provider.ProviderType));
+                throw Invalid(nameof(VerifyPasswordlessLoginCommand.Code), MapFailure(result.FailureReason));
+        }
 
         // Kod birinci adimi kanitladi; oturum havuzun dogrulama / MFA adimlarindan sonra acilir. MFA, kodun gittigi
         // kanal disindaki kanaldan istenir (bkz. LoginChallengeManager.BeginAsync).

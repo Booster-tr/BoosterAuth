@@ -4,7 +4,6 @@ using Booster.Auth.Common.Internal.Extensions;
 using Booster.Common.Extensions.ServiceExtensions;
 using Booster.ExceptionManager.Abstraction.Extensions;
 using Booster.ExceptionManager.WithCacheProvider.Extensions;
-using Booster.Logging.BoosterAmqp.Extensions;
 using Booster.SystemMessageService.Features._base;
 using Booster.SystemMessageService.Features.SystemMessages.RefreshCache;
 using Booster.SystemMessageService.Seeders;
@@ -39,13 +38,11 @@ public static class ServiceExtensions
         var amqpSettings = services.AddSettings<AmqpSettings>(configuration);
 
         services.AddBoosterCorrelationContext();
-        services.AddAmqpLogger();
 
         services.AddKafkaBus<SystemMessageDbContext>(
             amqpSettings,
             configureRider: rider =>
             {
-                rider.AddLogProducer();
             });
 
         return services;

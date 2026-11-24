@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Common.Internal.Constants;
@@ -43,7 +44,8 @@ public sealed class AccountService(
     IEventBus eventBus,
     LdapLoginService ldapLogin,
     AuthorizationService.AuthorizationServiceClient authorizationClient,
-    ILogger<AccountService> logger)
+    ILogger<AccountService> logger,
+    AuditLog audit)
 {
     private static readonly TimeSpan CodeTtl = TimeSpan.FromMinutes(15);
     private const int MaxCodeAttempts = 5;
@@ -227,6 +229,8 @@ public sealed class AccountService(
         await db.SaveChangesAsync(ct);
         await changeStore.RemoveAsync(ChangeKey(ctx), ct);
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principal.Id), ct);
+        audit.Success(kind == ContactKind.Email ? "account.email_changed" : "account.phone_changed",
+            new AuditEntry(PrincipalId: principal.Id, PoolId: ctx.Client.IsolationId, ClientId: ctx.Client.ClientId));
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -269,6 +273,8 @@ public sealed class AccountService(
         await RevokeSessionsAsync(ctx.Principal.Id, exceptSessionId: ctx.Session.Id, ct);
         await db.SaveChangesAsync(ct);
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(ctx.Principal.Id), ct);
+        audit.Success("account.password_changed",
+            new AuditEntry(PrincipalId: ctx.Principal.Id, PoolId: ctx.Client.IsolationId, ClientId: ctx.Client.ClientId));
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -297,6 +303,7 @@ public sealed class AccountService(
         using var scope = requestContextAccessor.BeginSystemContext(ctx.Client.IsolationId);
         var count = await RevokeSessionsAsync(ctx.Principal.Id, exceptSessionId: ctx.Session.Id, ct);
         await db.SaveChangesAsync(ct);
+        audit.Success("account.sessions_revoked", new AuditEntry(PrincipalId: ctx.Principal.Id, PoolId: ctx.Client.IsolationId, Reason: $"{count} oturum"));
         return count;
     }
 
@@ -352,6 +359,8 @@ public sealed class AccountService(
             await db.SaveChangesAsync(ct);
         }
 
+        audit.Success(status == PrincipalStatus.Active ? "account.activated" : "account.suspended", new AuditEntry(PrincipalId: principalId, PoolId: poolId));
+
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
     }
 
@@ -385,6 +394,8 @@ public sealed class AccountService(
             await tx.CommitAsync(ct);
         }
 
+        // Panelden ya da kullanicinin kendi istegiyle silme (kimin yaptigi istegin token / oturum sahibinden).
+        audit.Success("account.deleted", new AuditEntry(PrincipalId: principalId, PoolId: poolId));
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
         await DeleteRelationsAsync(principalId, poolId, ct);
 

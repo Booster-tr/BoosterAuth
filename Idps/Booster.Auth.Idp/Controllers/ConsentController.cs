@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Idp.Controllers.Base;
@@ -36,7 +37,8 @@ public class ConsentController(
     IClientDataStore clientDataStore,
     ILocalUserStore userStore,
     IdpDbContext db,
-    IRequestContextAccessor requestContextAccessor) : IdpBaseController
+    IRequestContextAccessor requestContextAccessor,
+    AuditLog audit) : IdpBaseController
 {
     [HttpGet("/ui/consent")]
     public async Task<IActionResult> Index(
@@ -75,6 +77,8 @@ public class ConsentController(
         {
             // Reddedildi: uygulamaya standart hata ile donulur (OAuth 2.0 access_denied); etkilesim kapanir.
             await interactionStore.RemoveAsync(interactionKey!, ct);
+            audit.Failure("consent.denied", new AuditEntry(PrincipalId: session!.PrincipalId, PoolId: client!.IsolationId,
+                ClientId: client.ClientId, Target: interaction.Scope));
             return Redirect(AppendQuery(interaction.RedirectUri, "error=access_denied", interaction.State));
         }
 
@@ -105,6 +109,9 @@ public class ConsentController(
 
             await db.SaveChangesAsync(ct);
         }
+
+        audit.Success("consent.granted", new AuditEntry(PrincipalId: session!.PrincipalId, PoolId: client.IsolationId,
+            ClientId: client.ClientId, Target: interaction.Scope));
 
         return Redirect(uiOptions.GetAuthorizeUrl(interactionKey!));
     }

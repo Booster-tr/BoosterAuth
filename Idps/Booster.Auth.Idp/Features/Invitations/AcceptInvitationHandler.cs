@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Auditing;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -35,7 +36,8 @@ public sealed class AcceptInvitationHandler(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
     ICacheService cacheService,
-    IRequestContextAccessor requestContextAccessor) : ICommandHandler<AcceptInvitationCommand>
+    IRequestContextAccessor requestContextAccessor,
+    AuditLog audit) : ICommandHandler<AcceptInvitationCommand>
 {
     public async Task ExecuteAsync(AcceptInvitationCommand cmd, CancellationToken ct)
     {
@@ -83,6 +85,7 @@ public sealed class AcceptInvitationHandler(
 
         await invitations.ConsumeAsync(cmd.Token, invitation, ct);
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principal.Id), ct);
+        audit.Success("account.invitation_accepted", new AuditEntry(PrincipalId: principal.Id, PoolId: invitation.IsolationId));
     }
 
     private static ValidationException Invalid(string property, string messageKey)

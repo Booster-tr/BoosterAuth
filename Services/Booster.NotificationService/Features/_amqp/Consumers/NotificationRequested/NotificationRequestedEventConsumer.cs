@@ -1,3 +1,4 @@
+using Booster.Hashing.TwoWays.Aes;
 using Booster.Database.Repositories;
 using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Common.Internal.EntityExtensions;
@@ -13,7 +14,8 @@ namespace Booster.NotificationService.Features._amqp.Consumers.NotificationReque
 public class NotificationRequestedEventConsumer(
     IAsyncRepository<Notification, NotificationDbContext> notificationRepository,
     ITemplateRenderer templateRenderer,
-    IEnumerable<INotificationSender> senders)
+    IEnumerable<INotificationSender> senders,
+    ISecretProtector protector)
     : IConsumer<NotificationRequestedEvent>
 {
     public async Task Consume(ConsumeContext<NotificationRequestedEvent> context)
@@ -58,6 +60,15 @@ public class NotificationRequestedEventConsumer(
             notification.SentTime = result.IsSuccess ? DateTimeOffset.UtcNow : null;
             notification.FailureMessage = result.FailureMessage;
         }
+
+        // Gonderildikten sonra kayitta alici ve icerik SIFRELI kalir (KVKK m.12): veritabanina erisen biri kodlari, davet
+        // baglantilarini ve adresleri okuyamaz. Kayit 30 gun sonra silinir (NotificationRetentionService).
+        // Sifreli metin duzden uzundur; sutuna sigmayan (cok nadir) icerik saklanmaz. Kayit hatasi Kafka'nin olayi tekrar
+        // islemesine, yani e-postanin ikinci kez gitmesine yol acardi.
+        var target = protector.Protect(notification.Target);
+        var body = protector.Protect(notification.Body);
+        notification.Target = target.Length <= 500 ? target : "-";
+        notification.Body = body.Length <= 20000 ? body : "-";
 
         await notificationRepository.AddAsync(notification, ct);
         await notificationRepository.SaveChangesAsync(ct);
