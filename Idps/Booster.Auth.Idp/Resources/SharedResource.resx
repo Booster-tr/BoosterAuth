@@ -985,4 +985,238 @@
   <data name="Invite.DoneText" xml:space="preserve">
     <value>Hesabınız kullanıma hazır. Artık uygulamanıza e-posta adresiniz ve parolanızla giriş yapabilirsiniz.</value>
   </data>
+  <data name="Account.PageTitle" xml:space="preserve">
+    <value>Hesabım · Booster Auth</value>
+  </data>
+  <data name="Account.Heading" xml:space="preserve">
+    <value>Hesabım</value>
+  </data>
+  <data name="Account.Subtitle" xml:space="preserve">
+    <value>Hesap bilgilerinizi ve güvenliğinizi buradan yönetin.</value>
+  </data>
+  <data name="Account.Name" xml:space="preserve">
+    <value>Ad soyad</value>
+  </data>
+  <data name="Account.UserName" xml:space="preserve">
+    <value>Kullanıcı adı</value>
+  </data>
+  <data name="Account.Email" xml:space="preserve">
+    <value>E-posta</value>
+  </data>
+  <data name="Account.Phone" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="Account.Password" xml:space="preserve">
+    <value>Parola</value>
+  </data>
+  <data name="Account.Sessions" xml:space="preserve">
+    <value>Oturumlar</value>
+  </data>
+  <data name="Account.Verified" xml:space="preserve">
+    <value>Doğrulandı</value>
+  </data>
+  <data name="Account.NotVerified" xml:space="preserve">
+    <value>Doğrulanmadı</value>
+  </data>
+  <data name="Account.NotSet" xml:space="preserve">
+    <value>Eklenmemiş</value>
+  </data>
+  <data name="Account.Edit" xml:space="preserve">
+    <value>Düzenle</value>
+  </data>
+  <data name="Account.Change" xml:space="preserve">
+    <value>Değiştir</value>
+  </data>
+  <data name="Account.Add" xml:space="preserve">
+    <value>Ekle</value>
+  </data>
+  <data name="Account.Manage" xml:space="preserve">
+    <value>Yönet</value>
+  </data>
+  <data name="Account.PasswordNone" xml:space="preserve">
+    <value>Parolasız giriş</value>
+  </data>
+  <data name="Account.PasswordDirectory" xml:space="preserve">
+    <value>Kurum dizininde yönetiliyor</value>
+  </data>
+  <data name="Account.SessionCount" xml:space="preserve">
+    <value>{0} etkin oturum</value>
+  </data>
+  <data name="Account.DirectoryNote" xml:space="preserve">
+    <value>Hesabınız kurum dizininden yönetiliyor. Ad, e-posta ve parola değişiklikleri için yöneticinize başvurun.</value>
+  </data>
+  <data name="Account.BackToApp" xml:space="preserve">
+    <value>Uygulamaya dön</value>
+  </data>
+  <data name="Account.BackToAccount" xml:space="preserve">
+    <value>Hesabıma dön</value>
+  </data>
+  <data name="Account.Cancel" xml:space="preserve">
+    <value>Vazgeç</value>
+  </data>
+  <data name="Account.DangerTitle" xml:space="preserve">
+    <value>Hesabı sil</value>
+  </data>
+  <data name="Account.DangerText" xml:space="preserve">
+    <value>Hesabınızı ve bilgilerinizi kalıcı olarak silin. Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="Account.DangerAction" xml:space="preserve">
+    <value>Hesabımı silmek istiyorum</value>
+  </data>
+  <data name="Account.Done.Profile" xml:space="preserve">
+    <value>Adınız güncellendi.</value>
+  </data>
+  <data name="Account.Done.Email" xml:space="preserve">
+    <value>E-posta adresiniz değiştirildi.</value>
+  </data>
+  <data name="Account.Done.Phone" xml:space="preserve">
+    <value>Telefon numaranız kaydedildi.</value>
+  </data>
+  <data name="Account.Done.Password" xml:space="preserve">
+    <value>Parolanız değiştirildi. Diğer cihazlardaki oturumlarınız kapatıldı.</value>
+  </data>
+  <data name="Account.Done.Sessions" xml:space="preserve">
+    <value>Diğer cihazlardaki oturumlarınız kapatıldı.</value>
+  </data>
+  <data name="Profile.Heading" xml:space="preserve">
+    <value>Adınızı düzenleyin</value>
+  </data>
+  <data name="Profile.Subtitle" xml:space="preserve">
+    <value>Uygulamalarda ve size gönderilen e-postalarda bu ad görünür.</value>
+  </data>
+  <data name="Profile.Submit" xml:space="preserve">
+    <value>Kaydet</value>
+  </data>
+  <data name="Contact.Email.Heading" xml:space="preserve">
+    <value>E-posta adresinizi değiştirin</value>
+  </data>
+  <data name="Contact.Email.HeadingAdd" xml:space="preserve">
+    <value>E-posta adresi ekleyin</value>
+  </data>
+  <data name="Contact.Email.Subtitle" xml:space="preserve">
+    <value>Yeni adrese bir doğrulama kodu göndereceğiz. Kodu girene kadar mevcut adresiniz geçerli kalır.</value>
+  </data>
+  <data name="Contact.Email.Label" xml:space="preserve">
+    <value>Yeni e-posta adresi</value>
+  </data>
+  <data name="Contact.Phone.Heading" xml:space="preserve">
+    <value>Telefon numaranızı değiştirin</value>
+  </data>
+  <data name="Contact.Phone.HeadingAdd" xml:space="preserve">
+    <value>Telefon numarası ekleyin</value>
+  </data>
+  <data name="Contact.Phone.Subtitle" xml:space="preserve">
+    <value>Yeni numaraya SMS ile bir doğrulama kodu göndereceğiz.</value>
+  </data>
+  <data name="Contact.Phone.Label" xml:space="preserve">
+    <value>Telefon numarası</value>
+  </data>
+  <data name="Contact.Phone.Hint" xml:space="preserve">
+    <value>Ülke koduyla yazın, ör. +90 532 000 00 00</value>
+  </data>
+  <data name="Contact.CurrentPassword" xml:space="preserve">
+    <value>Mevcut parolanız</value>
+  </data>
+  <data name="Contact.CurrentPasswordHint" xml:space="preserve">
+    <value>Güvenliğiniz için parolanızı yeniden girin.</value>
+  </data>
+  <data name="Contact.Submit" xml:space="preserve">
+    <value>Kod gönder</value>
+  </data>
+  <data name="Verify.Heading" xml:space="preserve">
+    <value>Doğrulama kodunu girin</value>
+  </data>
+  <data name="Verify.Subtitle.Email" xml:space="preserve">
+    <value>{0} adresine 6 haneli bir kod gönderdik. Kod 15 dakika geçerlidir.</value>
+  </data>
+  <data name="Verify.Subtitle.Phone" xml:space="preserve">
+    <value>{0} numarasına 6 haneli bir kod gönderdik. Kod 15 dakika geçerlidir.</value>
+  </data>
+  <data name="Verify.Code" xml:space="preserve">
+    <value>Doğrulama kodu</value>
+  </data>
+  <data name="Verify.Submit" xml:space="preserve">
+    <value>Doğrula ve kaydet</value>
+  </data>
+  <data name="Verify.Resend" xml:space="preserve">
+    <value>Kod gelmedi mi? Yeniden gönderin</value>
+  </data>
+  <data name="Password.Heading" xml:space="preserve">
+    <value>Parolanızı değiştirin</value>
+  </data>
+  <data name="Password.Subtitle" xml:space="preserve">
+    <value>Değişiklikten sonra diğer cihazlardaki oturumlarınız kapatılır.</value>
+  </data>
+  <data name="Password.Current" xml:space="preserve">
+    <value>Mevcut parola</value>
+  </data>
+  <data name="Password.New" xml:space="preserve">
+    <value>Yeni parola</value>
+  </data>
+  <data name="Password.Confirm" xml:space="preserve">
+    <value>Yeni parola (tekrar)</value>
+  </data>
+  <data name="Password.Submit" xml:space="preserve">
+    <value>Parolayı değiştir</value>
+  </data>
+  <data name="Sessions.Heading" xml:space="preserve">
+    <value>Oturumlarınız</value>
+  </data>
+  <data name="Sessions.Subtitle" xml:space="preserve">
+    <value>Hesabınızın açık olduğu tarayıcı ve cihazlar.</value>
+  </data>
+  <data name="Sessions.ThisDevice" xml:space="preserve">
+    <value>Bu cihaz</value>
+  </data>
+  <data name="Sessions.LastActive" xml:space="preserve">
+    <value>Son etkinlik: {0}</value>
+  </data>
+  <data name="Sessions.Unknown" xml:space="preserve">
+    <value>Bilinmeyen cihaz</value>
+  </data>
+  <data name="Sessions.SignOutOthers" xml:space="preserve">
+    <value>Diğer cihazlardan çıkış yap ({0})</value>
+  </data>
+  <data name="Sessions.OnlyThis" xml:space="preserve">
+    <value>Yalnızca bu cihazda oturumunuz açık.</value>
+  </data>
+  <data name="Ago.Now" xml:space="preserve">
+    <value>az önce</value>
+  </data>
+  <data name="Ago.Minutes" xml:space="preserve">
+    <value>{0} dk önce</value>
+  </data>
+  <data name="Ago.Hours" xml:space="preserve">
+    <value>{0} saat önce</value>
+  </data>
+  <data name="Ago.Days" xml:space="preserve">
+    <value>{0} gün önce</value>
+  </data>
+  <data name="Delete.Heading" xml:space="preserve">
+    <value>Hesabınızı silin</value>
+  </data>
+  <data name="Delete.Subtitle" xml:space="preserve">
+    <value>Bu işlem geri alınamaz.</value>
+  </data>
+  <data name="Delete.Effect1" xml:space="preserve">
+    <value>Adınız, e-posta adresiniz, telefonunuz ve parolanız silinir.</value>
+  </data>
+  <data name="Delete.Effect2" xml:space="preserve">
+    <value>Tüm cihazlardaki oturumlarınız kapatılır.</value>
+  </data>
+  <data name="Delete.Effect3" xml:space="preserve">
+    <value>Uygulamalara verdiğiniz izinler, bağlı hesaplar ve yetkileriniz kaldırılır.</value>
+  </data>
+  <data name="Delete.Confirm" xml:space="preserve">
+    <value>Hesabımın kalıcı olarak silineceğini anlıyorum.</value>
+  </data>
+  <data name="Delete.Submit" xml:space="preserve">
+    <value>Hesabımı kalıcı olarak sil</value>
+  </data>
+  <data name="Deleted.Heading" xml:space="preserve">
+    <value>Hesabınız silindi</value>
+  </data>
+  <data name="Deleted.Text" xml:space="preserve">
+    <value>Bilgileriniz silindi ve tüm oturumlarınız kapatıldı. Dilerseniz daha sonra yeniden kayıt olabilirsiniz.</value>
+  </data>
 </root>

@@ -156,6 +156,11 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Giris (`LdapLoginService`, `CredentialLoginHandler`): yerel parolasi OLMAYAN kullanici parola formunda dizinle dogrulanir; eslesme `PrincipalIdentity` (saglayici + objectGUID/entryUUID). Ilk giriste hesap (`AllowFederatedJit` + lisans limiti), ad/e-posta her giriste dizinden. Yerel parolali hesaba otomatik BAGLANMAZ. Hatali deneme kilidi onbellekte (havuz + kullanici adi). MFA uygulanir.
   - LDAP kullanicisina sifre sifirlama kodu gonderilmez (dizini atlayamasin). Giris ekraninda LDAP butonu yoktur; LDAP acikken kimlik alani kullanici adi da kabul eder.
   - Panel "Baglantiyi test et": `POST identity-providers/ldap/test`. Yerel test: `bitnamilegacy/openldap` (ag adi `openldap`, 1389/1636).
+- **Hesabim (son kullanici self-servis):** IdP `/ui/account?client_id=..&return_url=..` (`AccountController` + `AccountService`). Kimlik IdP oturum cerezinden; oturum yoksa `InteractionStateData.AccountReturnUrl` ile giris acilir, `AuthorizeEndpoint` giristen sonra kod uretmeden sayfaya doner.
+  - `return_url` yalnizca uygulamanin kayitli redirect / post-logout adresleriyle AYNI kokende (scheme+host+port) kabul edilir (acik yonlendirme yok).
+  - Ad; e-posta / telefon degisikligi yeni adrese kodla (`email_change` e-posta sablonu, telefon `phone_verification` SMS); parola (diger oturumlar kapanir); oturum listesi + digerlerinden cikis; hesap silme.
+  - Hassas islemler (e-posta / telefon / silme) parolasi olan kullanicida mevcut parolayi yeniden ister. LDAP kullanicisinda ad / e-posta / parola degistirilemez.
+  - Hesap silme: havuz kayit politikasi `AllowSelfDeletion` (varsayilan kapali; yonetim havuzunda her zaman kapali). Kayit anonimlestirilip soft-delete; parola, kimlikler, izinler, roller, oturumlar ve FGA iliskileri silinir.
 - **Davet:** `InvitationManager`.
   - Baglanti `/idp/ui/invite?token=`; 1 gun gecerli ve tek kullanimlik.
   - Yeniden gonderilen davet (`POST pools/users/invite`) eskisini gecersiz kilar.

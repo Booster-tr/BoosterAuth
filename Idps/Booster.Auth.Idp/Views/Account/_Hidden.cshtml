@@ -1,0 +1,8 @@
+@model Booster.Auth.Idp.Controllers.AccountPageModel
+@* Her Hesabim formunun ortak gizli alanlari: uygulama ve donus adresi her istekte yeniden dogrulanir. *@
+@Html.AntiForgeryToken()
+<input type="hidden" name="ClientId" value="@Model.ClientId" />
+@if (Model.ReturnUrl is not null)
+{
+    <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+}

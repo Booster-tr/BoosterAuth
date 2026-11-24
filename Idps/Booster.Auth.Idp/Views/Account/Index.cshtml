@@ -1,0 +1,136 @@
+@model Booster.Auth.Idp.Controllers.AccountPageModel
+@* Hesabim ozeti. Route: AccountController [HttpGet("/ui/account")]. *@
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = T["Account.PageTitle"].Value;
+
+    string Link(string page) => Url.Idp($"/ui/account/{page}?{Model.Query}");
+    string? notice = Model.Notice switch
+    {
+        "profile" => T["Account.Done.Profile"].Value,
+        "email" => T["Account.Done.Email"].Value,
+        "phone" => T["Account.Done.Phone"].Value,
+        "password" => T["Account.Done.Password"].Value,
+        "sessions" => T["Account.Done.Sessions"].Value,
+        _ => null
+    };
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["Account.Heading"]</h1>
+        <p class="auth-card__subtitle">@T["Account.Subtitle"]</p>
+    </header>
+
+    @if (notice is not null)
+    {
+        <div class="auth-alert auth-alert--success" role="status">
+            <svg class="auth-alert__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+                <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6" />
+                <path d="m6.75 10.25 2.25 2.25 4.25-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <p class="auth-alert__text" style="margin-top:0">@notice</p>
+        </div>
+    }
+
+    @if (Model.DirectoryManaged)
+    {
+        <div class="auth-alert auth-alert--info">
+            <p class="auth-alert__text" style="margin-top:0">@T["Account.DirectoryNote"]</p>
+        </div>
+    }
+
+    <dl class="account-list">
+        <div class="account-row">
+            <dt class="account-row__label">@T["Account.Name"]</dt>
+            <dd class="account-row__value">@Model.DisplayName</dd>
+            @if (!Model.DirectoryManaged)
+            {
+                <a class="auth-link account-row__action" href="@Link("profile")">@T["Account.Edit"]</a>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.UserName))
+        {
+            <div class="account-row">
+                <dt class="account-row__label">@T["Account.UserName"]</dt>
+                <dd class="account-row__value">@Model.UserName</dd>
+            </div>
+        }
+
+        <div class="account-row">
+            <dt class="account-row__label">@T["Account.Email"]</dt>
+            @if (string.IsNullOrEmpty(Model.Email))
+            {
+                <dd class="account-row__value account-row__value--muted">@T["Account.NotSet"]</dd>
+            }
+            else
+            {
+                <dd class="account-row__value">
+                    @Model.Email
+                    <span class="account-badge @(Model.EmailVerified ? null : "account-badge--muted")">@(Model.EmailVerified ? T["Account.Verified"] : T["Account.NotVerified"])</span>
+                </dd>
+            }
+            @if (!Model.DirectoryManaged)
+            {
+                <a class="auth-link account-row__action" href="@Link("email")">@(string.IsNullOrEmpty(Model.Email) ? T["Account.Add"] : T["Account.Change"])</a>
+            }
+        </div>
+
+        @if (Model.ShowPhone)
+        {
+            <div class="account-row">
+                <dt class="account-row__label">@T["Account.Phone"]</dt>
+                @if (string.IsNullOrEmpty(Model.Phone))
+                {
+                    <dd class="account-row__value account-row__value--muted">@T["Account.NotSet"]</dd>
+                }
+                else
+                {
+                    <dd class="account-row__value">
+                        @Model.Phone
+                        <span class="account-badge @(Model.PhoneVerified ? null : "account-badge--muted")">@(Model.PhoneVerified ? T["Account.Verified"] : T["Account.NotVerified"])</span>
+                    </dd>
+                }
+                <a class="auth-link account-row__action" href="@Link("phone")">@(string.IsNullOrEmpty(Model.Phone) ? T["Account.Add"] : T["Account.Change"])</a>
+            </div>
+        }
+
+        <div class="account-row">
+            <dt class="account-row__label">@T["Account.Password"]</dt>
+            @if (Model.DirectoryManaged)
+            {
+                <dd class="account-row__value account-row__value--muted">@T["Account.PasswordDirectory"]</dd>
+            }
+            else if (Model.HasPassword)
+            {
+                <dd class="account-row__value">••••••••</dd>
+                <a class="auth-link account-row__action" href="@Link("password")">@T["Account.Change"]</a>
+            }
+            else
+            {
+                <dd class="account-row__value account-row__value--muted">@T["Account.PasswordNone"]</dd>
+            }
+        </div>
+
+        <div class="account-row">
+            <dt class="account-row__label">@T["Account.Sessions"]</dt>
+            <dd class="account-row__value">@T["Account.SessionCount", Model.ActiveSessionCount]</dd>
+            <a class="auth-link account-row__action" href="@Link("sessions")">@T["Account.Manage"]</a>
+        </div>
+    </dl>
+
+    @if (Model.ReturnUrl is not null)
+    {
+        <a class="auth-btn auth-btn--primary auth-btn--block" href="@Model.ReturnUrl">@T["Account.BackToApp"]</a>
+    }
+
+    @if (Model.CanDelete)
+    {
+        <div class="account-danger">
+            <h2 class="account-danger__title">@T["Account.DangerTitle"]</h2>
+            <p class="account-danger__text">@T["Account.DangerText"]</p>
+            <a class="auth-link account-link-danger" href="@Link("delete")">@T["Account.DangerAction"]</a>
+        </div>
+    }
+</section>

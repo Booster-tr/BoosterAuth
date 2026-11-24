@@ -1,0 +1,64 @@
+<h1>Hesabım (son kullanıcı)</h1>
+<p class="lede">Kullanıcılarınız ad, e-posta, telefon, parola ve oturumlarını kendileri yönetir; havuz izin veriyorsa hesaplarını da silebilir.
+    Bu ekranları siz yazmazsınız: Booster Auth sunar, uygulamanıza tek bir bağlantı koymanız yeterlidir.</p>
+
+<h2 id="baglanti">Uygulamanıza bağlantı ekleyin</h2>
+<p>Uygulamanızın menüsüne "Hesabım" adında bir bağlantı koyun:</p>
+<div class="code"><span class="lbl">Bağlantı</span><pre>https://auth.firma.com/idp/ui/account?client_id=acme-web&amp;return_url=https%3A%2F%2Fapp.firma.com%2Fayarlar</pre></div>
+<ul>
+    <li><code>client_id</code>: uygulamanızın kimliği. Sayfa, uygulamanın havuzundaki kurallarla (parola kuralları, giriş yöntemleri) çalışır.</li>
+    <li><code>return_url</code> (isteğe bağlı): "Uygulamaya dön" butonunun adresi. Güvenlik için yalnızca uygulamaya kayıtlı yönlendirme ya da çıkış adresleriyle
+        <b>aynı alan adı ve porttaki</b> adresler kabul edilir.</li>
+</ul>
+<p>Kullanıcı uygulamanıza Booster Auth ile girdiyse sayfa doğrudan açılır. Oturumu yoksa önce normal giriş ekranı gelir, girişten sonra
+    Hesabım'a dönülür.</p>
+
+<h2 id="neler">Kullanıcı neler yapabilir?</h2>
+<table>
+    <thead><tr><th>İşlem</th><th>Nasıl çalışır</th></tr></thead>
+    <tbody>
+        <tr><td>Ad soyad</td><td>Doğrudan güncellenir; sonraki token'larda yeni ad yer alır.</td></tr>
+        <tr><td>E-posta değiştirme</td><td>Yeni adrese 6 haneli kod gönderilir; kod girilene kadar eski adres geçerli kalır. Adres başka bir kullanıcıdaysa reddedilir.</td></tr>
+        <tr><td>Telefon ekleme / değiştirme</td><td>Yeni numaraya SMS ile kod gönderilir. Ülke kodu yazılmazsa havuzun varsayılan ülke kodu kullanılır.
+            Telefon satırı yalnızca havuz telefonu kullanıyorsa (telefonla giriş ya da SMS ile iki adımlı doğrulama) görünür.</td></tr>
+        <tr><td>Parola değiştirme</td><td>Mevcut parola sorulur; havuzun parola kuralları ve parola geçmişi uygulanır. Değişiklikten sonra diğer cihazlardaki oturumlar kapanır.</td></tr>
+        <tr><td>Oturumlar</td><td>Açık oturumlar listelenir; tek tuşla diğer tüm cihazlardan çıkış yapılır.</td></tr>
+        <tr><td>Hesabı silme</td><td>Yalnızca havuzda açıksa (aşağıya bakın).</td></tr>
+    </tbody>
+</table>
+<div class="callout info"><p><b>Hassas işlemler parola ister.</b> E-posta / telefon değiştirme ve hesap silme için kullanıcının mevcut parolası yeniden sorulur.
+    Böylece açık bırakılmış bir tarayıcıdan hesap ele geçirilemez. Parolasız giriş yapan kullanıcılarda (e-postayla kod, dış sağlayıcı)
+    yeni adrese gönderilen kod ve oturum yeterlidir.</p></div>
+
+<h2 id="silme">Hesap silmeyi açma</h2>
+<p>Varsayılan olarak kapalıdır. Konsolda <b>Havuz Bilgileri &gt; Kayıt politikası</b>'nda
+    <b>"Kullanıcılar Hesabım sayfasından hesaplarını silebilsin"</b> seçeneğini açın. Kişisel verilerin silinmesi talebini (KVKK / GDPR)
+    kullanıcının kendisinin yapabilmesini sağlar.</p>
+<p>Silinen hesapta:</p>
+<ul>
+    <li>ad, e-posta, telefon ve kullanıcı adı silinir; kayıt anonimleştirilip silinmiş işaretlenir;</li>
+    <li>parola, parola geçmişi, dış sağlayıcı bağlantıları, uygulama izinleri, roller ve yetki ilişkileri kaldırılır;</li>
+    <li>tüm oturumlar ve yenileme token'ları iptal edilir;</li>
+    <li>kullanıcı lisansınızın kullanıcı sayısından düşer ve aynı e-postayla yeniden kayıt olabilir.</li>
+</ul>
+<p>Yönetim konsolunun yöneticileri Hesabım'dan hesaplarını silemez.</p>
+
+<h2 id="ldap">Kurum dizini (LDAP) kullanıcıları</h2>
+<p>Ad, e-posta ve parola kurum dizininden gelir; bu yüzden Hesabım'da değiştirilemez ve sayfada bunu söyleyen bir not görünür.
+    Telefon, oturumlar ve (açıksa) hesap silme kullanılabilir.</p>
+
+<h2 id="api">Kendi formunuzu yazmak isterseniz</h2>
+<p>Parola değiştirmeyi kendi ekranınızda yapmak için, kullanıcının access token'ıyla IdP'nin parola ucunu çağırın:</p>
+<div class="code"><span class="lbl">HTTP</span><pre>POST https://auth.firma.com/idp/password/change
+Authorization: Bearer &lt;kullanıcının access token'ı&gt;
+Content-Type: application/json
+
+{
+  "client_id": "acme-web",
+  "current_password": "...",
+  "new_password": "...",
+  "new_password_confirm": "..."
+}</pre></div>
+<p>Başarılıysa <code>204</code> döner. Hatalarda <code>400</code> ile alan bazlı mesajlar gelir (<code>errors[].property</code> ve
+    <code>errors[].message</code>; dil <code>Accept-Language</code> başlığına göre). Diğer işlemler için Hesabım sayfasını kullanmanızı öneririz;
+    doğrulama kodu, parola kuralları ve güvenlik kontrolleri orada hazırdır.</p>

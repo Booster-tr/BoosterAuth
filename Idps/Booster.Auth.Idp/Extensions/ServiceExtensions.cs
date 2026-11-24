@@ -104,6 +104,7 @@ public static class ServiceExtensions
         services.AddScoped<Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService>();
         services.AddScoped<Booster.Auth.Common.Internal.Licensing.ILicenseLimitService, Booster.Auth.Common.Internal.Licensing.LicenseLimitService>();
         services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.InvitationManager>();
+        services.AddScoped<Booster.Auth.Idp.Managers.AccountManagers.AccountService>();
 
         services.AddScoped<IClientDataStore, ClientDataStore>();
         services.AddSingleton<IClientLogoStore, ClientLogoStore>();

@@ -1,0 +1,47 @@
+@model Booster.Auth.Idp.Controllers.AccountPageModel
+@using Booster.Auth.Idp.Controllers
+@using Booster.Auth.Idp.Managers.AccountManagers
+@* E-posta ya da telefon degisikligi, adim 1: yeni deger (+ parolasi olan kullanicida mevcut parola). *@
+@{
+    Layout = "_AuthLayout";
+    var email = Model.Kind == ContactKind.Email;
+    var current = email ? Model.Email : Model.Phone;
+    var heading = email
+        ? (string.IsNullOrEmpty(current) ? T["Contact.Email.HeadingAdd"].Value : T["Contact.Email.Heading"].Value)
+        : (string.IsNullOrEmpty(current) ? T["Contact.Phone.HeadingAdd"].Value : T["Contact.Phone.Heading"].Value);
+    ViewData["Title"] = heading;
+    var action = email ? "/ui/account/email" : "/ui/account/phone";
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@heading</h1>
+        <p class="auth-card__subtitle">@(email ? T["Contact.Email.Subtitle"] : T["Contact.Phone.Subtitle"])</p>
+    </header>
+
+    <partial name="_ValidationSummary" />
+
+    <form method="post" action="@Url.Idp(action)" class="auth-form" data-auth-form asp-antiforgery="false">
+        <partial name="_Hidden" model="Model" />
+        @if (email)
+        {
+            <partial name="_Field" model="@(new AccountFieldModel("Value", T["Contact.Email.Label"].Value, Type: "email", Autocomplete: "email", Value: Model.Value, Autofocus: true))" />
+        }
+        else
+        {
+            <partial name="_Field" model="@(new AccountFieldModel("Value", T["Contact.Phone.Label"].Value, Type: "tel", Autocomplete: "tel", Value: Model.Value, Hint: T["Contact.Phone.Hint"].Value, Autofocus: true, InputMode: "tel"))" />
+        }
+        @if (Model.HasPassword && !Model.DirectoryManaged)
+        {
+            <partial name="_Field" model="@(new AccountFieldModel("CurrentPassword", T["Contact.CurrentPassword"].Value, Type: "password", Autocomplete: "current-password", Hint: T["Contact.CurrentPasswordHint"].Value))" />
+        }
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-btn auth-btn--primary auth-btn--block" data-submit-guard>
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["Contact.Submit"]</span>
+            </button>
+        </div>
+    </form>
+
+    <partial name="_Back" model="Model" />
+</section>

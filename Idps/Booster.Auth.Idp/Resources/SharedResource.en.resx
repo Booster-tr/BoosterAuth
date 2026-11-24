@@ -985,4 +985,238 @@
   <data name="Invite.DoneText" xml:space="preserve">
     <value>Your account is ready. You can now sign in to your application with your email address and password.</value>
   </data>
+  <data name="Account.PageTitle" xml:space="preserve">
+    <value>My account · Booster Auth</value>
+  </data>
+  <data name="Account.Heading" xml:space="preserve">
+    <value>My account</value>
+  </data>
+  <data name="Account.Subtitle" xml:space="preserve">
+    <value>Manage your account details and security.</value>
+  </data>
+  <data name="Account.Name" xml:space="preserve">
+    <value>Full name</value>
+  </data>
+  <data name="Account.UserName" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Account.Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Account.Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Account.Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Account.Sessions" xml:space="preserve">
+    <value>Sessions</value>
+  </data>
+  <data name="Account.Verified" xml:space="preserve">
+    <value>Verified</value>
+  </data>
+  <data name="Account.NotVerified" xml:space="preserve">
+    <value>Not verified</value>
+  </data>
+  <data name="Account.NotSet" xml:space="preserve">
+    <value>Not added</value>
+  </data>
+  <data name="Account.Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Account.Change" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="Account.Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Account.Manage" xml:space="preserve">
+    <value>Manage</value>
+  </data>
+  <data name="Account.PasswordNone" xml:space="preserve">
+    <value>Passwordless sign-in</value>
+  </data>
+  <data name="Account.PasswordDirectory" xml:space="preserve">
+    <value>Managed by your organization's directory</value>
+  </data>
+  <data name="Account.SessionCount" xml:space="preserve">
+    <value>{0} active session(s)</value>
+  </data>
+  <data name="Account.DirectoryNote" xml:space="preserve">
+    <value>Your account is managed by your organization's directory. Contact your administrator to change your name, email or password.</value>
+  </data>
+  <data name="Account.BackToApp" xml:space="preserve">
+    <value>Back to the application</value>
+  </data>
+  <data name="Account.BackToAccount" xml:space="preserve">
+    <value>Back to my account</value>
+  </data>
+  <data name="Account.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Account.DangerTitle" xml:space="preserve">
+    <value>Delete account</value>
+  </data>
+  <data name="Account.DangerText" xml:space="preserve">
+    <value>Permanently delete your account and your details. This cannot be undone.</value>
+  </data>
+  <data name="Account.DangerAction" xml:space="preserve">
+    <value>I want to delete my account</value>
+  </data>
+  <data name="Account.Done.Profile" xml:space="preserve">
+    <value>Your name has been updated.</value>
+  </data>
+  <data name="Account.Done.Email" xml:space="preserve">
+    <value>Your email address has been changed.</value>
+  </data>
+  <data name="Account.Done.Phone" xml:space="preserve">
+    <value>Your phone number has been saved.</value>
+  </data>
+  <data name="Account.Done.Password" xml:space="preserve">
+    <value>Your password has been changed. You have been signed out on your other devices.</value>
+  </data>
+  <data name="Account.Done.Sessions" xml:space="preserve">
+    <value>You have been signed out on your other devices.</value>
+  </data>
+  <data name="Profile.Heading" xml:space="preserve">
+    <value>Edit your name</value>
+  </data>
+  <data name="Profile.Subtitle" xml:space="preserve">
+    <value>This name appears in applications and in emails sent to you.</value>
+  </data>
+  <data name="Profile.Submit" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Contact.Email.Heading" xml:space="preserve">
+    <value>Change your email address</value>
+  </data>
+  <data name="Contact.Email.HeadingAdd" xml:space="preserve">
+    <value>Add an email address</value>
+  </data>
+  <data name="Contact.Email.Subtitle" xml:space="preserve">
+    <value>We will send a verification code to the new address. Your current address stays in effect until you enter the code.</value>
+  </data>
+  <data name="Contact.Email.Label" xml:space="preserve">
+    <value>New email address</value>
+  </data>
+  <data name="Contact.Phone.Heading" xml:space="preserve">
+    <value>Change your phone number</value>
+  </data>
+  <data name="Contact.Phone.HeadingAdd" xml:space="preserve">
+    <value>Add a phone number</value>
+  </data>
+  <data name="Contact.Phone.Subtitle" xml:space="preserve">
+    <value>We will send a verification code to the new number by SMS.</value>
+  </data>
+  <data name="Contact.Phone.Label" xml:space="preserve">
+    <value>Phone number</value>
+  </data>
+  <data name="Contact.Phone.Hint" xml:space="preserve">
+    <value>Include the country code, e.g. +44 7700 900000</value>
+  </data>
+  <data name="Contact.CurrentPassword" xml:space="preserve">
+    <value>Your current password</value>
+  </data>
+  <data name="Contact.CurrentPasswordHint" xml:space="preserve">
+    <value>For your security, enter your password again.</value>
+  </data>
+  <data name="Contact.Submit" xml:space="preserve">
+    <value>Send code</value>
+  </data>
+  <data name="Verify.Heading" xml:space="preserve">
+    <value>Enter the verification code</value>
+  </data>
+  <data name="Verify.Subtitle.Email" xml:space="preserve">
+    <value>We sent a 6-digit code to {0}. The code is valid for 15 minutes.</value>
+  </data>
+  <data name="Verify.Subtitle.Phone" xml:space="preserve">
+    <value>We sent a 6-digit code to {0}. The code is valid for 15 minutes.</value>
+  </data>
+  <data name="Verify.Code" xml:space="preserve">
+    <value>Verification code</value>
+  </data>
+  <data name="Verify.Submit" xml:space="preserve">
+    <value>Verify and save</value>
+  </data>
+  <data name="Verify.Resend" xml:space="preserve">
+    <value>Didn't get the code? Send it again</value>
+  </data>
+  <data name="Password.Heading" xml:space="preserve">
+    <value>Change your password</value>
+  </data>
+  <data name="Password.Subtitle" xml:space="preserve">
+    <value>After the change you will be signed out on your other devices.</value>
+  </data>
+  <data name="Password.Current" xml:space="preserve">
+    <value>Current password</value>
+  </data>
+  <data name="Password.New" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="Password.Confirm" xml:space="preserve">
+    <value>Confirm new password</value>
+  </data>
+  <data name="Password.Submit" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="Sessions.Heading" xml:space="preserve">
+    <value>Your sessions</value>
+  </data>
+  <data name="Sessions.Subtitle" xml:space="preserve">
+    <value>Browsers and devices where you are signed in.</value>
+  </data>
+  <data name="Sessions.ThisDevice" xml:space="preserve">
+    <value>This device</value>
+  </data>
+  <data name="Sessions.LastActive" xml:space="preserve">
+    <value>Last active: {0}</value>
+  </data>
+  <data name="Sessions.Unknown" xml:space="preserve">
+    <value>Unknown device</value>
+  </data>
+  <data name="Sessions.SignOutOthers" xml:space="preserve">
+    <value>Sign out on other devices ({0})</value>
+  </data>
+  <data name="Sessions.OnlyThis" xml:space="preserve">
+    <value>You are signed in on this device only.</value>
+  </data>
+  <data name="Ago.Now" xml:space="preserve">
+    <value>just now</value>
+  </data>
+  <data name="Ago.Minutes" xml:space="preserve">
+    <value>{0} min ago</value>
+  </data>
+  <data name="Ago.Hours" xml:space="preserve">
+    <value>{0} h ago</value>
+  </data>
+  <data name="Ago.Days" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+  <data name="Delete.Heading" xml:space="preserve">
+    <value>Delete your account</value>
+  </data>
+  <data name="Delete.Subtitle" xml:space="preserve">
+    <value>This cannot be undone.</value>
+  </data>
+  <data name="Delete.Effect1" xml:space="preserve">
+    <value>Your name, email address, phone number and password are deleted.</value>
+  </data>
+  <data name="Delete.Effect2" xml:space="preserve">
+    <value>You are signed out on all devices.</value>
+  </data>
+  <data name="Delete.Effect3" xml:space="preserve">
+    <value>Permissions you granted to applications, linked accounts and your access rights are removed.</value>
+  </data>
+  <data name="Delete.Confirm" xml:space="preserve">
+    <value>I understand that my account will be permanently deleted.</value>
+  </data>
+  <data name="Delete.Submit" xml:space="preserve">
+    <value>Permanently delete my account</value>
+  </data>
+  <data name="Deleted.Heading" xml:space="preserve">
+    <value>Your account has been deleted</value>
+  </data>
+  <data name="Deleted.Text" xml:space="preserve">
+    <value>Your details have been deleted and you have been signed out everywhere. You can sign up again later if you wish.</value>
+  </data>
 </root>

@@ -1,0 +1,28 @@
+@model Booster.Auth.Idp.Controllers.AccountPageModel
+@using Booster.Auth.Idp.Controllers
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = T["Profile.Heading"].Value;
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["Profile.Heading"]</h1>
+        <p class="auth-card__subtitle">@T["Profile.Subtitle"]</p>
+    </header>
+
+    <partial name="_ValidationSummary" />
+
+    <form method="post" action="@Url.Idp("/ui/account/profile")" class="auth-form" data-auth-form asp-antiforgery="false">
+        <partial name="_Hidden" model="Model" />
+        <partial name="_Field" model="@(new AccountFieldModel("DisplayName", T["Account.Name"].Value, Autocomplete: "name", Value: Model.DisplayName, Autofocus: true))" />
+        <div class="auth-form__actions">
+            <button type="submit" class="auth-btn auth-btn--primary auth-btn--block" data-submit-guard>
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["Profile.Submit"]</span>
+            </button>
+        </div>
+    </form>
+
+    <partial name="_Back" model="Model" />
+</section>

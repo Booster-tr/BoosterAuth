@@ -210,7 +210,8 @@ public sealed class ClientDataGrpcService(
                 Mode = policy.Registration.Mode,
                 RequireEmailVerification = policy.Registration.RequireEmailVerification,
                 RequirePhoneVerification = policy.Registration.RequirePhoneVerification,
-                AllowFederatedJit = policy.Registration.AllowFederatedJit
+                AllowFederatedJit = policy.Registration.AllowFederatedJit,
+                AllowSelfDeletion = policy.Registration.AllowSelfDeletion
             },
             Password = new PasswordPolicyData
             {

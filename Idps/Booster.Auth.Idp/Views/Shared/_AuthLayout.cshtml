@@ -23,7 +23,7 @@
         && ViewData["HideCookieBar"] is not true;
 }
 <!DOCTYPE html>
-<html lang="tr" dir="ltr">
+<html lang="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en" ? "en" : "tr")" dir="ltr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

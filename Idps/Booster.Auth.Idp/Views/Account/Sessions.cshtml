@@ -1,0 +1,79 @@
+@model Booster.Auth.Idp.Controllers.AccountPageModel
+@* Etkin oturumlar. Saatler goreli yazilir ("5 dk once"): sunucu kullanicinin saat dilimini bilmez. *@
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = T["Sessions.Heading"].Value;
+    var now = DateTimeOffset.UtcNow;
+
+    string Ago(DateTimeOffset at)
+    {
+        var d = now - at;
+        if (d.TotalMinutes < 1) return T["Ago.Now"].Value;
+        if (d.TotalHours < 1) return T["Ago.Minutes", (int)d.TotalMinutes].Value;
+        if (d.TotalDays < 1) return T["Ago.Hours", (int)d.TotalHours].Value;
+        return T["Ago.Days", (int)d.TotalDays].Value;
+    }
+
+    // Kaba tarayici / isletim sistemi adi; ayrintili cihaz tespiti gerekmez.
+    string Device(string? ua)
+    {
+        if (string.IsNullOrWhiteSpace(ua)) return T["Sessions.Unknown"].Value;
+        var browser = ua.Contains("Edg/") ? "Edge"
+            : ua.Contains("OPR/") ? "Opera"
+            : ua.Contains("Firefox/") ? "Firefox"
+            : ua.Contains("Chrome/") ? "Chrome"
+            : ua.Contains("Safari/") ? "Safari"
+            : null;
+        var os = ua.Contains("Windows") ? "Windows"
+            : ua.Contains("Android") ? "Android"
+            : ua.Contains("iPhone") || ua.Contains("iPad") ? "iOS"
+            : ua.Contains("Mac OS") ? "macOS"
+            : ua.Contains("Linux") ? "Linux"
+            : null;
+        return browser is null && os is null ? T["Sessions.Unknown"].Value
+            : browser is null ? os! : os is null ? browser : $"{browser} · {os}";
+    }
+
+    var others = Model.Sessions.Count(s => !s.IsCurrent);
+}
+
+<section class="auth-card">
+    <header class="auth-card__header">
+        <h1 class="auth-card__title">@T["Sessions.Heading"]</h1>
+        <p class="auth-card__subtitle">@T["Sessions.Subtitle"]</p>
+    </header>
+
+    <ul class="account-sessions">
+        @foreach (var s in Model.Sessions)
+        {
+            <li class="account-session">
+                <div class="account-session__name">
+                    @Device(s.UserAgent)
+                    @if (s.IsCurrent)
+                    {
+                        <span class="account-badge">@T["Sessions.ThisDevice"]</span>
+                    }
+                </div>
+                @* IP gosterilmez: IdP ag gecidinin arkasinda; kayitli adres kullanicinin degil gecidin adresi olabilir. *@
+                <div class="account-session__meta">@T["Sessions.LastActive", Ago(s.LastActivityAt)]</div>
+            </li>
+        }
+    </ul>
+
+    @if (others > 0)
+    {
+        <form method="post" action="@Url.Idp("/ui/account/sessions")" class="auth-form" asp-antiforgery="false">
+            <partial name="_Hidden" model="Model" />
+            <button type="submit" class="auth-btn auth-btn--secondary auth-btn--block" data-submit-guard>
+                <span class="auth-btn__spinner" aria-hidden="true"></span>
+                <span class="auth-btn__label">@T["Sessions.SignOutOthers", others]</span>
+            </button>
+        </form>
+    }
+    else
+    {
+        <p class="auth-hint">@T["Sessions.OnlyThis"]</p>
+    }
+
+    <partial name="_Back" model="Model" />
+</section>

@@ -27,6 +27,11 @@ public class IdpUiOptions
     public string ResetPasswordPath { get; set; } = "/reset-password";
     public string LoginChallengePath { get; set; } = "/ui/login/verify";
     public string ChangePasswordPath { get; set; } = "/ui/change-password";
+    public string AccountPath { get; set; } = "/ui/account";
+
+    /// <summary>Hesabim sayfalari; <paramref name="page"/> "" (ozet), "/profile", "/email/verify" ...</summary>
+    public string GetAccountUrl(string page, string query) =>
+        Local($"{AccountPath}{(string.IsNullOrEmpty(page) ? string.Empty : "/" + page.TrimStart('/'))}?{query}");
 
     public string GetChangePasswordUrl(string interactionKey) =>
         Local($"{ChangePasswordPath}?interaction_key={Uri.EscapeDataString(interactionKey)}");
