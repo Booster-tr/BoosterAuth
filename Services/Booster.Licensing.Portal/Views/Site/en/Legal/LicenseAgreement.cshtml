@@ -1,0 +1,158 @@
+@using Booster.Licensing.Portal.Services
+<p class="lede">This agreement sets out the terms under which you may use the Booster Auth software. The parties are the licensor
+    <b>@Legal.CompanyName</b> ("Booster", "we") and the company or institution that buys a license or requests a trial license ("Customer", "you").</p>
+<p>The agreement is concluded when you accept this text while placing an order or requesting a trial license in the portal. The accepted version,
+    the time of acceptance, the IP address and the accepting user are recorded. If the parties also sign an order form, this agreement is deemed
+    incorporated into it; in case of conflict, the specific terms of the signed form prevail. The Turkish text is binding; this translation is
+    provided for information.</p>
+
+<h2 id="definitions">1. Definitions</h2>
+<ul>
+    <li><b>Software:</b> the Booster Auth install package, its services, container images, scripts and their updates, excluding third-party components.</li>
+    <li><b>Installation:</b> a single instance of the Software running on one database, with a single installation ID (GUID) shown in the admin console
+        under <b>System &gt; License</b>.</li>
+    <li><b>License key:</b> a text digitally signed by us for a specific installation ID, plan, limits (users, pools, applications), domains and term.</li>
+    <li><b>Documentation:</b> the <a href="/en/docs">documentation</a> on this site and the instructions in the install package.</li>
+    <li><b>Third-party components:</b> open-source software used with the Software and subject to its own licenses
+        (see <a href="/en/legal/third-party">Third-party notices</a>).</li>
+    <li><b>End users:</b> your employees, customers and other people who sign in through the Software.</li>
+</ul>
+
+<h2 id="scope">2. Scope of the license</h2>
+<p>Subject to payment of the license fee (or acceptance of your request for a trial license), we grant you a <b>non-exclusive, non-transferable,
+    non-sublicensable right, limited to the license term and valid only for the installation named in the license key,</b> to use the Software.
+    This right covers the following uses, listed individually:</p>
+<ol>
+    <li><b>Reproduction (FSEK art.22):</b> installing the Software on servers you control or that are operated on your behalf, downloading the container
+        images, running them, loading them into memory and displaying them on screen.</li>
+    <li><b>Backup copies:</b> making the backup and archive copies needed to restore the licensed installation.</li>
+    <li><b>Configuration and adaptation (FSEK art.21, limited):</b> adapting the Software to your organisation with the settings, interface texts, legal
+        text templates, logo and theme options it provides. Modifying the source code is not included.</li>
+    <li><b>Integration:</b> connecting your own applications to the Software through documented interfaces (OpenID Connect, APIs, LDAP / Active Directory).</li>
+    <li><b>Use by end users:</b> allowing your end users to sign in through the Software and manage their own accounts.</li>
+    <li><b>Contractors:</b> allowing contractors who install or operate the Software on your behalf to use it, only for your business and provided they
+        comply with this agreement. You are responsible for your contractors' breaches.</li>
+</ol>
+<p>The license is limited by the plan limits (number of users, pools and applications) and by the domains written into the license key. No rights are
+    transferred unless expressly granted; all intellectual property rights in the Software remain with us.</p>
+
+<h2 id="term">3. Term, license key and offline validation</h2>
+<ul>
+    <li>A paid license is granted for the term stated in the plan you order (usually 12 months) and <b>does not renew automatically</b>. Renewal is done by
+        placing a new order; if you renew during the term, the new term is added to the current expiry date.</li>
+    <li>The license key is bound to the installation ID and validated <b>offline</b>. The Software never connects to us or to a license server.</li>
+    <li>When you move servers you can transfer your license to a new installation ID in the portal (at most 3 times a year). Because the model is
+        offline, the license on the old installation keeps working on that server until it expires; you are obliged to stop using the old installation.</li>
+    <li><b>Expiry:</b> paid licenses have a @LicenseIssuer.Defaults.PaidGraceDays-day grace period after expiry. When the grace period also ends, the admin
+        console becomes read-only and only the license screen works. <b>With a paid license, end-user sign-ins are never cut off.</b> When a limit is
+        exceeded, new records cannot be added; existing records keep working.</li>
+    <li>The Software may treat the license as restricted if it detects tampering intended to bypass the license check, such as turning the clock back.</li>
+</ul>
+
+<h2 id="trial">4. Trial license</h2>
+<ul>
+    <li>A trial license is free for @LicenseIssuer.Defaults.TrialDays days and limited to @LicenseIssuer.Defaults.TrialUsers users,
+        @LicenseIssuer.Defaults.TrialPools pool and @LicenseIssuer.Defaults.TrialClients applications.</li>
+    <li>It is granted only to evaluate the Software. It requires a company e-mail address, the e-mail domain must match the installation's domain, and it is
+        granted once per domain. Circumventing these rules (obtaining repeated trials with different accounts or domains) is prohibited.</li>
+    <li><b>The trial license is provided "as is", without any warranty, and support is provided only as available.</b> We do not recommend using it in
+        production.</li>
+    <li><b>When the term and the @LicenseIssuer.Defaults.TrialGraceDays-day grace period end, end-user sign-ins on the trial installation also stop.</b>
+        Once a paid license is activated, the installation continues where it left off.</li>
+    <li>The limited warranty in section 9 does not apply to trial licenses; the liability cap in section 10 does.</li>
+</ul>
+
+<h2 id="restrictions">5. Restrictions</h2>
+<p>You may not:</p>
+<ul>
+    <li>alter or forge the license key, bypass the license check or the limits, or distribute tools for doing so;</li>
+    <li>rent, sell, lend, sublicense or distribute the Software to third parties;</li>
+    <li>offer the Software to third parties as a standalone product or hosted identity service (this requires a separate written agreement). Users of your
+        own applications and services signing in through the Software is not covered by this restriction;</li>
+    <li>reverse engineer, decompile or disassemble the Software. <b>The rights granted by FSEK art.38 for interoperability remain unaffected;</b></li>
+    <li>remove copyright, trademark or license notices from the Software;</li>
+    <li>use the Software for unlawful purposes, in particular to process personal data unlawfully.</li>
+</ul>
+
+<h2 id="third-party">6. Third-party components</h2>
+<p>The Software works together with open-source components such as PostgreSQL, Redis, Apache Kafka and OpenFGA. These components are subject to their
+    own licenses, and this agreement does not restrict the rights those licenses give you. The list and license texts are on the
+    <a href="/en/legal/third-party">Third-party notices</a> page.</p>
+
+<h2 id="data">7. Data, telemetry and access</h2>
+<ul>
+    <li><b>The Software sends no data to us;</b> there is no telemetry, no usage statistics and no license validation request.</li>
+    <li><b>We have no access to your servers or to the data processed in the Software.</b> We cannot revoke a license or switch off the Software remotely.</li>
+    <li><b>You are the data controller</b> for your end users' personal data. The duties to inform, to obtain consent where required, to secure data, to
+        apply retention and to answer requests are yours. The legal text templates in the Software are examples only.</li>
+    <li>If you share logs or screenshots containing personal data with us during support, that data is processed under the
+        <a href="/en/legal/support#dpa">Data Processing Addendum</a>.</li>
+</ul>
+
+<h2 id="support">8. Support and updates</h2>
+<p>During a paid license term you have access to updates and to the support described in the <a href="/en/legal/support">Support Policy</a>.
+    Installing updates, and taking a backup before doing so, is your decision and responsibility.</p>
+
+<h2 id="warranty">9. Limited warranty</h2>
+<p>For paid licenses, we warrant for @Legal.WarrantyDays days from delivery of the license key that the Software will substantially perform the core
+    functions described in the Documentation. We will try to fix, within a reasonable time, a reproducible material non-conformity you report within this
+    period; if we cannot, we will refund the fee paid for that license pro rata to the remaining term. <b>Apart from this warranty the Software is provided
+    "as is"; we do not warrant that it will be uninterrupted, error-free or fit for a particular purpose.</b> Problems caused by modifying the Software,
+    running it in unsupported environments or configuring third-party components are not covered. Rights that cannot be excluded by law and the rules on
+    defects concealed through gross negligence remain unaffected.</p>
+
+<h2 id="liability">10. Limitation of liability</h2>
+<ul>
+    <li><b>Our total liability under this agreement is limited to the license fees you paid under it in the 12 months before the event giving rise to the
+        damage.</b> For trial licenses this amount is zero.</li>
+    <li><b>We are not liable for indirect damage, loss of profit or revenue, business interruption or loss of data.</b></li>
+    <li><b>Liability for intent or gross negligence, and liability that cannot be limited by law, are excluded from these limits</b> (TBK art.115).</li>
+</ul>
+
+<h2 id="backup">11. Backup duty</h2>
+<p><b>The Software runs on your servers; backing up your data regularly and testing that you can restore from backup is your responsibility.</b>
+    Backup methods are described in the <a href="/en/docs/operations">documentation</a>.</p>
+
+<h2 id="audit">12. License audit</h2>
+<p><b>At most once a year, with at least 30 days' written notice, we may ask you to declare in writing the installations (installation IDs) you use and
+    that your usage complies with the plan limits.</b> The audit is limited to this self-declaration; we do not ask for access to your servers or to
+    personal data. The declaration is kept confidential. If under-licensing is found, it is enough to order the missing part at the prices then current.</p>
+
+<h2 id="termination">13. Termination</h2>
+<ul>
+    <li>If a party materially breaches the agreement and does not cure the breach within <b>30 days</b> of written notice, the other party may terminate.
+        No cure period applies to breaches that cannot be cured, such as bypassing the license check.</li>
+    <li>On termination or expiry your right of use ends. On termination you stop using the Software and, if asked, confirm this in writing.</li>
+    <li>If we terminate for a reason not attributable to you, the fee for the remaining term is refunded.</li>
+</ul>
+
+<h2 id="notices">14. Notices</h2>
+<p>Ordinary correspondence is by e-mail to the addresses registered in the portal. <b>Notices of default, termination and rescission</b> (TTK art.18/3)
+    are made through a notary public, registered mail with return receipt or <b>KEP</b> (registered e-mail). Our KEP address: @Legal.Kep; our address:
+    @Legal.Address.</p>
+
+<h2 id="changes">15. Changes</h2>
+<p>Changes we make to this agreement <b>do not apply to you during your current license term</b>; they take effect only from your next renewal. We notify
+    changes by e-mail at least <b>30 days</b> before renewal. If you do not accept them you may decide not to renew; your current license continues under the
+    old terms until it expires.</p>
+
+<h2 id="export">16. Export control and sanctions</h2>
+<p>The Software contains encryption functions. You agree not to transfer the Software to, or use it for, persons or countries on sanctions lists in
+    breach of applicable export control and sanctions laws.</p>
+
+<h2 id="law">17. Governing law and jurisdiction</h2>
+<ul>
+    <li>This agreement is governed by Turkish law.</li>
+    <li><b>For disputes with merchants and public legal entities, the Istanbul (Çağlayan) Courts and Enforcement Offices have jurisdiction.</b> Where this
+        choice of court is not valid, the courts competent by law apply.</li>
+    <li>For commercial disputes concerning monetary claims, applying to a mediator before filing a lawsuit is mandatory by law.</li>
+</ul>
+
+<h2 id="general">18. General</h2>
+<ul>
+    <li>This agreement, together with the <a href="/en/legal/sales-terms">Sales and Order Terms</a> and any signed order form, is the entire agreement
+        between the parties.</li>
+    <li>If a provision is invalid, the remaining provisions are unaffected.</li>
+    <li>You may not assign this agreement without our written consent. Universal succession, such as a merger, is unaffected.</li>
+    <li>In case of conflict between this English translation and the Turkish text, the Turkish text prevails.</li>
+</ul>

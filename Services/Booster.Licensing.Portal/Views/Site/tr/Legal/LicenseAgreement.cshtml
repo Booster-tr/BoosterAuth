@@ -1,0 +1,162 @@
+@using Booster.Licensing.Portal.Services
+@* EULA (B2B). FSEK md.52: izin verilen kullanimlar tek tek sayilir. TBK md.21: aleyhe maddeler kalin yazilir ve siparis ekraninda ozetlenir. *@
+<p class="lede">Bu sözleşme, Booster Auth yazılımını hangi koşullarla kullanabileceğinizi düzenler. Taraflar, lisans veren
+    <b>@Legal.CompanyName</b> ("Booster", "biz") ile lisansı satın alan veya deneme lisansı talep eden şirket ya da kurumdur ("Müşteri", "siz").</p>
+<p>Sözleşme, portalda sipariş verirken veya deneme lisansı isterken bu metni kabul ettiğinizde kurulur. Kabul edilen sürüm, kabul zamanı,
+    IP adresi ve kabul eden kullanıcı kaydedilir. Taraflar ayrıca imzalı bir sipariş formu düzenlerse bu sözleşme o forma eklenmiş sayılır;
+    çelişki hâlinde imzalı formdaki özel hükümler geçerlidir.</p>
+
+<h2 id="tanimlar">1. Tanımlar</h2>
+<ul>
+    <li><b>Yazılım:</b> Booster Auth kurulum paketi, içerdiği servisler, konteyner imajları, betikler ve bunların güncellemeleri. Üçüncü taraf bileşenler hariçtir.</li>
+    <li><b>Kurulum:</b> Yazılımın tek bir veritabanı ile çalışan ve yönetim panelinde <b>Sistem &gt; Lisans</b> ekranında görünen tek bir
+        kurulum kimliğine (GUID) sahip örneği.</li>
+    <li><b>Lisans anahtarı:</b> Belirli bir kurulum kimliği, plan, limitler (kullanıcı, havuz, uygulama), alan adları ve süre için tarafımızdan
+        dijital olarak imzalanmış metin.</li>
+    <li><b>Dokümantasyon:</b> bu sitedeki <a href="/tr/docs">dokümantasyon</a> ve kurulum paketindeki açıklamalar.</li>
+    <li><b>Üçüncü taraf bileşenler:</b> Yazılımla birlikte kullanılan ve kendi lisanslarına tabi açık kaynak yazılımlar
+        (bkz. <a href="/tr/legal/third-party">Üçüncü Taraf Bildirimleri</a>).</li>
+    <li><b>Son kullanıcı:</b> Müşterinin, Yazılım üzerinden giriş yapan çalışanları, müşterileri ve diğer kişiler.</li>
+</ul>
+
+<h2 id="kapsam">2. Lisansın kapsamı</h2>
+<p>Lisans bedelinin ödenmesi (deneme lisansında talebin kabulü) şartıyla, size Yazılım üzerinde <b>münhasır olmayan, devredilemeyen,
+    alt lisans verilemeyen, lisans süresiyle sınırlı ve yalnızca lisans anahtarındaki kurulum için geçerli</b> bir kullanım hakkı veririz.
+    Bu hak aşağıda tek tek sayılan kullanımları kapsar:</p>
+<ol>
+    <li><b>Çoğaltma (FSEK md.22):</b> Yazılımı sizin kontrolünüzdeki veya sizin adınıza işletilen sunuculara kurmak, konteyner imajlarını
+        indirmek, çalıştırmak, belleğe yüklemek ve ekranda göstermek.</li>
+    <li><b>Yedek kopya:</b> Lisanslı kurulumu geri yükleyebilmek için gerekli yedek ve arşiv kopyalarını almak.</li>
+    <li><b>Yapılandırma ve uyarlama (FSEK md.21, sınırlı):</b> Yazılımın sunduğu ayarlar, arayüz metinleri, yasal metin şablonları, logo ve
+        tema ayarlarıyla Yazılımı kendi kuruluşunuza uyarlamak. Kaynak kodunun değiştirilmesi bu hakka dahil değildir.</li>
+    <li><b>Entegrasyon:</b> Kendi uygulamalarınızı dokümante edilmiş arayüzler (OpenID Connect, API'ler, LDAP / Active Directory bağlantısı)
+        üzerinden Yazılıma bağlamak.</li>
+    <li><b>Son kullanıcı kullanımı:</b> Son kullanıcılarınızın Yazılım üzerinden giriş yapmasına ve kendi hesaplarını yönetmesine izin vermek.</li>
+    <li><b>Yükleniciler:</b> Yazılımı sizin adınıza kuran veya işleten yüklenicilerin, yalnızca sizin işiniz için ve bu sözleşmeye uymaları
+        şartıyla Yazılımı kullanması. Yüklenicilerin ihlalinden siz sorumlusunuz.</li>
+</ol>
+<p>Lisans, plan limitleri (kullanıcı, havuz, uygulama sayısı) ve lisans anahtarına yazılan alan adlarıyla sınırlıdır. Açıkça verilmeyen
+    hiçbir hak devredilmiş sayılmaz; Yazılım üzerindeki tüm fikri haklar bizde kalır.</p>
+
+<h2 id="sure">3. Süre, lisans anahtarı ve çevrimdışı doğrulama</h2>
+<ul>
+    <li>Ücretli lisans, sipariş ettiğiniz planda yazan süre için (genellikle 12 ay) verilir ve <b>kendiliğinden yenilenmez</b>. Yenileme yeni bir
+        siparişle yapılır; süre içinde yenilerseniz yeni süre mevcut bitiş tarihine eklenir.</li>
+    <li>Lisans anahtarı kurulum kimliğine bağlıdır ve <b>çevrimdışı</b> doğrulanır. Yazılım bize veya bir lisans sunucusuna hiçbir zaman bağlanmaz.</li>
+    <li>Sunucu değiştirdiğinizde lisansınızı portaldan yeni kurulum kimliğine aktarabilirsiniz (yılda en fazla 3 kez). Çevrimdışı model nedeniyle
+        eski kurulumdaki lisans o sunucuda süresi dolana kadar çalışmaya devam eder; eski kurulumu kullanmayı bırakmanız sizin yükümlülüğünüzdür.</li>
+    <li><b>Süre sonu:</b> Bitişten sonra ücretli lisansta @LicenseIssuer.Defaults.PaidGraceDays günlük ek süre vardır. Ek süre de bitince yönetim
+        paneli salt okunur olur ve yalnızca lisans ekranı çalışır. <b>Ücretli lisansta son kullanıcı girişleri hiçbir durumda kesilmez.</b>
+        Limit aşıldığında yeni kayıt eklenemez; mevcut kayıtlar çalışmaya devam eder.</li>
+    <li>Yazılım, saatin geri alınması gibi lisans kontrolünü atlatmaya yönelik müdahaleleri tespit ettiğinde lisansı kısıtlı sayabilir.</li>
+</ul>
+
+<h2 id="deneme">4. Deneme lisansı</h2>
+<ul>
+    <li>Deneme lisansı @LicenseIssuer.Defaults.TrialDays gün için ücretsiz verilir; @LicenseIssuer.Defaults.TrialUsers kullanıcı,
+        @LicenseIssuer.Defaults.TrialPools havuz ve @LicenseIssuer.Defaults.TrialClients uygulama ile sınırlıdır.</li>
+    <li>Yalnızca Yazılımı değerlendirmek için verilir. Firma e-posta adresiyle alınır, e-posta alan adı kurulumun alan adıyla uyuşmalıdır ve
+        her alan adı için bir kez verilir. Bu kuralları dolanmak (farklı hesaplar veya alan adlarıyla tekrar deneme almak) yasaktır.</li>
+    <li><b>Deneme lisansı "olduğu gibi" verilir; hiçbir garanti içermez ve destek yalnızca imkân ölçüsünde sağlanır.</b> Üretim ortamında
+        kullanmanızı önermeyiz.</li>
+    <li><b>Süre ve @LicenseIssuer.Defaults.TrialGraceDays günlük ek süre bitince deneme kurulumunda son kullanıcı girişleri de durur.</b>
+        Ücretli lisans etkinleştirildiğinde kurulum kaldığı yerden devam eder.</li>
+    <li>Deneme lisansında 9. maddedeki sınırlı garanti uygulanmaz; 10. maddedeki sorumluluk sınırı uygulanır.</li>
+</ul>
+
+<h2 id="kisitlamalar">5. Kısıtlamalar</h2>
+<p>Aşağıdakileri yapamazsınız:</p>
+<ul>
+    <li>Lisans anahtarını değiştirmek, taklit etmek, lisans kontrolünü veya limitleri atlatmak ya da atlatmaya yarayan araçlar dağıtmak.</li>
+    <li>Yazılımı kiralamak, satmak, ödünç vermek, alt lisans vermek veya üçüncü kişilere dağıtmak.</li>
+    <li>Yazılımı bağımsız bir ürün veya barındırılan kimlik hizmeti olarak üçüncü kişilere sunmak (bunun için ayrıca yazılı anlaşma gerekir).
+        Kendi uygulama ve hizmetlerinizin kullanıcılarının Yazılım üzerinden giriş yapması bu yasağa girmez.</li>
+    <li>Yazılımı tersine mühendislik, kaynak koda dönüştürme veya ayrıştırma yoluyla incelemek. <b>FSEK md.38'in birlikte çalışabilirlik için
+        tanıdığı haklar saklıdır.</b></li>
+    <li>Yazılımdaki telif, marka ve lisans bildirimlerini kaldırmak.</li>
+    <li>Yazılımı hukuka aykırı amaçlarla, özellikle kişisel verileri hukuka aykırı işlemek için kullanmak.</li>
+</ul>
+
+<h2 id="ucuncu-taraf">6. Üçüncü taraf bileşenler</h2>
+<p>Yazılım, PostgreSQL, Redis, Apache Kafka ve OpenFGA gibi açık kaynak bileşenlerle birlikte çalışır. Bu bileşenler kendi lisanslarına
+    tabidir ve bu sözleşme o lisansların size tanıdığı hakları kısıtlamaz. Liste ve lisans metinleri
+    <a href="/tr/legal/third-party">Üçüncü Taraf Bildirimleri</a> sayfasındadır.</p>
+
+<h2 id="veri">7. Veriler, telemetri ve erişim</h2>
+<ul>
+    <li><b>Yazılım bize hiçbir veri göndermez;</b> telemetri, kullanım istatistiği veya lisans doğrulama isteği yoktur.</li>
+    <li><b>Sunucularınıza ve Yazılımda işlenen verilere erişimimiz yoktur.</b> Lisansı uzaktan iptal edemez veya Yazılımı uzaktan kapatamayız.</li>
+    <li>Son kullanıcılarınızın kişisel verileri bakımından <b>veri sorumlusu sizsiniz</b>. Aydınlatma, gerekiyorsa açık rıza, veri güvenliği,
+        saklama ve başvurulara cevap verme yükümlülükleri size aittir. Yazılımdaki yasal metin şablonları yalnızca örnektir.</li>
+    <li>Destek sırasında bizimle kişisel veri içeren log veya ekran görüntüsü paylaşırsanız, bu veriler
+        <a href="/tr/legal/support#dpa">Veri İşleme Eki</a>'ne göre işlenir.</li>
+</ul>
+
+<h2 id="destek">8. Destek ve güncellemeler</h2>
+<p>Ücretli lisans süresince güncellemelere ve <a href="/tr/legal/support">Destek Politikası</a>'ndaki desteğe erişiminiz vardır. Güncellemeleri
+    kurmak ve kurmadan önce yedek almak sizin kararınız ve sorumluluğunuzdadır.</p>
+
+<h2 id="garanti">9. Sınırlı garanti</h2>
+<p>Ücretli lisansta, lisans anahtarının teslim tarihinden itibaren @Legal.WarrantyDays gün boyunca Yazılımın Dokümantasyonda açıklanan temel
+    işlevleri esaslı olarak yerine getireceğini garanti ederiz. Bu süre içinde bildirdiğiniz ve tekrarlanabilen esaslı bir uyumsuzluğu makul
+    sürede gidermeye çalışırız; gideremezsek ilgili lisans için ödediğiniz bedeli kalan süreyle orantılı olarak iade ederiz. <b>Bu garanti
+    dışında Yazılım "olduğu gibi" sunulur; Yazılımın kesintisiz, hatasız veya belirli bir amaca uygun olacağını garanti etmeyiz.</b>
+    Yazılımın değiştirilmesinden, desteklenmeyen ortamlarda çalıştırılmasından veya üçüncü taraf bileşenlerin yapılandırmasından doğan
+    sorunlar garanti kapsamında değildir. Kanunen hariç tutulamayan haklarınız ve ağır kusurla gizlenen ayıplara ilişkin hükümler saklıdır.</p>
+
+<h2 id="sorumluluk">10. Sorumluluğun sınırı</h2>
+<ul>
+    <li><b>Bu sözleşmeden doğan toplam sorumluluğumuz, zarara yol açan olaydan önceki 12 ay içinde bu sözleşme kapsamında ödediğiniz lisans
+        bedelleriyle sınırlıdır.</b> Deneme lisansında bu tutar sıfırdır.</li>
+    <li><b>Dolaylı zararlardan, kâr ve gelir kaybından, iş kesintisinden ve veri kaybından sorumlu değiliz.</b></li>
+    <li><b>Kasıt veya ağır kusurdan doğan sorumluluğumuz ile kanunen sınırlandırılamayan sorumluluklarımız bu sınırların dışındadır</b>
+        (TBK md.115).</li>
+</ul>
+
+<h2 id="yedekleme">11. Yedekleme yükümlülüğü</h2>
+<p><b>Yazılım sizin sunucularınızda çalışır; verilerinizi düzenli olarak yedeklemek ve yedekten geri dönebildiğinizi test etmek sizin
+    sorumluluğunuzdadır.</b> Yedekleme yöntemleri <a href="/tr/docs/operations">dokümantasyonda</a> anlatılır.</p>
+
+<h2 id="denetim">12. Lisans denetimi</h2>
+<p><b>Yılda en fazla bir kez, en az 30 gün önceden yazılı bildirimle, kullandığınız kurulumları (kurulum kimlikleri) ve kullanımın plan
+    limitlerine uygunluğunu yazılı olarak beyan etmenizi isteyebiliriz.</b> Denetim yalnızca bu öz beyanla yapılır; sunucularınıza veya kişisel
+    verilere erişim istemeyiz. Beyan gizli tutulur. Eksik lisans tespit edilirse eksik kısım için o günkü fiyatlarla sipariş vermeniz yeterlidir.</p>
+
+<h2 id="fesih">13. Fesih</h2>
+<ul>
+    <li>Taraflardan biri sözleşmeyi esaslı olarak ihlal eder ve yazılı ihtardan sonra <b>30 gün</b> içinde ihlali gidermezse diğer taraf
+        sözleşmeyi feshedebilir. Lisans kontrolünün atlatılması gibi giderilmesi mümkün olmayan ihlallerde süre verilmez.</li>
+    <li>Fesih veya sürenin sona ermesiyle kullanım hakkınız sona erer. Fesih hâlinde Yazılımı kullanmayı bırakır ve istenirse bunu yazılı olarak
+        beyan edersiniz.</li>
+    <li>Sizden kaynaklanmayan bir fesihte, kalan süreye ait bedel iade edilir.</li>
+</ul>
+
+<h2 id="bildirim">14. Bildirimler</h2>
+<p>Olağan yazışmalar portalda kayıtlı e-posta adresleri üzerinden yapılır. <b>Temerrüt, fesih ve sözleşmeden dönme bildirimleri</b> (TTK md.18/3)
+    noter, iadeli taahhütlü mektup veya <b>KEP</b> ile yapılır. Bizim KEP adresimiz: @Legal.Kep; adresimiz: @Legal.Address.</p>
+
+<h2 id="degisiklik">15. Değişiklikler</h2>
+<p>Bu sözleşmede yapacağımız değişiklikler, yürürlükteki lisans süreniz boyunca <b>size karşı uygulanmaz</b>; yalnızca bir sonraki yenilemede
+    geçerli olur. Değişiklikleri yenilemeden en az <b>30 gün</b> önce e-posta ile bildiririz. Kabul etmezseniz yenileme yapmayabilirsiniz;
+    mevcut lisansınız süresi sonuna kadar eski koşullarla devam eder.</p>
+
+<h2 id="ihracat">16. İhracat kontrolü ve yaptırımlar</h2>
+<p>Yazılım şifreleme işlevleri içerir. Yazılımı, uygulanabilir ihracat kontrolü ve yaptırım mevzuatına aykırı biçimde yaptırım listelerindeki
+    kişilere veya ülkelere aktarmayacağınızı ve bu amaçla kullanmayacağınızı kabul edersiniz.</p>
+
+<h2 id="hukuk">17. Uygulanacak hukuk ve yetki</h2>
+<ul>
+    <li>Bu sözleşmeye Türk hukuku uygulanır.</li>
+    <li><b>Tacirler ve kamu tüzel kişileriyle aramızdaki uyuşmazlıklarda İstanbul (Çağlayan) Mahkemeleri ve İcra Daireleri yetkilidir.</b>
+        Bu yetki anlaşmasının geçerli olmadığı durumlarda kanunen yetkili mahkemeler geçerlidir.</li>
+    <li>Konusu para alacağı olan ticari uyuşmazlıklarda dava açmadan önce arabulucuya başvurmak kanunen zorunludur.</li>
+</ul>
+
+<h2 id="genel">18. Genel hükümler</h2>
+<ul>
+    <li>Bu sözleşme, <a href="/tr/legal/sales-terms">Satış ve Sipariş Koşulları</a> ve varsa imzalı sipariş formu ile birlikte taraflar
+        arasındaki anlaşmanın tamamıdır.</li>
+    <li>Bir hükmün geçersiz olması diğer hükümleri etkilemez.</li>
+    <li>Sözleşmeyi bizim yazılı onayımız olmadan devredemezsiniz. Şirket birleşmesi gibi külli halefiyet hâlleri saklıdır.</li>
+    <li>Bu sözleşmenin İngilizce çevirisi bilgi amaçlıdır; çelişki hâlinde Türkçe metin esas alınır.</li>
+</ul>

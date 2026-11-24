@@ -48,8 +48,9 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
     /// ucretsiz e-posta reddedilir; e-posta domaini kurulum domainlerinden biriyle uyusmali; ayni domaine (alt alan dahil)
     /// daha once deneme verilmisse reddedilir; IP basina gunde en fazla 3 istek. Her istek (red dahil) kaydedilir.
     /// </summary>
+    /// <param name="termsVersion">Istekte kabul edilen Lisans Sozlesmesi surumu; istek kaydina yazilir.</param>
     public async Task<SelfServiceResult> RequestTrialAsync(Customer customer, CustomerInstallation installation,
-        string email, string? ip, CancellationToken ct)
+        string email, string? ip, string termsVersion, CancellationToken ct)
     {
         var now = time.GetUtcNow();
         var emailDomain = SelfServiceRules.EmailDomain(email);
@@ -75,6 +76,7 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
             Domains = [.. installation.Domains],
             Granted = error is null,
             RejectReason = error,
+            TermsVersion = termsVersion,
         };
         db.TrialRequests.Add(request);
 

@@ -1,0 +1,41 @@
+@* 6563 md.3, E-Ticaret Yonetmeligi md.5, TTK md.39/2. Degerler LegalInfo'dan okunur. *@
+<p class="lede">Booster Auth yazılımını, bu web sitesini ve lisans portalını aşağıdaki şirket sunar.</p>
+
+<h2 id="sirket">Şirket bilgileri</h2>
+<dl>
+    <dt>Ticaret unvanı</dt><dd>@Legal.CompanyName</dd>
+    <dt>Şirket türü</dt><dd>@Legal.CompanyTypeTr</dd>
+    <dt>MERSİS numarası</dt><dd>@Legal.Mersis</dd>
+    <dt>Ticaret sicili</dt><dd>@Legal.TradeRegistry</dd>
+    <dt>Vergi dairesi / numarası</dt><dd>@Legal.TaxOffice / @Legal.TaxNumber</dd>
+    <dt>Merkez adresi</dt><dd>@Legal.Address</dd>
+    @if (!string.IsNullOrWhiteSpace(Legal.Trademark))
+    {
+        <dt>Marka</dt><dd>Booster Auth, tescil: @Legal.Trademark</dd>
+    }
+    <dt>Üyesi olunan oda</dt>
+    <dd>@Legal.Chamber@if (!string.IsNullOrWhiteSpace(Legal.ChamberRulesUrl)) {<text> · meslek kuralları: @Legal.ChamberRulesUrl</text>}</dd>
+</dl>
+
+<h2 id="iletisim">İletişim</h2>
+<dl>
+    <dt>KEP adresi</dt><dd>@Legal.Kep</dd>
+    <dt>E-posta</dt><dd>@Legal.Email</dd>
+    <dt>Destek</dt><dd><a href="mailto:@Legal.SupportEmail">@Legal.SupportEmail</a> · <a href="@Legal.PhoneHref">@Legal.Phone</a></dd>
+    <dt>KVKK başvuruları</dt><dd>@Legal.KvkkEmail (ayrıntılar: <a href="/tr/legal/privacy#basvuru">Aydınlatma Metni</a>)</dd>
+</dl>
+<p>Temerrüt, fesih ve dönme gibi hukuki sonuç doğuran bildirimlerinizi KEP adresimize, noter aracılığıyla ya da iadeli taahhütlü mektupla
+    merkez adresimize gönderebilirsiniz. Diğer yazışmalar için e-posta yeterlidir.</p>
+
+<h2 id="sozlesme">Sözleşmenin kurulması</h2>
+<p>Lisans siparişleri ve deneme lisansları <a href="/hesap">lisans portalında</a> verilir. Adımlar, verdiğiniz bilgileri nasıl
+    düzelteceğiniz, ödeme ve teslim <a href="/tr/legal/sales-terms">Satış ve Sipariş Koşulları</a>'nda; kullanım hakkınızın kapsamı
+    <a href="/tr/legal/license-agreement">Yazılım Lisans Sözleşmesi</a>'nde anlatılır.</p>
+<ul>
+    <li>Sözleşme dili Türkçedir. İngilizce metinler bilgi amaçlıdır; çelişki hâlinde Türkçe metin esas alınır.</li>
+    <li>Kabul ettiğiniz metnin sürümü siparişinizle birlikte saklanır ve sipariş ekranında görünür. Metinleri bu sayfalardan istediğiniz zaman
+        görüntüleyebilir, yazdırabilir ya da PDF olarak kaydedebilirsiniz.</li>
+    <li>Satışlarımız yalnızca işletme, kurum ve kamu kuruluşlarına yapılır; tüketicilere satış yapılmaz.</li>
+    <li>Uyuşmazlıklarda Türk hukuku uygulanır. Ticari uyuşmazlıklarda dava açmadan önce arabulucuya başvurmak kanunen zorunludur.</li>
+</ul>
+<p>Kişisel verilerin işlenmesi <a href="/tr/legal/privacy">Aydınlatma Metni</a>'nde, çerezler <a href="/tr/legal/cookies">Çerez Politikası</a>'nda açıklanır.</p>

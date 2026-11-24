@@ -3,6 +3,7 @@ using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Licensing.Portal.Data;
 using Booster.Licensing.Portal.Data.Entities;
 using Booster.Licensing.Portal.Services;
+using Booster.Licensing.Portal.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ namespace Booster.Licensing.Portal.Controllers;
 [Authorize(Policy = PortalPolicies.Customer)]
 [Route("hesap")]
 public sealed class AccountController(LicensingDbContext db, CustomerPortalService portal, OrderService orders,
-    Booster.Licensing.Portal.Options.LicensingPortalOptions options) : Controller
+    LicensingPortalOptions options, LegalInfo legal) : Controller
 {
     private Guid PrincipalId => Guid.Parse(User.FindFirst("sub")!.Value);
     private string Email => User.FindFirst("email")!.Value;
@@ -159,14 +160,26 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
 
     // ---------------------------------------------------------------- Deneme
 
+    /// <summary>
+    /// Deneme = Lisans Sozlesmesi'nin kabulu + B2B beyani. Iki kutu da isaretlenmeli (onceden isaretli gelmez);
+    /// kabul edilen surum istek kaydina (TrialRequest) yazilir.
+    /// </summary>
     [HttpPost("deneme")]
-    public async Task<IActionResult> Trial([FromForm] Guid installationId, CancellationToken ct)
+    public async Task<IActionResult> Trial([FromForm] Guid installationId, [FromForm] bool acceptB2b, [FromForm] bool acceptTerms,
+        CancellationToken ct)
     {
         var c = await CurrentCustomerAsync(ct);
         var inst = c?.Installations.SingleOrDefault(i => i.InstallationId == installationId);
         if (c is null || inst is null) return NotFound();
 
-        var result = await portal.RequestTrialAsync(c, inst, Email, ClientIp, ct);
+        if (!acceptB2b || !acceptTerms)
+        {
+            TempData["Error"] = TermsRequiredTrial;
+            TempData["ErrorCode"] = TermsRequiredCode;
+            return Redirect("/hesap/kurulumlar");
+        }
+
+        var result = await portal.RequestTrialAsync(c, inst, Email, ClientIp, legal.TermsVersion, ct);
         if (result.Error is not null)
         {
             TempData["Error"] = SelfServiceErrors.Text(result.Error);
@@ -231,17 +244,18 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
         var inst = c?.Installations.SingleOrDefault(i => i.InstallationId == installationId);
         if (c is null || inst is null) return NotFound();
 
-        ViewBag.Installation = inst;
-        // Paketler sayfasinda secilen plan (vurgulanir).
-        ViewBag.SelectedPlan = plan?.Trim().ToLowerInvariant();
-        ViewBag.Current = await db.IssuedLicenses.AsNoTracking()
-            .Where(l => l.InstallationId == installationId && l.Type == "paid" && l.TransferredToLicenseId == null && l.ExpiresAt > DateTimeOffset.UtcNow)
-            .OrderByDescending(l => l.ExpiresAt).FirstOrDefaultAsync(ct);
-        return View(await db.Plans.AsNoTracking().Where(p => p.IsActive).OrderBy(p => p.SortOrder).ToListAsync(ct));
+        // Paketler sayfasinda secilen plan (vurgulanir ve secili gelir).
+        return await NewOrderViewAsync(inst, plan?.Trim().ToLowerInvariant(), null, ct);
     }
 
+    /// <summary>
+    /// Siparisin son adimi. Satis Kosullari + Lisans Sozlesmesi kabulu ve B2B beyani zorunludur (TBK md.21, 6563);
+    /// kutular onceden isaretli gelmez ve burada sunucu tarafinda dogrulanir. Kabul edilen surum, zaman, IP ve
+    /// kullanici siparise yazilir.
+    /// </summary>
     [HttpPost("siparis/yeni")]
-    public async Task<IActionResult> NewOrder([FromForm] Guid installationId, [FromForm] Guid planId, CancellationToken ct)
+    public async Task<IActionResult> NewOrder([FromForm] Guid installationId, [FromForm] Guid planId,
+        [FromForm] bool acceptB2b, [FromForm] bool acceptTerms, CancellationToken ct)
     {
         var c = await CurrentCustomerAsync(ct);
         var inst = c?.Installations.SingleOrDefault(i => i.InstallationId == installationId);
@@ -249,9 +263,29 @@ public sealed class AccountController(LicensingDbContext db, CustomerPortalServi
         var plan = await db.Plans.AsNoTracking().SingleOrDefaultAsync(p => p.Id == planId && p.IsActive, ct);
         if (c is null || inst is null || plan is null) return NotFound();
 
-        var order = await orders.CreateAsync(c, inst, plan, Email, ct);
+        if (!acceptB2b || !acceptTerms)
+            return await NewOrderViewAsync(inst, plan.Code, TermsRequiredOrder, ct);
+
+        var order = await orders.CreateAsync(c, inst, plan, Email, legal.TermsVersion, ClientIp, ct);
         return Redirect($"/hesap/siparis?OrderId={order.Id}");
     }
+
+    private async Task<IActionResult> NewOrderViewAsync(CustomerInstallation inst, string? selectedPlan, string? error, CancellationToken ct)
+    {
+        ViewBag.Installation = inst;
+        ViewBag.SelectedPlan = selectedPlan;
+        ViewBag.Error = error;
+        ViewBag.Current = await db.IssuedLicenses.AsNoTracking()
+            .Where(l => l.InstallationId == inst.InstallationId && l.Type == "paid" && l.TransferredToLicenseId == null && l.ExpiresAt > DateTimeOffset.UtcNow)
+            .OrderByDescending(l => l.ExpiresAt).FirstOrDefaultAsync(ct);
+        return View("NewOrder", await db.Plans.AsNoTracking().Where(p => p.IsActive).OrderBy(p => p.SortOrder).ToListAsync(ct));
+    }
+
+    private const string TermsRequiredCode = "terms_required";
+    private const string TermsRequiredOrder =
+        "Siparişi tamamlamak için ticari amaç beyanını ve Satış Koşulları ile Lisans Sözleşmesi'nin kabulünü işaretleyin.";
+    private const string TermsRequiredTrial =
+        "Deneme lisansı için ticari amaç beyanını ve Lisans Sözleşmesi'nin kabulünü işaretleyin.";
 
     [HttpGet("siparis")]
     public async Task<IActionResult> Order([FromQuery(Name = "OrderId")] Guid orderId, CancellationToken ct)

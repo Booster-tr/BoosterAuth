@@ -194,3 +194,12 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 dotnet build Booster.Auth.slnx -v q
 docker compose up -d    # lokal ortam: ayri `booster_docker` klasorunde (docker-compose.yml)
 ```
+
+### Yasal metinler
+- **IdP (urun, musterinin metinleri):** gizlilik / kullanim kosullari / KVKK / acik riza / cerez metinleri `LegalDocument` + `LegalDocumentTranslation` (ITranslation deseni) tablolarinda; varsayilanlar `Idps/Booster.Auth.Idp/LegalTemplates/{anahtar}.{dil}.md` (gomulu, `WithCulture=false`). `LegalBootstrapper` eksikleri ekler, DEGISTIRILMEMIS metni yeni sablona gunceller, degistirilmise dokunmaz.
+  - Metinler UYGULAMA SAHIBININDIR (veri sorumlusu): sablonlarda satici (Booster) adi GECMEZ. Kurum bilgileri `LegalProfile` -> `{{organization}}` vb. yer tutucular.
+  - Markdown `LegalMarkdown`: ham HTML kapali, yalnizca http(s)/mailto/tel/ic baglanti; yer tutucu degerleri encode edilir.
+  - Ekran yazilari: `UiText` (resx anahtarini kurulum genelinde ezer; `OverridableStringLocalizer`). `<`/`>` yasak, `{0}` yer tutuculari korunmali.
+  - Panel uclari: `/idp/system/legal/*`, `/idp/system/ui-texts` (panel scope + admin rolu).
+  - KVKK 2026/347: aydinlatma / gizlilik metni "kabul" ettirilmez (kayit ekraninda yalnizca kullanim kosullari kabul edilir); acik riza hizmet sartina baglanmaz.
+- **Lisans sitesi (bizim metinlerimiz):** `/{dil}/legal/*` (kunye, site kosullari, lisans sozlesmesi, satis kosullari, KVKK/gizlilik, cerez, destek + veri isleme eki, ucuncu taraf bildirimleri). Sirket bilgileri `appsettings` `LegalInfo` (bos/"[...]" iken sayfalarda taslak uyarisi). Siparis ve deneme formlarinda isaretsiz zorunlu iki onay (B2B beyani + kosullar); kabul surumu/zaman/IP siparise yazilir. Yayindan once avukat incelemesi sart.

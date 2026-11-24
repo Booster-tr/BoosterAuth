@@ -1,0 +1,105 @@
+@using Booster.Licensing.Portal.Site
+@*
+    Ucuncu taraf bilesen listesi (tr ve en Legal/ThirdParty sayfalari kullanir).
+    Kaynak: deploy/compose/{tr,en}/docker-compose.yml imajlari, repodaki *.csproj PackageReference'lari ve panel reposunun package.json'i.
+    Surum veya bilesen degisince burayi guncelleyin.
+
+    LISANS NOTLARI (yalnizca dahili; sayfada gorunmez):
+    - Redis: compose redis:7.2-alpine kullanir; 7.2.x BSD-3-Clause'dur. 7.4-7.8 RSALv2/SSPLv1, 8.x RSALv2/SSPLv1/AGPLv3 lisanslidir.
+      Surum yukseltilmeden once lisans degerlendirmesi yapin (alternatif: Valkey, BSD-3-Clause).
+    - MassTransit: 8.x Apache-2.0. v9 ticari lisansa gecti; v9'a yukseltmeden once lisans degerlendirmesi yapin.
+    - postgis/postgis imaji PostGIS (GPL-2.0-or-later) icerir; imaji musteri upstream'den ceker (biz dagitmiyoruz).
+    - ghcr.io/booster-tr/* imajlari Debian tabanli .NET imajina dayanir ve GPL/LGPL paketler icerir: imajlari BIZ dagittigimiz icin
+      kaynak kodu teklifi (asagidaki paragraf) ve ileride bir SBOM gereklidir. Avukata teyit ettirin.
+*@
+@{
+    var m = (SitePageModel)Model!;
+    var en = m.Lang == "en";
+    string Spdx(string id) => $"https://spdx.org/licenses/{id}.html";
+    (string Name, string Version, string License, string Spdx, string Url)[] images =
+    [
+        ("PostgreSQL + PostGIS (postgis/postgis)", "15 / 3.4", "PostgreSQL License; PostGIS: GPL-2.0-or-later", "PostgreSQL", "https://www.postgresql.org/about/licence/"),
+        ("Redis (redis)", "7.2", "BSD-3-Clause", "BSD-3-Clause", "https://github.com/redis/redis/blob/7.2/COPYING"),
+        ("Apache Kafka (apache/kafka)", "3.7.0", "Apache-2.0", "Apache-2.0", "https://github.com/apache/kafka/blob/trunk/LICENSE"),
+        ("OpenFGA (openfga/openfga)", "1.20.0", "Apache-2.0", "Apache-2.0", "https://github.com/openfga/openfga/blob/main/LICENSE"),
+        ("Alpine Linux (alpine)", "3.20", en ? "Various (incl. GPL-2.0, MIT)" : "Çeşitli (GPL-2.0, MIT dahil)", "GPL-2.0-only", "https://alpinelinux.org/"),
+        (".NET / ASP.NET Core runtime (mcr.microsoft.com/dotnet/aspnet)", "10.0", "MIT", "MIT", "https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt"),
+        ("Node.js (node)", "", "MIT", "MIT", "https://github.com/nodejs/node/blob/main/LICENSE"),
+    ];
+    (string Name, string License, string Spdx, string Url)[] packages =
+    [
+        ("ASP.NET Core, Entity Framework Core, Microsoft.Extensions.*, Microsoft.IdentityModel.*, System.IdentityModel.Tokens.Jwt", "MIT", "MIT", "https://github.com/dotnet/aspnetcore"),
+        ("YARP (Yarp.ReverseProxy)", "MIT", "MIT", "https://github.com/dotnet/yarp"),
+        ("Npgsql, Npgsql.EntityFrameworkCore.PostgreSQL", "PostgreSQL License", "PostgreSQL", "https://github.com/npgsql/npgsql"),
+        ("NetTopologySuite", "BSD-3-Clause", "BSD-3-Clause", "https://github.com/NetTopologySuite/NetTopologySuite"),
+        ("FastEndpoints", "MIT", "MIT", "https://github.com/FastEndpoints/FastEndpoints"),
+        ("MassTransit, MassTransit.Kafka, MassTransit.EntityFrameworkCore (8.x)", "Apache-2.0", "Apache-2.0", "https://github.com/MassTransit/MassTransit"),
+        ("Confluent.Kafka / librdkafka", "Apache-2.0 / BSD-2-Clause", "Apache-2.0", "https://github.com/confluentinc/confluent-kafka-dotnet"),
+        ("OpenFga.Sdk", "Apache-2.0", "Apache-2.0", "https://github.com/openfga/dotnet-sdk"),
+        ("BouncyCastle.Cryptography", "MIT", "MIT", "https://github.com/bcgit/bc-csharp"),
+        ("StackExchange.Redis", "MIT", "MIT", "https://github.com/StackExchange/StackExchange.Redis"),
+        ("ZiggyCreatures.FusionCache", "MIT", "MIT", "https://github.com/ZiggyCreatures/FusionCache"),
+        ("Grpc.AspNetCore, Grpc.Net.ClientFactory, Grpc.Core.Api", "Apache-2.0", "Apache-2.0", "https://github.com/grpc/grpc-dotnet"),
+        ("Google.Protobuf", "BSD-3-Clause", "BSD-3-Clause", "https://github.com/protocolbuffers/protobuf"),
+        ("Markdig", "BSD-2-Clause", "BSD-2-Clause", "https://github.com/xoofx/markdig"),
+        ("Mapster", "MIT", "MIT", "https://github.com/MapsterMapper/Mapster"),
+        ("FluentValidation", "Apache-2.0", "Apache-2.0", "https://github.com/FluentValidation/FluentValidation"),
+        ("FluentEmail.Smtp, FluentEmail.Razor", "MIT", "MIT", "https://github.com/lukencode/FluentEmail"),
+        ("Konscious.Security.Cryptography.Argon2", "MIT", "MIT", "https://github.com/kmaragon/Konscious.Security.Cryptography"),
+        ("Novell.Directory.Ldap.NETStandard", "MIT", "MIT", "https://github.com/dsbenghe/Novell.Directory.Ldap.NETStandard"),
+        ("ITfoxtec.Identity.Saml2", "BSD-3-Clause", "BSD-3-Clause", "https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2"),
+        ("Newtonsoft.Json", "MIT", "MIT", "https://github.com/JamesNK/Newtonsoft.Json"),
+        ("System.Linq.Dynamic.Core", "Apache-2.0", "Apache-2.0", "https://github.com/zzzprojects/System.Linq.Dynamic.Core"),
+        ("Swashbuckle.AspNetCore", "MIT", "MIT", "https://github.com/domaindrivendev/Swashbuckle.AspNetCore"),
+    ];
+    (string Name, string License, string Spdx)[] web =
+    [
+        ("Next.js, React, React DOM", "MIT", "MIT"),
+        ("Radix UI, @tanstack/react-query, @tanstack/react-table, @xyflow/react", "MIT", "MIT"),
+        ("next-intl, next-themes, openid-client, iron-session, zod, react-hook-form, @hookform/resolvers", "MIT", "MIT"),
+        ("sonner, vaul, clsx, tailwind-merge, tw-animate-css", "MIT", "MIT"),
+        ("class-variance-authority", "Apache-2.0", "Apache-2.0"),
+        ("lucide-react", "ISC", "ISC"),
+    ];
+}
+<h2 id="@(en ? "images" : "imajlar")">@(en ? "Container images" : "Konteyner imajları")</h2>
+<p>@(en
+    ? "The install package's docker-compose.yml pulls these images from their official sources. Booster Auth's own services use the images below as their base."
+    : "Kurulum paketindeki docker-compose.yml bu imajları resmî kaynaklarından çeker. Booster Auth servislerinin kendi imajları da aşağıdaki taban imajları kullanır.")</p>
+<div class="table-scroll">
+<table>
+    <thead><tr><th>@(en ? "Component" : "Bileşen")</th><th>@(en ? "Version" : "Sürüm")</th><th>@(en ? "License" : "Lisans")</th></tr></thead>
+    <tbody>
+    @foreach (var c in images)
+    {
+        <tr><td><a href="@c.Url" rel="noopener">@c.Name</a></td><td>@c.Version</td><td><a href="@Spdx(c.Spdx)" rel="noopener">@c.License</a></td></tr>
+    }
+    </tbody>
+</table>
+</div>
+
+<h2 id="@(en ? "packages" : "paketler")">@(en ? ".NET libraries (services)" : ".NET kütüphaneleri (servisler)")</h2>
+<div class="table-scroll">
+<table>
+    <thead><tr><th>@(en ? "Component" : "Bileşen")</th><th>@(en ? "License" : "Lisans")</th></tr></thead>
+    <tbody>
+    @foreach (var c in packages)
+    {
+        <tr><td><a href="@c.Url" rel="noopener">@c.Name</a></td><td><a href="@Spdx(c.Spdx)" rel="noopener">@c.License</a></td></tr>
+    }
+    </tbody>
+</table>
+</div>
+
+<h2 id="@(en ? "panel" : "panel")">@(en ? "Admin console (web)" : "Yönetim paneli (web)")</h2>
+<div class="table-scroll">
+<table>
+    <thead><tr><th>@(en ? "Component" : "Bileşen")</th><th>@(en ? "License" : "Lisans")</th></tr></thead>
+    <tbody>
+    @foreach (var c in web)
+    {
+        <tr><td>@c.Name</td><td><a href="@Spdx(c.Spdx)" rel="noopener">@c.License</a></td></tr>
+    }
+    </tbody>
+</table>
+</div>

@@ -171,3 +171,17 @@ tbody tr:hover td { background: #F7F4EC; }
 .code { background: #0F2925; color: #E4ECE7; border-radius: var(--radius); padding: 10px 14px; font: 13px/1.6 var(--mono); overflow-x: auto; margin: 8px 0; }
 .files { columns: 2; padding-left: 1.1rem; }
 @media (max-width: 640px) { .files { columns: 1; } }
+
+/* ---------------------------------------------------------------- siparis / deneme onayi */
+.order-form h2 { margin: 28px 0 12px; }
+.form label.stat { margin-bottom: 0; cursor: pointer; font-weight: 400; color: var(--ink-2); }
+label.stat:has(input:checked) { background: var(--card); box-shadow: inset 0 3px 0 var(--brand); }
+.plan-pick { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-3); }
+.terms-summary { background: var(--card); border: 1px solid var(--rule); border-left: 3px solid var(--copper); border-radius: 0 4px 4px 0; padding: 14px 18px; margin-bottom: 16px; font-size: 14.5px; }
+.terms-summary p { margin: 0 0 6px; }
+.terms-summary ul { margin: 0; padding-left: 1.1rem; }
+.terms-summary li { margin: 4px 0; }
+.form label.check { flex-direction: row; align-items: flex-start; gap: 10px; font-weight: 400; color: var(--ink-2); }
+.form label.check input { margin-top: 4px; flex: none; padding: 0; }
+.trial-form { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.portal-legal a { white-space: nowrap; }

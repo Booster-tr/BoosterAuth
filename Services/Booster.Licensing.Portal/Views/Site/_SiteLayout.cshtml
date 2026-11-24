@@ -150,6 +150,13 @@
                 </ul>
             </div>
         </div>
+        <nav class="foot-legal" aria-label="@m.T("footer.legal")">
+            <span class="foot-h">@m.T("footer.legal")</span>
+            @foreach (var d in SiteCatalog.Legal)
+            {
+                <a href="@d.Path(lang)">@d.Title(lang)</a>
+            }
+        </nav>
         <div class="foot-base"><span>© @DateTime.UtcNow.Year Booster Auth. @m.T("footer.rights")</span><span>@m.T("footer.note")</span></div>
     </div>
 </footer>

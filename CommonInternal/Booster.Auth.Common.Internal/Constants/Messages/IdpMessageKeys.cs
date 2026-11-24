@@ -1,4 +1,4 @@
-﻿namespace Booster.Auth.Common.Internal.Constants.Messages;
+namespace Booster.Auth.Common.Internal.Constants.Messages;
 
 public class IdpMessageKeys
 {
@@ -109,6 +109,9 @@ public class IdpMessageKeys
     public const string AccountDeletionDisabled = "idp.account_deletion_disabled";
     public const string AccountDeletionConfirmRequired = "idp.account_deletion_confirm_required";
     public const string AccountUnavailable = "idp.account_unavailable";
+    public const string LegalDocumentNotFound = "idp.legal_document_not_found";
+    public const string UiTextKeyUnknown = "idp.ui_text_key_unknown";
+    public const string UiTextInvalid = "idp.ui_text_invalid";
     public const string ManagementPoolUserDeleteNotAllowed = "idp.management_pool_user_delete_not_allowed";
 
     // --- Havuz API'leri (uygulama backend'i, servis hesabi token'i) ------------

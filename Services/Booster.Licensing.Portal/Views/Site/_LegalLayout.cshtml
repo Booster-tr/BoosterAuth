@@ -1,0 +1,35 @@
+@using Booster.Licensing.Portal.Site
+@{
+    Layout = "~/Views/Site/_SiteLayout.cshtml";
+    var m = (SitePageModel)Model!;
+    var lang = m.Lang;
+}
+<div class="wrap docs legal">
+    <nav class="docs-nav" aria-label="@m.T("legal.nav")">
+        <details class="docs-nav-box" open data-docs-nav>
+            <summary>@m.T("legal.label") <span>· @m.Page.Title(lang)</span></summary>
+            <p class="docs-group">@m.T("legal.label")</p>
+            <ul>
+                @foreach (var d in SiteCatalog.Legal)
+                {
+                    <li><a href="@d.Path(lang)" aria-current="@(d == m.Page ? "page" : null)">@d.Title(lang)</a></li>
+                }
+            </ul>
+        </details>
+    </nav>
+    <article class="doc">
+        <p class="doc-crumb">@m.T("legal.label")</p>
+        @if (!Legal.IsComplete)
+        {
+            <div class="callout warn legal-draft" role="note"><p>@m.T("legal.draft")</p></div>
+        }
+        <h1>@m.Page.Title(lang)</h1>
+        <p class="legal-meta">@m.T("legal.updated"): <time datetime="@Legal.LastUpdated">@Legal.LastUpdated</time> · @m.T("legal.version"): @Legal.TermsVersion</p>
+        @RenderBody()
+        <p class="legal-meta legal-save">@m.T("legal.save")</p>
+    </article>
+    <aside class="toc" aria-label="@m.T("docs.on_this_page")">
+        <p class="toc-h">@m.T("docs.on_this_page")</p>
+        <div data-toc></div>
+    </aside>
+</div>

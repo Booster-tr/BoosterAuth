@@ -540,3 +540,28 @@ section{padding:120px 0}
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
   html.js .reveal:not(.in){opacity:1;transform:none}
 }
+
+/* ---------------------------------------------------------------- legal (/{lang}/legal/...) */
+.legal-meta{font-size:14px;color:var(--ink-3);margin:-8px 0 28px}
+.legal-save{margin:48px 0 0;padding-top:20px;border-top:1px solid var(--rule)}
+.legal-draft{margin:0 0 28px}
+.legal .doc h2{font-size:clamp(22px,2.2vw,26px);margin-top:44px;padding-top:22px}
+.legal .doc h3{font-size:18px}
+.legal .doc dl{display:grid;grid-template-columns:minmax(140px,2fr) minmax(0,5fr);gap:0;margin:8px 0 24px;border-top:1px solid var(--rule)}
+.legal .doc dt,.legal .doc dd{margin:0;padding:10px 0;border-bottom:1px solid var(--rule)}
+.legal .doc dt{color:var(--ink-3);font-size:15px;padding-right:16px}
+.legal .doc dd{color:var(--ink)}
+.table-scroll{overflow-x:auto;margin:8px 0 24px}
+.table-scroll table{margin:0;min-width:560px}
+.foot-legal{margin-top:40px;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;font-size:13px}
+.foot-legal .foot-h{margin:0 4px 0 0}
+.foot-legal a{color:#BFC3BD;text-decoration:none}
+.foot-legal a:hover{color:#fff}
+@media (max-width:640px){
+  .legal .doc dl{grid-template-columns:minmax(0,1fr)}
+  .legal .doc dt{border-bottom:0;padding-bottom:0}
+}
+@media print{
+  .top,.foot-band,.docs-nav,.toc,.skip{display:none!important}
+  .docs{display:block;padding:0}
+}

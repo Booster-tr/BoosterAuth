@@ -1,4 +1,6 @@
 using Booster.Auth.Idp.Controllers.Base;
+using Booster.Auth.Idp.Features._base.Entities;
+using Booster.Auth.Idp.Managers.LegalManagers;
 using Booster.Auth.Idp.Models;
 using Booster.Auth.Idp.Options;
 using Microsoft.AspNetCore.Authorization;
@@ -7,31 +9,31 @@ using Microsoft.AspNetCore.Mvc;
 namespace Booster.Auth.Idp.Controllers;
 
 [AllowAnonymous]
-public class PrivacyController(IdpUiOptions uiOptions) : IdpBaseController
+public class PrivacyController(IdpUiOptions uiOptions, LegalContentService legalContent) : IdpBaseController
 {
     public const string PreferencesPath = "/cookies/preferences";
 
     private const string SourcePreferences = "preferences";
 
     [HttpGet("/privacy")]
-    public IActionResult Privacy([FromQuery] string? returnUrl)
-        => Document("Privacy", 8, returnUrl);
+    public Task<IActionResult> Privacy([FromQuery] string? returnUrl, CancellationToken ct)
+        => Document(LegalDocumentKeys.Privacy, returnUrl, ct);
 
     [HttpGet("/terms")]
-    public IActionResult Terms([FromQuery] string? returnUrl)
-        => Document("Terms", 9, returnUrl);
+    public Task<IActionResult> Terms([FromQuery] string? returnUrl, CancellationToken ct)
+        => Document(LegalDocumentKeys.Terms, returnUrl, ct);
 
     [HttpGet("/explicit-consent")]
-    public IActionResult ExplicitConsent([FromQuery] string? returnUrl)
-        => Document("ExplicitConsent", 6, returnUrl);
+    public Task<IActionResult> ExplicitConsent([FromQuery] string? returnUrl, CancellationToken ct)
+        => Document(LegalDocumentKeys.ExplicitConsent, returnUrl, ct);
 
     [HttpGet("/kvkk")]
-    public IActionResult Kvkk([FromQuery] string? returnUrl)
-        => Document("Kvkk", 7, returnUrl);
+    public Task<IActionResult> Kvkk([FromQuery] string? returnUrl, CancellationToken ct)
+        => Document(LegalDocumentKeys.Kvkk, returnUrl, ct);
 
     [HttpGet("/cookies")]
-    public IActionResult Cookies([FromQuery] string? returnUrl)
-        => Document("Cookies", 6, returnUrl);
+    public Task<IActionResult> Cookies([FromQuery] string? returnUrl, CancellationToken ct)
+        => Document(LegalDocumentKeys.Cookies, returnUrl, ct);
 
     [HttpGet(PreferencesPath)]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
@@ -79,8 +81,14 @@ public class PrivacyController(IdpUiOptions uiOptions) : IdpBaseController
         return Redirect(back);
     }
 
-    private ViewResult Document(string key, int sectionCount, string? returnUrl)
-        => View("Document", new LegalDocumentViewModel(key, sectionCount, LocalOrNull(returnUrl)));
+    /// <summary>Metin veritabanindan (uygulama sahibinin metni), secili dilde; o dilde yoksa diger dilde.</summary>
+    private async Task<IActionResult> Document(string key, string? returnUrl, CancellationToken ct)
+    {
+        var page = await legalContent.GetPageAsync(key, System.Globalization.CultureInfo.CurrentUICulture.Name, ct);
+        return page is null
+            ? NotFound()
+            : View("Document", new LegalDocumentViewModel(page, LocalOrNull(returnUrl)));
+    }
 
     private string? LocalOrNull(string? url)
         => !string.IsNullOrEmpty(url) && Url.IsLocalUrl(url) ? url : null;

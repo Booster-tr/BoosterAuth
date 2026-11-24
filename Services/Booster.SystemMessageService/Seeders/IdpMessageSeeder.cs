@@ -110,6 +110,9 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.AccountDeletionDisabled, "Hesap", "Bu uygulamada hesap silme kapalı. Hesabınızın silinmesi için yöneticinize başvurun.", "Account", "Account deletion is turned off for this application. Contact your administrator to have your account deleted."),
         new(IdpMessageKeys.AccountDeletionConfirmRequired, "Onay", "Devam etmek için hesabınızın kalıcı olarak silineceğini onaylayın.", "Confirmation", "Confirm that your account will be permanently deleted to continue."),
         new(IdpMessageKeys.AccountUnavailable, "Hesap", "Hesap sayfası bu uygulama için kullanılamıyor.", "Account", "The account page is not available for this application."),
+        new(IdpMessageKeys.LegalDocumentNotFound, "Yasal metin", "Yasal metin bulunamadı.", "Legal document", "Legal document not found."),
+        new(IdpMessageKeys.UiTextKeyUnknown, "Ekran yazısı", "Bu anahtarda bir ekran yazısı yok.", "Screen text", "There is no screen text with this key."),
+        new(IdpMessageKeys.UiTextInvalid, "Ekran yazısı", "Metin < ya da > içeremez ve varsayılandaki {0} gibi yer tutucuları aynen korumalıdır.", "Screen text", "The text cannot contain < or > and must keep placeholders such as {0} from the default."),
         new(IdpMessageKeys.ManagementPoolUserDeleteNotAllowed, "Kullanıcı", "Panel yöneticileri bu ekrandan silinemez.", "User", "Panel administrators cannot be deleted from this screen."),
 
         // --- Havuz API'leri ---

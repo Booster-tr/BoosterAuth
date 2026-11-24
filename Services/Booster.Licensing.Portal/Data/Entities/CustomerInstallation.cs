@@ -48,6 +48,13 @@ public class TrialRequest : Entity
     /// <summary>Red sebebi (mesaj anahtari); verildiyse null.</summary>
     public string? RejectReason { get; set; }
     public Guid? LicenseId { get; set; }
+
+    /// <summary>
+    /// Istekte kabul edilen Lisans Sozlesmesi surumu (<c>LegalInfo.TermsVersion</c>) ve B2B beyani. Kabulun zamani,
+    /// IP'si ve kullanicisi bu kaydin <c>CreatedTime</c>, <see cref="IpAddress"/> ve <see cref="Email"/> alanlaridir.
+    /// Bu alan eklenmeden onceki isteklerde bostur.
+    /// </summary>
+    public string? TermsVersion { get; set; }
 }
 
 internal sealed class TrialRequestConfiguration : IEntityTypeConfiguration<TrialRequest>
@@ -59,6 +66,7 @@ internal sealed class TrialRequestConfiguration : IEntityTypeConfiguration<Trial
         builder.Property(x => x.IpAddress).HasMaxLength(64);
         builder.Property(x => x.Email).HasMaxLength(320).IsRequired();
         builder.Property(x => x.RejectReason).HasMaxLength(64);
+        builder.Property(x => x.TermsVersion).HasMaxLength(32);
         builder.HasIndex(x => new { x.IpAddress, x.CreatedTime });
         builder.HasIndex(x => x.CustomerId);
     }

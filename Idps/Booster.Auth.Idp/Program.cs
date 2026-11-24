@@ -83,6 +83,8 @@ using (var scope = app.Services.CreateScope())
 {
     var bootstrapper = scope.ServiceProvider.GetRequiredService<AdminBootstrapper>();
     await bootstrapper.InitializeAsync(CancellationToken.None);
+
+    await scope.ServiceProvider.GetRequiredService<LegalBootstrapper>().InitializeAsync(CancellationToken.None);
 }
 
 app.Run();

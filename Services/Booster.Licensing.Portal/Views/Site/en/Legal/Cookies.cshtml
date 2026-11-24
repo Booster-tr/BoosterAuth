@@ -1,0 +1,48 @@
+@* Keep cookie names and lifetimes in sync with Program.cs (AddCookie, AddOpenIdConnect, antiforgery, TempData). *@
+<p class="lede">This site and the license portal use <b>only strictly necessary cookies</b>. There are no analytics, advertising or tracking cookies, so
+    we do not ask for cookie consent and do not show a cookie banner.</p>
+<p>A cookie is a small text file that a website stores in your browser. All cookies below are <b>first-party</b> cookies: they are set and read only by
+    our own domain. The data controller is @Legal.CompanyName (<a href="/en/legal/imprint">Company information</a>).</p>
+
+<h2 id="site">Marketing site</h2>
+<p>The marketing pages and documentation set no cookies. If you are signed in to the portal, your browser also sends the portal session cookie below
+    on these pages.</p>
+
+<h2 id="portal">License portal</h2>
+<div class="table-scroll">
+<table>
+    <thead><tr><th>Cookie</th><th>Purpose</th><th>Lifetime</th><th>Category</th></tr></thead>
+    <tbody>
+        <tr><td><code>booster_licensing</code></td><td>Remembers that you are signed in; portal session.</td>
+            <td>Browser session; becomes invalid after 8 hours of inactivity. Deleted on sign-out.</td><td>Strictly necessary</td></tr>
+        <tr><td><code>.AspNetCore.Correlation.*</code></td><td>During sign-in, verifies that the response belongs to the sign-in you started (protects against forged sign-in requests).</td>
+            <td>15 minutes; deleted when sign-in completes.</td><td>Strictly necessary</td></tr>
+        <tr><td><code>.AspNetCore.OpenIdConnect.Nonce.*</code></td><td>Prevents replay of the sign-in response.</td>
+            <td>Up to 1 hour; deleted when sign-in completes.</td><td>Strictly necessary</td></tr>
+        <tr><td><code>.AspNetCore.Antiforgery.*</code></td><td>Verifies that forms were submitted by you (CSRF protection).</td>
+            <td>Browser session</td><td>Strictly necessary</td></tr>
+        <tr><td><code>.AspNetCore.Mvc.CookieTempDataProvider</code></td><td>Carries a one-time message (e.g. an error message) to the next page after an action.</td>
+            <td>Browser session; deleted once the message is shown.</td><td>Strictly necessary</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2 id="sign-in">Sign-in page</h2>
+<p>When you sign in to the portal you are redirected to our own Booster Auth sign-in service on a separate domain. It also sets first-party, strictly
+    necessary cookies: the sign-in session (<code>booster_idp_session</code>, for the session), language preference (<code>accept-language</code>, 1 year
+    if you choose a language), your cookie preference (<code>booster_cookie_consent</code>, 1 year) and form security
+    (<code>.AspNetCore.Antiforgery.*</code>, browser session). The sign-in page shows its own cookie notice.</p>
+
+<h2 id="third-party">Third-party requests</h2>
+<p>The site pages load fonts from Google Fonts. This is not a cookie, but your browser's IP address is sent to Google when the fonts load
+    (see the <a href="/en/legal/privacy#transfers">Privacy Notice</a>).</p>
+
+<h2 id="legal-basis">Legal basis</h2>
+<p>Strictly necessary cookies are required to provide the service you request (signing in to and using the portal). They are used without explicit
+    consent under KVKK art.5/2-(c) performance of a contract and, for security, art.5/2-(f) legitimate interest. If we ever add a non-essential cookie,
+    we will ask for your explicit consent before using it and offer a reject option that is equally visible.</p>
+
+<h2 id="control">How to control cookies</h2>
+<p>You can view, delete or block cookies in your browser settings (Chrome: Settings &gt; Privacy and security &gt; Cookies; Firefox: Settings &gt;
+    Privacy &amp; Security; Safari: Settings &gt; Privacy; Edge: Settings &gt; Cookies and site permissions). If you block strictly necessary cookies you
+    cannot sign in to the portal; the marketing pages keep working.</p>
