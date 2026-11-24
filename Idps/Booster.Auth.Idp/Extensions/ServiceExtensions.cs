@@ -1,4 +1,9 @@
+using Booster.Amqp.Constants;
+using Booster.Amqp.Extensions;
+using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Common.Internal.Amqp.Extensions;
+using Booster.Auth.Idp.Features._amqp.Consumers.PoolDefinitionChanged;
+using MassTransit;
 using Booster.Auth.Idp.Managers.LicenseManagers;
 using Booster.Auth.Management.Contracts;
 using Booster.Licensing.Runtime;
@@ -56,7 +61,21 @@ public static class ServiceExtensions
 
         services.AddBoosterMessaging<IdpDbContext>(
             configuration,
-            configureRider: rider => rider.AddNotificationProducer());
+            configureRider: rider =>
+            {
+                rider.AddNotificationProducer();
+                rider.AddConsumer<ScopeDefinitionChangedEventConsumer>();
+                rider.AddConsumer<RoleChangedEventConsumer>();
+            },
+            configureKafka: (cfg, context) =>
+            {
+                var groupId = context.GetRequiredService<AmqpSettings>().GroupId;
+
+                cfg.TopicEndpoint<string, ScopeDefinitionChangedEvent>(PoolDefinitionTopics.ScopeDefinitionChanged, groupId,
+                    e => e.AddConsumer<ScopeDefinitionChangedEvent, ScopeDefinitionChangedEventConsumer, IdpDbContext>(context));
+                cfg.TopicEndpoint<string, RoleChangedEvent>(PoolDefinitionTopics.RoleChanged, groupId,
+                    e => e.AddConsumer<RoleChangedEvent, RoleChangedEventConsumer, IdpDbContext>(context));
+            });
 
         var hashingOptions = services.AddSettings<HashingOptions>(configuration);
         services.AddHashing(hashingOptions);

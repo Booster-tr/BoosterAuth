@@ -1,3 +1,5 @@
+using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Constants;
@@ -7,6 +9,7 @@ using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using FastEndpoints;
+using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Management.Api.Features.Roles.Delete;
 
@@ -25,7 +28,7 @@ public class DeleteRoleEndpoint : EndpointWithoutRequest<DeleteRoleResponse>
         {
             s.Summary = "Rolü siler";
             s.Description = "Rolü soft-delete ile kaldırır ve " +
-                            "havuzun varsayılan rollerinden çıkarılır.";
+                            "havuzun varsayılan rollerinden çıkarılır. Kullanıcılardan IdP'de Kafka olayıyla kaldırılır.";
         });
     }
 
@@ -40,7 +43,9 @@ public readonly record struct DeleteRoleResponse(Guid Id);
 public class DeleteRoleCommandHandler(
     IAsyncRepository<Role, AuthNDbContext> roleRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IClientDataCacheStore clientDataCacheStore)
+    IClientDataCacheStore clientDataCacheStore,
+    IEventBus eventBus,
+    ILogger<DeleteRoleCommandHandler> logger)
     : ICommandHandler<DeleteRoleCommand, DeleteRoleResponse>
 {
     public async Task<DeleteRoleResponse> ExecuteAsync(DeleteRoleCommand command, CancellationToken ct)
@@ -58,6 +63,12 @@ public class DeleteRoleCommandHandler(
 
         await roleRepository.SaveChangesAsync(ct);
         await clientDataCacheStore.InvalidatePoolAsync(command.UserPoolId, ct);
+
+        await eventBus.PublishOrLogAsync(new RoleChangedEvent
+        {
+            UserPoolId = command.UserPoolId,
+            RoleId = role!.Id
+        }, logger, ct);
 
         return new DeleteRoleResponse(role!.Id);
     }
