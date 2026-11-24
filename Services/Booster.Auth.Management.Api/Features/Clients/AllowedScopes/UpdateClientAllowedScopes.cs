@@ -56,6 +56,9 @@ public class UpdateClientAllowedScopesCommandHandler(
             c => c.Id == command.ClientId, enableTracking: false, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
+        if (client!.UserPoolId == AuthConstants.ManagementPoolId)
+            throw new BusinessException(AuthNMessageKeys.ManagementPoolClientsReserved);
+
         var scopes = command.Scopes.Select(s => s.Trim().ToLowerInvariant()).Distinct().ToList();
 
         if (scopes.Count > 0)

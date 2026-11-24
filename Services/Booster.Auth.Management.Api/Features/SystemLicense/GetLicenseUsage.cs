@@ -47,7 +47,7 @@ public class GetLicenseUsageEndpoint(
         }
 
         var pools = await db.Set<UserPool>().CountAsync(p => p.Id != AuthConstants.ManagementPoolId, ct);
-        var clients = await db.Set<Client>().CountAsync(c => c.UserPoolId != AuthConstants.ManagementPoolId, ct);
+        var clients = await db.Set<Client>().CountAsync(c => c.Id != AuthConstants.ManagementClientId, ct);
 
         int? users = null;
         try

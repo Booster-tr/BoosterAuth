@@ -59,6 +59,14 @@ public sealed record GetLicenseResponse(
     IReadOnlyList<DomainCheckResult> DomainChecks,
     bool CanActivate = false)
 {
+    /// <summary>Saat kaydi silinmis / degistirilmis: lisans suresi dolmus sayildi, yeniden etkinlestirme kapali.</summary>
+    public bool ClockTampered { get; init; }
+
+    /// <summary>Kullanim lisans limitini asiyor: panel salt okunur, silme serbest.</summary>
+    public bool OverLimit { get; init; }
+
+    public bool DeletesAllowed { get; init; }
+
     internal static GetLicenseResponse From(LicenseEvaluation e, IReadOnlyList<(string Name, string Url)> targets)
     {
         var r = e.Result;
@@ -77,8 +85,14 @@ public sealed record GetLicenseResponse(
                     : DomainRules.Check(t.Url, l.AllowedDomains)))
             .ToList();
 
-        return new GetLicenseResponse(e.InstallationId, r.State, r.InvalidReason, r.PanelWritable, r.EndUserFlowsAllowed,
-            e.ClockRollbackDetected, r.EvaluatedAt, details, checks);
+        var snapshot = e.ToSnapshot();
+        return new GetLicenseResponse(e.InstallationId, r.State, r.InvalidReason, snapshot.PanelWritable, r.EndUserFlowsAllowed,
+            e.ClockRollbackDetected, r.EvaluatedAt, details, checks)
+        {
+            ClockTampered = e.ClockTampered,
+            OverLimit = e.OverLimit,
+            DeletesAllowed = snapshot.DeletesAllowed
+        };
     }
 }
 

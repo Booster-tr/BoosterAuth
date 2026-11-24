@@ -177,6 +177,9 @@ namespace Booster.Auth.Management.Api.Migrations
                     b.Property<DateTimeOffset?>("ClockHighWaterMark")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ClockMarkProtected")
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 

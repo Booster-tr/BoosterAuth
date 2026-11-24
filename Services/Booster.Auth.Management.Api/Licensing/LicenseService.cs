@@ -1,4 +1,9 @@
+using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.Constants.Messages;
+using Booster.Auth.Idp.Grpc;
+using Booster.Auth.Management.Api.Features._base;
+using Booster.Auth.Management.Api.Features._base.Entities;
+using Microsoft.EntityFrameworkCore;
 using Booster.ExceptionManager.Abstraction.Exceptions;
 using Booster.Licensing.Clock;
 using Booster.Licensing.Runtime;
@@ -7,12 +12,25 @@ using Booster.Licensing.Validation;
 namespace Booster.Auth.Management.Api.Licensing;
 
 /// <summary>Son degerlendirme: dogrulama sonucu + kurulum bilgisi + saat geri alma isareti.</summary>
+/// <param name="ClockTampered">Saat kaydi silinmis / degistirilmis: <see cref="Result"/> suresi dolmus (Restricted) sayilir.</param>
+/// <param name="OverLimit">Kullanim lisans limitini asiyor: panel salt okunur, silme serbest.</param>
 public sealed record LicenseEvaluation(
     Guid InstallationId,
     LicenseValidationResult Result,
     bool ClockRollbackDetected,
     DateTimeOffset? ActivatedAt,
-    string? ActivatedBy);
+    string? ActivatedBy,
+    bool ClockTampered = false,
+    bool OverLimit = false)
+{
+    public LicenseStatusSnapshot ToSnapshot()
+    {
+        var snapshot = LicenseStatusSnapshot.From(Result);
+        return OverLimit && snapshot.PanelWritable
+            ? snapshot with { PanelWritable = false, DeletesAllowed = true }
+            : snapshot;
+    }
+}
 
 /// <summary>
 /// Kurulumun lisans durumu. Lisansin SAHIBI Management'tir; IdP ve AuthZ durumu gRPC ile buradan alir.
@@ -23,7 +41,7 @@ public sealed record LicenseEvaluation(
 /// </para>
 /// Singleton; veritabanina her seferinde yeni bir scope ile gider.
 /// </summary>
-public sealed class LicenseService(
+public sealed partial class LicenseService(
     IServiceScopeFactory scopeFactory,
     ILicenseValidator validator,
     TimeProvider time,
@@ -36,7 +54,7 @@ public sealed class LicenseService(
     private DateTimeOffset _evaluatedAt = DateTimeOffset.MinValue;
 
     public async ValueTask<LicenseStatusSnapshot> GetAsync(CancellationToken ct = default) =>
-        LicenseStatusSnapshot.From((await GetEvaluationAsync(ct)).Result);
+        (await GetEvaluationAsync(ct)).ToSnapshot();
 
     public async Task<LicenseEvaluation> GetEvaluationAsync(CancellationToken ct = default)
     {
@@ -55,14 +73,33 @@ public sealed class LicenseService(
             using var scope = scopeFactory.CreateScope();
             var store = scope.ServiceProvider.GetRequiredService<InstallationStore>();
             var row = await store.EnsureAsync(ct);
-            var now = await new LicenseClock(store, time).GetEffectiveNowAsync(ct);
+
+            EffectiveTime now;
+            var tampered = false;
+            try
+            {
+                now = await new LicenseClock(store, time).GetEffectiveNowAsync(ct);
+            }
+            catch (LicenseClockTamperedException ex)
+            {
+                tampered = true;
+                now = new EffectiveTime(time.GetUtcNow(), false);
+                if (_current?.ClockTampered != true)
+                    logger.LogWarning("Lisans saat kaydi degistirilmis ({Reason}); lisans suresi dolmus sayiliyor.", ex.Message);
+            }
+
+            var result = validator.Validate(row.LicenseToken, row.InstallationId, now.Now);
+            if (tampered && result.License is not null)
+                result = result with { State = LicenseState.Restricted };
 
             var evaluation = new LicenseEvaluation(
                 row.InstallationId,
-                validator.Validate(row.LicenseToken, row.InstallationId, now.Now),
+                result,
                 now.ClockRollbackDetected,
                 row.LicenseActivatedAt,
-                row.LicenseActivatedBy);
+                row.LicenseActivatedBy,
+                tampered,
+                await IsOverLimitAsync(scope.ServiceProvider, result, ct));
 
             var previous = _current;
             if (previous is null || previous.Result.State != evaluation.Result.State)
@@ -89,6 +126,11 @@ public sealed class LicenseService(
     public async Task<LicenseEvaluation> ActivateAsync(string token, string activatedBy, CancellationToken ct)
     {
         var current = await GetEvaluationAsync(ct);
+
+        // Saat kaydi silinmisse ayni anahtari yeniden yapistirmak sureyi sifirlardi. Cozum: kurulum kaydini yenileyip
+        // (yeni kurulum GUID'i) lisansi portalda o kuruluma aktarmak.
+        if (current.ClockTampered)
+            throw new BusinessException(LicenseMessageKeys.ClockTampered);
         var candidate = validator.Validate(token, current.InstallationId, current.Result.EvaluatedAt);
 
         if (candidate.State == LicenseState.Invalid)
@@ -114,6 +156,45 @@ public sealed class LicenseService(
             candidate.License!.LicenseId, candidate.License.Type, candidate.License.Plan, candidate.License.ExpiresAt, activatedBy);
 
         return await EvaluateAsync(ct);
+    }
+}
+
+public sealed partial class LicenseService
+{
+    private int? _lastUserCount;
+
+    /// <summary>
+    /// Kullanim limiti asiyor mu? Yeni kayit zaten limitte reddedilir; bu kontrol veritabanina dogrudan eklenen kayitlari
+    /// ve daha kucuk pakete gecisi yakalar. Kullanici sayisi IdP'den alinir; alinamazsa son bilinen deger kullanilir.
+    /// Yalnizca panel yazilabilir durumdayken anlamlidir (aksi halde panel zaten salt okunur).
+    /// </summary>
+    private async Task<bool> IsOverLimitAsync(IServiceProvider services, LicenseValidationResult result, CancellationToken ct)
+    {
+        if (!result.PanelWritable)
+            return false;
+
+        var limits = LicenseStatusSnapshot.From(result).Limits!;
+        var db = services.GetRequiredService<AuthNDbContext>();
+
+        var pools = await db.Set<UserPool>().CountAsync(p => p.Id != AuthConstants.ManagementPoolId, ct);
+        var clients = await db.Set<Client>().CountAsync(c => c.Id != AuthConstants.ManagementClientId, ct);
+
+        try
+        {
+            var idp = services.GetRequiredService<PrincipalLookupService.PrincipalLookupServiceClient>();
+            _lastUserCount = (await idp.CountLicensedUsersAsync(new CountLicensedUsersRequest(),
+                deadline: DateTime.UtcNow.AddSeconds(3), cancellationToken: ct)).Count;
+        }
+        catch (Exception ex) when (!ct.IsCancellationRequested)
+        {
+            logger.LogDebug(ex, "Lisans kullanim kontrolu: kullanici sayisi IdP'den alinamadi; son bilinen deger kullaniliyor.");
+        }
+
+        var over = pools > limits.Pools || clients > limits.Clients || _lastUserCount > limits.Users;
+        if (over && _current?.OverLimit != true)
+            logger.LogWarning("Kullanim lisans limitini asiyor: kullanici {Users}/{MaxUsers}, havuz {Pools}/{MaxPools}, uygulama {Clients}/{MaxClients}. Panel salt okunur (silme serbest).",
+                _lastUserCount, limits.Users, pools, limits.Pools, clients, limits.Clients);
+        return over;
     }
 }
 

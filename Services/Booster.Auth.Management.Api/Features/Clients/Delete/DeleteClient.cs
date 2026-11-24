@@ -48,6 +48,10 @@ public class DeleteClientCommandHandler(
         var client = await clientRepository.GetAsync(c => c.Id == command.ClientId, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
+        // Panelin kendi uygulamasi silinemez. Yonetim havuzuna onceden eklenmis diger uygulamalar silinebilir.
+        if (client!.Id == AuthConstants.ManagementClientId)
+            throw new BusinessException(AuthNMessageKeys.ManagementPoolClientsReserved);
+
         clientRepository.Delete(client!);
         await clientRepository.SaveChangesAsync(ct);
 

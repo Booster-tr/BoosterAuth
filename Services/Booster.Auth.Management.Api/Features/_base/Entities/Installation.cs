@@ -25,8 +25,17 @@ public class Installation : Entity
 
     public string? LicenseActivatedBy { get; set; }
 
-    /// <summary>Gorulen en ileri zaman. Yalnizca ileri gider (bkz. LicenseClock).</summary>
+    /// <summary>
+    /// ESKI, sifresiz en ileri zaman. Artik yazilmaz; yalnizca bu surume gecen kurulumda bir kez
+    /// <see cref="ClockMarkProtected"/>'a tasinip bosaltilir (bkz. InstallationStore).
+    /// </summary>
     public DateTimeOffset? ClockHighWaterMark { get; set; }
+
+    /// <summary>
+    /// Gorulen en ileri zaman, AES-GCM ile sifreli ve kurulum GUID'ine bagli ("guid|ticks"). Satir olusturulurken
+    /// yazilir; bos, cozulemeyen ya da baska kuruluma ait deger = kayit degistirilmis: lisans suresi dolmus sayilir.
+    /// </summary>
+    public string? ClockMarkProtected { get; set; }
 }
 
 public class InstallationConfiguration : IEntityTypeConfiguration<Installation>

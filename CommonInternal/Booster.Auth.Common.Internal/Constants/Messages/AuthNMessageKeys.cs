@@ -68,4 +68,7 @@ public class AuthNMessageKeys
     public const string IdentityProviderClientIdRequired = "authn.identity_provider_client_id_required";
     public const string IdentityProviderIssuerRequired = "authn.identity_provider_issuer_required";
     public const string IdentityProviderSamlSettingsRequired = "authn.identity_provider_saml_settings_required";
+
+    /// <summary>Yonetim havuzunun uygulamalari (panel) sistem tarafindan yonetilir; lisans limitine sayilmadiklari icin elle eklenemez/degistirilemez.</summary>
+    public const string ManagementPoolClientsReserved = "authn.management_pool_clients_reserved";
 }

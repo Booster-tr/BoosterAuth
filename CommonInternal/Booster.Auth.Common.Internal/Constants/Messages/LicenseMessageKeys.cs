@@ -26,4 +26,13 @@ public static class LicenseMessageKeys
 
     /// <summary>Self-servis kayit / federasyon ilk girisi limit nedeniyle kapali. Son kullaniciya teknik ayrinti gosterilmez.</summary>
     public const string RegistrationClosed = "LICENSE_REGISTRATION_CLOSED";
+
+    /// <summary>Lisans durumu alinamadi (Management'a ulasilamiyor): yeni kayit olusturulmaz; mevcut girisler etkilenmez.</summary>
+    public const string StatusUnavailable = "LICENSE_STATUS_UNAVAILABLE";
+
+    /// <summary>Kullanim lisans limitini asti: panel salt okunur, yalnizca silme serbest.</summary>
+    public const string OverLimit = "LICENSE_OVER_LIMIT";
+
+    /// <summary>Lisansin saat kaydi silinmis ya da degistirilmis: lisans suresi dolmus sayilir.</summary>
+    public const string ClockTampered = "LICENSE_CLOCK_TAMPERED";
 }

@@ -61,6 +61,10 @@ public class UpdateClientCommandHandler(
         var client = await clientRepository.GetAsync(c => c.Id == command.ClientId, cancellationToken: ct);
         client.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.ClientNotFound);
 
+        // Panel uygulamasini bootstrapper yonetir; adresleri degistirilip musteri uygulamasi gibi kullanilamasin (limit disi).
+        if (client!.UserPoolId == AuthConstants.ManagementPoolId)
+            throw new BusinessException(AuthNMessageKeys.ManagementPoolClientsReserved);
+
         // Redirect politikasi yalnizca YENI eklenen adreslere uygulanir: politika sonradan acildiysa mevcut
         // (uymayan) adresler client'in baska alanlarini guncellemeyi engellemesin.
         var existing = client!.RedirectUris.Concat(client.PostLogoutRedirectUris).ToHashSet(StringComparer.Ordinal);

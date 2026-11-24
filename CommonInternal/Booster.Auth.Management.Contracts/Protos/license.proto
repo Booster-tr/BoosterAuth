@@ -21,4 +21,6 @@ message LicenseStatusMessage {
   int32 max_users = 6;
   int32 max_pools = 7;
   int32 max_clients = 8;
+  // Panel salt okunur ama silme serbest (kullanim limiti asildi).
+  bool deletes_allowed = 9;
 }
