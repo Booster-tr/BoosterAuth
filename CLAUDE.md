@@ -42,7 +42,7 @@ Portal imzalama anahtarini ilk acilista kendisi uretir ve `licensingdb`'ye `ISec
 Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 
 **Portal ayarlari:**
-- Musteri havuzu ve portal client'i `LicensingBootstrapper` (Management + AuthZ) ile kurulur. Varsayilan KAPALI; acmak icin `BootstrapOptions__Licensing__Enabled=true` ve `RedirectUris`. Musteri kurulumlarinda kapali kalir.
+- Musteri havuzu ve portal client'i `LicensingBootstrapper` (Management + AuthZ) ile kurulur. Varsayilan KAPALI; acmak icin `BootstrapOptions__Licensing__Enabled=true` ve `RedirectUris`. Cikis adresi (`.../signout-callback-oidc`) her `.../signin-oidc` adresinden turetilir; ayrica yazmak gerekmez. Musteri kurulumlarinda kapali kalir.
 - Admin erisimi `LicensingPortalOptions__AdminEmails__N` listesiyle verilir. E-posta Booster Auth'ta dogrulanmis olmalidir (`email_verified`).
 - **Musteri alani (`/hesap`, `AccountController`):** e-postasi dogrulanmis her kullanici erisebilir.
   - Islemler: firma bilgileri, kurulum ekleme, ucretsiz deneme, lisanslarim, aktarim.
