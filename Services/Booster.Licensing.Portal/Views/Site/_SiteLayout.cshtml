@@ -73,6 +73,7 @@
             <a href="/@lang/docs" aria-current="@Current("docs")">@m.T("nav.docs")</a>
             <a href="/@lang/pricing" aria-current="@Current("pricing")">@m.T("nav.pricing")</a>
             <a href="/@lang/download" aria-current="@Current("download")">@m.T("nav.download")</a>
+            <a href="/@lang/help" aria-current="@Current("help")">@m.T("nav.help")</a>
         </nav>
         <div class="top-right">
             <a class="portal" href="@portalHref">@SiteArt.Lock() @m.T("nav.portal")</a>
@@ -94,6 +95,7 @@
                     <a href="/@lang/docs" aria-current="@Current("docs")">@m.T("nav.docs")</a>
                     <a href="/@lang/pricing" aria-current="@Current("pricing")">@m.T("nav.pricing")</a>
                     <a href="/@lang/download" aria-current="@Current("download")">@m.T("nav.download")</a>
+                    <a href="/@lang/help" aria-current="@Current("help")">@m.T("nav.help")</a>
                     <a href="@portalHref">@m.T("nav.portal")</a>
                 </nav>
             </details>
@@ -137,6 +139,14 @@
                     <li><a href="/hesap/kurulumlar">@m.T("footer.installations")</a></li>
                     <li><a href="/hesap/siparisler">@m.T("footer.orders")</a></li>
                     <li><a href="@cur.Path(other)" hreflang="@other" lang="@other">@m.T("lang.switch")</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2 class="foot-h">@m.T("footer.support")</h2>
+                <ul>
+                    <li><a href="@SiteCatalog.SupportPhoneHref">@SiteCatalog.SupportPhone</a></li>
+                    <li><a href="mailto:@SiteCatalog.SupportEmail">@SiteCatalog.SupportEmail</a></li>
+                    <li><a href="/@lang/help">@m.T("footer.helpcenter")</a></li>
                 </ul>
             </div>
         </div>

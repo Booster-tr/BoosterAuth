@@ -1,0 +1,53 @@
+@using Booster.Licensing.Portal.Site
+<div class="page-head">
+    <div class="wrap">
+        <p class="kicker reveal">Help</p>
+        <h1 class="reveal d2">Something not working? <em>Get in touch.</em></h1>
+        <p class="lede reveal d3" style="margin-top:28px">Reach our support team by phone or e-mail with questions about installation, licensing or
+            integrating your applications.</p>
+
+        <div class="help-grid">
+            <div class="dl-card help-card reveal d3">
+                <div class="file"><b>@SiteCatalog.SupportPhone</b><span>Phone</span></div>
+                <a class="btn btn-primary" href="@SiteCatalog.SupportPhoneHref">Call <span class="arr" aria-hidden="true">→</span></a>
+                <ul class="facts">
+                    <li>For urgent issues and when you are stuck during installation.</li>
+                </ul>
+            </div>
+            <div class="dl-card help-card reveal d3">
+                <div class="file"><b>@SiteCatalog.SupportEmail</b><span>E-mail</span></div>
+                <a class="btn btn-primary" href="mailto:@SiteCatalog.SupportEmail">Send an e-mail <span class="arr" aria-hidden="true">→</span></a>
+                <ul class="facts">
+                    <li>For licensing, orders and technical questions; you can attach screenshots and logs.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section aria-labelledby="h-request" style="margin-top:80px">
+    <div class="wrap">
+        <p class="kicker reveal">For a faster answer</p>
+        <h2 id="h-request" class="reveal">Include these in your request.</h2>
+        <ol class="help-steps reveal d2">
+            <li><b>Installation ID:</b> the GUID shown on <i>System &gt; License</i> in the management panel.</li>
+            <li><b>Version:</b> the version on <i>System &gt; Service Status</i> in the panel.</li>
+            <li><b>What happened:</b> what you did, the error message and the time it occurred.</li>
+            <li><b>Logs:</b> the relevant service log, e.g. <code>docker compose logs --since 1h booster-idp</code>.</li>
+        </ol>
+        <p class="reveal d2" style="margin-top:24px">Do not include secrets such as passwords, license keys or service account secrets in your request.</p>
+    </div>
+</section>
+
+<div class="closing">
+    <div class="wrap closing-inner">
+        <h2 class="reveal">The answer may be in the docs.</h2>
+        <div class="side-cta reveal d2">
+            <p>Installation, licensing, application integration and fixes for common problems are explained step by step.</p>
+            <div class="cta-row">
+                <a class="btn btn-primary" href="/en/docs/operations">Troubleshooting <span class="arr" aria-hidden="true">→</span></a>
+                <a class="btn btn-ghost" href="/en/docs">Documentation</a>
+            </div>
+        </div>
+    </div>
+</div>

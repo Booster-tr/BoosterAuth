@@ -12,6 +12,11 @@ public static class SiteCatalog
     public const string DefaultLanguage = "tr";
     public const string ProductName = "Booster Auth";
 
+    // Destek iletisim bilgileri: site, portal ve dokumanlar buradan okur (tek yerde).
+    public const string SupportPhone = "0540 526 26 26";
+    public const string SupportPhoneHref = "tel:+905405262626";
+    public const string SupportEmail = "helpdesk@boosterauth.com";
+
     public sealed record Page(string Slug, string View, string TitleTr, string TitleEn, string DescTr, string DescEn,
         string? DocGroup = null, string? SeoTr = null, string? SeoEn = null)
     {
@@ -44,6 +49,12 @@ public static class SiteCatalog
         "booster-auth.zip kurulum paketini indirin. Kurulum betiği tüm parola ve anahtarları sizin sunucunuzda üretir; docker compose up -d ile sistem ayağa kalkar.",
         "Download the booster-auth.zip package. The setup script generates every password and key on your server, and docker compose up -d starts the whole system.",
         SeoTr: "İndir: Docker Compose kurulum paketi", SeoEn: "Download: the Docker Compose install package");
+
+    public static readonly Page Help = new("help", "Help",
+        "Yardım", "Help",
+        "Booster Auth destek: telefon ve e-posta ile bize ulaşın. Kurulum, lisans ve entegrasyon sorularınız için talep oluştururken gerekenler.",
+        "Booster Auth support: reach us by phone and e-mail. What to include when you contact us about installation, licensing or integration.",
+        SeoTr: "Yardım ve destek", SeoEn: "Help and support");
 
     // ---------------------------------------------------------------- dokumantasyon
     public static readonly Page[] Docs =
@@ -100,7 +111,7 @@ public static class SiteCatalog
         ("operate", "İşletim", "Operations"),
     ];
 
-    public static IEnumerable<Page> All => new[] { Home, Features, Pricing, Download }.Concat(Docs);
+    public static IEnumerable<Page> All => new[] { Home, Features, Pricing, Download, Help }.Concat(Docs);
 
     public static Page? Find(string slug) => All.FirstOrDefault(p => string.Equals(p.Slug, slug, StringComparison.Ordinal));
 
@@ -128,6 +139,7 @@ public static class SiteCatalog
         ["cta.download"] = "İndir ve dene", ["cta.trial"] = "7 gün ücretsiz deneyin", ["cta.pricing"] = "Paketleri inceleyin",
         ["cta.docs"] = "Dokümantasyon", ["cta.buy"] = "Lisans al", ["cta.start"] = "Hemen başla",
         ["lang.switch"] = "English", ["menu"] = "Menü", ["skip"] = "İçeriğe geç",
+        ["nav.help"] = "Yardım", ["footer.support"] = "Destek", ["footer.helpcenter"] = "Yardım merkezi",
         ["footer.tagline"] = "Kendi sunucunuzda çalışan kimlik ve erişim yönetimi.",
         ["footer.product"] = "Ürün", ["footer.resources"] = "Dokümantasyon", ["footer.account"] = "Hesap",
         ["footer.signin"] = "Lisans portalına giriş", ["footer.orders"] = "Siparişlerim", ["footer.installations"] = "Kurulumlarım",
@@ -145,6 +157,7 @@ public static class SiteCatalog
         ["cta.download"] = "Download and try", ["cta.trial"] = "Try it free for 7 days", ["cta.pricing"] = "See plans",
         ["cta.docs"] = "Documentation", ["cta.buy"] = "Get a license", ["cta.start"] = "Get started",
         ["lang.switch"] = "Türkçe", ["menu"] = "Menu", ["skip"] = "Skip to content",
+        ["nav.help"] = "Help", ["footer.support"] = "Support", ["footer.helpcenter"] = "Help center",
         ["footer.tagline"] = "Identity and access management that runs on your own servers.",
         ["footer.product"] = "Product", ["footer.resources"] = "Documentation", ["footer.account"] = "Account",
         ["footer.signin"] = "Sign in to the license portal", ["footer.orders"] = "My orders", ["footer.installations"] = "My installations",
