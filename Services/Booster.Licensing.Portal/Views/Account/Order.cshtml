@@ -15,6 +15,12 @@
         <dt>Tutar</dt><dd>@(Model.Price > 0 ? $"{Model.Price.ToString("N2", tr)} {Model.Currency}" : "Size ayrıca bildirilecek")</dd>
         <dt>Kurulum</dt><dd><code>@Model.InstallationId</code></dd>
         <dt>Fatura</dt><dd>@Model.BillingName, @Model.BillingTaxOffice @Model.BillingTaxNumber</dd>
+        @if (Model.TermsVersion is not null)
+        {
+            <dt>Kabul edilen koşullar</dt>
+            <dd><a href="/tr/legal/sales-terms">Satış ve Sipariş Koşulları</a> ve <a href="/tr/legal/license-agreement">Yazılım Lisans Sözleşmesi</a>,
+                sürüm @Model.TermsVersion · @Model.TermsAcceptedAt?.ToString("yyyy-MM-dd HH:mm") UTC · @Model.TermsAcceptedBy</dd>
+        }
     </dl>
 
     @if (Model.Status == OrderStatus.Pending)

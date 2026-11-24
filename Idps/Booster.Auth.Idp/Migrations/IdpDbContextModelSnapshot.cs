@@ -65,6 +65,132 @@ namespace Booster.Auth.Idp.Migrations
                     b.ToTable("Consents", (string)null);
                 });
 
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.LegalDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasFilter("\"DeletedTime\" IS NULL");
+
+                    b.ToTable("LegalDocuments", (string)null);
+                });
+
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.LegalDocumentTranslation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(100000)
+                        .HasColumnType("character varying(100000)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Customized")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("EffectiveDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("LanguageCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<Guid>("LegalDocumentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Summary")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LegalDocumentId", "LanguageCode")
+                        .IsUnique()
+                        .HasFilter("\"DeletedTime\" IS NULL");
+
+                    b.ToTable("LegalDocumentTranslations", (string)null);
+                });
+
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.LegalProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<string>("KepAddress")
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<string>("OrganizationName")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("RegistryInfo")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LegalProfiles", (string)null);
+                });
+
             modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.LocalCredential", b =>
                 {
                     b.Property<Guid>("Id")
@@ -569,6 +695,70 @@ namespace Booster.Auth.Idp.Migrations
                     b.ToTable("Sessions", (string)null);
                 });
 
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.UiText", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasFilter("\"DeletedTime\" IS NULL");
+
+                    b.ToTable("UiTexts", (string)null);
+                });
+
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.UiTextTranslation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LanguageCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<Guid>("UiTextId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("UpdatedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UiTextId", "LanguageCode")
+                        .IsUnique()
+                        .HasFilter("\"DeletedTime\" IS NULL");
+
+                    b.ToTable("UiTextTranslations", (string)null);
+                });
+
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
                 {
                     b.Property<long>("Id")
@@ -748,6 +938,17 @@ namespace Booster.Auth.Idp.Migrations
                     b.Navigation("Principal");
                 });
 
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.LegalDocumentTranslation", b =>
+                {
+                    b.HasOne("Booster.Auth.Idp.Features._base.Entities.LegalDocument", "LegalDocument")
+                        .WithMany("Translations")
+                        .HasForeignKey("LegalDocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LegalDocument");
+                });
+
             modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.LocalCredential", b =>
                 {
                     b.HasOne("Booster.Auth.Idp.Features._base.Entities.Principal", "Principal")
@@ -840,6 +1041,17 @@ namespace Booster.Auth.Idp.Migrations
                     b.Navigation("Principal");
                 });
 
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.UiTextTranslation", b =>
+                {
+                    b.HasOne("Booster.Auth.Idp.Features._base.Entities.UiText", "UiText")
+                        .WithMany("Translations")
+                        .HasForeignKey("UiTextId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UiText");
+                });
+
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
                 {
                     b.HasOne("MassTransit.EntityFrameworkCoreIntegration.OutboxState", null)
@@ -850,6 +1062,11 @@ namespace Booster.Auth.Idp.Migrations
                         .WithMany()
                         .HasForeignKey("InboxMessageId", "InboxConsumerId")
                         .HasPrincipalKey("MessageId", "ConsumerId");
+                });
+
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.LegalDocument", b =>
+                {
+                    b.Navigation("Translations");
                 });
 
             modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.Principal", b =>
@@ -864,6 +1081,11 @@ namespace Booster.Auth.Idp.Migrations
             modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.Session", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Booster.Auth.Idp.Features._base.Entities.UiText", b =>
+                {
+                    b.Navigation("Translations");
                 });
 #pragma warning restore 612, 618
         }

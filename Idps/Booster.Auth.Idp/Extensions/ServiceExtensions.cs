@@ -125,6 +125,12 @@ public static class ServiceExtensions
         services.AddScoped<Booster.Auth.Idp.Managers.UserManagers.InvitationManager>();
         services.AddScoped<Booster.Auth.Idp.Managers.AccountManagers.AccountService>();
 
+        // Yasal metinler ve ekran yazilari (uygulama sahibinin; panelin Sistem menusunden duzenlenir).
+        services.AddScoped<Booster.Auth.Idp.Managers.LegalManagers.LegalContentService>();
+        services.AddSingleton<Booster.Auth.Idp.Managers.LegalManagers.UiTextOverrides>();
+        services.AddTransient<Microsoft.Extensions.Localization.IStringLocalizer<SharedResource>, Booster.Auth.Idp.Managers.LegalManagers.OverridableStringLocalizer>();
+        services.AddScoped<LegalBootstrapper>();
+
         services.AddScoped<IClientDataStore, ClientDataStore>();
         services.AddSingleton<IClientLogoStore, ClientLogoStore>();
         services.AddScoped<IPasswordPolicyManager, PasswordPolicyManager>();

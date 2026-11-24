@@ -12,7 +12,10 @@ namespace Booster.Licensing.Portal.Services;
 /// </summary>
 public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, TimeProvider time, PortalNotifier notifier)
 {
-    public async Task<Order> CreateAsync(Customer customer, CustomerInstallation installation, Plan plan, string createdBy, CancellationToken ct)
+    /// <param name="termsVersion">Siparis ekraninda kabul edilen Satis Kosullari / Lisans Sozlesmesi surumu.</param>
+    /// <param name="ip">Kabul eden istemcinin IP adresi.</param>
+    public async Task<Order> CreateAsync(Customer customer, CustomerInstallation installation, Plan plan, string createdBy,
+        string termsVersion, string? ip, CancellationToken ct)
     {
         if (!plan.IsActive) throw new InvalidOperationException("Pasif plan icin siparis verilemez.");
 
@@ -42,6 +45,10 @@ public sealed class OrderService(LicensingDbContext db, LicenseIssuer issuer, Ti
             BillingTaxNumber = customer.TaxNumber,
             BillingAddress = customer.Address,
             CreatedBy = createdBy,
+            TermsVersion = termsVersion,
+            TermsAcceptedAt = time.GetUtcNow(),
+            TermsAcceptedIp = ip,
+            TermsAcceptedBy = createdBy,
         };
         db.Orders.Add(order);
         await db.SaveChangesAsync(ct);

@@ -20,6 +20,11 @@ public class IdpDbContext(DbContextOptions<IdpDbContext> options, IRequestContex
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<PrincipalRole> PrincipalRoles => Set<PrincipalRole>();
     public DbSet<PrincipalScope> PrincipalScopes => Set<PrincipalScope>();
+    public DbSet<LegalDocument> LegalDocuments => Set<LegalDocument>();
+    public DbSet<LegalDocumentTranslation> LegalDocumentTranslations => Set<LegalDocumentTranslation>();
+    public DbSet<LegalProfile> LegalProfiles => Set<LegalProfile>();
+    public DbSet<UiText> UiTexts => Set<UiText>();
+    public DbSet<UiTextTranslation> UiTextTranslations => Set<UiTextTranslation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

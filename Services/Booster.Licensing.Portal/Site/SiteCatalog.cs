@@ -111,7 +111,46 @@ public static class SiteCatalog
         ("operate", "İşletim", "Operations"),
     ];
 
-    public static IEnumerable<Page> All => new[] { Home, Features, Pricing, Download, Help }.Concat(Docs);
+    // ---------------------------------------------------------------- yasal metinler (/{dil}/legal/...)
+    // Sirket bilgileri LegalInfo'dan okunur. Gorunumler: Views/Site/{tr|en}/Legal/*.cshtml (_LegalLayout).
+    public static readonly Page Imprint = new("legal/imprint", "Legal/Imprint", "Künye", "Company information",
+        "Booster Auth'u sunan şirketin unvanı, MERSİS ve sicil bilgileri, adresi, KEP adresi ve iletişim bilgileri.",
+        "Legal name, registration details, address, registered e-mail (KEP) and contact details of the company behind Booster Auth.",
+        SeoTr: "Künye ve iletişim bilgileri", SeoEn: "Company information and contact details");
+
+    public static readonly Page TermsOfUse = new("legal/terms", "Legal/Terms", "Site Kullanım Koşulları", "Website terms of use",
+        "Booster Auth web sitesinin, dokümantasyonun ve lisans portalının kullanım koşulları.",
+        "Terms of use for the Booster Auth website, documentation and license portal.");
+
+    public static readonly Page LicenseAgreement = new("legal/license-agreement", "Legal/LicenseAgreement", "Yazılım Lisans Sözleşmesi", "Software License Agreement",
+        "Booster Auth yazılımının kurulum başına, yıllık ve çevrimdışı lisans koşulları; deneme lisansı, sorumluluk ve fesih.",
+        "Terms of the per-installation, annual, offline Booster Auth license: trial license, liability and termination.");
+
+    public static readonly Page SalesTerms = new("legal/sales-terms", "Legal/SalesTerms", "Satış ve Sipariş Koşulları", "Sales and Order Terms",
+        "Sipariş adımları, havale / EFT ile ödeme, lisans anahtarının teslimi, fatura, yenileme, iptal ve iade.",
+        "Order steps, payment by bank transfer, delivery of the license key, invoicing, renewal, cancellation and refunds.");
+
+    public static readonly Page Privacy = new("legal/privacy", "Legal/Privacy", "Aydınlatma Metni ve Gizlilik", "Privacy Notice",
+        "KVKK aydınlatma metni: web sitesi ve lisans portalında hangi kişisel verileri, hangi amaç ve hukuki sebeple işlediğimiz, kimlere aktardığımız ve haklarınız.",
+        "Privacy notice under the Turkish data protection law (KVKK): what personal data we process on the website and license portal, why, who receives it and your rights.",
+        SeoTr: "KVKK Aydınlatma Metni ve Gizlilik", SeoEn: "Privacy Notice (KVKK)");
+
+    public static readonly Page CookiePolicy = new("legal/cookies", "Legal/Cookies", "Çerez Politikası", "Cookie Policy",
+        "Web sitesi ve lisans portalında kullanılan çerezler: adları, amaçları ve süreleri. Yalnızca zorunlu çerezler kullanılır.",
+        "Cookies used on the website and license portal: names, purposes and lifetimes. Only strictly necessary cookies are used.");
+
+    public static readonly Page SupportPolicy = new("legal/support", "Legal/Support", "Destek Politikası ve Veri İşleme Eki", "Support Policy and Data Processing Addendum",
+        "Destek kanalları ve hedef yanıt süreleri; destek sırasında paylaşılan log ve ekran görüntülerinin işlenmesine ilişkin veri işleme eki.",
+        "Support channels and target response times, and the data processing addendum for logs and screenshots shared with support.");
+
+    public static readonly Page ThirdParty = new("legal/third-party", "Legal/ThirdParty", "Üçüncü Taraf Bildirimleri", "Third-party notices",
+        "Booster Auth kurulum paketinin kullandığı açık kaynak bileşenler ve lisansları.",
+        "Open-source components used by the Booster Auth installation package and their licenses.",
+        SeoTr: "Üçüncü taraf ve açık kaynak bildirimleri", SeoEn: "Third-party and open-source notices");
+
+    public static readonly Page[] Legal = [Imprint, TermsOfUse, LicenseAgreement, SalesTerms, Privacy, CookiePolicy, SupportPolicy, ThirdParty];
+
+    public static IEnumerable<Page> All => new[] { Home, Features, Pricing, Download, Help }.Concat(Docs).Concat(Legal);
 
     public static Page? Find(string slug) => All.FirstOrDefault(p => string.Equals(p.Slug, slug, StringComparison.Ordinal));
 
@@ -147,6 +186,10 @@ public static class SiteCatalog
         ["docs.on_this_page"] = "Bu sayfada", ["docs.next"] = "Sonraki", ["docs.prev"] = "Önceki", ["docs.nav"] = "Dokümantasyon menüsü",
         ["docs.pager"] = "Önceki ve sonraki sayfa", ["docs.label"] = "Dokümantasyon",
         ["copy"] = "Kopyala", ["copied"] = "Kopyalandı",
+        ["footer.legal"] = "Yasal", ["legal.label"] = "Yasal metinler", ["legal.nav"] = "Yasal metinler menüsü",
+        ["legal.updated"] = "Son güncelleme", ["legal.version"] = "Sürüm",
+        ["legal.draft"] = "Bu metin taslaktır; şirket bilgileri tamamlandıktan ve hukuki incelemeden sonra yürürlüğe girer.",
+        ["legal.save"] = "Bu metni tarayıcınızın yazdırma menüsüyle PDF olarak kaydedip saklayabilirsiniz.",
     };
 
     private static readonly Dictionary<string, string> En = new()
@@ -165,5 +208,9 @@ public static class SiteCatalog
         ["docs.on_this_page"] = "On this page", ["docs.next"] = "Next", ["docs.prev"] = "Previous", ["docs.nav"] = "Documentation menu",
         ["docs.pager"] = "Previous and next page", ["docs.label"] = "Documentation",
         ["copy"] = "Copy", ["copied"] = "Copied",
+        ["footer.legal"] = "Legal", ["legal.label"] = "Legal", ["legal.nav"] = "Legal documents menu",
+        ["legal.updated"] = "Last updated", ["legal.version"] = "Version",
+        ["legal.draft"] = "This text is a draft. It takes effect once the company details are completed and it has passed legal review.",
+        ["legal.save"] = "You can save this text as a PDF using your browser's print menu.",
     };
 }

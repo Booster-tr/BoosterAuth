@@ -1,0 +1,42 @@
+@* Turkish e-commerce law (6563 art.3, regulation art.5, TTK art.39/2). Values come from LegalInfo (appsettings). *@
+<p class="lede">The Booster Auth software, this website and the license portal are provided by the company below.</p>
+
+<h2 id="company">Company details</h2>
+<dl>
+    <dt>Legal name</dt><dd>@Legal.CompanyName</dd>
+    <dt>Company type</dt><dd>@Legal.CompanyTypeEn</dd>
+    <dt>MERSIS number</dt><dd>@Legal.Mersis</dd>
+    <dt>Trade registry</dt><dd>@Legal.TradeRegistry</dd>
+    <dt>Tax office / number</dt><dd>@Legal.TaxOffice / @Legal.TaxNumber</dd>
+    <dt>Registered address</dt><dd>@Legal.Address</dd>
+    @if (!string.IsNullOrWhiteSpace(Legal.Trademark))
+    {
+        <dt>Trademark</dt><dd>Booster Auth, registration: @Legal.Trademark</dd>
+    }
+    <dt>Chamber membership</dt>
+    <dd>@Legal.Chamber@if (!string.IsNullOrWhiteSpace(Legal.ChamberRulesUrl)) {<text> · professional rules: @Legal.ChamberRulesUrl</text>}</dd>
+</dl>
+
+<h2 id="contact">Contact</h2>
+<dl>
+    <dt>Registered e-mail (KEP)</dt><dd>@Legal.Kep</dd>
+    <dt>E-mail</dt><dd>@Legal.Email</dd>
+    <dt>Support</dt><dd><a href="mailto:@Legal.SupportEmail">@Legal.SupportEmail</a> · <a href="@Legal.PhoneHref">@Legal.Phone</a></dd>
+    <dt>Data protection requests</dt><dd>@Legal.KvkkEmail (details: <a href="/en/legal/privacy#requests">Privacy Notice</a>)</dd>
+</dl>
+<p>Notices with legal effect, such as notices of default, termination or rescission, can be sent to our KEP address, through a notary public or by
+    registered mail with return receipt to our registered address. E-mail is sufficient for all other correspondence.</p>
+
+<h2 id="contract">How the contract is concluded</h2>
+<p>License orders and trial licenses are placed in the <a href="/hesap">license portal</a>. The steps, how to correct your details, payment and
+    delivery are described in the <a href="/en/legal/sales-terms">Sales and Order Terms</a>; the scope of your right of use is set out in the
+    <a href="/en/legal/license-agreement">Software License Agreement</a>.</p>
+<ul>
+    <li>The contract language is Turkish. English texts are provided for information; in case of conflict the Turkish text prevails.</li>
+    <li>The version of the text you accept is stored with your order and shown on the order page. You can view, print or save the texts as PDF from
+        these pages at any time.</li>
+    <li>We sell only to businesses, institutions and public bodies; we do not sell to consumers.</li>
+    <li>Turkish law applies to disputes. For commercial disputes, applying to a mediator before filing a lawsuit is mandatory by law.</li>
+</ul>
+<p>How we process personal data is explained in the <a href="/en/legal/privacy">Privacy Notice</a>; cookies are described in the
+    <a href="/en/legal/cookies">Cookie Policy</a>.</p>

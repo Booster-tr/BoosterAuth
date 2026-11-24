@@ -13,6 +13,7 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.84.0" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.84.0" />
     <PackageReference Include="FastEndpoints" Version="8.3.0" />
+    <PackageReference Include="Markdig" Version="1.6.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.24.1-preview.1" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
 		  <PrivateAssets>all</PrivateAssets>
@@ -44,4 +45,9 @@
     <ProjectReference Include="..\..\CommonInternal\Booster.Auth.Ldap\Booster.Auth.Ldap.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Yasal metinlerin varsayilan sablonlari (LegalBootstrapper veritabanina tohumlar). -->
+    <!-- WithCulture=false: "kvkk.tr-tr.md" adindaki ".tr-tr" kultur sanilip uydu derlemeye konmasin. -->
+    <EmbeddedResource Include="LegalTemplates\*.md" WithCulture="false" LogicalName="LegalTemplates.%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>

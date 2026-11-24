@@ -88,7 +88,7 @@ public sealed class SiteController(LicensingDbContext db, InstallPackage package
                 foreach (var alt in SiteCatalog.Languages)
                     sb.Append("    <xhtml:link rel=\"alternate\" hreflang=\"").Append(alt).Append("\" href=\"").Append(BaseUrl).Append(page.Path(alt)).Append("\"/>\n");
                 sb.Append("    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"").Append(BaseUrl).Append(page.Path(SiteCatalog.DefaultLanguage)).Append("\"/>\n");
-                sb.Append("    <changefreq>weekly</changefreq>\n    <priority>").Append(page == SiteCatalog.Home ? "1.0" : page.DocGroup is null ? "0.8" : "0.6").Append("</priority>\n  </url>\n");
+                sb.Append("    <changefreq>weekly</changefreq>\n    <priority>").Append(page == SiteCatalog.Home ? "1.0" : SiteCatalog.Legal.Contains(page) ? "0.3" : page.DocGroup is null ? "0.8" : "0.6").Append("</priority>\n  </url>\n");
             }
         sb.Append("</urlset>\n");
         return Content(sb.ToString(), "application/xml", Encoding.UTF8);

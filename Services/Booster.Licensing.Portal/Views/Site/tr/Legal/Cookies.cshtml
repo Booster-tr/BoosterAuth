@@ -1,0 +1,49 @@
+@* KVKK Cerez Uygulamalari Rehberi: yalnizca kesin gerekli cerez -> riza / banner gerekmez, bilgilendirme zorunlu.
+   Cerez adlari ve sureleri Program.cs (AddCookie, AddOpenIdConnect, antiforgery, TempData) ile ayni tutulmali. *@
+<p class="lede">Bu sitede ve lisans portalında <b>yalnızca zorunlu çerezler</b> kullanılır. Analitik, reklam veya takip çerezi yoktur; bu yüzden
+    çerez onayı istemiyoruz ve çerez bildirimi (banner) göstermiyoruz.</p>
+<p>Çerez, ziyaret ettiğiniz sitenin tarayıcınıza kaydettiği küçük bir metin dosyasıdır. Aşağıdaki çerezlerin tümü <b>birinci taraf</b> çerezdir,
+    yani yalnızca bizim alan adımız tarafından kurulur ve okunur. Veri sorumlusu @Legal.CompanyName'dir (<a href="/tr/legal/imprint">Künye</a>).</p>
+
+<h2 id="site">Tanıtım sitesi</h2>
+<p>Tanıtım sayfaları ve dokümantasyon çerez kurmaz. Portala giriş yaptıysanız aşağıdaki portal oturum çerezi bu sayfalarda da tarayıcınız
+    tarafından gönderilir.</p>
+
+<h2 id="portal">Lisans portalı</h2>
+<div class="table-scroll">
+<table>
+    <thead><tr><th>Çerez</th><th>Amaç</th><th>Süre</th><th>Kategori</th></tr></thead>
+    <tbody>
+        <tr><td><code>booster_licensing</code></td><td>Giriş yaptığınızı hatırlar; portal oturumu.</td>
+            <td>Tarayıcı oturumu; 8 saat işlem yapılmazsa geçersiz olur. Çıkışta silinir.</td><td>Zorunlu</td></tr>
+        <tr><td><code>.AspNetCore.Correlation.*</code></td><td>Giriş sırasında, dönüşün sizin başlattığınız girişe ait olduğunu doğrular (sahte giriş isteklerine karşı).</td>
+            <td>15 dakika; giriş tamamlanınca silinir.</td><td>Zorunlu</td></tr>
+        <tr><td><code>.AspNetCore.OpenIdConnect.Nonce.*</code></td><td>Giriş yanıtının yeniden oynatılmasını önler.</td>
+            <td>En fazla 1 saat; giriş tamamlanınca silinir.</td><td>Zorunlu</td></tr>
+        <tr><td><code>.AspNetCore.Antiforgery.*</code></td><td>Formların sizin tarafınızdan gönderildiğini doğrular (CSRF koruması).</td>
+            <td>Tarayıcı oturumu</td><td>Zorunlu</td></tr>
+        <tr><td><code>.AspNetCore.Mvc.CookieTempDataProvider</code></td><td>Bir işlemden sonra gösterilecek tek seferlik mesajı (ör. hata mesajı) sonraki sayfaya taşır.</td>
+            <td>Tarayıcı oturumu; mesaj gösterilince silinir.</td><td>Zorunlu</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2 id="giris">Giriş ekranı</h2>
+<p>Portala girişte, ayrı alan adında çalışan kendi Booster Auth giriş hizmetimize yönlendirilirsiniz. Bu hizmet de birinci taraf ve zorunlu
+    çerezler kurar: giriş oturumu (<code>booster_idp_session</code>, oturum süresince), dil tercihi (<code>accept-language</code>, dil
+    seçtiyseniz 1 yıl), çerez tercihiniz (<code>booster_cookie_consent</code>, 1 yıl) ve form güvenliği (<code>.AspNetCore.Antiforgery.*</code>,
+    tarayıcı oturumu). Giriş ekranı kendi çerez bilgilendirmesini de gösterir.</p>
+
+<h2 id="ucuncu-taraf">Üçüncü taraf istekleri</h2>
+<p>Site sayfaları yazı tiplerini ve diğer tüm dosyaları kendi sunucumuzdan yükler; sayfalar üçüncü taraf bir yazı tipi, analiz ya da reklam
+    hizmetine istek göndermez.</p>
+
+<h2 id="hukuki-sebep">Hukuki sebep</h2>
+<p>Zorunlu çerezler, talep ettiğiniz hizmetin (portala giriş ve portal işlemleri) sunulması için gereklidir; KVKK md.5/2-(c) sözleşmenin ifası ve
+    güvenlik için md.5/2-(f) meşru menfaat kapsamında, açık rıza aranmadan kullanılır. İleride zorunlu olmayan bir çerez eklersek, kullanmadan önce
+    açık onayınızı isteriz ve reddetme seçeneğini eşit görünürlükte sunarız.</p>
+
+<h2 id="kontrol">Çerezleri nasıl kontrol edersiniz</h2>
+<p>Tarayıcınızın ayarlarından çerezleri görüntüleyebilir, silebilir veya engelleyebilirsiniz (Chrome: Ayarlar &gt; Gizlilik ve güvenlik &gt;
+    Çerezler; Firefox: Ayarlar &gt; Gizlilik ve Güvenlik; Safari: Ayarlar &gt; Gizlilik; Edge: Ayarlar &gt; Çerezler ve site izinleri). Zorunlu
+    çerezleri engellerseniz portala giriş yapamazsınız; tanıtım sayfaları çalışmaya devam eder.</p>

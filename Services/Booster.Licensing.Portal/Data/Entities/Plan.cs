@@ -82,6 +82,17 @@ public class Order : Entity
 
     /// <summary>Odeme onayinda uretilen lisans.</summary>
     public Guid? LicenseId { get; set; }
+
+    // Siparis ekraninda kabul edilen Satis Kosullari + Lisans Sozlesmesi ve B2B beyani (TBK md.21 ispati).
+    // Bu alanlar eklenmeden once verilen siparislerde bostur.
+
+    /// <summary>Kabul edilen metin surumu (<c>LegalInfo.TermsVersion</c>).</summary>
+    public string? TermsVersion { get; set; }
+    public DateTimeOffset? TermsAcceptedAt { get; set; }
+    /// <summary>Kabul eden istemcinin IP'si (CF-Connecting-IP, yoksa baglanti adresi).</summary>
+    public string? TermsAcceptedIp { get; set; }
+    /// <summary>Kabul eden portal kullanicisinin e-postasi.</summary>
+    public string? TermsAcceptedBy { get; set; }
 }
 
 internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
@@ -104,6 +115,9 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.CreatedBy).HasMaxLength(320).IsRequired();
         builder.Property(x => x.PaidBy).HasMaxLength(320);
         builder.Property(x => x.CancelledBy).HasMaxLength(320);
+        builder.Property(x => x.TermsVersion).HasMaxLength(32);
+        builder.Property(x => x.TermsAcceptedIp).HasMaxLength(64);
+        builder.Property(x => x.TermsAcceptedBy).HasMaxLength(320);
         builder.HasIndex(x => new { x.Status, x.CreatedTime });
         builder.HasIndex(x => x.CustomerId);
         builder.HasOne(x => x.Customer).WithMany().HasForeignKey(x => x.CustomerId);

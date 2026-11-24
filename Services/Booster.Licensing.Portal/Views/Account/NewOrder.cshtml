@@ -1,15 +1,25 @@
+@using Booster.Licensing.Portal.Site
 @model List<Plan>
 @{
     ViewData["Title"] = "Lisans satın al";
     var inst = (CustomerInstallation)ViewBag.Installation;
+    var customer = inst.Customer;
     var current = ViewBag.Current as IssuedLicense;
+    var selected = ViewBag.SelectedPlan as string;
+    var error = ViewBag.Error as string;
     var tr = System.Globalization.CultureInfo.GetCultureInfo("tr-TR");
+    // Tek plan varsa ya da sitede plan secildiyse secili gelir.
+    var preselect = Model.Count == 1 ? Model[0].Code : selected;
+    var editCompany = $"/hesap/firma?returnUrl={Uri.EscapeDataString($"/hesap/siparis/yeni?InstallationId={inst.InstallationId}&plan={selected}")}";
 }
 <h1>Lisans satın al / yenile</h1>
 <section class="card">
     <dl class="facts">
         <dt>Kurulum</dt><dd>@inst.Label <code>@inst.InstallationId</code></dd>
         <dt>Domain'ler</dt><dd>@string.Join(", ", inst.Domains)</dd>
+        <dt>Fatura bilgileri</dt>
+        <dd>@customer.Name@(customer.TaxOffice is null && customer.TaxNumber is null ? "" : $", {customer.TaxOffice} {customer.TaxNumber}") · @customer.ContactEmail
+            <a href="@editCompany">Düzenle</a></dd>
         @if (current is not null)
         {
             <dt>Mevcut lisans</dt><dd>@current.Plan, bitiş @current.ExpiresAt.ToString("yyyy-MM-dd")</dd>
@@ -31,17 +41,51 @@
 {
     <p class="alert">Şu anda satışta plan yok. Lütfen bizimle iletişime geçin.</p>
 }
-<div class="stats">
-    @foreach (var p in Model)
-    {
-        <form method="post" class="stat @(string.Equals(ViewBag.SelectedPlan as string, p.Code, StringComparison.OrdinalIgnoreCase) ? "stat-selected" : "")" data-plan="@p.Code">
-            <input type="hidden" name="installationId" value="@inst.InstallationId" />
-            <input type="hidden" name="planId" value="@p.Id" />
-            <b>@p.Name</b>
-            <span>@p.MaxUsers.ToString("N0", tr) kullanıcı · @p.MaxPools havuz · @p.MaxClients uygulama</span>
-            <span>@p.DurationMonths ay</span>
-            <span class="price">@(p.Price > 0 ? $"{p.Price.ToString("N2", tr)} {p.Currency}" : "Fiyat için bizimle iletişime geçin")</span>
-            <button class="btn btn-primary" type="submit">Sipariş ver</button>
-        </form>
-    }
-</div>
+else
+{
+    <form method="post" class="form order-form">
+        <input type="hidden" name="installationId" value="@inst.InstallationId" />
+        <h2>1. Plan</h2>
+        <div class="stats">
+            @foreach (var p in Model)
+            {
+                var isSelected = string.Equals(preselect, p.Code, StringComparison.OrdinalIgnoreCase);
+                <label class="stat plan-option @(string.Equals(selected, p.Code, StringComparison.OrdinalIgnoreCase) ? "stat-selected" : "")" data-plan="@p.Code">
+                    <span class="plan-pick"><input type="radio" name="planId" value="@p.Id" required checked="@isSelected" /> Bu planı seç</span>
+                    <b>@p.Name</b>
+                    <span>@p.MaxUsers.ToString("N0", tr) kullanıcı · @p.MaxPools havuz · @p.MaxClients uygulama</span>
+                    <span>@p.DurationMonths ay · kurulum başına</span>
+                    <span class="price">@(p.Price > 0 ? $"{p.Price.ToString("N2", tr)} {p.Currency}" : "Fiyat için bizimle iletişime geçin")</span>
+                </label>
+            }
+        </div>
+        <p class="muted">@Legal.VatNoteTr Ödeme yalnızca havale / EFT ile yapılır; banka bilgileri ve referans kodu sipariş onayından sonra gösterilir ve e-postanıza gönderilir.</p>
+
+        <h2>2. Onay</h2>
+        @if (error is not null)
+        {
+            <p class="alert" data-error-code="terms_required">@error</p>
+        }
+        <div class="terms-summary">
+            <p><b>Siparişi onaylamadan önce özellikle bilmeniz gerekenler:</b></p>
+            <ul>
+                <li><b>Sorumluluk sınırı:</b> <b>Kasıt ve ağır kusur hâlleri dışında sorumluluğumuz, son 12 ayda ödediğiniz lisans bedeliyle sınırlıdır. Dolaylı zarar, kâr kaybı ve veri kaybından sorumlu değiliz; verilerinizi yedeklemek sizin sorumluluğunuzdadır.</b></li>
+                <li><b>İade:</b> <b>Lisans anahtarı teslim edildikten sonra bedel iade edilmez.</b> İstisnalar Satış Koşulları'nda sayılmıştır (giderilemeyen esaslı ayıp, mükerrer ödeme, bizden kaynaklanan esaslı ihlal). Ödeme yapılmadan önce siparişi ücretsiz iptal ettirebilirsiniz.</li>
+                <li><b>Süre ve yenileme:</b> <b>Lisans, seçtiğiniz planda yazan süre boyunca geçerlidir ve kendiliğinden yenilenmez.</b> Yenileme yeni bir siparişle yapılır; süre içinde fiyat değişmez.</li>
+                <li><b>Uyuşmazlık:</b> <b>Türk hukuku uygulanır; İstanbul (Çağlayan) mahkemeleri ve icra daireleri yetkilidir.</b></li>
+            </ul>
+        </div>
+        <label class="check">
+            <input type="checkbox" name="acceptB2b" value="true" required />
+            <span>Bu siparişi <b>@customer.Name</b> adına ve onun ticari ya da mesleki faaliyeti kapsamında verdiğimi, şirketi bu işlemde temsile
+                yetkili olduğumu ve işlemin 6502 sayılı Tüketicinin Korunması Hakkında Kanun kapsamında bir tüketici işlemi olmadığını beyan ederim.</span>
+        </label>
+        <label class="check">
+            <input type="checkbox" name="acceptTerms" value="true" required />
+            <span><a href="/tr/legal/sales-terms" target="_blank" rel="noopener">Satış ve Sipariş Koşulları</a>'nı ve
+                <a href="/tr/legal/license-agreement" target="_blank" rel="noopener">Yazılım Lisans Sözleşmesi</a>'ni okudum ve kabul ediyorum.</span>
+        </label>
+        <p class="muted">Kişisel verileriniz <a href="/tr/legal/privacy" target="_blank" rel="noopener">Aydınlatma Metni</a>'nde açıklanmıştır.</p>
+        <button class="btn btn-primary" type="submit">Siparişi onayla</button>
+    </form>
+}

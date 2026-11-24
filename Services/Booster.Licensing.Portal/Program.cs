@@ -19,6 +19,8 @@ var hashingOptions = builder.Services.AddSettings<HashingOptions>(builder.Config
 builder.Services.AddHashing(hashingOptions);
 
 var portal = builder.Services.AddSettings<LicensingPortalOptions>(builder.Configuration);
+// Yasal metinlerdeki sirket bilgileri (appsettings "LegalInfo"; dagitimda LegalInfo__CompanyName gibi).
+builder.Services.AddSettings<LegalInfo>(builder.Configuration);
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<SigningKeyStore>();

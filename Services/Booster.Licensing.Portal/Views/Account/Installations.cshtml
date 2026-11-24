@@ -30,15 +30,29 @@
     <section class="card" data-installation="@inst.InstallationId">
         <div class="page-head">
             <h2>@inst.Label</h2>
-            @if (current is null)
-            {
-                @* action acikca yazildiginda tag helper CSRF token'ini kendiliginden eklemez; asp-antiforgery sart. *@
-                <form method="post" action="/hesap/deneme" asp-antiforgery="true">
-                    <input type="hidden" name="installationId" value="@inst.InstallationId" />
-                    <button class="btn btn-primary" type="submit">Ücretsiz deneme al (7 gün)</button>
-                </form>
-            }
         </div>
+        @if (current is null)
+        {
+            @* action acikca yazildiginda tag helper CSRF token'ini kendiliginden eklemez; asp-antiforgery sart.
+               Deneme = Lisans Sozlesmesi kabulu + B2B beyani; kutular onceden isaretli gelmez, sunucuda da dogrulanir. *@
+            <form method="post" action="/hesap/deneme" asp-antiforgery="true" class="form trial-form">
+                <input type="hidden" name="installationId" value="@inst.InstallationId" />
+                <p class="muted"><b>Ücretsiz deneme (7 gün):</b> deneme lisansı olduğu gibi verilir, garanti ve öncelikli destek içermez; süresi ve ek süresi
+                    bitince son kullanıcı girişleri de durur. Üretim ortamında kullanmanızı önermeyiz.</p>
+                <label class="check">
+                    <input type="checkbox" name="acceptB2b" value="true" required />
+                    <span>Deneme lisansını <b>@customer.Name</b> adına ve onun ticari ya da mesleki faaliyeti kapsamında talep ettiğimi, şirketi bu işlemde
+                        temsile yetkili olduğumu ve işlemin 6502 sayılı Kanun kapsamında bir tüketici işlemi olmadığını beyan ederim.</span>
+                </label>
+                <label class="check">
+                    <input type="checkbox" name="acceptTerms" value="true" required />
+                    <span><a href="/tr/legal/license-agreement#deneme" target="_blank" rel="noopener">Yazılım Lisans Sözleşmesi</a>'ni (deneme koşulları dahil)
+                        okudum ve kabul ediyorum.</span>
+                </label>
+                <p class="muted">Kişisel verileriniz <a href="/tr/legal/privacy" target="_blank" rel="noopener">Aydınlatma Metni</a>'nde açıklanmıştır.</p>
+                <button class="btn btn-primary" type="submit">Ücretsiz deneme al (7 gün)</button>
+            </form>
+        }
         <p><a class="btn btn-ghost" href="/hesap/siparis/yeni?InstallationId=@inst.InstallationId">Satın al / yenile</a></p>
         <dl class="facts">
             <dt>Kurulum kimliği</dt><dd><code>@inst.InstallationId</code></dd>
