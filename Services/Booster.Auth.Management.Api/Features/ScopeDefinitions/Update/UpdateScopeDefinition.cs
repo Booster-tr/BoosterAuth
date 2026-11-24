@@ -1,3 +1,5 @@
+using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Constants;
@@ -11,6 +13,7 @@ using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Management.Api.Features.ScopeDefinitions.Update;
 
@@ -29,7 +32,7 @@ public class UpdateScopeDefinitionEndpoint : Endpoint<UpdateScopeDefinitionComma
         {
             s.Summary = "Kapsam tanımını günceller";
             s.Description = "Kapsam adı, görünen ad ve açıklamayı günceller. Ad değişirse rol, uygulama ve havuz atamaları " +
-                            "yeni ada taşınır; kullanıcılara daha önce atanmış kapsam IdP'de güncellenmez.";
+                            "yeni ada taşınır; kullanıcılara atanmış kapsam IdP'de Kafka olayıyla güncellenir.";
         });
     }
 
@@ -51,7 +54,9 @@ public class UpdateScopeDefinitionCommandHandler(
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<ClientAllowedScope, AuthNDbContext> clientAllowedScopeRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IClientDataCacheStore clientDataCacheStore)
+    IClientDataCacheStore clientDataCacheStore,
+    IEventBus eventBus,
+    ILogger<UpdateScopeDefinitionCommandHandler> logger)
     : ICommandHandler<UpdateScopeDefinitionCommand, UpdateScopeDefinitionResponse>
 {
     public async Task<UpdateScopeDefinitionResponse> ExecuteAsync(
@@ -101,6 +106,14 @@ public class UpdateScopeDefinitionCommandHandler(
 
         await scopeRepository.SaveChangesAsync(ct);
         await clientDataCacheStore.InvalidatePoolAsync(poolId, ct);
+
+        if (newName != oldName)
+            await eventBus.PublishOrLogAsync(new ScopeDefinitionChangedEvent
+            {
+                UserPoolId = poolId,
+                OldScope = oldName,
+                NewScope = newName
+            }, logger, ct);
 
         return new UpdateScopeDefinitionResponse(scope.Id);
     }

@@ -1,3 +1,5 @@
+using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Constants;
@@ -8,6 +10,7 @@ using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
+using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Management.Api.Features.ScopeDefinitions.Delete;
 
@@ -26,7 +29,8 @@ public class DeleteScopeDefinitionEndpoint : EndpointWithoutRequest<DeleteScopeD
         {
             s.Summary = "Kapsam tanımını siler";
             s.Description = "Tanımı soft-delete ile kaldırır; aynı havuzdaki rol/uygulama atamalarını " +
-                            "ve havuzun varsayılan kapsamlarındaki karşılığını da temizler.";
+                            "ve havuzun varsayılan kapsamlarındaki karşılığını da temizler. Kullanıcılardan " +
+                            "IdP'de Kafka olayıyla kaldırılır.";
         });
     }
 
@@ -44,7 +48,9 @@ public class DeleteScopeDefinitionCommandHandler(
     IAsyncRepository<ClientAllowedScope, AuthNDbContext> clientAllowedScopeRepository,
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
-    IClientDataCacheStore clientDataCacheStore)
+    IClientDataCacheStore clientDataCacheStore,
+    IEventBus eventBus,
+    ILogger<DeleteScopeDefinitionCommandHandler> logger)
     : ICommandHandler<DeleteScopeDefinitionCommand, DeleteScopeDefinitionResponse>
 {
     public async Task<DeleteScopeDefinitionResponse> ExecuteAsync(
@@ -81,6 +87,12 @@ public class DeleteScopeDefinitionCommandHandler(
 
         await scopeRepository.SaveChangesAsync(ct);
         await clientDataCacheStore.InvalidatePoolAsync(poolId, ct);
+
+        await eventBus.PublishOrLogAsync(new ScopeDefinitionChangedEvent
+        {
+            UserPoolId = poolId,
+            OldScope = scopeKey
+        }, logger, ct);
 
         return new DeleteScopeDefinitionResponse(scope.Id);
     }

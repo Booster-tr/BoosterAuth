@@ -170,6 +170,10 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - `UseBusOutbox` rider ureticilerini kapsamiyor; `OutboxMessage` tablolarina (IdP, Management, portal) hic satir yazilmiyor.
   - Sonuc: transaction geri alinsa da olay gitmis olur; Kafka kapaliysa olay kaybolur.
   - Kural: olayi is islemi KAYDEDILDIKTEN/commit edildikten SONRA yayinla. Yinelenmemesi gereken islerde once DB'de sahiplen (`ON CONFLICT DO NOTHING`), sonra yayinla (bkz. portal `RenewalReminderService`).
+- **Rol / kapsam ad senkronu:** IdP `PrincipalScope.Scope` ve `PrincipalRole.RoleName` Management tanimlarinin kopyasidir (token bunlardan uretilir).
+  - Management kapsam ad degisikligi / silme -> `ScopeDefinitionChangedEvent`; rol anahtar degisikligi / silme -> `RoleChangedEvent` (`PoolDefinitionTopics`). IdP tuketicileri kopyalari gunceller / siler.
+  - `PublishOrLogAsync`: Kafka hatasi loglanir; olay kaybolursa kopya bayat kalir. Verilmis token'lar suresi dolana kadar eski haliyle gecerlidir.
+  - `RoleScope` IdP'ye tasinmaz; rolun kapsam listesi degisikligi senkron gerektirmez.
 
 ## Komutlar
 ```bash

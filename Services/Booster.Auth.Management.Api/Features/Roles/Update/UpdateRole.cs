@@ -1,3 +1,5 @@
+using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Constants;
@@ -11,6 +13,7 @@ using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Management.Api.Features.Roles.Update;
 
@@ -29,7 +32,7 @@ public class UpdateRoleEndpoint : Endpoint<UpdateRoleCommand, UpdateRoleResponse
         {
             s.Summary = "Rolü günceller";
             s.Description = "Anahtar, görünen ad, açıklama ve kapsamları günceller. Kullanıcılara daha önce " +
-                            "atanmış rol adı IdP'de güncellenmez.";
+                            "atanmış rol adı IdP'de Kafka olayıyla güncellenir.";
         });
     }
 
@@ -51,7 +54,9 @@ public class UpdateRoleCommandHandler(
     IAsyncRepository<Role, AuthNDbContext> roleRepository,
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<ScopeDefinition, AuthNDbContext> scopeDefinitionRepository,
-    IClientDataCacheStore clientDataCacheStore)
+    IClientDataCacheStore clientDataCacheStore,
+    IEventBus eventBus,
+    ILogger<UpdateRoleCommandHandler> logger)
     : ICommandHandler<UpdateRoleCommand, UpdateRoleResponse>
 {
     public async Task<UpdateRoleResponse> ExecuteAsync(UpdateRoleCommand command, CancellationToken ct)
@@ -61,8 +66,9 @@ public class UpdateRoleCommandHandler(
         role.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.RoleNotFound);
 
         var key = command.Key.Trim().ToLowerInvariant();
+        var keyChanged = key != role!.Key;
 
-        if (key != role!.Key)
+        if (keyChanged)
         {
             var keyExists = await roleRepository.AnyAsync(
                 r => r.UserPoolId == command.UserPoolId && r.Key == key && r.Id != role.Id, cancellationToken: ct);
@@ -102,6 +108,14 @@ public class UpdateRoleCommandHandler(
 
         await roleRepository.SaveChangesAsync(ct);
         await clientDataCacheStore.InvalidatePoolAsync(command.UserPoolId, ct);
+
+        if (keyChanged)
+            await eventBus.PublishOrLogAsync(new RoleChangedEvent
+            {
+                UserPoolId = command.UserPoolId,
+                RoleId = role.Id,
+                NewKey = key
+            }, logger, ct);
 
         return new UpdateRoleResponse(role.Id);
     }

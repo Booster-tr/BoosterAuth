@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Extensions;
 using Booster.Hashing.Extensions;
 using Booster.Hashing.Options;
@@ -24,7 +25,9 @@ public static class ServiceExtensions
     public static IServiceCollection AddAuthNServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddBoosterServices<AuthNDbContext>(configuration);
-        services.AddBoosterMessaging<AuthNDbContext>(configuration);
+        services.AddBoosterMessaging<AuthNDbContext>(
+            configuration,
+            configureRider: rider => rider.AddPoolDefinitionProducers());
         services.AddSettings<BootstrapOptions>(configuration);
 
         var hashingOptions = services.AddSettings<HashingOptions>(configuration);
