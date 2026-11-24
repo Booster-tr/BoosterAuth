@@ -122,6 +122,8 @@ forwarded.KnownProxies.Clear();
 app.UseForwardedHeaders(forwarded);
 
 app.UseExceptionHandler("/hata");
+// Govdesiz hata yanitlari (or. 404) bos sayfa yerine ekran gosterir; 404 ziyaretcinin dilinde. Govdesi olan yanitlar etkilenmez.
+app.UseStatusCodePagesWithReExecute("/bulunamadi");
 app.UseBoosterMessaging();
 // AI dosyalari (/llms.txt, /ai/booster-auth/SKILL.md): .md varsayilan olarak sunulmaz.
 var contentTypes = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();

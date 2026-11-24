@@ -79,7 +79,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Panelin "Lisans al" butonu `/?installationId=` ile gelir: giris -> kurulum formu dolu (kurulum zaten kayitliysa Kurulumlarim).
 - **Musteri kurulum paketi:** dil basina `deploy/compose/tr/` (`kurulum.sh|ps1`, `BENIOKU.md`) ve `deploy/compose/en/` (`setup.sh|ps1`, `README.md`); ikisinde de docker-compose, `.env.example`, `init/`.
   - Portala gomulu kaynak olarak derlenir; `/{tr|en}/download/booster-auth.zip` zip'i sitenin dilinde calisma aninda uretir (`InstallPackage`; `.sh` 0755).
-  - Bir dosyayi degistirince DIGER dildekini de degistir. `docker-compose.yml` yorum disinda iki dilde ayni olmak ZORUNDA; degilse zip uretilmez (`EnsureSameCompose`).
+  - Bir dosyayi degistirince DIGER dildekini de degistir. `docker-compose.yml` yorumlar ve zorunlu degisken mesajlari (`${X:?mesaj}`) disinda iki dilde ayni olmak ZORUNDA; degilse zip uretilmez (`EnsureSameCompose`).
   - `.dockerignore` `.env.*` ve `docker-compose*` dosyalarini dislar; paket dosyalari icin `!deploy/compose/...` istisnalari VAR, silme.
   - Image'lar `ghcr.io/booster-tr/*` (public, portal haric). Paket lisans portali ayarlarini ICERMEZ (yalnizca Booster'in kendi kurulumu).
   - Paket dosyalari LF olmali (`.gitattributes`); betikler ayrica `tr -d '\r'` ile calistirilir.

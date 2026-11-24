@@ -41,22 +41,46 @@ if [ ! -s "$TRUST_DIR/ca.crt" ] || [ ! -s "$CA_DIR/ca.key" ]; then
         -subj "/CN=Booster Auth Local CA" \
         -addext "basicConstraints=critical,CA:TRUE" \
         -addext "keyUsage=critical,keyCertSign,cRLSign" 2>/dev/null
-    rm -f "$TLS_DIR/server.crt"   # yeni CA ile yeniden imzalansin
+    # Yalnizca BIZIM sertifikamiz yeni CA ile yeniden imzalanir; sizin sertifikaniza dokunulmaz.
+    if openssl x509 -in "$TLS_DIR/server.crt" -noout -issuer 2>/dev/null | grep -q "Booster Auth Local CA"; then
+        rm -f "$TLS_DIR/server.crt"
+    fi
 fi
 
 # ------------------------------------------------------------------ gateway TLS
+# Iki tur sertifika olabilir:
+#  - Bizim urettigimiz (yerel CA imzali; issuer "Booster Auth Local CA"): eksikse, adresi (PUBLIC_HOST) tutmuyorsa,
+#    30 gun icinde doluyorsa ya da CA degistiyse yeniden uretilir.
+#  - Sizin koydugunuz (baska bir CA, or. kurum ya da Let's Encrypt): ASLA degistirilmez; yalnizca uyari yazilir.
+#    Yenilemesi sizdedir. Bu kural olmadan init her acilista sizin sertifikanizi yerel CA sertifikasiyla eziyordu.
+is_local_cert() {
+    openssl x509 -in "$TLS_DIR/server.crt" -noout -issuer 2>/dev/null | grep -q "Booster Auth Local CA"
+}
+has_public_host() {
+    openssl x509 -in "$TLS_DIR/server.crt" -noout -ext subjectAltName 2>/dev/null | grep -q "DNS:${PUBLIC_HOST}\(,\|$\)"
+}
+expires_soon() {
+    ! openssl x509 -in "$TLS_DIR/server.crt" -noout -checkend $((30*24*3600)) >/dev/null 2>&1
+}
+
 need_cert=false
 if [ ! -s "$TLS_DIR/server.crt" ] || [ ! -s "$TLS_DIR/server.key" ]; then
     need_cert=true
-elif ! openssl x509 -in "$TLS_DIR/server.crt" -noout -ext subjectAltName 2>/dev/null | grep -q "DNS:${PUBLIC_HOST}\(,\|$\)"; then
-    echo "[init] PUBLIC_HOST (${PUBLIC_HOST}) sertifikada yok"
-    need_cert=true
-elif ! openssl x509 -in "$TLS_DIR/server.crt" -noout -checkend $((30*24*3600)) >/dev/null; then
-    echo "[init] Sertifikanin suresi 30 gun icinde doluyor"
-    need_cert=true
-elif ! openssl verify -CAfile "$TRUST_DIR/ca.crt" "$TLS_DIR/server.crt" >/dev/null 2>&1; then
-    echo "[init] Sertifika mevcut CA ile imzali degil"
-    need_cert=true
+elif is_local_cert; then
+    if ! has_public_host; then
+        echo "[init] PUBLIC_HOST (${PUBLIC_HOST}) sertifikada yok"
+        need_cert=true
+    elif expires_soon; then
+        echo "[init] Sertifikanin suresi 30 gun icinde doluyor"
+        need_cert=true
+    elif ! openssl verify -CAfile "$TRUST_DIR/ca.crt" "$TLS_DIR/server.crt" >/dev/null 2>&1; then
+        echo "[init] Sertifika mevcut CA ile imzali degil"
+        need_cert=true
+    fi
+else
+    echo "[init] Kendi sertifikaniz kullaniliyor (pki/tls); dokunulmuyor."
+    has_public_host || echo "[init] UYARI: sertifikanizda PUBLIC_HOST (${PUBLIC_HOST}) yok; tarayici uyari verebilir."
+    expires_soon && echo "[init] UYARI: sertifikanizin suresi 30 gun icinde doluyor; yenileyip pki/tls'e koyun."
 fi
 
 if [ "$need_cert" = true ]; then

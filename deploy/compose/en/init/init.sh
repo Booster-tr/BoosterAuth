@@ -41,22 +41,46 @@ if [ ! -s "$TRUST_DIR/ca.crt" ] || [ ! -s "$CA_DIR/ca.key" ]; then
         -subj "/CN=Booster Auth Local CA" \
         -addext "basicConstraints=critical,CA:TRUE" \
         -addext "keyUsage=critical,keyCertSign,cRLSign" 2>/dev/null
-    rm -f "$TLS_DIR/server.crt"   # re-sign with the new CA
+    # Only OUR certificate is re-signed with the new CA; yours is left alone.
+    if openssl x509 -in "$TLS_DIR/server.crt" -noout -issuer 2>/dev/null | grep -q "Booster Auth Local CA"; then
+        rm -f "$TLS_DIR/server.crt"
+    fi
 fi
 
 # ------------------------------------------------------------------ gateway TLS
+# There are two kinds of certificate:
+#  - Ours (signed by the local CA; issuer "Booster Auth Local CA"): regenerated when missing, when it does not match
+#    PUBLIC_HOST, when it expires within 30 days or when the CA changed.
+#  - Yours (another CA, e.g. corporate or Let's Encrypt): NEVER changed; only a warning is written. Renewing it is up
+#    to you. Without this rule init replaced your certificate with a local-CA one on every start.
+is_local_cert() {
+    openssl x509 -in "$TLS_DIR/server.crt" -noout -issuer 2>/dev/null | grep -q "Booster Auth Local CA"
+}
+has_public_host() {
+    openssl x509 -in "$TLS_DIR/server.crt" -noout -ext subjectAltName 2>/dev/null | grep -q "DNS:${PUBLIC_HOST}\(,\|$\)"
+}
+expires_soon() {
+    ! openssl x509 -in "$TLS_DIR/server.crt" -noout -checkend $((30*24*3600)) >/dev/null 2>&1
+}
+
 need_cert=false
 if [ ! -s "$TLS_DIR/server.crt" ] || [ ! -s "$TLS_DIR/server.key" ]; then
     need_cert=true
-elif ! openssl x509 -in "$TLS_DIR/server.crt" -noout -ext subjectAltName 2>/dev/null | grep -q "DNS:${PUBLIC_HOST}\(,\|$\)"; then
-    echo "[init] PUBLIC_HOST (${PUBLIC_HOST}) is not in the certificate"
-    need_cert=true
-elif ! openssl x509 -in "$TLS_DIR/server.crt" -noout -checkend $((30*24*3600)) >/dev/null; then
-    echo "[init] Certificate expires within 30 days"
-    need_cert=true
-elif ! openssl verify -CAfile "$TRUST_DIR/ca.crt" "$TLS_DIR/server.crt" >/dev/null 2>&1; then
-    echo "[init] Certificate is not signed by the current CA"
-    need_cert=true
+elif is_local_cert; then
+    if ! has_public_host; then
+        echo "[init] PUBLIC_HOST (${PUBLIC_HOST}) is not in the certificate"
+        need_cert=true
+    elif expires_soon; then
+        echo "[init] Certificate expires within 30 days"
+        need_cert=true
+    elif ! openssl verify -CAfile "$TRUST_DIR/ca.crt" "$TLS_DIR/server.crt" >/dev/null 2>&1; then
+        echo "[init] Certificate is not signed by the current CA"
+        need_cert=true
+    fi
+else
+    echo "[init] Using your own certificate (pki/tls); leaving it unchanged."
+    has_public_host || echo "[init] WARNING: PUBLIC_HOST (${PUBLIC_HOST}) is not in your certificate; browsers may warn."
+    expires_soon && echo "[init] WARNING: your certificate expires within 30 days; renew it and put it in pki/tls."
 fi
 
 if [ "$need_cert" = true ]; then

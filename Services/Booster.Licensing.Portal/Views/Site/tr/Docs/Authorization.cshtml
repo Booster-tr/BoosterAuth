@@ -13,13 +13,16 @@
 </table>
 
 <h2 id="roller">Roller ve kapsamlar</h2>
-<p>Havuzda tanımladığınız roller ve kapsamlar erişim token'ına yazılır. API'niz token'ı doğruladıktan sonra claim'e bakar:</p>
+<p>Kullanıcıya verilen roller ve kapsamlar erişim token'ına yazılır. API'niz token'ı doğruladıktan sonra claim'e bakar:</p>
 <div class="code"><span class="lbl">Erişim token'ı (özet)</span><pre>{
   "sub": "6f1c…",
   "aud": "https://api.firma.com",
   "scope": "openid orders:read orders:write",
-  "role": ["manager"]
+  "role": ["manager", "auditor"]
 }</pre></div>
+<p><code>role</code> kullanıcının tek rolü varsa metin (<code>"role": "manager"</code>), birden çok rolü varsa dizidir; ikisini de karşılayın
+    (ASP.NET Core <code>MapInboundClaims = false</code> ile her iki durumda da rol başına bir claim üretir). Rolün kapsam listesi token'a taşınmaz;
+    kapsamlar kullanıcıya ayrıca verilir.</p>
 
 <h2 id="sema">Yetki şeması (ReBAC)</h2>
 <p>Konsolda havuz menüsündeki <b>Yetki Şeması</b> ekranında:</p>

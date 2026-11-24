@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
 using System.IO.Compression;
 
@@ -8,7 +9,7 @@ namespace Booster.Licensing.Portal.Services;
 /// basina ilk istekte uretilip bellekte tutulur. Sitenin dili hangisiyse paket (betikler, README, .env.example,
 /// yorumlar) o dildedir. Zip icinde tum dosyalar "booster-auth/" klasorundedir; .sh dosyalari 0755 yazilir.
 /// </summary>
-public sealed class InstallPackage
+public sealed partial class InstallPackage
 {
     public const string FileName = "booster-auth.zip";
     public static readonly IReadOnlyList<string> Languages = ["tr", "en"];
@@ -74,8 +75,13 @@ public sealed class InstallPackage
     {
         var resource = Resources(lang).First(r => r.Path == path).Resource;
         using var reader = new StreamReader(typeof(InstallPackage).Assembly.GetManifestResourceStream(resource)!);
+        // Zorunlu degisken mesajlari (${X:?mesaj}) dile gore farkli olabilir: Ingilizce pakette Turkce hata cikmasin.
         return reader.ReadToEnd().Replace("\r", "").Split('\n')
             .Where(l => !l.TrimStart().StartsWith('#'))
+            .Select(l => RequiredMessage().Replace(l, "${$1:?}"))
             .ToList();
     }
+
+    [GeneratedRegex(@"\$\{(\w+):\?[^}]*\}")]
+    private static partial Regex RequiredMessage();
 }
