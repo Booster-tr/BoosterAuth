@@ -130,6 +130,13 @@
             <div><dt>Oturum ve onay denetimi<small>iptal · davet</small></dt>
                 <dd>Her uygulama için onay ekranı gösterilebilir; oturumlar ve verilen onaylar konsoldan iptal edilir. Davet bağlantıları tek
                     kullanımlıktır ve 1 gün geçerlidir.</dd></div>
+            <div><dt>KVKK'ya uygun denetim kaydı<small>kim · ne zaman · nereden</small></dt>
+                <dd>Girişler, başarısız denemeler, hesap değişiklikleri, konsoldan yapılan her değişiklik ve kişisel veri içeren ekranların okunması ayrı bir
+                    denetim akışına yazılır. Kayıtta kişi kimliği, IP ve sonuç bulunur; e-posta, telefon, ad, parola, kod ve token yazılmaz. İşletim loglarında
+                    kaçabilecek e-posta, telefon ve token'lar gönderilmeden önce maskelenir.</dd></div>
+            <div><dt>Log ve izleme sizin ağınızda<small>OpenTelemetry · OpenObserve</small></dt>
+                <dd>Log, trace ve metrikler pakette gelen OpenObserve'e gider; arayüz yalnızca yerel ağdan açılır ve hiçbir veri bize gönderilmez. Gönderilen e-posta
+                    ve SMS kayıtları şifreli saklanır, 30 gün sonra silinir. İsterseniz kendi OTLP sisteminize yönlendirirsiniz.</dd></div>
             <div><dt>HTTPS hazır<small>yerel CA</small></dt>
                 <dd>İlk açılışta yerel bir sertifika yetkilisi ve HTTPS sertifikası otomatik üretilir. Üretimde kendi sertifikanızı ya da reverse
                     proxy'nizi kullanırsınız.</dd></div>
@@ -316,6 +323,11 @@
             <details><summary>Lisans süresi dolarsa kullanıcılarımız etkilenir mi?</summary><p>Ücretli lisansta hayır. Son kullanıcı girişleri devam eder. Yönetim konsolu
                 @LicenseIssuer.Defaults.PaidGraceDays günlük ek sürenin ardından salt okunur hale gelir; yenilemeyle tam yetki geri gelir.</p></details>
             <details><summary>Sunucumuzu değiştirirsek lisans ne olur?</summary><p>Lisansınızı lisans portalından yeni kurulumunuza kendiniz aktarırsınız; yılda en fazla 3 aktarım hakkı vardır.</p></details>
+            <details><summary>Loglar KVKK açısından nasıl tutuluyor?</summary><p>Veri sizin sunucunuzda kalır; loglar ve denetim kayıtları pakette gelen OpenObserve'e
+                yazılır, bize hiçbir şey gönderilmez. Denetim kayıtları kişisel veriye kimin, ne zaman, nereden eriştiğini gösterir; kayıtlarda kişi kimliği ve IP
+                bulunur, e-posta, telefon, ad, parola, kod ve token yazılmaz. İşletim loglarında bu değerler maskelenir, gönderilen e-posta / SMS kayıtları şifreli
+                tutulur ve 30 gün sonra silinir. Saklama sürelerini kendi saklama ve imha politikanıza göre siz belirlersiniz. Veri sorumlusu siz olduğunuz için
+                aydınlatma metinleri ve politikalar size aittir. Ayrıntılar <a class="text-link" href="/tr/docs/operations#loglar">İşletim rehberinde</a>.</p></details>
         </div>
     </div>
 </section>
