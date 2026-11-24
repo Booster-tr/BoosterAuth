@@ -110,7 +110,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Kontrol tek merkezi servisle yapilir: `ILicenseLimitService`. Kontrol BACKEND'dedir; UI yalnizca gosterir.
   - Kullanici, pool ve client olusturan TUM yollar bu kontrolden gecer.
   - Hata kodlari: `LICENSE_LIMIT_USERS`, `LICENSE_LIMIT_POOLS`, `LICENSE_LIMIT_CLIENTS`.
-  - Mevcut kayitlar limit asimindan ASLA etkilenmez.
+  - Yeni kayit limitte reddedilir. Mevcut kayitlarin son kullanici girisleri limit asimindan ASLA etkilenmez.
   - Self-servis kayitta son kullaniciya teknik detay gosterilmez; genel bir "kayit su an kapali" mesaji cikar (`LICENSE_REGISTRATION_CLOSED`).
   - **Uygulama:** `CommonInternal/.../Licensing/LicenseLimitService`.
     - Cagiran ACIK bir transaction icinde olmalidir. Servis `pg_advisory_xact_lock` alir, sayar ve doluysa reddeder; ekleme + commit kilit altinda yapilir. Boylece ayni anda iki istek son yeri alamaz.
@@ -119,9 +119,11 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
     - Kullanici: self-servis kayit, federasyon ilk girisi, panelden ekleme, CSV ice aktarma.
     - Pool: `POST userpools`. Client: `POST clients`.
     - Muaf olanlar: bootstrapper'lar, admin seeder ve servis hesaplari (kullanici sayilmaz).
-  - **Sayim:** yonetim havuzu ve silinmisler HARIC; pasif ve askidakiler DAHIL.
+  - **Sayim:** silinmisler HARIC; pasif ve askidakiler DAHIL. Kullanicilarda yonetim havuzu (panel yoneticileri) haric; uygulamalarda yalnizca panelin kendi uygulamasi (`ManagementClientId`) haric.
+  - **Yonetim havuzu:** uygulama olusturma / guncelleme / izinli kapsam degistirme REDDEDILIR (`authn.management_pool_clients_reserved`); panel uygulamasi silinemez. Panel uygulamasini yalnizca bootstrapper yonetir. Aksi halde limit disi havuzda sinirsiz uygulama acilabilirdi.
+  - **Limit asimi (`LicenseService.IsOverLimitAsync`, her degerlendirmede):** kullanim limitin USTUNDEYSE (veritabanina dogrudan ekleme ya da kucuk pakete gecis) panel salt okunur, yalnizca DELETE serbest (`DeletesAllowed`, `LICENSE_OVER_LIMIT`). Limitin altina inince kendiliginden acilir. Kullanici sayisi IdP gRPC'den; alinamazsa son bilinen deger. Panelden kullanici silme: `DELETE idp/pools/users` (`AccountService.DeletePrincipalAsync`).
   - Gecerli lisans yokken deneme varsayilanlari uygulanir: 100 / 1 / 3.
-  - Durum bilinemiyorsa (Management'a ulasilamiyor) limit UYGULANMAZ.
+  - Durum bilinemiyorsa (Management'a ulasilamiyor) yeni kayit REDDEDILIR (`LICENSE_STATUS_UNAVAILABLE`; son kullaniciya `rejectWith`). Girisler etkilenmez. `GrpcLicenseStatusProvider` acilista ilk sorguyu bekletir, boylece acilista gereksiz ret olmaz.
   - Kullanim: `GET management/system/license/usage`. 30 sn onbellek yalnizca gosterim icindir.
 - **Client redirect URI'leri lisansla kisitlanmaz.** Bunun yerine pool ayarlarinda ayri bir "izin verilen redirect domain'leri" politikasi bulunur (varsayilan kapali).
   - Ayar: `UserPoolPolicy.Redirect` (Enabled, AllowedDomains, AllowTestHosts, AllowCustomSchemes); uc `PUT userpools/policy/redirect`.
@@ -132,6 +134,8 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 ### Lisans calisma zamani (nerede ne var)
 - **Sahip Management.**
   - `authndb.Installations` tek satirdir: kurulum GUID'i, aktif token ve saat icin gorulen en ileri zaman.
+  - En ileri zaman `ClockMarkProtected`: `ISecretProtector` (AES-GCM, HASHING_ENCRYPTION_KEY) ile sifreli, kurulum GUID'ine bagli. Satirla birlikte yazilir. Bos / cozulemeyen / baska kuruluma ait = `LicenseClockTamperedException`: lisans Restricted sayilir ve yeniden etkinlestirme reddedilir (`LICENSE_CLOCK_TAMPERED`). Cozum: kurulum satirini yenileyip (yeni GUID) lisansi portalda aktarmak.
+  - Eski sifresiz `ClockHighWaterMark` yalnizca surum gecisinde bir kez tasinip bosaltilir. Sinir: anahtar musterinin `.env`'inde; bu bir zorlastirma, kesin koruma degil. Eski sutun ve gecis yolu sonraki surumlerde kaldirilabilir.
   - Durum `Licensing/LicenseService` tarafindan hesaplanir. En fazla 1 dk eskiyebilir; saat basi ve acilista yeniden hesaplanir.
   - Uclar:
     - `GET management/system/license`

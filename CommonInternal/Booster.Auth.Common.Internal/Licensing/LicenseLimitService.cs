@@ -49,9 +49,10 @@ public sealed class LicenseLimitService(ILicenseStatusProvider license) : ILicen
     {
         var limit = await GetLimitAsync(resource, ct);
 
-        // Durum bilinemiyor (Management'a ulasilamadi): engelleme yok. Altyapi arizasi kayitlari durdurmasin.
+        // Durum bilinemiyor (Management'a ulasilamadi ya da IdP'nin Management baglantisi kesildi): yeni kayit OLUSTURULMAZ.
+        // Acik birakilsaydi baglanti kesilerek kullanici limiti kapatilabilirdi. Mevcut kullanicilarin girisi etkilenmez.
         if (limit is null)
-            return;
+            throw new BusinessException(rejectWith ?? LicenseMessageKeys.StatusUnavailable);
 
         if (db.Database.CurrentTransaction is null)
             throw new InvalidOperationException("Lisans limit kontrolu acik bir transaction icinde yapilmalidir (yaris durumu).");

@@ -64,6 +64,10 @@ public class CreateClientCommandHandler(
 {
     public async Task<CreateClientResponse> ExecuteAsync(CreateClientCommand command, CancellationToken ct)
     {
+        // Yonetim havuzunun uygulamalari lisans limitine sayilmaz; buraya eklenebilseydi limit asilabilirdi.
+        if (command.UserPoolId == AuthConstants.ManagementPoolId)
+            throw new BusinessException(AuthNMessageKeys.ManagementPoolClientsReserved);
+
         var pool = await userPoolRepository.GetAsync(
             p => p.Id == command.UserPoolId, enableTracking: false, cancellationToken: ct);
         pool.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.UserPoolNotFound);
@@ -86,11 +90,11 @@ public class CreateClientCommandHandler(
         client.SetId();
         client.Status = EntityStatus.Active;
 
-        // Lisans limiti: sayim + ekleme ayni transaction ve kilit altinda. Yonetim havuzunun client'lari (panel) sayilmaz.
+        // Lisans limiti: sayim + ekleme ayni transaction ve kilit altinda. Yalnizca panelin kendi uygulamasi sayilmaz.
         await using (var tx = await db.Database.BeginTransactionAsync(ct))
         {
             await licenseLimits.EnsureCanCreateAsync(db, LicensedResource.Clients,
-                c => db.Set<Client>().CountAsync(x => x.UserPoolId != AuthConstants.ManagementPoolId, c), ct);
+                c => db.Set<Client>().CountAsync(x => x.Id != AuthConstants.ManagementClientId, c), ct);
 
             await clientRepository.AddAsync(client, ct);
             await clientRepository.SaveChangesAsync(ct);

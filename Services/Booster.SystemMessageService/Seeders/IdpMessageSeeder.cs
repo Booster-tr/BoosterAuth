@@ -110,6 +110,7 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.AccountDeletionDisabled, "Hesap", "Bu uygulamada hesap silme kapalı. Hesabınızın silinmesi için yöneticinize başvurun.", "Account", "Account deletion is turned off for this application. Contact your administrator to have your account deleted."),
         new(IdpMessageKeys.AccountDeletionConfirmRequired, "Onay", "Devam etmek için hesabınızın kalıcı olarak silineceğini onaylayın.", "Confirmation", "Confirm that your account will be permanently deleted to continue."),
         new(IdpMessageKeys.AccountUnavailable, "Hesap", "Hesap sayfası bu uygulama için kullanılamıyor.", "Account", "The account page is not available for this application."),
+        new(IdpMessageKeys.ManagementPoolUserDeleteNotAllowed, "Kullanıcı", "Panel yöneticileri bu ekrandan silinemez.", "User", "Panel administrators cannot be deleted from this screen."),
 
         // --- Havuz API'leri ---
         new(IdpMessageKeys.PoolApiCallerNotAllowed, "Yetki", "Bu uç yalnızca havuzun servis hesabı token'ı ile çağrılabilir.", "Authorization", "This endpoint can only be called with a pool service account token."),

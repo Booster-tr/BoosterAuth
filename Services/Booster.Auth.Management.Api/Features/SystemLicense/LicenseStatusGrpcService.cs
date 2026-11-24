@@ -22,6 +22,7 @@ public sealed class LicenseStatusGrpcService(LicenseService license) : LicenseSt
             MaxUsers = s.Limits?.Users ?? 0,
             MaxPools = s.Limits?.Pools ?? 0,
             MaxClients = s.Limits?.Clients ?? 0,
+            DeletesAllowed = s.DeletesAllowed,
         };
     }
 }

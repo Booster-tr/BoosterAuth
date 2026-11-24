@@ -323,9 +323,16 @@ public sealed class AccountService(
         if (!ctx.DirectoryManaged)
             await VerifyCurrentPasswordAsync(ctx, currentPassword, ct);
 
-        var principalId = ctx.Principal.Id;
-        var poolId = ctx.Client.IsolationId;
+        await DeletePrincipalAsync(ctx.Principal.Id, ctx.Client.IsolationId, ct);
+        await changeStore.RemoveAsync(ChangeKey(ctx), ct);
+    }
 
+    /// <summary>
+    /// Silmenin cekirdegi; son kullanicinin kendi hesap silmesi ve panelden kullanici silme ortak kullanir.
+    /// Cagiran yetkiyi ve kullanicinin havuzda oldugunu dogrulamis olmalidir.
+    /// </summary>
+    public async Task DeletePrincipalAsync(Guid principalId, Guid poolId, CancellationToken ct)
+    {
         using (requestContextAccessor.BeginSystemContext(poolId))
         {
             await using var tx = await db.Database.BeginTransactionAsync(ct);
@@ -355,7 +362,6 @@ public sealed class AccountService(
         }
 
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
-        await changeStore.RemoveAsync(ChangeKey(ctx), ct);
         await DeleteRelationsAsync(principalId, poolId, ct);
     }
 

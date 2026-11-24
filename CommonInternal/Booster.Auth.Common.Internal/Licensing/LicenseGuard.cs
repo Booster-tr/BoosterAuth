@@ -48,8 +48,14 @@ public sealed class LicenseGuard : IGlobalPreProcessor
             return;
 
         var status = await provider.GetAsync(ct);
-        if (!status.PanelWritable)
-            throw new ForbiddenException(LicenseMessageKeys.Restricted);
+        if (status.PanelWritable)
+            return;
+
+        // Limit asimi: musteri silerek limitin altina inebilsin (or. daha kucuk pakete gecis).
+        if (status.DeletesAllowed && HttpMethods.IsDelete(http.Request.Method))
+            return;
+
+        throw new ForbiddenException(status.DeletesAllowed ? LicenseMessageKeys.OverLimit : LicenseMessageKeys.Restricted);
     }
 
     private static bool IsExempt(HttpContext http)

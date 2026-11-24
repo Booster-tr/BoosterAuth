@@ -16,6 +16,7 @@ public class AuthNMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<AuthN
         new(AuthNMessageKeys.RoleScopeNotFound, "Rol yetkisi", "Role bağlı yetki bulunamadı.", "Role scope", "Role scope not found."),
         new(AuthNMessageKeys.ScopeDefinitionNotFound, "Yetki", "Yetki tanımı bulunamadı.", "Scope", "Scope definition not found."),
         new(AuthNMessageKeys.ClientNotFound, "Uygulama", "Uygulama bulunamadı.", "Client", "Client not found."),
+        new(AuthNMessageKeys.ManagementPoolClientsReserved, "Uygulama", "Yönetim havuzunun uygulamaları sistem tarafından yönetilir; bu havuzda uygulama eklenemez ya da değiştirilemez. Uygulamanızı kendi havuzunuzda oluşturun.", "Client", "Applications of the management pool are managed by the system and cannot be added or changed. Create your application in your own pool."),
 
         // --- Firma yetkileri ---
         new(AuthNMessageKeys.ClientOwnerRelationRequiresOwner, "Yetkilendirme", "Sahip yetkisini yalnızca uygulama sahipleri verebilir veya geri alabilir.", "Authorization", "Only application owners can grant or revoke the owner permission."),

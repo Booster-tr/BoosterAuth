@@ -9,6 +9,19 @@ public class LicenseMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<Lic
 {
     protected override IReadOnlyList<Msg> Messages =>
     [
+        new(LicenseMessageKeys.StatusUnavailable, "Lisans",
+            "Lisans durumu şu anda doğrulanamıyor; yeni kayıt oluşturulamaz. Biraz sonra tekrar deneyin.",
+            "License",
+            "The license status cannot be verified right now, so new records cannot be created. Please try again shortly."),
+        new(LicenseMessageKeys.OverLimit, "Lisans",
+            "Kullanım lisans limitini aşıyor. Yönetim paneli salt okunur; yalnızca silme işlemleri yapılabilir. Limitin altına inin ya da lisansınızı yükseltin.",
+            "License",
+            "Usage exceeds the license limits. The management panel is read-only and only deletions are allowed. Get below the limits or upgrade your license."),
+        new(LicenseMessageKeys.ClockTampered, "Lisans",
+            "Lisans kaydı değiştirilmiş ya da silinmiş; lisans süresi dolmuş sayıldı. Lisans portalından destek isteyin.",
+            "License",
+            "The license record was modified or deleted, so the license is treated as expired. Contact support through the license portal."),
+
         new(LicenseMessageKeys.Restricted, "Lisans",
             "Lisansınız geçerli değil ya da süresi doldu. Yönetim paneli salt okunur; Sistem > Lisans ekranından lisansınızı yenileyin.",
             "License",
