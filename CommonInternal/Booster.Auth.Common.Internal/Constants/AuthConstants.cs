@@ -50,18 +50,63 @@ public static class AuthConstants
     /// <summary>Portalin OAuth client kaydi. Panel gibi PKCE'li authorization code; client secret yok.</summary>
     public static readonly Guid LicensingClientId = Guid.Parse("00000000-0000-0000-0000-000000000203");
 
+<<<<<<< Updated upstream
     public static readonly Guid LicensingCustomerRoleId = Guid.Parse("00000000-0000-0000-0000-000000000204");
+=======
+    /// <summary>Kendi kendine kayıt olan her oyuncuya varsayılan atanan rol (hunter).</summary>
+    public static readonly Guid WalkToWinHunterRoleId = Guid.Parse("00000000-0000-0000-0000-000000000104");
+
+    /// <summary>Av oluşturan / yöneten kullanıcı rolü; panelden atanır.</summary>
+    public static readonly Guid WalkToWinHuntCreatorRoleId = Guid.Parse("00000000-0000-0000-0000-000000000105");
+
+    /// <summary>WalkToWin yöneticisi; tüm avları yönetir. Panelden atanır.</summary>
+    public static readonly Guid WalkToWinAdminRoleId = Guid.Parse("00000000-0000-0000-0000-000000000106");
+>>>>>>> Stashed changes
 
     public const string LicensingTenantName = "Booster Licensing";
     public const string LicensingPoolName = "Booster Musterileri";
     public const string LicensingClientKey = "licensing-portal";
     public const string LicensingClientName = "Booster Lisans Portali";
 
+<<<<<<< Updated upstream
     public const string LicensingCustomerRoleName = "customer";
     public const string LicensingCustomerRoleDisplayName = "Musteri";
 
     /// <summary>Lisans portalini kullanma izni.</summary>
     public const string LicensingPortalScope = "licensing:portal";
+=======
+    public const string WalkToWinHunterRoleName = "hunter";
+    public const string WalkToWinHunterRoleDisplayName = "Avcı";
+
+    /// <summary>İlk kurulumdaki rol anahtarı; mevcut kurulumlarda bootstrapper "hunter"a çevirir.</summary>
+    public const string WalkToWinLegacyPlayerRoleName = "player";
+
+    public const string WalkToWinHuntCreatorRoleName = "hunt_creator";
+    public const string WalkToWinHuntCreatorRoleDisplayName = "Av Oluşturucu";
+
+    public const string WalkToWinAdminRoleName = "admin";
+    public const string WalkToWinAdminRoleDisplayName = "WalkToWin Yöneticisi";
+
+    /// <summary>Mobil uygulamada av başlatma / oynama izni. Client'ın izinli tek scope'u.</summary>
+    public const string WalkToWinPlayScope = "walktowin:play";
+>>>>>>> Stashed changes
+
+    /// <summary>
+    /// Av oluşturma / yönetme. Client'ın AllowedScopes'una BİLEREK eklenmez: IdP /authorize'da istenen scope'u
+    /// yalnızca client'a göre denetler; eklenseydi her oyuncu bu scope'u isteyip alırdı. Token'a yalnızca
+    /// kullanıcıya rol atanırken yazılan PrincipalScope'tan girer.
+    /// </summary>
+    public const string WalkToWinHuntsManageScope = "walktowin:hunts.manage";
+
+    /// <summary>WalkToWin yöneticisi; HuntsManage ile aynı nedenle client'ta izinli değildir.</summary>
+    public const string WalkToWinAdminScope = "walktowin:admin";
+
+    // WalkToWin havuzunun kendi AuthZ şeması (store: pool-{WalkToWinPoolId}).
+    // workspace tek nesnedir: workspace:{WalkToWinPoolId} (token'daki actor ile aynı değer).
+    public const string WalkToWinWorkspaceType = "workspace";
+    public const string WalkToWinHuntType = "hunt";
+    public const string WalkToWinAdminRelation = "admin";
+    public const string WalkToWinCreatorRelation = "creator";
 
     // --- Resource tipleri --------------------------------------------------
 
