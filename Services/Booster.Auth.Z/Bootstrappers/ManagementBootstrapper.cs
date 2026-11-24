@@ -60,7 +60,7 @@ public sealed class ManagementBootstrapper(
 
                 AdminEndUser
             ],
-            ct);
+            ct: ct);
 
         var schema = new PoolSchema
         {
@@ -101,7 +101,7 @@ public sealed class ManagementBootstrapper(
         var found = await relationManager.ReadAsync(storeId, tuple.User, tuple.Relation, tuple.Object, ct);
 
         if (found.Count == 0)
-            await relationManager.WriteAsync(storeId, tuple.User, tuple.Relation, tuple.Object, ct);
+            await relationManager.WriteAsync(storeId, tuple.User, tuple.Relation, tuple.Object, ct: ct);
     }
 
     /// <summary>

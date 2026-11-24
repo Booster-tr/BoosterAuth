@@ -68,6 +68,7 @@ POST https://auth.firma.com/idp/apis/relations/check
 <ul>
     <li>Biçim <code>tip:kimlik</code>; kullanıcı kümesi için <code>tip:kimlik#ilişki</code> (ör. <code>team:satis#member</code>).</li>
     <li>Tek istekte en fazla 100 tuple. Şemaya uymayan istek <code>400</code> ile reddedilir.</li>
+    <li>Yazma ve silme <b>idempotenttir</b>: var olan ilişkiyi yazmak ya da olmayanı silmek hata vermez; istek güvenle tekrarlanabilir.</li>
 </ul>
 
 <h2 id="hatalar">Hatalar</h2>
@@ -75,7 +76,9 @@ POST https://auth.firma.com/idp/apis/relations/check
     <thead><tr><th>Durum</th><th>Neden</th></tr></thead>
     <tbody>
         <tr><td><code>401</code></td><td>Token yok, süresi dolmuş ya da <code>resource</code> IdP adresi değil</td></tr>
-        <tr><td><code>403</code></td><td>Token bir servis hesabına ait değil (ör. kullanıcı token'ı), hesap askıda ya da işlem için yetkisi yetersiz</td></tr>
+        <tr><td><code>403</code></td><td><code>idp.pool_api_caller_not_allowed</code>: token bir servis hesabına ait değil (ör. kullanıcı token'ı) ya da hesap askıda.
+            <code>idp.pool_api_relation_too_low</code>: hesabın bu işlem için yetkisi yetmiyor (okuma ve kontrol: görüntüleme, rol / kapsam: yönetici,
+            ilişki yazma: yetki yöneticisi).</td></tr>
         <tr><td><code>400</code></td><td>Havuzda tanımsız rol / kapsam, bulunamayan kullanıcı ya da şemaya uymayan ilişki</td></tr>
     </tbody>
 </table>

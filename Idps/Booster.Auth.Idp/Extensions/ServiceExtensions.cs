@@ -64,6 +64,7 @@ public static class ServiceExtensions
             configureRider: rider =>
             {
                 rider.AddNotificationProducer();
+                rider.AddPrincipalEventProducers();
                 rider.AddConsumer<ScopeDefinitionChangedEventConsumer>();
                 rider.AddConsumer<RoleChangedEventConsumer>();
             },

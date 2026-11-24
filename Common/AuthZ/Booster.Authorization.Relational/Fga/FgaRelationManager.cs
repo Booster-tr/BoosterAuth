@@ -5,20 +5,35 @@ namespace Booster.Authorization.Relational.Fga;
 
 public sealed class FgaRelationManager(IFgaClientProvider clientProvider)
 {
-    public async Task WriteAsync(
-        string storeId, string user, string relation, string @object, CancellationToken ct = default)
+    /// <summary>
+    /// Yazma / silme idempotenttir: var olan iliskiyi yazmak ya da olmayani silmek hata degildir (OpenFGA
+    /// on_duplicate / on_missing = ignore). Yeniden denenen istekler (ag hatasi, cift tiklama) ayni sonucu verir.
+    /// </summary>
+    // modelId: yazma havuzun CANLI modeline gore dogrulanir. Verilmezse OpenFGA depodaki EN SON modeli kullanir; eski bir
+    // surum yeniden canliya alindiginda yazmalar yanlis modele (or. bos taslak) gore reddediliyordu.
+    private static readonly ClientWriteOptions Idempotent = new()
     {
-        var client = clientProvider.GetClientForStore(storeId);
+        Conflict = new ConflictOptions
+        {
+            OnDuplicateWrites = OnDuplicateWrites.Ignore,
+            OnMissingDeletes = OnMissingDeletes.Ignore
+        }
+    };
+
+    public async Task WriteAsync(
+        string storeId, string user, string relation, string @object, string? modelId = null, CancellationToken ct = default)
+    {
+        var client = clientProvider.GetClientForStore(storeId, modelId);
         await client.Write(new ClientWriteRequest
         {
             Writes = [new ClientTupleKey { User = user, Relation = relation, Object = @object }]
-        }, cancellationToken: ct);
+        }, Idempotent, cancellationToken: ct);
     }
 
     public async Task WriteBatchAsync(
-        string storeId, IEnumerable<TupleInput> tuples, CancellationToken ct = default)
+        string storeId, IEnumerable<TupleInput> tuples, string? modelId = null, CancellationToken ct = default)
     {
-        var client = clientProvider.GetClientForStore(storeId);
+        var client = clientProvider.GetClientForStore(storeId, modelId);
         await client.Write(new ClientWriteRequest
         {
             Writes = tuples.Select(t => new ClientTupleKey
@@ -27,23 +42,23 @@ public sealed class FgaRelationManager(IFgaClientProvider clientProvider)
                 Relation = t.Relation,
                 Object = t.Object
             }).ToList()
-        }, cancellationToken: ct);
+        }, Idempotent, cancellationToken: ct);
     }
 
     public async Task DeleteAsync(
-        string storeId, string user, string relation, string @object, CancellationToken ct = default)
+        string storeId, string user, string relation, string @object, string? modelId = null, CancellationToken ct = default)
     {
-        var client = clientProvider.GetClientForStore(storeId);
+        var client = clientProvider.GetClientForStore(storeId, modelId);
         await client.Write(new ClientWriteRequest
         {
             Deletes = [new ClientTupleKeyWithoutCondition { User = user, Relation = relation, Object = @object }]
-        }, cancellationToken: ct);
+        }, Idempotent, cancellationToken: ct);
     }
 
     public async Task DeleteBatchAsync(
-        string storeId, IEnumerable<TupleInput> tuples, CancellationToken ct = default)
+        string storeId, IEnumerable<TupleInput> tuples, string? modelId = null, CancellationToken ct = default)
     {
-        var client = clientProvider.GetClientForStore(storeId);
+        var client = clientProvider.GetClientForStore(storeId, modelId);
         await client.Write(new ClientWriteRequest
         {
             Deletes = tuples.Select(t => new ClientTupleKeyWithoutCondition
@@ -52,7 +67,7 @@ public sealed class FgaRelationManager(IFgaClientProvider clientProvider)
                 Relation = t.Relation,
                 Object = t.Object
             }).ToList()
-        }, cancellationToken: ct);
+        }, Idempotent, cancellationToken: ct);
     }
 
     public async Task<IReadOnlyList<StoredTuple>> ReadAsync(

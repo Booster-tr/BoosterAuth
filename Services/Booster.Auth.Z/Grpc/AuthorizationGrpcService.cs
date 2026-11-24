@@ -12,6 +12,7 @@ namespace Booster.Auth.Z.Grpc;
 public sealed class AuthorizationGrpcService(
     IPoolStoreProvider poolStoreProvider,
     FgaRelationManager relationManager,
+    FgaSchemaWriter schemaWriter,
     ILookupManager lookupManager) : AuthorizationService.AuthorizationServiceBase
 {
     public override async Task<CheckResponse> Check(CheckRequest request, ServerCallContext context)
@@ -77,7 +78,13 @@ public sealed class AuthorizationGrpcService(
     public override async Task<LookupResponse> ReadRelations(
         ReadRelationsRequest request, ServerCallContext context)
     {
-        var (storeId, _) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
+        var (storeId, modelId) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
+
+        // Yalnizca kullaniciyla okuma: OpenFGA nesne tipi ister ("object type field is required"). Modeldeki her tip
+        // icin ayri okunur ve TEK yanitta doner (sayfalama yok). Kullanici silinirken tum iliskilerini bulmak icindir;
+        // once hic okunamiyor, silinen kullanicinin iliskileri kaliyordu.
+        if (!string.IsNullOrEmpty(request.User) && string.IsNullOrEmpty(request.Object))
+            return await ReadAllForUserAsync(storeId, modelId, request, context.CancellationToken);
 
         var page = await relationManager.ReadPageAsync(
             storeId,
@@ -102,11 +109,11 @@ public sealed class AuthorizationGrpcService(
     public override async Task<WriteRelationsResponse> WriteRelations(
         WriteRelationsRequest request, ServerCallContext context)
     {
-        var (storeId, _) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
+        var (storeId, modelId) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
 
         var tuples = ToTuples(request);
 
-        await RejectInvalidAsync(() => relationManager.WriteBatchAsync(storeId, tuples, context.CancellationToken));
+        await RejectInvalidAsync(() => relationManager.WriteBatchAsync(storeId, tuples, modelId, context.CancellationToken));
 
         return new WriteRelationsResponse { AffectedCount = tuples.Count };
     }
@@ -114,11 +121,11 @@ public sealed class AuthorizationGrpcService(
     public override async Task<WriteRelationsResponse> DeleteRelations(
         WriteRelationsRequest request, ServerCallContext context)
     {
-        var (storeId, _) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
+        var (storeId, modelId) = await ResolveStoreAsync(request.IsolationId, context.CancellationToken);
 
         var tuples = ToTuples(request);
 
-        await RejectInvalidAsync(() => relationManager.DeleteBatchAsync(storeId, tuples, context.CancellationToken));
+        await RejectInvalidAsync(() => relationManager.DeleteBatchAsync(storeId, tuples, modelId, context.CancellationToken));
 
         return new WriteRelationsResponse { AffectedCount = tuples.Count };
     }
@@ -168,6 +175,33 @@ public sealed class AuthorizationGrpcService(
             ? poolId
             : throw new RpcException(new Status(
                 StatusCode.InvalidArgument, "isolation_id geçerli bir Guid olmalıdır."));
+
+    private async Task<LookupResponse> ReadAllForUserAsync(
+        string storeId, string modelId, ReadRelationsRequest request, CancellationToken ct)
+    {
+        var model = await schemaWriter.GetModelAsync(storeId, modelId, ct);
+        var response = new LookupResponse();
+
+        foreach (var type in model?.TypeDefinitions.Select(t => t.Type) ?? [])
+        {
+            string? continuation = null;
+            do
+            {
+                var page = await relationManager.ReadPageAsync(
+                    storeId, request.User, NullIfEmpty(request.Relation), $"{type}:", 100, continuation, ct);
+
+                response.Results.AddRange(page.Tuples.Select(t => new LookupResultItem
+                {
+                    User = t.User,
+                    Relation = t.Relation,
+                    Object = t.Object
+                }));
+                continuation = page.ContinuationToken;
+            } while (!string.IsNullOrEmpty(continuation));
+        }
+
+        return response;
+    }
 
     private async Task<(string StoreId, string ModelId)> ResolveStoreAsync(string isolationId, CancellationToken ct)
     {

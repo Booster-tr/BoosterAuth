@@ -48,6 +48,8 @@ public class RevokeClientAccessCommandHandler(
 {
     public async Task<AccessChangeResponse> ExecuteAsync(RevokeClientAccessCommand command, CancellationToken ct)
     {
+        RevokeParams.Ensure(command.PrincipalId, command.Relation);
+
         // Owner yetkisini yalnızca owner geri alabilir.
         if (string.Equals(command.Relation, AuthConstants.OwnerRelation, StringComparison.OrdinalIgnoreCase))
         {

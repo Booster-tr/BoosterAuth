@@ -116,10 +116,15 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.UiTextKeyUnknown, "Ekran yazısı", "Bu anahtarda bir ekran yazısı yok.", "Screen text", "There is no screen text with this key."),
         new(IdpMessageKeys.UiTextInvalid, "Ekran yazısı", "Metin < ya da > içeremez ve varsayılandaki {0} gibi yer tutucuları aynen korumalıdır.", "Screen text", "The text cannot contain < or > and must keep placeholders such as {0} from the default."),
         new(IdpMessageKeys.LanguageNotSupported, "Dil", "Bu dil desteklenmiyor. Desteklenen diller: tr-tr, en-us.", "Language", "This language is not supported. Supported languages: tr-tr, en-us."),
-        new(IdpMessageKeys.ManagementPoolUserDeleteNotAllowed, "Kullanıcı", "Panel yöneticileri bu ekrandan silinemez.", "User", "Panel administrators cannot be deleted from this screen."),
+        new(IdpMessageKeys.CannotDeleteSelf, "Kullanıcı", "Kendi hesabınızı bu ekrandan silemezsiniz.", "User", "You cannot delete your own account here."),
+        new(IdpMessageKeys.CannotDeleteLastAdmin, "Kullanıcı", "Son yönetici silinemez. Önce başka bir kullanıcıya yönetici rolü verin.", "User", "The last administrator cannot be deleted. Give the administrator role to another user first."),
+        new(IdpMessageKeys.CannotSuspendSelf, "Kullanıcı", "Kendi hesabınızı askıya alamazsınız.", "User", "You cannot suspend your own account."),
+        new(IdpMessageKeys.CannotSuspendLastAdmin, "Kullanıcı", "Son yönetici askıya alınamaz. Önce başka bir kullanıcıya yönetici rolü verin.", "User", "The last administrator cannot be suspended. Give the administrator role to another user first."),
+        new(IdpMessageKeys.PrincipalStatusInvalid, "Kullanıcı", "Geçersiz durum. Yalnızca etkin ya da askıda seçilebilir.", "User", "Invalid status. Only active or suspended can be chosen."),
 
         // --- Havuz API'leri ---
         new(IdpMessageKeys.PoolApiCallerNotAllowed, "Yetki", "Bu uç yalnızca havuzun servis hesabı token'ı ile çağrılabilir.", "Authorization", "This endpoint can only be called with a pool service account token."),
+        new(IdpMessageKeys.PoolApiRelationTooLow, "Havuz API", "Servis hesabının bu işlem için yetkisi yetmiyor. Okuma ve kontrol için görüntüleme, rol / kapsam vermek için yönetici, ilişki yazmak için yetki yöneticisi yetkisi gerekir.", "Pool API", "The service account does not have enough access for this operation. Reading and checks need viewer, granting roles / scopes needs manager, writing relations needs grant manager."),
         new(IdpMessageKeys.PoolApiRelationRejected, "İlişki", "İlişki havuzun yetki şemasına uymuyor.", "Relation", "The relation does not match the pool's authorization schema."),
 
         // --- Panelden kullanıcı ekleme / içe aktarma / davet ---

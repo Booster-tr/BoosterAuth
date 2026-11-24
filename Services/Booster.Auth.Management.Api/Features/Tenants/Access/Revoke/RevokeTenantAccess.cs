@@ -59,6 +59,8 @@ public class RevokeTenantAccessCommandHandler(
     public async Task<AccessChangeResponse> ExecuteAsync(
         RevokeTenantAccessCommand command, CancellationToken ct)
     {
+        RevokeParams.Ensure(command.PrincipalId, command.Relation);
+
         var tenant = await tenantRepository.GetAsync(
             t => t.Id == command.TenantId, enableTracking: false, cancellationToken: ct);
         tenant.ThrowCustomExceptionIfDataNull(AuthNMessageKeys.TenantNotFound);

@@ -52,8 +52,10 @@ public static class PoolApiCaller
             Object = AuthConstants.Pool(poolId.Value)
         }, cancellationToken: ct);
 
+        // Cagiran dogru (servis hesabi) ama bu islem icin yetkisi yetmiyor: farkli mesaj, yoksa entegratör
+        // "yalnizca servis hesabi cagirabilir" gorup yanlis yerde ariyordu.
         if (!check.Allowed)
-            throw new ForbiddenException(IdpMessageKeys.PoolApiCallerNotAllowed);
+            throw new ForbiddenException(IdpMessageKeys.PoolApiRelationTooLow);
 
         return poolId.Value;
     }

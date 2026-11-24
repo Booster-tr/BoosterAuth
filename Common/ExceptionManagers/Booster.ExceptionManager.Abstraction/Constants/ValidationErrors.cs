@@ -16,6 +16,7 @@ public static partial class ValidationErrors
     public const string RangeInputError = "common.range_input_error";
     public const string LanguageFormatError = "common.language_format_error";
     public const string MaxLengthError = "common.max_length_error";
+    public const string PageSizeInvalid = "common.page_size_invalid";
     public const string MinLengthError = "common.min_length_error";
     public const string ContainsSpaceError = "common.contains_space_error";
     public const string InternalServerError = "common.internal_error";

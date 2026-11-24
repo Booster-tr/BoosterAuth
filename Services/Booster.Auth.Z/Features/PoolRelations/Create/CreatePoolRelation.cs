@@ -72,7 +72,7 @@ public class CreatePoolRelationCommandHandler(
         try
         {
             await relationManager.WriteAsync(
-                schema.StoreId, $"{command.SubjectType}:{command.SubjectId}", command.Relation, @object, ct);
+                schema.StoreId, $"{command.SubjectType}:{command.SubjectId}", command.Relation, @object, schema.ModelId, ct);
         }
         catch (FgaApiValidationError)
         {

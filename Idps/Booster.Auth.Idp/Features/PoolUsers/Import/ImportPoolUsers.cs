@@ -148,6 +148,17 @@ public static class PoolUserCsv
 {
     public sealed record Row(int Line, string? Email, string DisplayName);
 
+    /// <summary>
+    /// Baslik Turkce harflerden arindirilir: Excel'in Turkce basliklari ("E-posta", "Adı", "Soyadı", "İsim") tanınsin.
+    /// ToLowerInvariant "Adı" -> "adı", "İsim" -> "i̇sim" verdigi icin listedeki "adi" / "isim" ile hic eslesmiyordu.
+    /// </summary>
+    private static string NormalizeHeader(string header)
+    {
+        var h = header.Trim().Replace("İ", "i").Replace("I", "ı").ToLowerInvariant();
+        return h.Replace("ı", "i").Replace("ş", "s").Replace("ğ", "g").Replace("ü", "u").Replace("ö", "o").Replace("ç", "c")
+            .Replace("̇", string.Empty);
+    }
+
     private static readonly string[] EmailHeaders = ["email", "e-posta", "eposta", "mail"];
     private static readonly string[] FirstNameHeaders = ["ad", "adi", "first_name", "firstname", "first name", "isim"];
     private static readonly string[] LastNameHeaders = ["soyad", "soyadi", "last_name", "lastname", "last name"];
@@ -161,7 +172,7 @@ public static class PoolUserCsv
 
         var header = lines[headerIndex];
         var sep = header.Count(c => c == ';') > header.Count(c => c == ',') ? ';' : ',';
-        var columns = Split(header, sep).Select(h => h.Trim().ToLowerInvariant()).ToList();
+        var columns = Split(header, sep).Select(NormalizeHeader).ToList();
 
         var email = columns.FindIndex(c => EmailHeaders.Contains(c));
         if (email < 0) throw Invalid();

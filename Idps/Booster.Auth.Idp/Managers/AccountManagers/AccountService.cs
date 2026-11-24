@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Amqp.Events;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Database.Models;
@@ -331,6 +332,29 @@ public sealed class AccountService(
     /// Silmenin cekirdegi; son kullanicinin kendi hesap silmesi ve panelden kullanici silme ortak kullanir.
     /// Cagiran yetkiyi ve kullanicinin havuzda oldugunu dogrulamis olmalidir.
     /// </summary>
+    /// <summary>
+    /// Panelden askiya alma / etkinlestirme. Askiya alinan kullanici giris yapamaz, kod alamaz, token yenileyemez; tum
+    /// oturumlari ve yenileme token'lari hemen kapatilir. Kayit, roller ve iliskiler korunur (geri acilabilir).
+    /// </summary>
+    public async Task SetStatusAsync(Guid principalId, Guid poolId, PrincipalStatus status, CancellationToken ct)
+    {
+        using (requestContextAccessor.BeginSystemContext(poolId))
+        {
+            var principal = await db.Principals.FirstAsync(p => p.Id == principalId, ct);
+            if (principal.Status == status)
+                return;
+
+            principal.Status = status;
+            principal.UpdatedTime = DateTimeOffset.UtcNow;
+            if (status != PrincipalStatus.Active)
+                await RevokeSessionsAsync(principalId, exceptSessionId: null, ct);
+
+            await db.SaveChangesAsync(ct);
+        }
+
+        await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
+    }
+
     public async Task DeletePrincipalAsync(Guid principalId, Guid poolId, CancellationToken ct)
     {
         using (requestContextAccessor.BeginSystemContext(poolId))
@@ -363,6 +387,10 @@ public sealed class AccountService(
 
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
         await DeleteRelationsAsync(principalId, poolId, ct);
+
+        // Kisisel veri tutan diger servisler (Notification: gonderilen e-posta / SMS kayitlari) temizlesin. Commit'ten sonra;
+        // Kafka hatasi silmeyi bozmaz, loglanir.
+        await eventBus.PublishOrLogAsync(new PrincipalDeletedEvent { UserPoolId = poolId, PrincipalId = principalId }, logger, ct);
     }
 
     /// <summary>

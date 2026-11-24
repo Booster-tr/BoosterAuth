@@ -51,15 +51,27 @@ public class DeletePoolUserCommandHandler(
 {
     public async Task<DeletePoolUserResponse> ExecuteAsync(DeletePoolUserCommand command, CancellationToken ct)
     {
-        // Panel yoneticileri bu yoldan silinmez.
-        if (command.UserPoolId == AuthConstants.ManagementPoolId)
-            throw new ForbiddenException(IdpMessageKeys.ManagementPoolUserDeleteNotAllowed);
+        // Panel kullanicilari (yonetim havuzu) da silinebilir: ayrilan bir yonetici sistemden cikarilabilmeli. Iki
+        // istisna: kisi kendini silemez (kendini kilitlemesin) ve son yonetici silinemez (panel sahipsiz kalmasin).
+        if (command.UserPoolId == AuthConstants.ManagementPoolId && command.PrincipalId == requestContextAccessor.Context().PrincipalId)
+            throw new ForbiddenException(IdpMessageKeys.CannotDeleteSelf);
 
         using (requestContextAccessor.BeginSystemContext(command.UserPoolId))
         {
             var exists = await db.Principals.AnyAsync(p => p.Id == command.PrincipalId && p.Type == PrincipalType.User, ct);
             if (!exists)
                 throw new BusinessException(IdpMessageKeys.PrincipalNotFound);
+
+            if (command.UserPoolId == AuthConstants.ManagementPoolId)
+            {
+                var isAdmin = await db.PrincipalRoles.AnyAsync(r => r.PrincipalId == command.PrincipalId && r.RoleName == AuthConstants.AdminRoleName, ct);
+                var otherAdmins = await db.PrincipalRoles
+                    .Where(r => r.PrincipalId != command.PrincipalId && r.RoleName == AuthConstants.AdminRoleName)
+                    .Join(db.Principals.Where(p => p.Status == PrincipalStatus.Active), r => r.PrincipalId, p => p.Id, (r, _) => r)
+                    .CountAsync(ct);
+                if (isAdmin && otherAdmins == 0)
+                    throw new ForbiddenException(IdpMessageKeys.CannotDeleteLastAdmin);
+            }
         }
 
         await accountService.DeletePrincipalAsync(command.PrincipalId, command.UserPoolId, ct);

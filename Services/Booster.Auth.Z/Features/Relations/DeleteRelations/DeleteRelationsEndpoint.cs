@@ -54,7 +54,7 @@ public class DeleteRelationsCommandHandler(
             .Select(t => new TupleInput(t.User, t.Relation, t.Object))
             .ToList();
 
-        await relationManager.DeleteBatchAsync(mapping.StoreId, tuples, ct);
+        await relationManager.DeleteBatchAsync(mapping.StoreId, tuples, mapping.ActiveModelId, ct);
 
         return new DeleteRelationsResponse(tuples.Count);
     }

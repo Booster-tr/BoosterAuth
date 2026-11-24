@@ -1,3 +1,6 @@
+using Booster.ExceptionManager.Abstraction.Constants;
+using FluentValidation;
+using FluentValidation.Results;
 ﻿using Booster.Database.DynamicFilter.Models;
 using System.Collections.Specialized;
 
@@ -8,6 +11,8 @@ public static class CollectionToPageRequestExtension
     public const string PageQueryStringName = "Page";
 
     public const string PageSizeQueryStringName = "PageSize";
+
+    public const int MaxPageSize = 500;
 
     public static PageRequest ToPageRequest(this NameValueCollection nvc)
     {
@@ -26,8 +31,12 @@ public static class CollectionToPageRequestExtension
             pageRequest.PageIndex = page;
         }
 
-        if (int.TryParse(nvc[PageSizeQueryStringName], out int pageSize))
+        // Sayfa boyutu 1..MaxPageSize: negatif deger veritabaninda LIMIT hatasi (500), 0 sonsuz sayfa sayisi, cok buyuk
+        // deger tek istekte tum tabloyu dokuyordu.
+        if (nvc[PageSizeQueryStringName] is { Length: > 0 } rawSize)
         {
+            if (!int.TryParse(rawSize, out int pageSize) || pageSize is < 1 or > MaxPageSize)
+                throw new ValidationException([new ValidationFailure(PageSizeQueryStringName, ValidationErrors.PageSizeInvalid)]);
             pageRequest.PageSize = pageSize;
         }
 

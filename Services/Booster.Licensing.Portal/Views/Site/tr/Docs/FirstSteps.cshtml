@@ -54,11 +54,15 @@ mehmet@@firma.com;Mehmet;Kaya</pre></div>
 <p>Davet bağlantıları <b>1 gün</b> geçerli ve tek kullanımlıktır; yeniden gönderilen davet eskisini geçersiz kılar. Davet kabul edilince
     kullanıcı parolasını belirler ve e-postası doğrulanmış sayılır. LDAP / Active Directory kullanıcılarını eklemeniz gerekmez; hesapları ilk
     girişte açılır.</p>
+<p>Bir kullanıcıyı <b>askıya alabilir</b> (giriş ve token yenileme hemen durur, açık oturumları kapanır; rol ve izinleri korunur, sonra yeniden
+    etkinleştirilebilir) ya da <b>silebilirsiniz</b> (kayıt anonimleştirilir; parola, roller, oturumlar, yetki ilişkileri ve gönderilmiş bildirim kayıtları
+    silinir). Konsol kullanıcıları için de aynısı geçerlidir; yalnızca kendinizi ve son yöneticiyi silemez ya da askıya alamazsınız.</p>
 
 <h2 id="roller">5. Roller ve kapsamlar</h2>
 <ol>
     <li><b>Kapsamlar</b> ekranında API'nizin izinlerini tanımlayın, ör. <code>orders:read</code>, <code>orders:write</code>.</li>
-    <li><b>Roller</b> ekranında rol oluşturun (ör. <code>manager</code>) ve role kapsamlar ekleyin.</li>
-    <li>Kullanıcılara rol atayın ya da havuzun <b>varsayılan rolleri</b>ni belirleyin.</li>
+    <li><b>Roller</b> ekranında rol oluşturun (ör. <code>manager</code>).</li>
+    <li>Kullanıcılara rol ve kapsam atayın ya da havuzun <b>varsayılan rol ve kapsamlarını</b> belirleyin.</li>
 </ol>
-<p>Roller token'da <code>role</code>, kapsamlar <code>scope</code> claim'i olarak yer alır. Sırada: <a href="/tr/docs/integration">uygulamanızı bağlamak</a>.</p>
+<p>Roller token'da <code>role</code>, kullanıcıya verilen kapsamlar <code>scope</code> claim'i olarak yer alır. Rolün kapsam listesi token'a taşınmaz;
+    kapsamı kullanıcıya ayrıca verin. Sırada: <a href="/tr/docs/integration">uygulamanızı bağlamak</a>.</p>

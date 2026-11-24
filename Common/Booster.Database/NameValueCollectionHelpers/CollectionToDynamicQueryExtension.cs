@@ -28,8 +28,9 @@ public static class CollectionToDynamicQueryExtension
         { "startswith", FilterOperator.StartsWith },
         { "endswith", FilterOperator.EndsWith },
         { "isempty", FilterOperator.IsEmpty },
-        { "isnotempty", FilterOperator.IsNotEmpty },
-        { "raw", FilterOperator.Raw }
+        { "isnotempty", FilterOperator.IsNotEmpty }
+        // "raw" sorgu dizesinden KABUL EDILMEZ: istemcinin yazdigi ham Dynamic LINQ ifadesi calistiriliyordu (500 /
+        // enjeksiyon yuzeyi). Raw yalnizca kodun kendi urettigi koleksiyon filtrelerinde kullanilir.
     };
 
     public static DynamicQuery ToDynamicFilter<T>(this NameValueCollection nvc)
@@ -100,6 +101,10 @@ public static class CollectionToDynamicQueryExtension
             string value = nvc[key]!;
             var (cleanKey, explicitOperator) = ParseKeyWithOperator(key);
 
+            // Alan adlari yalnizca tanimlayici olabilir; ic ice alan adi koleksiyon filtresine metin olarak girer.
+            if (!cleanKey.Split('.').All(IsIdentifier))
+                continue;
+
             Filter newFilter;
 
             if (IsNestedProperty(cleanKey))
@@ -118,6 +123,9 @@ public static class CollectionToDynamicQueryExtension
         return rootFilter;
     }
 
+
+    private static bool IsIdentifier(string part)
+        => part.Length is > 0 and <= 100 && (char.IsLetter(part[0]) || part[0] == '_') && part.All(c => char.IsLetterOrDigit(c) || c == '_');
 
     private static bool IsKnownProperty(PropertyInfo[] properties, string key)
     {
