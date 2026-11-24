@@ -12,11 +12,11 @@ namespace Booster.Auth.Idp.Controllers.Base;
 
 public class IdpBaseController : Controller
 {
-    protected string ResolveLang()
-    {
-        var lang = Request.Headers.AcceptLanguage.FirstOrDefault() ?? "tr-tr";
-        return lang.Length > 5 ? lang[..5].ToLowerInvariant() : lang.ToLowerInvariant();
-    }
+    /// <summary>
+    /// Hata mesajlarinin dili = ekranin dili (RequestLocalization: once dil secici cerezi, sonra Accept-Language).
+    /// Once yalnizca basliga bakiyordu; dil seciciyle Ingilizceye gecen kullanici Turkce hata goruyordu.
+    /// </summary>
+    protected static string ResolveLang() => System.Globalization.CultureInfo.CurrentUICulture.Name.ToLowerInvariant();
 
     public const string ClientLogoUrlKey = "ClientLogoUrl";
 

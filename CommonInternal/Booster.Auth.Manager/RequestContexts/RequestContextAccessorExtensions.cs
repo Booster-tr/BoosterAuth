@@ -11,7 +11,9 @@ public static class RequestContextAccessorExtensions
     {
         var previous = accessor.RequestContext;
 
-        accessor.RequestContext = RequestContext.ForSystem(isolation);
+        // Istegin dili korunur: sistem baglaminda gonderilen e-posta / SMS (kod, davet, sifirlama) kullanicinin sectigi
+        // dilde gitmeli. Once "tr-tr"ye dusuyordu; Ingilizce ekrandan istenen kod Turkce geliyordu.
+        accessor.RequestContext = RequestContext.ForSystem(isolation, previous?.AcceptLanguage);
 
         return new ContextScope(accessor, previous);
     }

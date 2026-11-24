@@ -52,7 +52,7 @@ public sealed class ImportPoolUsersValidator : Validator<ImportPoolUsersCommand>
     {
         // ~1000 satir icin bol; cok buyuk istekleri ayristirmaya baslamadan reddeder.
         RuleFor(x => x.Csv).NotEmpty().WithMessage(IdpMessageKeys.ImportCsvInvalid)
-            .MaximumLength(1_000_000).WithMessage(IdpMessageKeys.ImportTooManyRows);
+            .MaximumLength(1_000_000).WithMessage(IdpMessageKeys.ImportFileTooLarge);
     }
 }
 
@@ -70,10 +70,8 @@ public class ImportPoolUsersCommandHandler(
     {
         var rows = PoolUserCsv.Parse(cmd.Csv);
         if (rows.Count > MaxRows)
-            throw new ValidationException([new ValidationFailure(nameof(cmd.Csv), IdpMessageKeys.ImportTooManyRows)
-            {
-                FormattedMessagePlaceholderValues = new Dictionary<string, object> { ["Max"] = MaxRows }
-            }]);
+            // Ceviri yer tutucu doldurmaz; sinir metnin icinde yazilidir (eski anahtar "{Max}" gosteriyordu).
+            throw new ValidationException([new ValidationFailure(nameof(cmd.Csv), IdpMessageKeys.ImportRowLimitExceeded)]);
 
         var pool = await poolDataReader.GetAsync(cmd.UserPoolId, ct)
                    ?? throw new BusinessException(IdpMessageKeys.PoolNotFound);

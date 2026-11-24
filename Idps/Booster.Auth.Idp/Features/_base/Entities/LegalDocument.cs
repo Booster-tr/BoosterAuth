@@ -59,6 +59,12 @@ public static class LegalDocumentKeys
     /// <summary>"en", "en-US", "tr" gibi degerleri desteklenen dillerden birine indirger.</summary>
     public static string NormalizeLanguage(string? language) =>
         language is not null && language.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "en-us" : "tr-tr";
+
+    /// <summary>Yazma uclari icin: "tr", "tr-TR", "en", "en-US" kabul edilir; baska dil (or. "de-de") reddedilir.
+    /// Once her bilinmeyen dil "tr-tr"ye inip Turkce metnin uzerine yaziyordu.</summary>
+    public static bool IsSupportedLanguage(string? language)
+        => language is not null && (language.Equals("tr", StringComparison.OrdinalIgnoreCase) || language.Equals("en", StringComparison.OrdinalIgnoreCase)
+            || Languages.Contains(language.ToLowerInvariant()));
 }
 
 public class LegalDocumentConfiguration : IEntityTypeConfiguration<LegalDocument>

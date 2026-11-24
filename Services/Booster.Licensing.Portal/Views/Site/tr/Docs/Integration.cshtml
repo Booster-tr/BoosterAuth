@@ -11,8 +11,14 @@
         <tr><td>client_id</td><td>Uygulamanın istemci anahtarı, ör. <code>acme-web</code></td></tr>
         <tr><td>redirect_uri</td><td>Uygulamada kayıtlı adres, ör. <code>https://app.firma.com/callback</code></td></tr>
         <tr><td>Akış</td><td>Authorization Code + PKCE (<code>S256</code> zorunlu; implicit akış desteklenmez)</td></tr>
-        <tr><td>Kapsamlar</td><td><code>openid profile email offline_access</code> + uygulamaya izin verilen kapsamlar</td></tr>
-        <tr><td>resource (isteğe bağlı)</td><td>Token'ın hedef API'si (audience), ör. <code>https://api.firma.com</code></td></tr>
+        <tr><td>Kapsamlar</td><td><code>openid profile email offline_access</code> + uygulamaya izin verilen özel kapsamlar. Özel kapsam token'a yalnızca
+            <b>kullanıcıda varsa</b> girer; kullanıcıya verilmiş kapsamlar istenmese de eklenir.</td></tr>
+        <tr><td>resource (isteğe bağlı)</td><td>Token'ın hedef API'si (audience), ör. <code>https://api.firma.com</code>; uygulamanın izinli API'lerinden biri
+            olmalıdır. Verilmezse audience IdP'nin kendisidir (<code>https://auth.firma.com/idp</code>); bu token <code>/idp/me</code>'de çalışır.</td></tr>
+        <tr><td>prompt (isteğe bağlı)</td><td><code>login</code>: oturum olsa da yeniden giriş. <code>create</code>: kayıt ekranı. <code>none</code>: ekran
+            gösterilmez; oturum yoksa <code>error=login_required</code>, izin gerekiyorsa <code>error=consent_required</code> ile uygulamaya dönülür.</td></tr>
+        <tr><td>max_age (isteğe bağlı)</td><td>Saniye. Kullanıcının son girişi bundan eskiyse yeniden giriş istenir; ID token'daki
+            <code>auth_time</code> gerçek giriş anıdır.</td></tr>
     </tbody>
 </table>
 <div class="callout"><p><b>Tek issuer.</b> Issuer tüm havuzlar için aynıdır (<code>/idp</code>); kullanıcının hangi havuzda doğrulanacağı
@@ -88,11 +94,27 @@ app.MapGet("/orders", () => "...")
     <thead><tr><th>Token</th><th>Claim'ler</th></tr></thead>
     <tbody>
         <tr><td>Erişim token'ı</td><td><code>sub</code>, <code>aud</code>, <code>azp</code>, <code>scope</code>, <code>role</code> (rol başına bir tane), <code>sid</code>, <code>principal_type</code></td></tr>
-        <tr><td>ID token</td><td><code>sub</code>, <code>name</code>, <code>email</code>, <code>email_verified</code>, <code>nonce</code>, <code>auth_time</code></td></tr>
+        <tr><td>ID token (yalnızca <code>openid</code> istenirse)</td><td><code>sub</code>, <code>nonce</code>, <code>auth_time</code>; <code>name</code> yalnızca
+            <code>profile</code>, <code>email</code> ve <code>email_verified</code> yalnızca <code>email</code> kapsamıyla</td></tr>
         <tr><td><code>/idp/me</code></td><td><code>sub</code>, <code>name</code>, <code>email</code>, <code>email_verified</code>, <code>userpool</code></td></tr>
     </tbody>
 </table>
 <p>Erişim token'ı varsayılan olarak 15 dakika, yenileme token'ı 14 gün geçerlidir; süreler havuzun oturum politikasından değiştirilir.</p>
+<p>Yenileme token'ı her kullanıldığında rol ve kapsamlar kullanıcının <b>güncel</b> kaydından okunur: yöneticinin aldığı yetki bir sonraki
+    yenilemede token'dan düşer. Askıya alınan kullanıcı yenileyemez.</p>
+
+<h2 id="hatalar">Hatalar</h2>
+<p><b>Token ucu</b> standart OAuth 2.0 hata gövdesi döner (RFC 6749): <code>error</code> (<code>invalid_request</code>, <code>invalid_client</code>,
+    <code>invalid_grant</code>, <code>invalid_scope</code>, <code>invalid_target</code>, <code>unsupported_grant_type</code>),
+    <code>error_description</code> (istek dilinde açıklama) ve Booster Auth'a özgü <code>code</code> (mesaj anahtarı).</p>
+<p><b>Yetkilendirme ucu</b> hatayı uygulamanın <code>redirect_uri</code>'sine <code>error</code> ve <code>state</code> ile döner: <code>invalid_scope</code>,
+    <code>invalid_target</code> (izinsiz <code>resource</code>), <code>login_required</code> / <code>consent_required</code> (<code>prompt=none</code>),
+    <code>access_denied</code> (kullanıcı izin ekranında reddetti). İstemci ya da adres doğrulanamıyorsa hata sayfası gösterilir.</p>
+
+<h2 id="izin">İzin ekranı</h2>
+<p>Uygulamada <b>Kullanıcı onayı iste</b> açıksa kullanıcı ilk girişte istenen kapsamları görür ve izin verir; izin kaydedilir, aynı kapsamlar için
+    tekrar sorulmaz. Uygulama yeni bir kapsam isterse ekran yeniden çıkar. Reddedilirse uygulamaya <code>error=access_denied</code> döner.
+    Verilen izinler konsolda uygulamanın <b>Onaylar</b> ekranından geri alınabilir.</p>
 
 <h2 id="servis">Sunucudan sunucuya (servis hesabı)</h2>
 <p>İnsan kullanıcı olmadan çalışan servisler için havuzun <b>Servis Hesapları</b> ekranından bir servis hesabı oluşturun; anahtar ve sır yalnızca bir kez
@@ -143,3 +165,5 @@ grant_type=client_credentials
 <p>Uygulamaya dönülmesi için istekte <code>post_logout_redirect_uri</code> ile birlikte <code>client_id</code> ya da <code>id_token_hint</code>
     bulunmalıdır. ASP.NET Core'da <code>SaveTokens</code> kapalıysa ikisi de gönderilmez; <code>OnRedirectToIdentityProviderForSignOut</code>
     olayında <code>context.ProtocolMessage.ClientId</code> değerini atayın.</p>
+<p><code>logout_all=true</code> kullanıcının <b>tüm</b> oturumlarını kapatır; yalnızca o kullanıcıya ait <code>id_token_hint</code> ile birlikte
+    gönderildiğinde uygulanır (başka bir site kullanıcıyı tüm cihazlardan çıkaramasın). İpucu yoksa yalnızca mevcut oturum kapanır.</p>

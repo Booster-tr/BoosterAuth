@@ -81,6 +81,7 @@ public sealed class VerifyPasswordlessLoginHandler(
     private static string MapFailure(string? reason) => reason switch
     {
         PasswordlessFailures.CodeExpired => IdpMessageKeys.LoginCodeExpired,
+        PasswordlessFailures.AttemptsExceeded => IdpMessageKeys.LoginCodeAttemptsExceeded,
         _ => IdpMessageKeys.LoginCodeInvalid
     };
 

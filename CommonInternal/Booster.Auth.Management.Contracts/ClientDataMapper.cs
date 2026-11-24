@@ -11,6 +11,7 @@ public static class ClientDataMapper
         {
             ClientId = source.ClientId.ToString(),
             ClientKey = source.ClientKey,
+            DisplayName = source.DisplayName ?? string.Empty,
             AllowedGrantTypes = (int)source.AllowedGrantTypes,
             IsolationId = source.IsolationId.ToString(),
             IsActive = source.IsActive,
@@ -83,6 +84,7 @@ public static class ClientDataMapper
         {
             ClientId = Guid.Parse(message.ClientId),
             ClientKey = message.ClientKey,
+            DisplayName = message.DisplayName,
             AllowedGrantTypes = (OAuthGrantType)message.AllowedGrantTypes,
             AllowedScopes = [.. message.AllowedScopes],
             IsolationId = Guid.Parse(message.IsolationId),

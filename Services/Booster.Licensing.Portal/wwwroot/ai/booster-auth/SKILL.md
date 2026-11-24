@@ -19,18 +19,21 @@ Replace `https://auth.company.com` with the customer's Booster Auth address; ask
 | Userinfo | `/idp/me` |
 | Logout | `/idp/logout` |
 | Flow | Authorization Code + PKCE. `code_challenge_method=S256` is REQUIRED; implicit flow is not supported. |
-| Scopes | `openid profile email offline_access` + scopes allowed for the application |
-| Audience | Pass `resource=<API address>`; it becomes the access token's `aud`. It must be in the application's allowed APIs. |
+| Scopes | `openid profile email offline_access` + custom scopes allowed for the application. A custom scope is in the token only if the user holds it; scopes granted to the user are added even if not requested. |
+| Audience | Pass `resource=<API address>`; it becomes the access token's `aud`. It must be in the application's allowed APIs (else `invalid_target`). Without `resource` the audience is the IdP itself (`<issuer>`, e.g. `https://auth.company.com/idp`), which `/idp/me` accepts. |
 
 - The user pool is selected by the `client_id`; there is no pool parameter.
 - Access token claims: `sub`, `aud`, `azp`, `scope` (space separated), `role` (one per role), `sid`, `principal_type`, `actor` (pool id).
 - ID token claims: `sub`, `name`, `email`, `email_verified`, `nonce`, `auth_time`.
 - In .NET set `MapInboundClaims = false` so `sub`, `email`, `role` keep their names.
-- Role / scope changes appear in the user's NEXT token, not in tokens already issued.
+- Role / scope changes appear in the user's NEXT token (a refresh reads the current roles / scopes), not in tokens already issued.
 
 ## Sign-in options
 
 - Sign-up screen: add `prompt=create` to the authorize request. Force re-authentication: `prompt=login`.
+- Silent SSO check: `prompt=none` (no screen; returns `error=login_required` or `consent_required` to the redirect URI). `max_age=<seconds>` forces sign-in if the last one is older; the ID token `auth_time` is the real sign-in time.
+- ID token only when `openid` is requested; `name` needs `profile`, `email` / `email_verified` need `email`.
+- Token endpoint errors are RFC 6749 JSON: `error`, `error_description`, plus Booster's `code`.
 - Hide sign-in methods on a platform: `hidden_providers=<comma separated>` on the authorize request.
   Values: a provider type (`apple`, `google`, `microsoft`, `github`, `facebook`, `linkedin`, `x`, `oidc`, `saml`), a provider key,
   `email_code`, `phone_code`. Example for Android: `hidden_providers=apple`. It only narrows the screen; it is not a security rule.
@@ -42,6 +45,7 @@ Replace `https://auth.company.com` with the customer's Booster Auth address; ask
 
 Redirect to `/idp/logout` with `post_logout_redirect_uri` AND either `client_id` or `id_token_hint`; otherwise the user stays on the
 Booster Auth "signed out" page. The URI must be registered as a post-logout URI on the application.
+`logout_all=true` ends all of the user's sessions only together with that user's `id_token_hint`; otherwise only the current session ends.
 ASP.NET Core does not send `client_id` and only sends `id_token_hint` when `SaveTokens = true`, so add:
 
 ```csharp
@@ -104,7 +108,7 @@ grant_type=client_credentials&client_id=management&service_account_key=<key>&ser
 ## Common mistakes
 
 - Missing PKCE or using `plain` -> request rejected. Always S256.
-- Token `aud` empty or wrong -> pass `resource` when requesting the token; it must be in the application's allowed APIs.
+- Token `aud` wrong -> pass `resource` when requesting the token; it must be in the application's allowed APIs. Without it `aud` is the IdP itself.
 - Using a user token for `/idp/apis/*` -> `403`. Use a service account token from a backend.
 - Using the application's own `client_id` for the service account token -> `invalid_service_account`. Use `client_id=management`.
 - `403` with a service account token -> its permission is not enough (e.g. a viewer granting roles) or it is suspended.

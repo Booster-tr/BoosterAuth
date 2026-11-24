@@ -37,8 +37,10 @@ public class DiscoveryEndpoint(IdpOptions options) : EndpointWithoutRequest<Disc
             SubjectTypesSupported = ["public"],
             IdTokenSigningAlgValuesSupported = ["RS256"],
             ScopesSupported = OidcScopes.All,
-            TokenEndpointAuthMethodsSupported = ["client_secret_post"],
-            ClaimsSupported = ["sub", "booster:panel:access", "offline_access", "azp", "scope", "aud", "jti", "iat", "exp", "nbf", "name", "email", "auth_time", "nonce"],
+            // Uygulamalar secret'siz (PKCE'li public client); servis hesaplari kendi alanlarini kullanir.
+            TokenEndpointAuthMethodsSupported = ["none"],
+            ClaimsSupported = ["sub", "aud", "azp", "iss", "iat", "exp", "nbf", "jti", "scope", "role", "sid", "actor",
+                "principal_type", "name", "email", "email_verified", "auth_time", "nonce"],
             CodeChallengeMethodsSupported = ["S256"]
         };
 

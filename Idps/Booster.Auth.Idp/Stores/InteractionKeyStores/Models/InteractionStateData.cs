@@ -31,6 +31,9 @@ public sealed class InteractionStateData
     public string? Resource { get; init; }
     public string? UiLocale { get; init; }
 
+    /// <summary>OIDC <c>max_age</c> (saniye): oturum bundan eskiyse yeniden giris istenir.</summary>
+    public int? MaxAge { get; init; }
+
     /// <summary>
     /// Doluysa bu bir OIDC istegi degil, "Hesabim" sayfasinin girisidir: giris tamamlaninca kod uretilmez,
     /// kullanici bu (IdP icindeki) adrese dondurulur. Yalnizca AccountController doldurur.
@@ -72,4 +75,7 @@ public sealed class AuthorizationCodeData
     public string? Nonce { get; init; }
     public string? CodeChallenge { get; init; }
     public string? CodeChallengeMethod { get; init; }
+
+    /// <summary>Kullanicinin gercekten giris yaptigi an (oturumun acilisi); ID token <c>auth_time</c>.</summary>
+    public DateTimeOffset AuthTime { get; init; } = DateTimeOffset.UtcNow;
 }

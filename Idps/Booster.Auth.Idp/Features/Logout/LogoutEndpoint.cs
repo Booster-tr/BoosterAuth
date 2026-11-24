@@ -41,8 +41,15 @@ public class LogoutEndpoint(
         var token = cookieManager.Get(HttpContext.Request);
         var session = string.IsNullOrEmpty(token) ? null : await sessionStore.ResolveAsync(token, ct);
 
+        // "Tum cihazlardan cik" yalnizca bu kullaniciya ait imzali id_token_hint ile ya da POST ile: aksi halde herhangi
+        // bir site gizli bir GET ile kullaniciyi tum cihazlardan cikarabiliyordu. Tek oturumun kapanmasi OIDC geregi
+        // ipucusuz da olur.
         if (session is not null)
-            await RevokeAsync(session, req.LogoutAll, ct);
+        {
+            var logoutAll = req.LogoutAll
+                && (HttpMethods.IsPost(HttpContext.Request.Method) || SubjectFromIdToken(req.IdTokenHint) == session.PrincipalId.ToString());
+            await RevokeAsync(session, logoutAll, ct);
+        }
 
         cookieManager.Clear(HttpContext.Response);
 
@@ -118,8 +125,12 @@ public class LogoutEndpoint(
         return builder.ToString();
     }
 
+    private string? ClientKeyFromIdToken(string? idTokenHint) => ReadIdTokenHint(idTokenHint)?.Audiences.FirstOrDefault();
+
+    private string? SubjectFromIdToken(string? idTokenHint) => ReadIdTokenHint(idTokenHint)?.Subject;
+
     /// <summary>Imza bizim anahtarimizla dogrulanir; suresi dolmus ipucu gecerlidir (OIDC RP-Initiated Logout).</summary>
-    private string? ClientKeyFromIdToken(string? idTokenHint)
+    private JwtSecurityToken? ReadIdTokenHint(string? idTokenHint)
     {
         if (string.IsNullOrEmpty(idTokenHint))
             return null;
@@ -134,7 +145,7 @@ public class LogoutEndpoint(
                 IssuerSigningKeys = keyService.GetValidationKeys()
             }, out var token);
 
-            return ((JwtSecurityToken)token).Audiences.FirstOrDefault();
+            return (JwtSecurityToken)token;
         }
         catch (Exception)
         {

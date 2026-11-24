@@ -1,3 +1,4 @@
+using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Features._base.Enums;
@@ -63,10 +64,25 @@ public sealed class ResetPasswordHandler(
         await passwordPolicyManager.EnsureNotReusedAsync(client.Password, reset.PrincipalId, cmd.Password, nameof(ResetPasswordCommand.Password), ct);
 
         var credential = await credentialRepository.GetAsync(
-            c => c.PrincipalId == reset.PrincipalId, cancellationToken: ct)
-            ?? throw new AuthorizeException(IdpMessageKeys.PrincipalNotFound);
+            c => c.PrincipalId == reset.PrincipalId, cancellationToken: ct);
 
         var newHash = passwordHasher.Hash(cmd.Password);
+
+        // Davet edilip henuz parola belirlememis kullanicinin parola kaydi yoktur. Kod hesabin adresine gittigi icin
+        // sahiplik kanitlanmistir: parola burada olusturulur (once "kullanici bulunamadi" hatasi veriliyordu).
+        var isNew = credential is null;
+        if (credential is null)
+        {
+            credential = new LocalCredential
+            {
+                Id = EntityId.New(),
+                PrincipalId = reset.PrincipalId,
+                PasswordHash = newHash,
+                PasswordChangedAt = DateTimeOffset.UtcNow,
+                CreatedTime = DateTimeOffset.UtcNow
+            };
+            await credentialRepository.AddAsync(credential, ct);
+        }
 
         credential.PasswordHash = newHash;
         credential.PasswordChangedAt = DateTimeOffset.UtcNow;
@@ -75,7 +91,8 @@ public sealed class ResetPasswordHandler(
         credential.FailedAttemptCount = 0;
         credential.LockedUntil = null;
 
-        credentialRepository.Update(credential);
+        if (!isNew)
+            credentialRepository.Update(credential);
 
         await passwordPolicyManager.RecordAsync(reset.PrincipalId, newHash, client.Password, ct);
 
@@ -138,7 +155,7 @@ public sealed class ResetPasswordHandler(
         await resetStore.StoreAsync(
             PasswordResetKeys.ForInteraction(interactionKey),
             reset with { AttemptCount = reset.AttemptCount + 1 },
-            ResetCodeTtl,
+            reset.ExpiresAt - DateTimeOffset.UtcNow + TimeSpan.FromMinutes(10),
             ct);
     }
 

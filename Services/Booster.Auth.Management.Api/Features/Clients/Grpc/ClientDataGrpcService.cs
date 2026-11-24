@@ -185,6 +185,7 @@ public sealed class ClientDataGrpcService(
         {
             ClientId = client.Id,
             ClientKey = client.ClientKey,
+            DisplayName = client.DisplayName,
             AllowedGrantTypes = client.AllowedGrantTypes,
             AllowedScopes = [.. client.AllowedScopes.Select(s => s.Scope)],
 

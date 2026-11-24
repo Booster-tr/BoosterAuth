@@ -1,3 +1,7 @@
+using Booster.Auth.Idp.Options;
+using Booster.Auth.Idp.Features.Token.Handlers._base;
+using Booster.Auth.Idp.Constants;
+using Booster.Auth.Database.Models.Enums;
 ﻿using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Idp.Providers.Abstractions.Stores;
 using Booster.Auth.Idp.Stores.PrincipalStores;
@@ -30,6 +34,7 @@ public sealed class AuthorizationCodeGrantHandler(
     IAsyncRepository<PrincipalScope, IdpDbContext> scopeRepository,
     IAsyncRepository<RefreshToken, IdpDbContext> refreshTokenRepository,
     ISimpleHasher simpleHasher,
+    IdpOptions idpOptions,
     IRequestContextAccessor requestContextAccessor) : IGrantTypeHandler
 {
     public OAuthGrantType GrantType => OAuthGrantType.AuthorizationCode;
@@ -53,6 +58,9 @@ public sealed class AuthorizationCodeGrantHandler(
         var principal = await principalStore.GetByIdAsync(authCode.PrincipalId, ct)
             ?? throw new BusinessException(IdpMessageKeys.PrincipalNotFound);
 
+        if (principal.Status != PrincipalStatus.Active)
+            throw new BusinessException(IdpMessageKeys.InvalidGrant);
+
         var roles = await roleRepository.Query()
             .Where(r => r.PrincipalId == principal.Id)
             .Select(r => r.RoleName)
@@ -63,15 +71,18 @@ public sealed class AuthorizationCodeGrantHandler(
             .Select(s => s.Scope)
             .ToListAsync(ct);
 
-        var grantedScope = MergeScopes(authCode.Scope, principalScopes);
+        var grantedScope = TokenGrantRules.BuildScope(authCode.Scope, principalScopes);
 
         var finalScope = ApplyRequestedScope(grantedScope, request.Scope);
 
         var accessTtl = client.Session.AccessTokenTtlSeconds;
         var refreshTtl = client.Session.RefreshTokenTtlSeconds;
 
+        var audience = TokenGrantRules.ResolveAudience(request.Resource, authCode.Audience, client, idpOptions.Issuer);
+        var scopes = finalScope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
         var (accessToken, expiresIn) = tokenService.CreateAccessToken(
-            audience: request.Resource ?? string.Empty,
+            audience: audience,
             subject: principal.Id,
             azp: client.ClientId.ToString(),
             scope: finalScope,
@@ -81,15 +92,19 @@ public sealed class AuthorizationCodeGrantHandler(
             actor: authCode.IsolationId.ToString(),
             sessionId: authCode.SessionId);
 
-        var idToken = tokenService.CreateIdToken(
-            audience: client.ClientKey,
-            subject: principal.Id,
-            nonce: authCode.Nonce,
-            name: principal.DisplayName,
-            email: principal.Email,
-            emailVerified: principal.EmailVerified,
-            authTime: DateTime.UtcNow,
-            ttlSeconds: accessTtl);
+        // ID token yalnizca openid istendiyse; ad yalnizca profile, e-posta yalnizca email kapsamiyla (OIDC Core 5.4).
+        // auth_time kullanicinin GERCEKTEN giris yaptigi an (oturumun acilisi), token'in uretildigi an degil.
+        var idToken = scopes.Contains(OidcScopes.OpenId)
+            ? tokenService.CreateIdToken(
+                audience: client.ClientKey,
+                subject: principal.Id,
+                nonce: authCode.Nonce,
+                name: scopes.Contains(OidcScopes.Profile) ? principal.DisplayName : null,
+                email: scopes.Contains(OidcScopes.Email) ? principal.Email : null,
+                emailVerified: principal.EmailVerified,
+                authTime: authCode.AuthTime.UtcDateTime,
+                ttlSeconds: accessTtl)
+            : null;
 
         var refreshString = await IssueRefreshTokenAsync(authCode, client, finalScope, roles, refreshTtl, ct);
 
@@ -161,12 +176,6 @@ public sealed class AuthorizationCodeGrantHandler(
         {
             throw new BusinessException(IdpMessageKeys.PkceValidationFailed);
         }
-    }
-
-    private static string MergeScopes(string codeScope, IReadOnlyList<string> principalScopes)
-    {
-        var fromCode = codeScope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        return string.Join(' ', fromCode.Union(principalScopes, StringComparer.Ordinal));
     }
 
     private static string GenerateToken()

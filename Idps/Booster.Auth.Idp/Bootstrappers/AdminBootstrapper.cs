@@ -16,6 +16,7 @@ public sealed class AdminBootstrapper(
     IAsyncRepository<LocalCredential, IdpDbContext> credentialRepository,
     IAsyncRepository<PasswordHistory, IdpDbContext> passwordHistoryRepository,
     IAsyncRepository<PrincipalRole, IdpDbContext> principalRoleRepository,
+    IAsyncRepository<PrincipalScope, IdpDbContext> principalScopeRepository,
     IPasswordHasher passwordHasher,
     IRequestContextAccessor requestContextAccessor,
     BootstrapOptions bootstrapOptions)
@@ -27,10 +28,13 @@ public sealed class AdminBootstrapper(
             withoutGlobalFilter: true,
             cancellationToken: ct);
 
-        if (exists)
-            return;
-
         using var scope = requestContextAccessor.BeginSystemContext(AuthConstants.ManagementPoolId);
+
+        if (exists)
+        {
+            await EnsurePanelScopeAsync(ct);
+            return;
+        }
 
         var now = DateTimeOffset.UtcNow;
 
@@ -79,6 +83,31 @@ public sealed class AdminBootstrapper(
             CreatedTime = now
         }, ct);
 
+        await principalScopeRepository.AddAsync(NewPanelScope(now), ct);
+
         await principalRepository.SaveChangesAsync(ct);
     }
+
+    /// <summary>
+    /// Token kapsamlari kullanicinin TASIDIGI kapsamlardan uretilir (istekte yazmak yetmez). Eski kurulumlarda admin
+    /// <c>booster:panel</c>'i kapsam olarak tasimiyordu, istekten aliyordu; eklenmezse panele giremez.
+    /// </summary>
+    private async Task EnsurePanelScopeAsync(CancellationToken ct)
+    {
+        if (await principalScopeRepository.AnyAsync(
+                s => s.PrincipalId == AuthConstants.AdminUserId && s.Scope == AuthConstants.ManagementPanelScope,
+                cancellationToken: ct))
+            return;
+
+        await principalScopeRepository.AddAsync(NewPanelScope(DateTimeOffset.UtcNow), ct);
+        await principalScopeRepository.SaveChangesAsync(ct);
+    }
+
+    private static PrincipalScope NewPanelScope(DateTimeOffset now) => new()
+    {
+        Id = EntityId.New(),
+        PrincipalId = AuthConstants.AdminUserId,
+        Scope = AuthConstants.ManagementPanelScope,
+        CreatedTime = now
+    };
 }

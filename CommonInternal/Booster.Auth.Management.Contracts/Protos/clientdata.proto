@@ -58,6 +58,9 @@ message ClientDataMessage {
   repeated FederationProviderMessage federation_providers = 17;
 
   MfaPolicyMessage mfa = 18;
+
+  // Uygulamanin gorunen adi (izin ekrani). Bos ise ekran client_key gosterir.
+  string display_name = 19;
 }
 
 message MfaPolicyMessage {

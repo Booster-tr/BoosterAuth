@@ -77,6 +77,16 @@ public sealed class IdpExceptionHandler(
             
             case ValidationException vEx:
                 {
+                    // /authorize tarayicida acilir: ham JSON yerine hata sayfasi. redirect_uri henuz dogrulanmadigi icin
+                    // uygulamaya yonlendirilmez (acik yonlendirme olmasin).
+                    if (httpContext.Request.Path.Equals("/authorize", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var first = vEx.Errors.FirstOrDefault()?.ErrorMessage ?? ValidationErrors.ValidationError;
+                        await LogAsync(error, LogLevel.Warning, first, StatusCodes.Status302Found, ct);
+                        httpContext.Response.Redirect(uiOptions.GetErrorUrl("invalid_request", await translationManager.GetAsync(first, lang, ct)));
+                        return true;
+                    }
+
                     var errors = await Task.WhenAll(vEx.Errors.Select(async e => new
                     {
                         property = e.PropertyName,
@@ -166,8 +176,24 @@ public sealed class IdpExceptionHandler(
         if (e.Exception is BusinessException codeEx)
             problem.Extensions["code"] = codeEx.Message;
 
+        // Token ucu: standart OAuth 2.0 hata govdesi (RFC 6749 5.2). Hazir OIDC kutuphaneleri yalnizca "error" alanini
+        // okur; ProblemDetails alanlari ek bilgi olarak kalir.
+        var contentType = "application/problem+json";
+        if (ctx.Request.Path.Equals("/token", StringComparison.OrdinalIgnoreCase))
+        {
+            var oauthError = status == StatusCodes.Status500InternalServerError ? "server_error" : OAuthErrors.ForToken(e.Exception);
+            problem.Extensions["error"] = oauthError;
+            problem.Extensions["error_description"] = detail;
+            contentType = "application/json";
+            if (oauthError == OAuthErrors.InvalidClient)
+            {
+                status = StatusCodes.Status401Unauthorized;
+                problem.Status = status;
+            }
+        }
+
         ctx.Response.StatusCode = status;
-        ctx.Response.ContentType = "application/problem+json";
+        ctx.Response.ContentType = contentType;
         await ctx.Response.WriteAsJsonAsync(problem, ct);
     }
 

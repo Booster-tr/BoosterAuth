@@ -55,6 +55,7 @@ public class IdpMessageKeys
 
     public const string LoginCodeInvalid = "idp.login_code_invalid";
     public const string LoginCodeExpired = "idp.login_code_expired";
+    public const string LoginCodeAttemptsExceeded = "idp.login_code_attempts_exceeded";
 
     // --- Giriş doğrulaması (e-posta/telefon doğrulama, MFA) ------------------
     public const string LoginChallengeExpired = "idp.login_challenge_expired";
@@ -96,7 +97,8 @@ public class IdpMessageKeys
     public const string InvitationInvalid = "idp.invitation_invalid";
     public const string InvitationNotPending = "idp.invitation_not_pending";
     public const string ImportCsvInvalid = "idp.import_csv_invalid";
-    public const string ImportTooManyRows = "idp.import_too_many_rows";
+    public const string ImportRowLimitExceeded = "idp.import_row_limit_exceeded";
+    public const string ImportFileTooLarge = "idp.import_file_too_large";
     public const string DisplayNameRequired = "idp.display_name_required";
     public const string EmailInvalid = "idp.email_invalid";
 
@@ -113,6 +115,7 @@ public class IdpMessageKeys
     public const string LegalDocumentNotFound = "idp.legal_document_not_found";
     public const string UiTextKeyUnknown = "idp.ui_text_key_unknown";
     public const string UiTextInvalid = "idp.ui_text_invalid";
+    public const string LanguageNotSupported = "idp.language_not_supported";
     public const string ManagementPoolUserDeleteNotAllowed = "idp.management_pool_user_delete_not_allowed";
 
     // --- Havuz API'leri (uygulama backend'i, servis hesabi token'i) ------------

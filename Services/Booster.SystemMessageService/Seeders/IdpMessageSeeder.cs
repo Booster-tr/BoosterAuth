@@ -74,6 +74,7 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         // --- Parolasız giriş ---
         new(IdpMessageKeys.LoginCodeInvalid, "Giriş kodu", "Girdiğiniz kod hatalı. Lütfen kontrol edip tekrar deneyin.", "Sign-in code", "The code you entered is incorrect. Please check it and try again."),
         new(IdpMessageKeys.LoginCodeExpired, "Giriş kodu", "Kodun süresi doldu. Lütfen yeni bir kod isteyin.", "Sign-in code", "The code has expired. Please request a new one."),
+        new(IdpMessageKeys.LoginCodeAttemptsExceeded, "Doğrulama kodu", "Çok fazla hatalı deneme yapıldı ve kod iptal edildi. Yeni bir kod isteyin.", "Verification code", "Too many wrong attempts; the code was cancelled. Request a new code."),
 
         // --- Giriş doğrulaması (e-posta/telefon doğrulama, MFA) ---
         new(IdpMessageKeys.LoginChallengeExpired, "Doğrulama", "Doğrulama süresi doldu. Lütfen yeniden giriş yapın.", "Verification", "The verification has expired. Please sign in again."),
@@ -114,6 +115,7 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.LegalDocumentNotFound, "Yasal metin", "Yasal metin bulunamadı.", "Legal document", "Legal document not found."),
         new(IdpMessageKeys.UiTextKeyUnknown, "Ekran yazısı", "Bu anahtarda bir ekran yazısı yok.", "Screen text", "There is no screen text with this key."),
         new(IdpMessageKeys.UiTextInvalid, "Ekran yazısı", "Metin < ya da > içeremez ve varsayılandaki {0} gibi yer tutucuları aynen korumalıdır.", "Screen text", "The text cannot contain < or > and must keep placeholders such as {0} from the default."),
+        new(IdpMessageKeys.LanguageNotSupported, "Dil", "Bu dil desteklenmiyor. Desteklenen diller: tr-tr, en-us.", "Language", "This language is not supported. Supported languages: tr-tr, en-us."),
         new(IdpMessageKeys.ManagementPoolUserDeleteNotAllowed, "Kullanıcı", "Panel yöneticileri bu ekrandan silinemez.", "User", "Panel administrators cannot be deleted from this screen."),
 
         // --- Havuz API'leri ---
@@ -124,7 +126,8 @@ public class IdpMessageSeeder(IServiceScopeFactory scopeFactory, ILogger<IdpMess
         new(IdpMessageKeys.InvitationInvalid, "Davet", "Bu davet bağlantısı geçersiz ya da süresi dolmuş. Yöneticinizden yeni bir davet isteyin.", "Invitation", "This invitation link is invalid or has expired. Ask your administrator for a new invitation."),
         new(IdpMessageKeys.InvitationNotPending, "Davet", "Bu kullanıcı parolasını zaten belirlemiş; davet gönderilemez.", "Invitation", "This user has already set a password; an invitation cannot be sent."),
         new(IdpMessageKeys.ImportCsvInvalid, "İçe aktarma", "CSV dosyası okunamadı. İlk satır başlık olmalı ve bir email sütunu içermeli (email,ad,soyad).", "Import", "The CSV file could not be read. The first row must be a header containing an email column (email,first_name,last_name)."),
-        new(IdpMessageKeys.ImportTooManyRows, "İçe aktarma", "Bir dosyada en fazla {Max} kullanıcı içe aktarılabilir.", "Import", "At most {Max} users can be imported in one file."),
+        new(IdpMessageKeys.ImportRowLimitExceeded, "İçe aktarma", "Bir dosyada en fazla 1000 kullanıcı içe aktarılabilir. Dosyayı bölüp tekrar deneyin.", "Import", "At most 1000 users can be imported in one file. Split the file and try again."),
+        new(IdpMessageKeys.ImportFileTooLarge, "İçe aktarma", "Dosya çok büyük (en fazla 1 MB).", "Import", "The file is too large (at most 1 MB)."),
         new(IdpMessageKeys.EmailInvalid, "E-posta", "Geçerli bir e-posta adresi girin.", "Email", "Enter a valid email address."),
         new(IdpMessageKeys.DisplayNameRequired, "Kullanıcı", "Ad soyad zorunludur.", "User", "Display name is required."),
 

@@ -129,9 +129,12 @@ public static class ServiceExtensions
             // Lisans kisitliyken panel yazma isteklerini reddeder; son kullanici akislarina dokunmaz (LicenseGuard).
             c.Endpoints.Configurator = ep => ep.PreProcessor<LicenseGuard>(Order.Before);
 
-            if (!wrapResponses) return;
-
+            // Dogrulama hatalari her serviste istisna isleyicisinden gecer: mesaj anahtari istegin diline cevrilir ve
+            // ayni bicimde doner. Once yalnizca sarmalanan servislerde boyleydi; IdP ham anahtari FastEndpoints
+            // biciminde donduruyor, panel de kullaniciya "idp.email_invalid" gosteriyordu.
             c.Errors.ResponseBuilder = (failures, _, _) => throw new ValidationException(failures);
+
+            if (!wrapResponses) return;
 
             c.Serializer.ResponseSerializer = (rsp, dto, contentType, jsonContext, ct) =>
             {

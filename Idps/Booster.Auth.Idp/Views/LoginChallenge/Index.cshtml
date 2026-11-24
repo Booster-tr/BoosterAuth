@@ -23,13 +23,13 @@
         <h1 class="auth-card__title">@T[$"{key}.Heading"]</h1>
         @* Hedef MASKELİDİR: parolayı bilen biri bu ekrandan kullanıcının tam
            e-posta/telefon bilgisini öğrenmemeli. *@
-        <p class="auth-card__subtitle">@T[$"{key}.Subtitle", Model.MaskedTarget]</p>
+        <p class="auth-card__subtitle">@T[Model.Step == LoginStep.Mfa && Model.Channel == ChallengeChannel.Sms ? "Challenge.Mfa.SubtitleSms" : $"{key}.Subtitle", Model.MaskedTarget]</p>
     </header>
 
     @if (Model.Resent)
     {
         @* role=status: yeniden gönderim sonrası odak değişmez ama ekran okuyucu duyurur. *@
-        <p class="auth-hint" role="status">@T["Challenge.Resent", Model.MaskedTarget]</p>
+        <p class="auth-hint" role="status">@(Model.ResendWait ? T["Challenge.ResendWait"] : T[Model.Channel == ChallengeChannel.Sms ? "Challenge.ResentSms" : "Challenge.Resent", Model.MaskedTarget])</p>
     }
 
     <partial name="_ValidationSummary" />

@@ -7,7 +7,7 @@ Key facts for integrating an application:
 
 - Issuer: `https://<booster-auth-host>/idp` (same for every pool; the pool is selected by `client_id`).
 - Flow: Authorization Code + PKCE with `code_challenge_method=S256` (required). No implicit flow.
-- Pass `resource=<api address>` to set the access token audience. Access token claims: `sub`, `aud`, `scope`, `role`, `actor` (pool id).
+- Pass `resource=<api address>` (one of the application's allowed APIs) to set the access token audience; without it the audience is the IdP itself (`/idp`). Token errors follow RFC 6749 (`error`, `error_description`). Access token claims: `sub`, `aud`, `scope`, `role`, `actor` (pool id).
 - `hidden_providers=apple,phone_code` on `/idp/authorize` hides sign-in methods (e.g. Apple on Android).
 - Logout: `/idp/logout` with `post_logout_redirect_uri` and `client_id` or `id_token_hint`.
 - Backends grant roles / scopes and write / check authorization relations via `/idp/apis/*` with the token of a service account created

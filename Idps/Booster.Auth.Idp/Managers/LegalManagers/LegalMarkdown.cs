@@ -25,7 +25,11 @@ public static class LegalMarkdown
     public sealed record Rendered(string Html, IReadOnlyList<Heading> Headings);
 
     /// <param name="placeholders">{{anahtar}} -&gt; deger; degerler HTML-encode edilerek yerlestirilir.</param>
-    public static Rendered Render(string markdown, IReadOnlyDictionary<string, string> placeholders)
+    /// <param name="pathPrefix">
+    /// IdP'nin disaridan gorunen yol oneki (<c>/idp</c>). Metindeki kok-goreli baglantilar (<c>/kvkk</c>) bununla
+    /// tamamlanir; yoksa gateway kokune gidip 404 veriyordu. Metin yazari oneki bilmek zorunda kalmaz.
+    /// </param>
+    public static Rendered Render(string markdown, IReadOnlyDictionary<string, string> placeholders, string pathPrefix = "")
     {
         var document = Markdown.Parse(markdown ?? string.Empty, Pipeline);
 
@@ -33,6 +37,8 @@ public static class LegalMarkdown
         {
             if (!IsSafeUrl(link.Url))
                 link.Url = "#";
+            else
+                link.Url = WithPrefix(link.Url!, pathPrefix);
         }
         foreach (var autolink in document.Descendants<AutolinkInline>())
         {
@@ -68,6 +74,12 @@ public static class LegalMarkdown
             text = text.Replace("{{" + key + "}}", value, StringComparison.Ordinal);
         return text;
     }
+
+    private static string WithPrefix(string url, string prefix)
+        => prefix.Length > 0 && url.StartsWith('/') && !url.StartsWith("//")
+           && !url.StartsWith(prefix + "/", StringComparison.OrdinalIgnoreCase) && url != prefix
+            ? prefix + url
+            : url;
 
     private static bool IsSafeUrl(string? url)
     {

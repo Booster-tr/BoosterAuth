@@ -7,6 +7,9 @@ public sealed record ClientData
     public required Guid ClientId { get; init; }
 
     public required string ClientKey { get; init; }
+
+    /// <summary>Gorunen ad (izin ekrani). Eski Management surumu gondermezse bos.</summary>
+    public string DisplayName { get; init; } = string.Empty;
     public required OAuthGrantType AllowedGrantTypes { get; init; }
     public required IReadOnlyList<string> AllowedScopes { get; init; }
 

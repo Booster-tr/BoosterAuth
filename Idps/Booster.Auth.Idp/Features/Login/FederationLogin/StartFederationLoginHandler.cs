@@ -111,6 +111,6 @@ public sealed class StartFederationLoginValidator : Validator<StartFederationLog
     public StartFederationLoginValidator()
     {
         RuleFor(x => x.InteractionKey).NotEmpty().WithMessage(ValidationErrors.NotEmptyError);
-        RuleFor(x => x.ProviderKey).NotEmpty().MaximumLength(100).WithMessage(ValidationErrors.NotEmptyError);
+        RuleFor(x => x.ProviderKey).NotEmpty().WithMessage(ValidationErrors.NotEmptyError).MaximumLength(100).WithMessage(ValidationErrors.MaxLengthError);
     }
 }

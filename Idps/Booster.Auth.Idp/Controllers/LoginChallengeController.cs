@@ -30,7 +30,7 @@ public class LoginChallengeController(
     [HttpGet("/ui/login/verify")]
     public async Task<IActionResult> Index(
         [FromQuery(Name = "interaction_key")] string interactionKey,
-        [FromQuery(Name = "resent")] bool resent,
+        [FromQuery(Name = "resent")] string? resent,
         CancellationToken ct)
     {
         if (string.IsNullOrEmpty(interactionKey))
@@ -47,7 +47,7 @@ public class LoginChallengeController(
         if (challenge is null)
             return Redirect(uiOptions.GetLoginUrl(interactionKey));
 
-        return View(LoginChallengeViewModel.From(interactionKey, challenge, resent));
+        return View(LoginChallengeViewModel.From(interactionKey, challenge, resent == "true", resent == "wait"));
     }
 
     [HttpPost("/ui/login/verify")]
@@ -89,7 +89,12 @@ public class LoginChallengeController(
     [HttpPost("/ui/login/verify/resend")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Resend([FromForm] string interactionKey, CancellationToken ct)
-        => await RunAsync(interactionKey, (client, token) => challengeManager.ResendAsync(interactionKey, client, token), resent: true, ct);
+    {
+        var sent = true;
+        var result = await RunAsync(interactionKey, async (client, token) => sent = await challengeManager.ResendAsync(interactionKey, client, token), resent: true, ct);
+        // Bekleme suresi dolmadan istenirse kod gitmez; ekran "gonderildi" yerine "bekleyin" der.
+        return !sent && result is RedirectResult r ? Redirect(r.Url.Replace("resent=true", "resent=wait")) : result;
+    }
 
     [HttpPost("/ui/login/verify/method")]
     [ValidateAntiForgeryToken]

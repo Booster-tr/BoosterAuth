@@ -81,33 +81,16 @@ public sealed class ConsentViewModel
     /// </summary>
     private static ConsentScopeViewModel Describe(string scope) => scope switch
     {
-        "openid" => new(scope, ConsentScopeIcon.Identity, "Kimliğiniz",
-            "Sizi tanımlayan benzersiz kullanıcı kimliğinizi paylaşır. Oturum açmak için gereklidir.", true, true),
-
-        "profile" => new(scope, ConsentScopeIcon.User, "Profil bilgileriniz",
-            "Ad soyadınız, kullanıcı adınız ve profil fotoğrafınız gibi temel bilgilerinizi görür.", false, true),
-
-        "email" => new(scope, ConsentScopeIcon.Mail, "E-posta adresiniz",
-            "E-posta adresinizi ve doğrulanmış olup olmadığını görür. Sizin adınıza e-posta göndermez.", false, true),
-
-        "phone" => new(scope, ConsentScopeIcon.Phone, "Telefon numaranız",
-            "Telefon numaranızı ve doğrulanmış olup olmadığını görür.", false, true),
-
-        "address" => new(scope, ConsentScopeIcon.Address, "Adres bilgileriniz",
-            "Hesabınıza kayıtlı adres bilgilerinizi görür.", false, true),
-
-        "offline_access" => new(scope, ConsentScopeIcon.Refresh, "Kesintisiz erişim",
-            "Siz kullanmadığınız zamanlarda da erişimini sürdürür; her seferinde yeniden giriş yapmanız gerekmez.", false, true),
-
-        "api" => new(scope, ConsentScopeIcon.Api, "Uygulama servisleri",
-            "Sizin adınıza Booster servislerine istek gönderir.", false, true),
-
-        "std_user" => new(scope, ConsentScopeIcon.Badge, "Standart kullanıcı yetkileri",
-            "Hesabınızın standart kullanıcı yetkileriyle işlem yapar. Yönetici işlemlerini kapsamaz.", false, true),
-
-        _ => new(scope, ConsentScopeIcon.Key, Humanize(scope),
-            "Bu uygulama ek bir izin istiyor. Ne anlama geldiğinden emin değilseniz izin vermeyin.", false, false)
+        // Baslik / aciklama kaynak anahtaridir (Consent.Scope.*); gorunum dile gore cevirir.
+        "openid" => Known(scope, ConsentScopeIcon.Identity, required: true),
+        "profile" => Known(scope, ConsentScopeIcon.User),
+        "email" => Known(scope, ConsentScopeIcon.Mail),
+        "offline_access" => Known(scope, ConsentScopeIcon.Refresh),
+        _ => new(scope, ConsentScopeIcon.Key, Humanize(scope), "Consent.Scope.Unknown.Desc", false, false)
     };
+
+    private static ConsentScopeViewModel Known(string scope, string icon, bool required = false)
+        => new(scope, icon, $"Consent.Scope.{scope}.Title", $"Consent.Scope.{scope}.Desc", required, true);
 
     /// <summary>"reports:read" -&gt; "Reports Read". Türkçe kültürle büyük harfe çevrilir.</summary>
     private static string Humanize(string scope)
@@ -156,8 +139,8 @@ public sealed class ConsentViewModel
 
 /// <param name="Name">Ham scope adı (protokol değeri, İngilizce).</param>
 /// <param name="Icon">Listede gösterilecek ikon anahtarı.</param>
-/// <param name="Title">Kullanıcıya gösterilen başlık.</param>
-/// <param name="Description">Ne yapılacağını açıklayan tek cümle.</param>
+/// <param name="Title">Tanınan kapsamda kaynak anahtarı (Consent.Scope.*.Title), tanınmayanda okunur ad.</param>
+/// <param name="Description">Kaynak anahtarı (Consent.Scope.*.Desc).</param>
 /// <param name="Required">Oturum açmak için zorunlu mu?</param>
 /// <param name="IsKnown">
 /// Tanınan bir scope mu? Tanınmayanlarda ham protokol adı da gösterilir —
