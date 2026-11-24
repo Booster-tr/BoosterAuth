@@ -130,6 +130,13 @@
             <div><dt>Sessions and consent<small>revoke · invite</small></dt>
                 <dd>A consent screen can be shown per application; sessions and granted consents can be revoked from the console. Invitation links
                     are single-use and valid for one day.</dd></div>
+            <div><dt>Privacy-minded audit trail<small>who · when · from where</small></dt>
+                <dd>Sign-ins, failed attempts, account changes, every change made from the console and reads of screens with personal data go to a separate
+                    audit stream. Entries hold the user ID, IP and outcome; e-mail addresses, phone numbers, names, passwords, codes and tokens are never
+                    written. E-mails, phone numbers and tokens that might slip into operational logs are masked before they leave the service.</dd></div>
+            <div><dt>Logs and monitoring on your network<small>OpenTelemetry · OpenObserve</small></dt>
+                <dd>Logs, traces and metrics go to the bundled OpenObserve; its UI is reachable only from your local network and nothing is sent to us.
+                    Sent e-mail and SMS records are stored encrypted and deleted after 30 days. You can point everything at your own OTLP system instead.</dd></div>
             <div><dt>HTTPS out of the box<small>local CA</small></dt>
                 <dd>A local certificate authority and HTTPS certificate are generated on first start. In production you bring your own certificate or
                     reverse proxy.</dd></div>
@@ -319,6 +326,11 @@
                 console becomes read-only after a @LicenseIssuer.Defaults.PaidGraceDays-day grace period, and renewing restores full access.</p></details>
             <details><summary>What happens to the license if we move servers?</summary><p>You transfer the license to your new installation yourself in
                 the license portal, up to 3 times a year.</p></details>
+            <details><summary>How are logs kept with personal data protection in mind?</summary><p>Data stays on your server; logs and audit records go to the
+                bundled OpenObserve and nothing is sent to us. Audit records show who accessed personal data, when and from where; they hold the user ID and IP,
+                never e-mail addresses, phone numbers, names, passwords, codes or tokens. Those values are masked in operational logs, and sent e-mail / SMS
+                records are stored encrypted and deleted after 30 days. You set retention periods according to your own retention policy. As the data
+                controller, privacy notices and policies remain yours. See the <a class="text-link" href="/en/docs/operations#logs">operations guide</a>.</p></details>
         </div>
     </div>
 </section>

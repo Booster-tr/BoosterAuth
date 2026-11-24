@@ -13,6 +13,9 @@
 </table>
 
 <h2 id="logs">Logs, monitoring and audit records</h2>
+<p><b>Privacy approach:</b> logging follows the data minimization principle (KVKK, GDPR). Who accessed personal data, when and from where can be traced in
+    a separate audit stream; records hold no more personal data than the task needs, and everything stays on your server and is never sent to us. You are the
+    data controller: you decide retention periods, access rights and privacy notices according to your organization's policy.</p>
 <p>Services send their logs, traces and metrics to <b>OpenObserve</b> with OpenTelemetry. Open the UI in a browser on the local network:
     <code>http://&lt;server&gt;:5080</code> (<code>OPENOBSERVE_PORT</code>). Sign in with <code>OPENOBSERVE_ADMIN_EMAIL</code> and
     <code>OPENOBSERVE_ADMIN_PASSWORD</code> from <code>.env</code>; the setup script generates the password and shows it at the end. Services write with the same e-mail / password; change the password only in <code>.env</code> and run <code>docker compose up -d</code>. Do not expose this port to the internet.</p>

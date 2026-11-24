@@ -13,6 +13,9 @@
 </table>
 
 <h2 id="loglar">Loglar, izleme ve denetim kayıtları</h2>
+<p><b>KVKK yaklaşımı:</b> log altyapısı veri minimizasyonu ilkesine göre kurulmuştur. Kişisel veriye kimin, ne zaman, nereden eriştiği ayrı bir denetim
+    akışında izlenebilir; kayıtlara işin gerektirdiğinden fazla kişisel veri girmez ve bütün kayıtlar sizin sunucunuzda kalır, bize gönderilmez. Veri sorumlusu
+    sizsiniz: saklama sürelerini, erişim yetkilerini ve aydınlatma metinlerini kurumunuzun politikasına göre belirlersiniz.</p>
 <p>Servisler log, trace ve metriklerini OpenTelemetry ile <b>OpenObserve</b>'e gönderir. Arayüz yerel ağdan tarayıcıyla açılır:
     <code>http://&lt;sunucu&gt;:5080</code> (<code>OPENOBSERVE_PORT</code>). Giriş bilgileri <code>.env</code>'deki
     <code>OPENOBSERVE_ADMIN_EMAIL</code> ve <code>OPENOBSERVE_ADMIN_PASSWORD</code>'dur; kurulum betiği parolayı üretir ve kurulum sonunda gösterir. Servisler de aynı e-posta / parolayla yazar; parolayı yalnızca <code>.env</code>'de değiştirip <code>docker compose up -d</code> çalıştırın. Port internete açılmamalıdır.</p>

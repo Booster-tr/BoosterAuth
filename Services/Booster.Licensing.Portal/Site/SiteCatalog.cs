@@ -100,8 +100,8 @@ public static class SiteCatalog
             "Çevrimdışı lisans: kurulum kimliği, deneme, satın alma, lisansı konsolda etkinleştirme, lisans durumları, yenileme ve aktarım.",
             "Offline licensing: installation ID, trial, purchasing, activating a license in the console, license states, renewal and transfer.", "operate"),
         new("docs/operations", "Docs/Operations", "İşletim ve sorun giderme", "Operations and troubleshooting",
-            "Booster Auth'u işletmek: günlük komutlar, güncelleme, yedekleme, e-posta ayarları ve sık karşılaşılan sorunların çözümü.",
-            "Running Booster Auth: everyday commands, updates, backups, e-mail settings and fixes for common problems.", "operate"),
+            "Booster Auth'u işletmek: günlük komutlar, güncelleme, yedekleme, KVKK'ya uygun log ve denetim kayıtları, e-posta ayarları ve sık karşılaşılan sorunların çözümü.",
+            "Running Booster Auth: everyday commands, updates, backups, privacy-minded logs and audit records, e-mail settings and fixes for common problems.", "operate"),
     ];
 
     public static readonly (string Key, string Tr, string En)[] DocGroups =
