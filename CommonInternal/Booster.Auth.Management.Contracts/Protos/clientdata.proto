@@ -61,6 +61,9 @@ message ClientDataMessage {
 
   // Uygulamanin gorunen adi (izin ekrani). Bos ise ekran client_key gosterir.
   string display_name = 19;
+
+  // Havuzdaki rollerin kapsamlari: token'a kullanicinin rollerinin kapsamlari da eklenir (IdP RoleScope tutmaz).
+  repeated RoleScopesMessage role_scopes = 20;
 }
 
 message MfaPolicyMessage {
@@ -98,6 +101,11 @@ message SessionPolicyMessage {
   int32 access_token_ttl_seconds = 1;
   int32 refresh_token_ttl_seconds = 2;
   int32 idle_timeout_seconds = 3;
+}
+
+message RoleScopesMessage {
+  string role_id = 1;                       // Guid
+  repeated string scopes = 2;
 }
 
 message DefaultRoleMessage {

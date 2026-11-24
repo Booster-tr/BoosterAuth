@@ -163,7 +163,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **IdP guvenlik basliklari:** CSP (`'self'`, Swagger haric; `form-action` YOK cunku giris formu redirect_uri'ye 302 ile gider), nosniff, Referrer-Policy; HSTS `X-Forwarded-Proto` sayesinde calisir. Gorunumlerde satir ici `style=` / `<script>` YAZMA.
 
 ## IdP akis kurallari (2026-11 E2E turu)
-- **Token kapsami** (`TokenGrantRules.BuildScope`): istenen standart OIDC kapsamlari + kullanicinin TASIDIGI kapsamlar. Ozel kapsami istemek yetmez. Yonetim havuzunda `booster:panel` varsayilan kapsamdir; admin icin `AdminBootstrapper` eksikse ekler.
+- **Token kapsami** (`TokenGrantRules.BuildScope`): istenen standart OIDC kapsamlari + kullaniciya verilen kapsamlar + rollerinin kapsamlari. Ozel kapsami istemek yetmez. Yonetim havuzunda `booster:panel` varsayilan kapsamdir; admin icin `AdminBootstrapper` eksikse ekler.
 - **Audience** (`TokenGrantRules.ResolveAudience`): token istegindeki `resource`, yoksa authorize'daki, o da yoksa issuer (`/idp`). Issuer disi her audience uygulamanin `AllowedAudiences`'inda olmali (`invalid_target`).
 - **Refresh:** rol / kapsam her yenilemede guncel kayittan okunur; aktif olmayan kullanici yenileyemez.
 - **prompt=none / max_age / auth_time:** `AuthorizeEndpoint`; `auth_time` = oturumun `CreatedTime`'i (kod verisinde `AuthTime`). ID token yalnizca `openid` ile; `name` / `email` kapsama bagli.
@@ -182,7 +182,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 - **FGA yazma / silme idempotent** (`FgaRelationManager`: on_duplicate / on_missing = ignore).
 - **Sema:** tip icermeyen sema canliya alinamaz (`no_types`).
 - **Sayfalama:** `PageSize` 1..500 (`common.page_size_invalid`); sorgu dizesinden `-raw` filtresi kabul edilmez, alan adlari tanimlayici olmali.
-- **Rolun kapsam listesi token'a TASINMAZ** (RoleScope IdP'de yok); token'a kullaniciya verilen kapsamlar girer. Dokuman buna gore yazili.
+- **Rol kapsamlari token'a girer:** Management uygulama verisiyle (gRPC `role_scopes`) havuzun rol -> kapsam eslemesini gonderir; `TokenGrantRules.BuildScope` kullanicinin rollerinin kapsamlarini ekler. Rol / kapsam kaydedilince havuz onbellegi temizlenir, yeni token'lara hemen yansir.
 
 ## Kullanici ekleme ve davet (IdP)
 - **Tek olusturma noktasi:** `Managers/UserManagers/EndUserFactory` (Principal + varsayilan rol/kapsam + FGA `end_user`).

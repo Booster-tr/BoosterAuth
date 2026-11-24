@@ -12,7 +12,7 @@
         <tr><td>redirect_uri</td><td>Uygulamada kayıtlı adres, ör. <code>https://app.firma.com/callback</code></td></tr>
         <tr><td>Akış</td><td>Authorization Code + PKCE (<code>S256</code> zorunlu; implicit akış desteklenmez)</td></tr>
         <tr><td>Kapsamlar</td><td><code>openid profile email offline_access</code> + uygulamaya izin verilen özel kapsamlar. Özel kapsam token'a yalnızca
-            <b>kullanıcıda varsa</b> girer; kullanıcıya verilmiş kapsamlar istenmese de eklenir.</td></tr>
+            <b>kullanıcıda ya da rollerinden birinde varsa</b> girer; kullanıcının (ve rollerinin) kapsamları istenmese de eklenir.</td></tr>
         <tr><td>resource (isteğe bağlı)</td><td>Token'ın hedef API'si (audience), ör. <code>https://api.firma.com</code>; uygulamanın izinli API'lerinden biri
             olmalıdır. Verilmezse audience IdP'nin kendisidir (<code>https://auth.firma.com/idp</code>); bu token <code>/idp/me</code>'de çalışır.</td></tr>
         <tr><td>prompt (isteğe bağlı)</td><td><code>login</code>: oturum olsa da yeniden giriş. <code>create</code>: kayıt ekranı. <code>none</code>: ekran

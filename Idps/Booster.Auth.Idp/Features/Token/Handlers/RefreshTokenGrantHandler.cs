@@ -80,17 +80,18 @@ public sealed class RefreshTokenGrantHandler(
         // Rol ve kapsamlar her yenilemede GUNCEL kayittan okunur: yoneticinin aldigi yetki ya da silinen rol / kapsam
         // yenilenen token'a tasinmaz (once ilk girisin kopyasi suresiz tasiniyordu). Iki indeksli sorgu; yenileme
         // zaten token satirini okuyup yazdigi icin ek yuk kucuktur.
-        var roles = await roleRepository.Query()
+        var roleRows = await roleRepository.Query()
             .Where(r => r.PrincipalId == principal.Id)
-            .Select(r => r.RoleName)
+            .Select(r => new { r.RoleId, r.RoleName })
             .ToListAsync(ct);
+        var roles = roleRows.Select(r => r.RoleName).ToList();
 
         var principalScopes = await scopeRepository.Query()
             .Where(s => s.PrincipalId == principal.Id)
             .Select(s => s.Scope)
             .ToListAsync(ct);
 
-        var current = TokenGrantRules.BuildScope(stored.GrantedScopes, principalScopes);
+        var current = TokenGrantRules.BuildScope(stored.GrantedScopes, principalScopes, roleRows.Select(r => r.RoleId), client);
         var scopeString = ApplyRequestedScope(current, request.Scope);
 
         var accessTtl = client.Session.AccessTokenTtlSeconds;

@@ -10,15 +10,22 @@ namespace Booster.Auth.Idp.Features.Token.Handlers._base;
 public static class TokenGrantRules
 {
     /// <summary>
-    /// Kapsam = istenen standart OIDC kapsamlari (openid, profile, email, offline_access) + kullanicinin SU AN tasidigi
-    /// kapsamlar. Ozel bir kapsami istemek yetmez, kullanicida olmalidir: once istenen her izinli kapsam veriliyordu,
-    /// kullanicidan alinan kapsam da uygulama istedikce geliyordu.
+    /// Kapsam = istenen standart OIDC kapsamlari (openid, profile, email, offline_access) + kullaniciya dogrudan verilen
+    /// kapsamlar + kullanicinin ROLLERININ kapsamlari (rol -> kapsam eslemesi Management'tan uygulama verisiyle gelir).
+    /// Ozel bir kapsami istemek yetmez, kullanicida ya da rolunde olmalidir.
     /// </summary>
-    public static string BuildScope(string requestedScope, IEnumerable<string> principalScopes)
-        => string.Join(' ', requestedScope
+    public static string BuildScope(string requestedScope, IEnumerable<string> principalScopes,
+        IEnumerable<Guid> roleIds, ClientData client)
+    {
+        var roles = roleIds.ToHashSet();
+        var fromRoles = client.RoleScopes.Where(r => roles.Contains(r.RoleId)).SelectMany(r => r.Scopes);
+
+        return string.Join(' ', requestedScope
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Where(OidcScopes.IsStandard)
-            .Union(principalScopes, StringComparer.Ordinal));
+            .Union(principalScopes, StringComparer.Ordinal)
+            .Union(fromRoles, StringComparer.Ordinal));
+    }
 
     /// <summary>
     /// Audience: token isteginde verilen <c>resource</c>, yoksa authorize'da verilen (koda bagli), o da yoksa IdP'nin

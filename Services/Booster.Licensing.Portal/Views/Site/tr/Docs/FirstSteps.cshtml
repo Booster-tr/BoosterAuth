@@ -61,8 +61,8 @@ mehmet@@firma.com;Mehmet;Kaya</pre></div>
 <h2 id="roller">5. Roller ve kapsamlar</h2>
 <ol>
     <li><b>Kapsamlar</b> ekranında API'nizin izinlerini tanımlayın, ör. <code>orders:read</code>, <code>orders:write</code>.</li>
-    <li><b>Roller</b> ekranında rol oluşturun (ör. <code>manager</code>).</li>
+    <li><b>Roller</b> ekranında rol oluşturun (ör. <code>manager</code>) ve role kapsamlar ekleyin.</li>
     <li>Kullanıcılara rol ve kapsam atayın ya da havuzun <b>varsayılan rol ve kapsamlarını</b> belirleyin.</li>
 </ol>
-<p>Roller token'da <code>role</code>, kullanıcıya verilen kapsamlar <code>scope</code> claim'i olarak yer alır. Rolün kapsam listesi token'a taşınmaz;
-    kapsamı kullanıcıya ayrıca verin. Sırada: <a href="/tr/docs/integration">uygulamanızı bağlamak</a>.</p>
+<p>Roller token'da <code>role</code>, kullanıcıya doğrudan verilen kapsamlar ve rollerinin kapsamları <code>scope</code> claim'i olarak yer alır.
+    Rolün kapsamlarını değiştirdiğinizde yeni token'lar hemen bu listeyi kullanır. Sırada: <a href="/tr/docs/integration">uygulamanızı bağlamak</a>.</p>

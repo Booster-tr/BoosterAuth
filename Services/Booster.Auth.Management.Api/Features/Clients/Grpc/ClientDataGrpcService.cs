@@ -77,11 +77,12 @@ public sealed class ClientDataGrpcService(
         };
 
         var defaultRoles = await ResolveDefaultRolesAsync(pool, ct);
+        var roleScopes = await ResolveRoleScopesAsync(pool.Id, ct);
 
         return new GetClientDataResponse
         {
             Found = true,
-            Client = ClientDataMapper.ToMessage(BuildClientData(poolOnly, defaultRoles, []))
+            Client = ClientDataMapper.ToMessage(BuildClientData(poolOnly, defaultRoles, [], roleScopes))
         };
     }
 
@@ -105,11 +106,12 @@ public sealed class ClientDataGrpcService(
 
         var defaultRoles = await ResolveDefaultRolesAsync(client.UserPool, ct);
         var federationProviders = await ResolveFederationProvidersAsync(client.UserPool.Id, ct);
+        var roleScopes = await ResolveRoleScopesAsync(client.UserPool.Id, ct);
 
         return new GetClientDataResponse
         {
             Found = true,
-            Client = ClientDataMapper.ToMessage(BuildClientData(client, defaultRoles, federationProviders))
+            Client = ClientDataMapper.ToMessage(BuildClientData(client, defaultRoles, federationProviders, roleScopes))
         };
     }
 
@@ -123,6 +125,17 @@ public sealed class ClientDataGrpcService(
             .Where(r => pool.DefaultRoleIds.Contains(r.Id))
             .Select(r => new DefaultRoleData { RoleId = r.Id, RoleName = r.Key })
             .ToListAsync(ct);
+    }
+
+    /// <summary>Havuz rollerinin kapsamlari (yalnizca kapsami olan roller). Rol kaydedilince havuz onbellegi temizlenir.</summary>
+    private async Task<List<RoleScopesData>> ResolveRoleScopesAsync(Guid userPoolId, CancellationToken ct)
+    {
+        var rows = await roleRepository.Query()
+            .AsNoTracking()
+            .Where(r => r.UserPoolId == userPoolId && r.RoleScopes.Any())
+            .Select(r => new { r.Id, Scopes = r.RoleScopes.Select(s => s.Scope).ToList() })
+            .ToListAsync(ct);
+        return rows.Select(r => new RoleScopesData { RoleId = r.Id, Scopes = r.Scopes }).ToList();
     }
 
     private async Task<List<FederationProviderData>> ResolveFederationProvidersAsync(Guid userPoolId, CancellationToken ct)
@@ -176,7 +189,8 @@ public sealed class ClientDataGrpcService(
     private const string ClientSecretSetting = "client_secret";
 
     private static ClientData BuildClientData(
-        Client client, List<DefaultRoleData> defaultRoles, List<FederationProviderData> federationProviders)
+        Client client, List<DefaultRoleData> defaultRoles, List<FederationProviderData> federationProviders,
+        List<RoleScopesData> roleScopes)
     {
         var pool = client.UserPool;
         var policy = pool.Policy;
@@ -237,6 +251,7 @@ public sealed class ClientDataGrpcService(
             },
             DefaultScopes = [.. pool.DefaultScopes],
             DefaultRoles = defaultRoles,
+            RoleScopes = roleScopes,
             FederationProviders = federationProviders
         };
     }

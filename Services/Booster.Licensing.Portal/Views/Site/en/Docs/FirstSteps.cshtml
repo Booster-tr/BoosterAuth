@@ -61,8 +61,8 @@ john@@company.com,John,Smith</pre></div>
 <h2 id="roles">5. Roles and scopes</h2>
 <ol>
     <li>On the <b>Scopes</b> screen, define your API's permissions, e.g. <code>orders:read</code>, <code>orders:write</code>.</li>
-    <li>On the <b>Roles</b> screen, create a role (e.g. <code>manager</code>).</li>
+    <li>On the <b>Roles</b> screen, create a role (e.g. <code>manager</code>) and add scopes to it.</li>
     <li>Assign roles and scopes to users, or set the pool's <b>default roles and scopes</b>.</li>
 </ol>
-<p>Roles appear in the token as the <code>role</code> claim and the scopes granted to the user as <code>scope</code>. A role's scope list is not
-    carried into the token; grant the scope to the user as well. Next: <a href="/en/docs/integration">connect your application</a>.</p>
+<p>Roles appear in the token as the <code>role</code> claim; scopes granted directly to the user and the scopes of their roles appear as
+    <code>scope</code>. When you change a role's scopes, new tokens use the new list right away. Next: <a href="/en/docs/integration">connect your application</a>.</p>
