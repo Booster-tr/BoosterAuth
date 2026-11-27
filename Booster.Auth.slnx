@@ -60,6 +60,7 @@
   <Folder Name="/Services/">
     <Project Path="Services/Booster.Auth.Management.Api/Booster.Auth.Management.Api.csproj" Id="01832b74-2452-407a-a9ca-218203cd078b" />
     <Project Path="Services/Booster.Auth.Z/Booster.Auth.Z.csproj" Id="ca1a0785-17ec-46b9-b8f9-21fcca71fe3e" />
+    <Project Path="Services/Booster.Labs.Site/Booster.Labs.Site.csproj" />
     <Project Path="Services/Booster.Licensing.Portal/Booster.Licensing.Portal.csproj" />
     <Project Path="Services/Booster.NotificationService/Booster.NotificationService.csproj" />
     <Project Path="Services/Booster.SystemMessageService/Booster.SystemMessageService.csproj" />

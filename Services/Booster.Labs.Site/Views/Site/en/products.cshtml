@@ -1,0 +1,108 @@
+@{ var m = (SitePageModel)Model!; var lang = m.Lang; }
+
+<section class="hero hero-glow">
+    <div class="wrap">
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <span class="eyebrow reveal">Our Products</span>
+                <h1 class="reveal reveal-d1">Enterprise software, built with engineering rigor.</h1>
+                <p class="lead reveal reveal-d2">
+                    Boosters Labs builds products that cover identity and authorization end to end.
+                    Every product is engineered around security, simplicity and <strong>keeping your
+                    data with you</strong>.
+                </p>
+                <div class="actions reveal reveal-d3">
+                    <a class="btn btn-primary btn-lg" href="/@lang/products/boosters-auth">Boosters Auth</a>
+                    <a class="btn btn-outline-light btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                </div>
+            </div>
+            <div class="hero-art reveal reveal-d2">
+                <img class="hero-mark" src="~/img/mark-dark-512.png" alt="Boosters Labs emblem" width="320" height="320" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="split">
+            <div class="reveal">
+                <span class="pill pill-gold">Product</span>
+                <h2 class="mt-2">Boosters Auth</h2>
+                <p class="lead">
+                    A multi-tenant OIDC/OAuth2 identity provider with OpenFGA-based relationship
+                    authorization. Authentication and fine-grained authorization in a single product.
+                </p>
+                <ul class="ticks">
+                    <li>Runs on-prem; licensed offline — your data stays with you.</li>
+                    <li>Modern identity flows with SSO, passwordless login and MFA.</li>
+                    <li>Federation with Google, Microsoft, Apple and more; LDAP / Active Directory.</li>
+                    <li>Fine-grained, relationship-based authorization with OpenFGA.</li>
+                </ul>
+                <div class="actions">
+                    <a class="btn btn-primary" href="/@lang/products/boosters-auth">@m.T("cta.details")</a>
+                    <a class="btn btn-ghost" href="/@lang/contact">@m.T("cta.contact")</a>
+                </div>
+            </div>
+            <div class="split-media reveal reveal-d1">
+                <img src="~/img/mark-light-512.png" alt="Boosters Auth" width="420" height="420" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Shared principles</span>
+            <h2 class="reveal reveal-d1">What every product strives for</h2>
+        </div>
+        <div class="grid grid-3 mt-4">
+            <article class="card reveal">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <h3>Security by default</h3>
+                <p>Security lives in the design — it is never bolted on afterwards.</p>
+            </article>
+            <article class="card reveal reveal-d1">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></span>
+                <h3>It stays yours</h3>
+                <p>With on-prem and offline options, you keep full control of your data and infrastructure.</p>
+            </article>
+            <article class="card reveal reveal-d2">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
+                <h3>Standards compliant</h3>
+                <p>Built on open standards like OIDC/OAuth2 — predictable and easy to understand.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Roadmap</span>
+            <h2 class="reveal reveal-d1">More on the way</h2>
+            <p class="lead center reveal reveal-d2">
+                Boosters Auth is the first member of our product family. We will share new
+                solutions built on the same principles here as they are ready. If you have a
+                specific need, write to us — we love to listen.
+            </p>
+            <div class="actions center reveal reveal-d3">
+                <a class="btn btn-ghost" href="/@lang/contact">@m.T("cta.contact")</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Let's talk about your product</h2>
+            <p class="lead">Let's assess your organization's identity and authorization needs together.</p>
+            <div class="actions center">
+                <a class="btn btn-primary btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                <a class="btn btn-outline-light btn-lg" href="/@lang/products/boosters-auth">Boosters Auth</a>
+            </div>
+        </div>
+    </div>
+</section>

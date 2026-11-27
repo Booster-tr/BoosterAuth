@@ -1,0 +1,11 @@
+@{ var m = (SitePageModel)Model!; var lang = m.Lang; }
+<section class="section center">
+    <div class="wrap">
+        <span class="eyebrow">404</span>
+        <h1>@m.T("notfound.title")</h1>
+        <p class="lead center">@m.T("notfound.lead")</p>
+        <div class="actions center">
+            <a class="btn btn-primary" href="/@lang">@m.T("notfound.home")</a>
+        </div>
+    </div>
+</section>

@@ -7,16 +7,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@(ViewData["Title"] is string t ? $"{t} - " : "")Booster Auth</title>
-    <meta name="description" content="Booster Auth: kendi sunucunuzda OpenID Connect kimlik sağlayıcı, kullanıcı ve yetki yönetimi." />
+    <title>@(ViewData["Title"] is string t ? $"{t} - " : "")Boosters Auth</title>
+    <meta name="description" content="Boosters Auth: kendi sunucunuzda OpenID Connect kimlik sağlayıcı, kullanıcı ve yetki yönetimi." />
     <meta name="theme-color" content="#173F38" />
-    <link rel="icon" href="/img/logo.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="~/css/fonts.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/portal.css" asp-append-version="true" />
 </head>
 <body>
 <header class="topbar">
-    <a class="brand" href="/tr" aria-label="Booster Auth ana sayfa"><img class="brand-mark" src="/img/logo.svg" alt="" width="26" height="26" />Booster <span>Auth</span></a>
+    <a class="brand" href="/tr" aria-label="Boosters Auth ana sayfa"><img class="brand-mark" src="/img/mark-light-512.png" alt="" width="26" height="26" />Boosters <span>Auth</span></a>
     <nav class="nav nav-site" aria-label="Site">
         <a href="/tr">Ürün</a>
         <a href="/tr/docs">Dokümantasyon</a>
@@ -58,7 +61,7 @@
     @RenderBody()
 </main>
 <footer class="portal-foot">
-    <span>© @DateTime.UtcNow.Year Booster Auth</span>
+    <span>© @DateTime.UtcNow.Year Boosters Auth</span>
     <span>Destek: <a href="@Booster.Licensing.Portal.Site.SiteCatalog.SupportPhoneHref">@Booster.Licensing.Portal.Site.SiteCatalog.SupportPhone</a>
         · <a href="mailto:@Booster.Licensing.Portal.Site.SiteCatalog.SupportEmail">@Booster.Licensing.Portal.Site.SiteCatalog.SupportEmail</a>
         · <a href="/tr/help">Yardım</a></span>

@@ -8,10 +8,10 @@ namespace Booster.Licensing.Portal.Site;
 /// </summary>
 public static class SiteArt
 {
-    /// <summary>Marka isareti. <paramref name="onDark"/>: koyu zemin (footer) icin ters renkler.</summary>
+    /// <summary>Marka isareti (Boosters Auth amblemi). <paramref name="onDark"/>: koyu zemin (footer) icin beyaz amblem.</summary>
     public static IHtmlContent Mark(bool onDark = false) => new HtmlString(onDark
-        ? """<svg class="mark" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="#EEF3EF"/><path d="M8 7h6.2a3.6 3.6 0 0 1 1.3 7A3.8 3.8 0 0 1 14.6 19H8z" fill="none" stroke="#173F38" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 13h6" stroke="#9C5E25" stroke-width="1.8"/></svg>"""
-        : """<svg class="mark" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" rx="5" fill="#173F38"/><path d="M8 7h6.2a3.6 3.6 0 0 1 1.3 7A3.8 3.8 0 0 1 14.6 19H8z" fill="none" stroke="#EEF3EF" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 13h6" stroke="#D6AE80" stroke-width="1.8"/></svg>""");
+        ? """<img class="mark" src="/img/mark-dark-512.png" alt="" width="26" height="26" />"""
+        : """<img class="mark" src="/img/mark-light-512.png" alt="" width="26" height="26" />""");
 
     /// <summary>Kucuk kilit ikonu (lisans portali baglantisi).</summary>
     public static IHtmlContent Lock() => new HtmlString(
