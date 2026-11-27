@@ -42,8 +42,8 @@ public sealed class RenewalReminderService(LicensingDbContext db, PortalNotifier
             // En yakin esik: 7 gun icindeyse 7, degilse 30. Gec kalinan 30 gunluk hatirlatma 7'nin yerine gecmez.
             var kind = Kinds.Where(k => daysLeft <= k).Min();
 
-            // Once SAHIPLEN, sonra gonder. Kafka olayi geri alinamadigi icin (outbox yok) "gonder + kaydet" sirasi
-            // es zamanli calismada e-postayi yineler. ON CONFLICT ile yalnizca satiri yazabilen calisma gonderir.
+            // Once SAHIPLEN, sonra gonder. Gonderim geri alinamadigi icin "gonder + kaydet" sirasi es zamanli
+            // calismada e-postayi yineler. ON CONFLICT ile yalnizca satiri yazabilen calisma gonderir.
             var reminderId = EntityId.New();
             var claimed = await db.Database.ExecuteSqlInterpolatedAsync($"""
                 INSERT INTO "LicenseReminders" ("Id", "LicenseId", "Kind", "CreatedTime")
@@ -52,11 +52,9 @@ public sealed class RenewalReminderService(LicensingDbContext db, PortalNotifier
                 """, ct);
             if (claimed == 0) continue;
 
-            if (await notifier.RenewalReminderAsync(license.Customer, license, daysLeft, ct))
-                sent++;
-            else
-                // Gonderilemedi: sahiplik birakilir, bir sonraki turda tekrar denenir.
-                await db.LicenseReminders.Where(r => r.Id == reminderId).ExecuteDeleteAsync(ct);
+            // Yanit beklenmez: Notification kapaliysa bu hatirlatma kaybolur, yeniden denenmez (bilincli karar).
+            notifier.RenewalReminder(license.Customer, license, daysLeft);
+            sent++;
         }
 
         if (sent > 0) logger.LogInformation("{Count} yenileme hatirlatmasi gonderildi.", sent);

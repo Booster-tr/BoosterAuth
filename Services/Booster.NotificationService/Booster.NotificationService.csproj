@@ -9,6 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Grpc.AspNetCore" Version="2.84.0" />
 		<PackageReference Include="FluentEmail.Razor" Version="3.0.2" />
 		<PackageReference Include="FluentEmail.Smtp" Version="3.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
@@ -23,7 +24,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Common\Amqp\Booster.Amqp\Booster.Amqp.csproj" />
 		<ProjectReference Include="..\..\Common\Booster.Hashing\Booster.Hashing.csproj" />
 		<ProjectReference Include="..\..\Common\Caching\Booster.Caching.Redis\Booster.Caching.Redis.csproj" />
 		<ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.WithCacheProvider\Booster.ExceptionManager.WithCacheProvider.csproj" />

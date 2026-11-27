@@ -1,6 +1,5 @@
 using Booster.Auth.Common.Internal.Auditing;
-using Booster.Auth.Common.Internal.Amqp.Extensions;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
@@ -20,7 +19,6 @@ using Booster.Hashing.OneWays.Simple;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
-using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Idp.Managers.AccountManagers;
 
@@ -41,7 +39,7 @@ public sealed class AccountService(
     ISecureCacheStore<ContactChangeData> changeStore,
     ICacheService cacheService,
     IRequestContextAccessor requestContextAccessor,
-    IEventBus eventBus,
+    NotificationClient notifications,
     LdapLoginService ldapLogin,
     AuthorizationService.AuthorizationServiceClient authorizationClient,
     ILogger<AccountService> logger,
@@ -161,7 +159,7 @@ public sealed class AccountService(
             ExpiresAt = DateTimeOffset.UtcNow.Add(CodeTtl)
         }, CodeTtl, ct);
 
-        await eventBus.PublishAsync(new NotificationRequestedEvent
+        notifications.Send(new NotificationRequest
         {
             TenantId = Guid.Empty,
             UserPoolId = ctx.Client.IsolationId,
@@ -176,7 +174,7 @@ public sealed class AccountService(
                 ["DisplayName"] = ctx.Principal.DisplayName,
                 ["ExpiresInMinutes"] = ((int)CodeTtl.TotalMinutes).ToString()
             }
-        }, ct);
+        });
     }
 
     /// <summary>Bekleyen degisiklik (kod ekrani icin); yoksa null.</summary>
@@ -399,9 +397,9 @@ public sealed class AccountService(
         await cacheService.RemoveByTagAsync(LocalPrincipalStore.Tag(principalId), ct);
         await DeleteRelationsAsync(principalId, poolId, ct);
 
-        // Kisisel veri tutan diger servisler (Notification: gonderilen e-posta / SMS kayitlari) temizlesin. Commit'ten sonra;
-        // Kafka hatasi silmeyi bozmaz, loglanir.
-        await eventBus.PublishOrLogAsync(new PrincipalDeletedEvent { UserPoolId = poolId, PrincipalId = principalId }, logger, ct);
+        // Kisisel veri tutan diger servisler (Notification: gonderilen e-posta / SMS kayitlari) temizlesin. Yanit beklenmez;
+        // Notification kapaliysa kayitlar kalir ve 30 gunluk saklama suresi sonunda silinir (NotificationRetentionService).
+        notifications.DeletePrincipalNotifications(poolId, principalId);
     }
 
     /// <summary>

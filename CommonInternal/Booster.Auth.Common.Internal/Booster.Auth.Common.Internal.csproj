@@ -15,6 +15,7 @@
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="10.0.13" />
 		<PackageReference Include="FastEndpoints" Version="8.3.0" />
+		<PackageReference Include="Grpc.Net.ClientFactory" Version="2.84.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.2.3" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
 	</ItemGroup>
@@ -32,7 +33,8 @@
 
 		<ProjectReference Include="..\..\Common\ExceptionManagers\Booster.ExceptionManager.WithCacheProvider\Booster.ExceptionManager.WithCacheProvider.csproj" />
 
-		<ProjectReference Include="..\..\Common\Amqp\Booster.Amqp\Booster.Amqp.csproj" />
+		<!-- Bildirim istemcisi (IdP, lisans portali): NotificationClient -->
+		<ProjectReference Include="..\Booster.Auth.Notification.Contracts\Booster.Auth.Notification.Contracts.csproj" />
 
 		<ProjectReference Include="..\..\Common\Observability\Booster.Observability\Booster.Observability.csproj" />
 

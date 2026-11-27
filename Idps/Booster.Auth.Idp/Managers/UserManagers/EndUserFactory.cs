@@ -18,7 +18,7 @@ namespace Booster.Auth.Idp.Managers.UserManagers;
 /// Faz 1.5'te lisans limit kontrolu buraya eklenir ve self-servis kayit ile federasyon ilk girisi de bu sinifa
 /// tasinir; boylece kullanici olusturan HER yol tek kontrolden gecer.
 /// </para>
-/// Kaydetmez: cagiran, davet olayini da ayni islemde (outbox) yazabilsin diye SaveChanges'i kendisi cagirir.
+/// Kaydetmez: cagiran SaveChanges'i kendisi cagirir; davet e-postasi commit'ten SONRA gonderilir (InvitationManager).
 /// Cagiran, havuzun sistem baglaminda (<c>BeginSystemContext(poolId)</c>) olmalidir.
 /// </summary>
 public sealed class EndUserFactory(

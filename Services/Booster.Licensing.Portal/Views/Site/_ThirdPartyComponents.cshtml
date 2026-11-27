@@ -7,7 +7,6 @@
     LISANS NOTLARI (yalnizca dahili; sayfada gorunmez):
     - Redis: compose redis:7.2-alpine kullanir; 7.2.x BSD-3-Clause'dur. 7.4-7.8 RSALv2/SSPLv1, 8.x RSALv2/SSPLv1/AGPLv3 lisanslidir.
       Surum yukseltilmeden once lisans degerlendirmesi yapin (alternatif: Valkey, BSD-3-Clause).
-    - MassTransit: 8.x Apache-2.0. v9 ticari lisansa gecti; v9'a yukseltmeden once lisans degerlendirmesi yapin.
     - openobserve/openobserve imaji AGPL-3.0: imaji musteri upstream'den ceker, biz degistirip dagitmiyoruz (ag uzerinden
       hizmet olarak sunmuyoruz). Kaynak koda dokunursak AGPL yukumlulukleri dogar; once avukata danisin.
     - postgis/postgis imaji PostGIS (GPL-2.0-or-later) icerir; imaji musteri upstream'den ceker (biz dagitmiyoruz).
@@ -22,7 +21,6 @@
     [
         ("PostgreSQL + PostGIS (postgis/postgis)", "15 / 3.4", "PostgreSQL License; PostGIS: GPL-2.0-or-later", "PostgreSQL", "https://www.postgresql.org/about/licence/"),
         ("Redis (redis)", "7.2", "BSD-3-Clause", "BSD-3-Clause", "https://github.com/redis/redis/blob/7.2/COPYING"),
-        ("Apache Kafka (apache/kafka)", "3.7.0", "Apache-2.0", "Apache-2.0", "https://github.com/apache/kafka/blob/trunk/LICENSE"),
         ("OpenFGA (openfga/openfga)", "1.20.0", "Apache-2.0", "Apache-2.0", "https://github.com/openfga/openfga/blob/main/LICENSE"),
         ("Alpine Linux (alpine)", "3.20", en ? "Various (incl. GPL-2.0, MIT)" : "Çeşitli (GPL-2.0, MIT dahil)", "GPL-2.0-only", "https://alpinelinux.org/"),
         (".NET / ASP.NET Core runtime (mcr.microsoft.com/dotnet/aspnet)", "10.0", "MIT", "MIT", "https://github.com/dotnet/aspnetcore/blob/main/LICENSE.txt"),
@@ -36,8 +34,6 @@
         ("Npgsql, Npgsql.EntityFrameworkCore.PostgreSQL", "PostgreSQL License", "PostgreSQL", "https://github.com/npgsql/npgsql"),
         ("NetTopologySuite", "BSD-3-Clause", "BSD-3-Clause", "https://github.com/NetTopologySuite/NetTopologySuite"),
         ("FastEndpoints", "MIT", "MIT", "https://github.com/FastEndpoints/FastEndpoints"),
-        ("MassTransit, MassTransit.Kafka, MassTransit.EntityFrameworkCore (8.x)", "Apache-2.0", "Apache-2.0", "https://github.com/MassTransit/MassTransit"),
-        ("Confluent.Kafka / librdkafka", "Apache-2.0 / BSD-2-Clause", "Apache-2.0", "https://github.com/confluentinc/confluent-kafka-dotnet"),
         ("OpenFga.Sdk", "Apache-2.0", "Apache-2.0", "https://github.com/openfga/dotnet-sdk"),
         ("BouncyCastle.Cryptography", "MIT", "MIT", "https://github.com/bcgit/bc-csharp"),
         ("StackExchange.Redis", "MIT", "MIT", "https://github.com/StackExchange/StackExchange.Redis"),

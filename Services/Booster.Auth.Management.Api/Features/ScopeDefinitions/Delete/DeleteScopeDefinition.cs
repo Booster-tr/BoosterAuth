@@ -1,5 +1,4 @@
-using Booster.Auth.Common.Internal.Amqp.Events;
-using Booster.Auth.Common.Internal.Amqp.Extensions;
+using Booster.Auth.Management.Api.Managers.PoolDefinitionSyncManagers;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Constants;
@@ -10,7 +9,6 @@ using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using FastEndpoints;
 using Microsoft.EntityFrameworkCore;
-using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Management.Api.Features.ScopeDefinitions.Delete;
 
@@ -30,7 +28,7 @@ public class DeleteScopeDefinitionEndpoint : EndpointWithoutRequest<DeleteScopeD
             s.Summary = "Kapsam tanımını siler";
             s.Description = "Tanımı soft-delete ile kaldırır; aynı havuzdaki rol/uygulama atamalarını " +
                             "ve havuzun varsayılan kapsamlarındaki karşılığını da temizler. Kullanıcılardan " +
-                            "IdP'de Kafka olayıyla kaldırılır.";
+                            "IdP'de gRPC ile (yanıt beklenmeden) kaldırılır.";
         });
     }
 
@@ -49,8 +47,7 @@ public class DeleteScopeDefinitionCommandHandler(
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
     IClientDataCacheStore clientDataCacheStore,
-    IEventBus eventBus,
-    ILogger<DeleteScopeDefinitionCommandHandler> logger)
+    IdpPoolDefinitionSync idpSync)
     : ICommandHandler<DeleteScopeDefinitionCommand, DeleteScopeDefinitionResponse>
 {
     public async Task<DeleteScopeDefinitionResponse> ExecuteAsync(
@@ -88,11 +85,7 @@ public class DeleteScopeDefinitionCommandHandler(
         await scopeRepository.SaveChangesAsync(ct);
         await clientDataCacheStore.InvalidatePoolAsync(poolId, ct);
 
-        await eventBus.PublishOrLogAsync(new ScopeDefinitionChangedEvent
-        {
-            UserPoolId = poolId,
-            OldScope = scopeKey
-        }, logger, ct);
+        idpSync.ScopeDefinitionChanged(poolId, scopeKey);
 
         return new DeleteScopeDefinitionResponse(scope.Id);
     }

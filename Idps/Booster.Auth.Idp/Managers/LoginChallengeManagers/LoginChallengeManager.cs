@@ -1,6 +1,6 @@
 using Booster.Auth.Common.Internal.Auditing;
 using System.Security.Cryptography;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Providers.Abstractions.BaseProviders.PasswordlessBased.Models;
@@ -12,8 +12,6 @@ using Booster.Caching.Abstraction;
 using Booster.Hashing.OneWays.Simple;
 using FluentValidation;
 using FluentValidation.Results;
-
-using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Idp.Managers.LoginChallengeManagers;
 
@@ -56,7 +54,7 @@ public sealed class LoginChallengeManager(
     ILocalUserStore userStore,
     ISessionStore sessionStore,
     IRequestContextAccessor requestContextAccessor,
-    IEventBus eventBus,
+    NotificationClient notifications,
     AuditLog audit) : ILoginChallengeManager
 {
     /// <summary>Yarım girişin ömrü: süresi dolarsa kullanıcı parolayı yeniden girer.</summary>
@@ -261,7 +259,7 @@ public sealed class LoginChallengeManager(
             ExpiresAt = expiresAt
         }, CodeLifetime + ExpiredCodeGrace, ct);
 
-        await eventBus.PublishAsync(new NotificationRequestedEvent
+        notifications.Send(new NotificationRequest
         {
             TenantId = Guid.Empty,
             UserPoolId = client.IsolationId,
@@ -281,7 +279,7 @@ public sealed class LoginChallengeManager(
                 ["DisplayName"] = user.DisplayName,
                 ["ExpiresInMinutes"] = ((int)CodeLifetime.TotalMinutes).ToString()
             }
-        }, ct);
+        });
     }
 
     private async Task<LoginChallengeData> RequireAsync(string interactionKey, ClientData client, CancellationToken ct)

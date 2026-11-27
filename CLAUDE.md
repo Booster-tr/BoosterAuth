@@ -61,7 +61,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Havale bilgileri `LicensingPortalOptions__Bank__{BankName,AccountName,Iban}` ayarlarindan okunur (gizli degil).
 - **Portal e-postalari (`PortalNotifier`):** Notification servisi gonderir; sablonlar `license_*` anahtarlariyla `NotificationBootstrapper`'da (tr/en).
   - Akislar: deneme, siparis alindi, lisans hazir, aktarim, yenileme hatirlatmasi. Alici firmanin fatura e-postasi.
-  - Gonderim commit'ten SONRA ve en-iyi-cabadir: Kafka hatasi loglanir, islem bozulmaz.
+  - Gonderim commit'ten SONRA ve en-iyi-cabadir: gRPC ile yanit beklenmeden gider (`NotificationClient`); Notification kapaliysa e-posta kaybolur, islem bozulmaz.
   - Baglantilar `LicensingPortalOptions__PublicUrl` ile uretilir.
 - **Yenileme hatirlatmasi (`RenewalReminderService`):** acilista ve 6 saatte bir calisir; admin Siparisler ekranindan elle de tetiklenebilir.
   - Bitise 30 ve 7 gun kala, lisans ve tur basina BIR KEZ (`LicenseReminders` tekil index'i).
@@ -178,7 +178,7 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 ## Yonetim kurallari (2026-11 E2E turu)
 - **Kullanici durumu:** `PUT idp/pools/users/status` (Active / Suspended). Askiya alma oturum ve yenileme token'larini hemen kapatir; kayit, rol ve iliskiler kalir.
 - **Panel kullanicilari** (yonetim havuzu) silinebilir / askiya alinabilir; kisi kendini ve son `admin`'i silemez / askiya alamaz.
-- **Silinen kullanicinin iliskileri:** AuthZ `ReadRelations` yalnizca kullaniciyla cagrilirsa modeldeki her tip icin okur (OpenFGA tip ister). Silme `PrincipalDeletedEvent` (`auth-principal-deleted-topic`) yayinlar; Notification o kullanicinin bildirim kayitlarini siler.
+- **Silinen kullanicinin iliskileri:** AuthZ `ReadRelations` yalnizca kullaniciyla cagrilirsa modeldeki her tip icin okur (OpenFGA tip ister). Silme sonrasi Notification `DeletePrincipalNotifications` (gRPC, yanit beklenmez) o kullanicinin bildirim kayitlarini siler.
 - **FGA yazma / silme idempotent** (`FgaRelationManager`: on_duplicate / on_missing = ignore).
 - **Sema:** tip icermeyen sema canliya alinamaz (`no_types`).
 - **Sayfalama:** `PageSize` 1..500 (`common.page_size_invalid`); sorgu dizesinden `-raw` filtresi kabul edilmez, alan adlari tanimlayici olmali.
@@ -187,12 +187,12 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
 ## Gozlemlenebilirlik, log ve denetim (KVKK)
 - **Kurulum:** `Common/Observability/Booster.Observability` (`AddBoosterObservability`): OpenTelemetry log + trace + metrik, OTLP/HTTP. `AddBoosterServices` (tum .NET servisleri) ve gateway cagirir. Ayar: `Observability__OtlpEndpoint` (or. `http://openobserve:5080/api/default`), `Observability__OtlpHeaders`; bossa yalnizca konsol.
 - **Akislar:** isletim loglari `booster`, denetim kayitlari `audit` (logger kategorisi `Booster.Audit`); OpenObserve `stream-name` basligiyla ayirir. Oneri: isletim 30 gun, denetim 2 yil (stream ayari).
-- **Maskeleme:** `SensitiveDataRedactor` disa aktarmadan once e-posta, telefon, JWT, `password=/token=/code=` vb. gizler. Bu son savunma hattidir: kodda kisisel veri LOGLAMA (olay govdesi, e-posta, kod, token). FusionCache / EF Core / ASP.NET Core / MassTransit loglari Warning.
+- **Maskeleme:** `SensitiveDataRedactor` disa aktarmadan once e-posta, telefon, JWT, `password=/token=/code=` vb. gizler. Bu son savunma hattidir: kodda kisisel veri LOGLAMA (olay govdesi, e-posta, kod, token). FusionCache / EF Core / ASP.NET Core loglari Warning.
 - **Denetim kaydi:** `CommonInternal/.../Auditing/AuditLog` (`Success` / `Failure`, `AuditEntry`). Kisi kimligi (sub), havuz, uygulama, IP, tarayici, sonuc; e-posta / telefon / ad / parola / kod / token YAZILMAZ; bilinmeyen kimlik HMAC ozeti (`IdpOptions.ApplicationPeper`).
   - Yonetim: `AdminAuditMiddleware` panel scope'lu ya da servis hesabi token'iyla her degisikligi ve kisisel veri okuyan panel uclarini (`/pools/users`, `/clients/sessions` ...) yazar; govde yazilmaz, yalnizca sorgudaki ...Id parametreleri.
   - Son kullanici: oturum acilisi (`SessionStore.CreateAsync`), giris hatasi / kilit, kod hatalari, sifre sifirlama / degistirme, e-posta / telefon degisikligi, hesap silme / askiya alma, cikis, onay, davet, refresh tekrar kullanimi. Yeni bir guvenlik olayi eklerken `AuditLog` kullan.
 - **Bildirim kayitlari:** Target ve Body `ISecretProtector` ile sifreli (Notification servisi `HashingOptions` alir), 30 gun sonra silinir (`NotificationRetentionService`, `NotificationRetentionDays`).
-- **Eski log hatti (Kafka -> LoggingService -> loggingdb) KALDIRILDI.** `ILogWriter` yok; standart `ILogger` kullan.
+- **Eski log hatti (LoggingService -> loggingdb) KALDIRILDI.** `ILogWriter` yok; standart `ILogger` kullan.
 - **Kurulum paketi:** `openobserve` servisi `observability` profilinde (`COMPOSE_PROFILES`), arayuz `OPENOBSERVE_PORT` (yerel ag). Servisler OpenObserve'a arayuzle AYNI e-posta / parolayla yazar (`Observability__OtlpUser` / `OtlpPassword` = `OPENOBSERVE_ADMIN_EMAIL` / `OPENOBSERVE_ADMIN_PASSWORD`); parola tek yerde, `.env`. Kurulum betigi uretir ve sonda gosterir. `OTEL_HEADERS` yalnizca baska OTLP alicisi icin.
 
 ## Kullanici ekleme ve davet (IdP)
@@ -215,13 +215,14 @@ Public key portalin Genel sayfasinda gorunur; `LicensePublicKeys`'e eklenir.
   - Yeniden gonderilen davet (`POST pools/users/invite`) eskisini gecersiz kilar.
   - Kabul edilince parola belirlenir ve e-posta dogrulanmis sayilir.
 - Havuz politikasi istemcisiz akislarda `PoolDataReader` (Management `GetPoolData` gRPC) ile okunur.
-- **OLAYLAR OUTBOX'A YAZILMAZ (2026-11 yerelde dogrulandi):** `IEventBus.PublishAsync` -> Kafka rider `ITopicProducer`, olayi HEMEN gonderir.
-  - `UseBusOutbox` rider ureticilerini kapsamiyor; `OutboxMessage` tablolarina (IdP, Management, portal) hic satir yazilmiyor.
-  - Sonuc: transaction geri alinsa da olay gitmis olur; Kafka kapaliysa olay kaybolur.
-  - Kural: olayi is islemi KAYDEDILDIKTEN/commit edildikten SONRA yayinla. Yinelenmemesi gereken islerde once DB'de sahiplen (`ON CONFLICT DO NOTHING`), sonra yayinla (bkz. portal `RenewalReminderService`).
+- **Servisler arasi bildirim: KAFKA YOK, gRPC + fire-and-forget (karar).** Kafka'li son surum `stable-with-kafka` dalinda.
+  - Ic gRPC (8081, gateway'e acik degil): Notification `NotificationDispatchService` (`Send`, `DeletePrincipalNotifications`); IdP `PoolDefinitionSyncService`.
+  - Istemciler: `NotificationClient` (IdP, portal; `NotificationSettings__GrpcAddress`) ve Management `IdpPoolDefinitionSync`. Cagri `FireAndForget.Run` ile gider: yanit BEKLENMEZ, istegin iptal sinyali kullanilmaz, 30 sn sinir.
+  - Veri kaybi KABUL: karsi servis kapali / hatali ise cagri kaybolur, yeniden denenmez, yalnizca loglanir (icerik loglanmaz). Outbox YOK.
+  - Kural: cagriyi is islemi KAYDEDILDIKTEN/commit edildikten SONRA yap. Yinelenmemesi gereken islerde once DB'de sahiplen (`ON CONFLICT DO NOTHING`), sonra cagir (bkz. portal `RenewalReminderService`).
 - **Rol / kapsam ad senkronu:** IdP `PrincipalScope.Scope` ve `PrincipalRole.RoleName` Management tanimlarinin kopyasidir (token bunlardan uretilir).
-  - Management kapsam ad degisikligi / silme -> `ScopeDefinitionChangedEvent`; rol anahtar degisikligi / silme -> `RoleChangedEvent` (`PoolDefinitionTopics`). IdP tuketicileri kopyalari gunceller / siler.
-  - `PublishOrLogAsync`: Kafka hatasi loglanir; olay kaybolursa kopya bayat kalir. Verilmis token'lar suresi dolana kadar eski haliyle gecerlidir.
+  - Management kapsam ad degisikligi / silme ve rol anahtar degisikligi / silme -> `IdpPoolDefinitionSync` -> IdP `PoolDefinitionSyncGrpcService` kopyalari gunceller / siler.
+  - IdP o an kapaliysa kopya bayat kalir. Verilmis token'lar suresi dolana kadar eski haliyle gecerlidir.
   - `RoleScope` IdP'ye tasinmaz; rolun kapsam listesi degisikligi senkron gerektirmez.
 - **Havuz API'leri (`Idps/Booster.Auth.Idp/Apis/`, `/idp/apis/*`):** musteri uygulamasinin backend'i icin; panel uclari (`pools/...`, `/authz/relations`) panel scope'u ister, bunlar istemez.
   - Cagiran YALNIZCA panelde acilan havuz servis hesabi: YONETIM havuzunda Machine principal (`OwnerPoolId` = hedef havuz), token `client_id=management` + `resource=<PUBLIC_URL>/idp`. Havuz `OwnerPoolId`'den; istekte havuz alinmaz (`PoolApiCaller`).

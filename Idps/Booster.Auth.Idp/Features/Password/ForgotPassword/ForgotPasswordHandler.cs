@@ -1,5 +1,5 @@
 using Booster.Auth.Idp.Providers.Abstractions.Stores;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Features._base;
 using Booster.Auth.Idp.Features._base.Entities;
@@ -16,7 +16,6 @@ using Booster.ExceptionManager.Abstraction.Constants;
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Idp.Features.Password.ForgotPassword;
 
@@ -27,7 +26,7 @@ public sealed class ForgotPasswordHandler(
     IAsyncRepository<Principal, IdpDbContext> principalRepository,
     IRequestContextAccessor requestContextAccessor,
     ISimpleHasher simpleHasher,
-    IEventBus eventBus,
+    NotificationClient notifications,
     Booster.Auth.Idp.Managers.LdapManagers.LdapLoginService ldapLogin) : ICommandHandler<ForgotPasswordCommand>
 {
     private static readonly TimeSpan ResetCodeTtl = TimeSpan.FromMinutes(15);
@@ -90,7 +89,7 @@ public sealed class ForgotPasswordHandler(
         // Sayac: AttemptCount = penceredeki gonderim sayisi.
         await resetStore.StoreAsync(pendingKey, window with { AttemptCount = window.AttemptCount + 1 }, window.ExpiresAt - now, ct);
 
-        await eventBus.PublishAsync(new NotificationRequestedEvent
+        notifications.Send(new NotificationRequest
         {
             TenantId = Guid.Empty,
             UserPoolId = client.IsolationId,
@@ -105,7 +104,7 @@ public sealed class ForgotPasswordHandler(
                 ["DisplayName"] = principal.DisplayName,
                 ["ExpiresInMinutes"] = ((int)ResetCodeTtl.TotalMinutes).ToString()
             }
-        }, ct);
+        });
     }
 
     private async Task<Principal?> FindPrincipalAsync(

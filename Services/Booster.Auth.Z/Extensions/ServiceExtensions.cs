@@ -17,7 +17,6 @@ public static class ServiceExtensions
     public static IServiceCollection AddAuthZServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddBoosterServices<AuthZDbContext>(configuration);
-        services.AddBoosterMessaging<AuthZDbContext>(configuration);
 
         services.AddScoped<IPoolStoreProvider, PoolStoreProvider>();
 

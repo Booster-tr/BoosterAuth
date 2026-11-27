@@ -11,8 +11,11 @@ var app = builder.Build();
 
 app.UseBoosterServices();
 app.UseRouting();
-app.UseBoosterMessaging();
+app.UseBoosterCorrelation();
 app.UseBoosterApi();
+
+// IdP ve lisans portalinin bildirim istekleri (ic ag, gRPC portu 8081).
+app.MapGrpcService<Booster.NotificationService.Features.Dispatch.NotificationDispatchGrpcService>();
 
 // Şablonlar olmadan hiçbir bildirim render edilemez; servis açılışında kurulur.
 using (var scope = app.Services.CreateScope())

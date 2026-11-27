@@ -1,0 +1,31 @@
+syntax = "proto3";
+option csharp_namespace = "Booster.Auth.Notification.Grpc";
+package notification;
+
+// IdP ve lisans portali bildirimi bu servisle ister. Cagiranlar yaniti BEKLEMEZ (fire-and-forget, NotificationClient):
+// Notification o an kapaliysa bildirim kaybolur, yeniden denenmez (bilincli karar).
+service NotificationDispatchService {
+  // Sablonu isler ve kanaldan (e-posta / SMS / push) gonderir.
+  rpc Send (SendNotificationRequest) returns (NotificationAck);
+
+  // Silinen hesabin gonderim kayitlarini (alici, kod iceren govde) siler.
+  rpc DeletePrincipalNotifications (DeletePrincipalNotificationsRequest) returns (NotificationAck);
+}
+
+message SendNotificationRequest {
+  string tenant_id = 1;          // Guid
+  string user_pool_id = 2;       // Guid
+  string principal_id = 3;       // Guid; bos = kullaniciya bagli degil (or. lisans portali)
+  string template_key = 4;
+  int32 channel = 5;             // NotificationChannel
+  string target = 6;             // e-posta adresi / telefon / cihaz
+  string language_code = 7;
+  map<string, string> data = 8;  // sablon degiskenleri
+}
+
+message DeletePrincipalNotificationsRequest {
+  string user_pool_id = 1;       // Guid
+  string principal_id = 2;       // Guid
+}
+
+message NotificationAck {}

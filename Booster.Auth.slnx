@@ -5,9 +5,6 @@
     <Project Path="Common/Booster.Database/Booster.Database.csproj" />
     <Project Path="Common/Booster.Hashing/Booster.Hashing.csproj" />
   </Folder>
-  <Folder Name="/Common/Amqp/">
-    <Project Path="Common/Amqp/Booster.Amqp/Booster.Amqp.csproj" />
-  </Folder>
   <Folder Name="/Common/AuthZ/">
     <Project Path="Common/AuthZ/Booster.Authorization.Contracts/Booster.Authorization.Contracts.csproj" />
     <Project Path="Common/AuthZ/Booster.Authorization.Fga/Booster.Authorization.Fga.csproj" />
@@ -37,6 +34,7 @@
     <Project Path="CommonInternal/Booster.Auth.Ldap/Booster.Auth.Ldap.csproj" />
     <Project Path="CommonInternal/Booster.Auth.Management.Contracts/Booster.Auth.Management.Contracts.csproj" />
     <Project Path="CommonInternal/Booster.Auth.Manager/Booster.Auth.Manager.csproj" />
+    <Project Path="CommonInternal/Booster.Auth.Notification.Contracts/Booster.Auth.Notification.Contracts.csproj" />
   </Folder>
   <Folder Name="/Gateways/">
     <Project Path="Gateways/Booster.Auth.YarpGateway/Booster.Auth.YarpGateway.csproj" />

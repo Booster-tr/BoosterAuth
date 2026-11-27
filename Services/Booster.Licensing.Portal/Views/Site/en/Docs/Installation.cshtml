@@ -13,7 +13,7 @@ docker compose up -d</pre></div>
     <li>Internet access during installation (images are pulled from <code>ghcr.io/booster-tr</code>)</li>
     <li>An address for Booster Auth, e.g. <code>auth.company.com</code>. It must be on <b>one of the domains in your license</b>.</li>
 </ul>
-<p>PostgreSQL, Redis, Kafka and OpenFGA ship with the package; there is nothing else to install.</p>
+<p>PostgreSQL, Redis and OpenFGA ship with the package; there is nothing else to install.</p>
 
 <h2 id="download">1. Download the package</h2>
 <p>Download <code>booster-auth.zip</code> (about 15 KB) from the <a href="/en/download">Download</a> page and unzip it:</p>
@@ -71,7 +71,7 @@ docker compose ps</pre></div>
     <li><b>OIDC discovery:</b> <code>https://auth.company.com/idp/.well-known/openid-configuration</code></li>
 </ul>
 <p>These are the only two entry points. Services run with read-only filesystems, as non-root users and with Linux capabilities dropped;
-    PostgreSQL, Redis, Kafka and OpenFGA stay on the internal network.</p>
+    PostgreSQL, Redis and OpenFGA stay on the internal network.</p>
 
 <h2 id="https">HTTPS certificate</h2>
 <p>On first start, your own local certificate authority (CA) and a server certificate are generated (the <code>pki/</code> folder). Browsers do not

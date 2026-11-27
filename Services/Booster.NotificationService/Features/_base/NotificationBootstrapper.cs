@@ -1,5 +1,5 @@
 using Booster.Database.Repositories;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.NotificationService.Features._base.Entities;
 using Booster.NotificationService.Infrastructures.Templating;
@@ -68,7 +68,6 @@ public class NotificationBootstrapper(
             EmailLayout.Paragraph(intro) +
             EmailLayout.CodeBox("{{Code}}"),
             footer);
-
 
     private static string InvitationBody(
         string preheader, string heading, string intro, string button, string fallback, string footer) =>

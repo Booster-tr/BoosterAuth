@@ -111,17 +111,14 @@ public class ImportPoolUsersCommandHandler(
                 continue;
             }
 
-            // Satir satir kaydedilir: bir hata, onceki satirlarin kullanicilarini ve davetlerini (outbox) geri almaz.
-            Guid? createdId = null;
+            // Satir satir kaydedilir: bir hata, onceki satirlarin kullanicilarini ve davetlerini geri almaz.
+            Principal? newUser = null;
             try
             {
                 await factory.RunWithinUserLimitAsync(async c =>
                 {
-                    var principal = await factory.CreateInvitedAsync(pool, name, email, c);
-                    if (cmd.SendInvitations)
-                        await invitations.SendAsync(principal, cmd.UserPoolId, c);
+                    newUser = await factory.CreateInvitedAsync(pool, name, email, c);
                     await principalRepository.SaveChangesAsync(c);
-                    createdId = principal.Id;
                 }, ct);
             }
             catch (BusinessException e) when (e.Message == LicenseMessageKeys.LimitUsers)
@@ -132,7 +129,11 @@ public class ImportPoolUsersCommandHandler(
                 continue;
             }
 
-            results.Add(new(row.Line, email, name, ImportRowStatus.Created, createdId));
+            // Davet e-postasi COMMIT'ten sonra: gonderim geri alinamaz.
+            if (cmd.SendInvitations)
+                await invitations.SendAsync(newUser!, cmd.UserPoolId, ct);
+
+            results.Add(new(row.Line, email, name, ImportRowStatus.Created, newUser!.Id));
         }
 
         var created = results.Count(r => r.Status == ImportRowStatus.Created);

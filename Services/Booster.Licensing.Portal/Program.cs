@@ -29,9 +29,8 @@ builder.Services.AddScoped<CustomerPortalService>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddSingleton<InstallPackage>();
 
-// Musteri e-postalari Booster Notification servisi uzerinden (Kafka + EF outbox).
-builder.Services.AddBoosterMessaging<LicensingDbContext>(builder.Configuration,
-    configureRider: rider => Booster.Auth.Common.Internal.Amqp.Extensions.NotificationBusExtensions.AddNotificationProducer(rider));
+// Musteri e-postalari Booster Notification servisi uzerinden (gRPC, yanit beklenmeden): NotificationSettings__GrpcAddress.
+Booster.Auth.Common.Internal.Notifications.NotificationClientExtensions.AddBoosterNotificationClient(builder.Services, builder.Configuration);
 builder.Services.AddScoped<PortalNotifier>();
 builder.Services.AddScoped<RenewalReminderService>();
 builder.Services.AddHostedService<RenewalReminderWorker>();
@@ -124,7 +123,7 @@ app.UseForwardedHeaders(forwarded);
 app.UseExceptionHandler("/hata");
 // Govdesiz hata yanitlari (or. 404) bos sayfa yerine ekran gosterir; 404 ziyaretcinin dilinde. Govdesi olan yanitlar etkilenmez.
 app.UseStatusCodePagesWithReExecute("/bulunamadi");
-app.UseBoosterMessaging();
+app.UseBoosterCorrelation();
 // AI dosyalari (/llms.txt, /ai/booster-auth/SKILL.md): .md varsayilan olarak sunulmaz.
 var contentTypes = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
 contentTypes.Mappings[".md"] = "text/markdown; charset=utf-8";

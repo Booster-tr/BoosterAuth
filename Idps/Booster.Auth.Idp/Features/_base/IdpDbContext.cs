@@ -1,4 +1,3 @@
-using MassTransit;
 using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Manager.RequestContexts;
@@ -29,10 +28,6 @@ public class IdpDbContext(DbContextOptions<IdpDbContext> options, IRequestContex
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.AddInboxStateEntity();
-        modelBuilder.AddOutboxMessageEntity();
-        modelBuilder.AddOutboxStateEntity();
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }

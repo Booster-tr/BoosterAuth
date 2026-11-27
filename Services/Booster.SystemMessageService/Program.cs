@@ -10,7 +10,7 @@ var app = builder.Build();
 
 app.UseBoosterServices();
 app.UseRouting();
-app.UseBoosterMessaging();
+app.UseBoosterCorrelation();
 app.UseBoosterApi();
 
 app.Run();

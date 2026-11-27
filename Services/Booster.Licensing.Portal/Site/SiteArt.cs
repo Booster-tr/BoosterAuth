@@ -18,7 +18,7 @@ public static class SiteArt
         """<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="6" width="9" height="6.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 6V4.2a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>""");
 
     /// <summary>
-    /// Dagitim mimarisi: kurum sinirinin icinde uygulamalar, LDAP / AD, Booster Auth, ic ag (PostgreSQL, Redis, Kafka, OpenFGA)
+    /// Dagitim mimarisi: kurum sinirinin icinde uygulamalar, LDAP / AD, Booster Auth, ic ag (PostgreSQL, Redis, OpenFGA)
     /// ve lisans dosyasi; sinirin disinda istege bagli dis saglayicilar ve baglanti kurulmayan lisans sunucusu.
     /// </summary>
     public static IHtmlContent Architecture(string lang)
@@ -30,8 +30,8 @@ public static class SiteArt
 <svg viewBox="0 0 1120 580" role="img" aria-labelledby="archT archD">
   <title id="archT">{{L("Booster Auth dağıtım mimarisi", "Booster Auth deployment architecture")}}</title>
   <desc id="archD">{{L(
-      "Kurumun altyapısı içinde Booster Auth: solda web, mobil ve arka uç uygulamaları OIDC ile, LDAP / Active Directory dizini ise oturum açma için bağlanır; altta dışarıya açılmayan PostgreSQL, Redis, Kafka ve OpenFGA; sağda yerelde doğrulanan lisans dosyası. Altyapının dışında yalnızca yapılandırılırsa kullanılan dış kimlik sağlayıcıları bulunur; lisans sunucusuna bağlantı kurulmaz.",
-      "Booster Auth inside the organisation's infrastructure: web, mobile and back-end applications connect over OIDC on the left, and an LDAP / Active Directory directory is used for sign-in; below, PostgreSQL, Redis, Kafka and OpenFGA are not exposed; on the right, a license file verified locally. Outside the boundary are external identity providers used only if configured; no connection is made to a license server.")}}</desc>
+      "Kurumun altyapısı içinde Booster Auth: solda web, mobil ve arka uç uygulamaları OIDC ile, LDAP / Active Directory dizini ise oturum açma için bağlanır; altta dışarıya açılmayan PostgreSQL, Redis ve OpenFGA; sağda yerelde doğrulanan lisans dosyası. Altyapının dışında yalnızca yapılandırılırsa kullanılan dış kimlik sağlayıcıları bulunur; lisans sunucusuna bağlantı kurulmaz.",
+      "Booster Auth inside the organisation's infrastructure: web, mobile and back-end applications connect over OIDC on the left, and an LDAP / Active Directory directory is used for sign-in; below, PostgreSQL, Redis and OpenFGA are not exposed; on the right, a license file verified locally. Outside the boundary are external identity providers used only if configured; no connection is made to a license server.")}}</desc>
   <defs>
     <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9" fill="none" stroke="#24564C" stroke-width="1.5"/></marker>
     <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 1 L9 5 L0 9" fill="none" stroke="#9C5E25" stroke-width="1.5"/></marker>
@@ -78,14 +78,12 @@ public static class SiteArt
     <rect x="376" y="382" width="{{(tr ? 232 : 196)}}" height="20" fill="#F4F0E8"/>
     <text x="384" y="397" font-size="12" font-weight="600" letter-spacing="1" fill="#9C5E25">{{L("İÇ AĞ · DIŞARIYA AÇILMAZ", "INTERNAL · NOT EXPOSED")}}</text>
     <g font-size="14" font-weight="500" fill="#1C201E">
-      <rect x="380" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
-      <text x="428" y="460" text-anchor="middle">PostgreSQL</text><text x="428" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("kalıcı veri", "persistent data")}}</text>
-      <rect x="488" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
-      <text x="536" y="460" text-anchor="middle">Redis</text><text x="536" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("önbellek", "cache")}}</text>
-      <rect x="596" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
-      <text x="644" y="460" text-anchor="middle">Kafka</text><text x="644" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("olaylar", "events")}}</text>
-      <rect x="704" y="420" width="96" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
-      <text x="752" y="460" text-anchor="middle">OpenFGA</text><text x="752" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("yetkilendirme", "authorization")}}</text>
+      <rect x="380" y="420" width="132" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="446" y="460" text-anchor="middle">PostgreSQL</text><text x="446" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("kalıcı veri", "persistent data")}}</text>
+      <rect x="524" y="420" width="132" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="590" y="460" text-anchor="middle">Redis</text><text x="590" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("önbellek", "cache")}}</text>
+      <rect x="668" y="420" width="132" height="88" rx="6" fill="#FBF9F4" stroke="#C4BAA8"/>
+      <text x="734" y="460" text-anchor="middle">OpenFGA</text><text x="734" y="482" text-anchor="middle" font-size="11.5" font-weight="400" fill="#61665F">{{L("yetkilendirme", "authorization")}}</text>
     </g>
     <path d="M525 342 L 525 382" stroke="#24564C" stroke-width="1.5" marker-end="url(#ah)" marker-start="url(#ah)"/>
 

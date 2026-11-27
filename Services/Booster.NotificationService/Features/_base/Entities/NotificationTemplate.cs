@@ -1,6 +1,6 @@
 using Booster.Database.Models;
 using Booster.Database.Postgres.Models;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

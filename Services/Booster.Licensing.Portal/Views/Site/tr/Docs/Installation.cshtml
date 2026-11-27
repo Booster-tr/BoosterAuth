@@ -13,7 +13,7 @@ docker compose up -d</pre></div>
     <li>Kurulum sırasında internet erişimi (image'lar <code>ghcr.io/booster-tr</code> adresinden indirilir)</li>
     <li>Booster Auth için bir adres: ör. <code>auth.firma.com</code>. Bu adres <b>lisansınızdaki domain'lerden biri</b> olmalıdır.</li>
 </ul>
-<p>PostgreSQL, Redis, Kafka ve OpenFGA pakete dahildir; ayrıca kurmanız gerekmez.</p>
+<p>PostgreSQL, Redis ve OpenFGA pakete dahildir; ayrıca kurmanız gerekmez.</p>
 
 <h2 id="indir">1. Paketi indirin</h2>
 <p><a href="/tr/download">İndir</a> sayfasından <code>booster-auth.zip</code> dosyasını (yaklaşık 15 KB) indirip açın:</p>
@@ -70,7 +70,7 @@ docker compose ps</pre></div>
     <li><b>OIDC keşif adresi:</b> <code>https://auth.firma.com/idp/.well-known/openid-configuration</code></li>
 </ul>
 <p>Dışarıya yalnızca bu iki kapı açılır. Servisler salt okunur dosya sistemiyle, root olmayan kullanıcıyla ve Linux yetkileri kaldırılmış olarak
-    çalışır; PostgreSQL, Redis, Kafka ve OpenFGA iç ağda kalır.</p>
+    çalışır; PostgreSQL, Redis ve OpenFGA iç ağda kalır.</p>
 
 <h2 id="https">HTTPS sertifikası</h2>
 <p>İlk açılışta kendi yerel sertifika yetkiliniz (CA) ve sunucu sertifikası otomatik üretilir (<code>pki/</code> klasörü). Tarayıcı bu sertifikayı

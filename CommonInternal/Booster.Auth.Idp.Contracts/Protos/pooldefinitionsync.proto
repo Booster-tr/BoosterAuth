@@ -1,0 +1,28 @@
+syntax = "proto3";
+option csharp_namespace = "Booster.Auth.Idp.Grpc";
+package idp;
+
+// Management'ta rol / kapsam adi degisince ya da silinince IdP'deki kullanici kopyalarini (PrincipalRole.RoleName,
+// PrincipalScope.Scope) gunceller. Management yaniti BEKLEMEZ (fire-and-forget): IdP o an kapaliysa kopya bayat kalir
+// (bilincli karar).
+service PoolDefinitionSyncService {
+  // new_key bos = rol silindi.
+  rpc RoleChanged (RoleChangedRequest) returns (PoolDefinitionSyncAck);
+
+  // new_scope bos = kapsam silindi.
+  rpc ScopeDefinitionChanged (ScopeDefinitionChangedRequest) returns (PoolDefinitionSyncAck);
+}
+
+message RoleChangedRequest {
+  string user_pool_id = 1;   // Guid
+  string role_id = 2;        // Guid
+  string new_key = 3;
+}
+
+message ScopeDefinitionChangedRequest {
+  string user_pool_id = 1;   // Guid
+  string old_scope = 2;
+  string new_scope = 3;
+}
+
+message PoolDefinitionSyncAck {}

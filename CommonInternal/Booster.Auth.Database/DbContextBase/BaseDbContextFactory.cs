@@ -8,7 +8,7 @@ namespace Booster.Auth.Database.DbContextBase;
 /// <c>dotnet ef</c> komutlarının DbContext'i oluşturmak için kullandığı fabrika.
 /// <para>
 /// Fabrika olmasaydı EF, migration üretmek için uygulamanın host'unu kurmak
-/// zorunda kalırdı; o da Kafka/Redis gibi bağımlılıkların kayıtlı olmasını
+/// zorunda kalırdı; o da Redis gibi bağımlılıkların kayıtlı olmasını
 /// gerektirir. Migration üretmek için altyapının ayakta olması saçma bir
 /// koşuldur, bu yüzden bağlantı dizesi doğrudan appsettings'ten okunur.
 /// </para>

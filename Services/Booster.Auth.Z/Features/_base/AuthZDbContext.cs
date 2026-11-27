@@ -1,4 +1,3 @@
-using MassTransit;
 using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.Auth.Z.Features._base.Entities;
@@ -17,13 +16,6 @@ public class AuthZDbContext(
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        // MassTransit outbox/inbox tablolari. Log ve audit mesajlari is
-        // islemiyle AYNI transaction'da outbox'a yazilir: broker o an kapaliysa
-        // bile kayit kaybolmaz, baglanti gelince teslim edilir.
-        modelBuilder.AddInboxStateEntity();
-        modelBuilder.AddOutboxMessageEntity();
-        modelBuilder.AddOutboxStateEntity();
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
