@@ -1,0 +1,106 @@
+@{ var m = (SitePageModel)Model!; var lang = m.Lang; }
+
+<section class="hero hero-glow">
+    <div class="wrap">
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <span class="eyebrow reveal">@m.T("nav.contact")</span>
+                <h1 class="reveal reveal-d1">Bize ulasin</h1>
+                <p class="lead reveal reveal-d2">
+                    Urunlerimiz, oyunlarimiz veya is birligi firsatlari hakkinda konusmak isterseniz
+                    sizi dinlemekten memnuniyet duyariz. En hizli yol e-posta ile yazmaniz.
+                </p>
+                <div class="actions reveal reveal-d3">
+                    <a class="btn btn-primary btn-lg" href="mailto:info@@boosterslabs.com">E-posta gonder</a>
+                    <a class="btn btn-outline-light btn-lg" href="/@lang/products">@m.T("nav.products")</a>
+                </div>
+            </div>
+            <div class="hero-art reveal reveal-d2">
+                <img class="hero-mark" src="~/img/mark-dark-512.png" alt="Boosters Labs amblem" width="320" height="320" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="split">
+            <div class="reveal">
+                <span class="eyebrow">Iletisim</span>
+                <h2 class="mt-2">E-posta ile yazin</h2>
+                <p class="lead mt-2">
+                    Tum sorulariniz icin birincil iletisim kanalimiz e-postadir. Mesajinizi gonderin,
+                    en kisa surede size donus yapalim.
+                </p>
+                <ul class="info-list mt-3">
+                    <li>
+                        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+                        <span>info@@boosterslabs.com</span>
+                    </li>
+                    <li>
+                        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.6 7-11a7 7 0 10-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+                        <span>Turkiye</span>
+                    </li>
+                </ul>
+                <div class="actions mt-4">
+                    <a class="btn btn-primary btn-lg" href="mailto:info@@boosterslabs.com">E-posta gonder</a>
+                </div>
+            </div>
+            <div class="split-media reveal reveal-d1">
+                <img class="hero-mark" src="~/img/mark-light-512.png" alt="Boosters Labs amblem" width="280" height="280" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Nasil yardimci olabiliriz</span>
+            <h2 class="reveal reveal-d1">Dogru konuyla yazin</h2>
+            <p class="lead center reveal reveal-d2">
+                Asagidaki baglantilar ayni adrese, konusu hazir bir e-posta acar; boylece talebinizi
+                daha hizli yonlendirebiliriz.
+            </p>
+        </div>
+        <div class="grid grid-3 mt-4">
+            <article class="card reveal">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16v10H4z"/><path d="M8 7V5h8v2"/></svg></span>
+                <h3>Satis ve is birligi</h3>
+                <p>Lisanslama, fiyatlandirma ve ortaklik firsatlari hakkinda konusalim.</p>
+                <div class="actions">
+                    <a class="btn btn-ghost" href="mailto:info@@boosterslabs.com?subject=Satis%20ve%20is%20birligi">Yazin</a>
+                </div>
+            </article>
+            <article class="card reveal reveal-d1">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <h3>Destek</h3>
+                <p>Kurulumunuzla ilgili teknik sorulariniz icin bize ulasin.</p>
+                <div class="actions">
+                    <a class="btn btn-ghost" href="mailto:info@@boosterslabs.com?subject=Destek">Yazin</a>
+                </div>
+            </article>
+            <article class="card reveal reveal-d2">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg></span>
+                <h3>Genel</h3>
+                <p>Diger tum sorulariniz ve geri bildirimleriniz icin.</p>
+                <div class="actions">
+                    <a class="btn btn-ghost" href="mailto:info@@boosterslabs.com">Yazin</a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Konusmaya hazir misiniz?</h2>
+            <p class="lead">Mesajinizi gonderin, en kisa surede size donus yapalim.</p>
+            <div class="actions center">
+                <a class="btn btn-primary btn-lg" href="mailto:info@@boosterslabs.com">E-posta gonder</a>
+                <a class="btn btn-outline-light btn-lg" href="/@lang/about">@m.T("nav.about")</a>
+            </div>
+        </div>
+    </div>
+</section>

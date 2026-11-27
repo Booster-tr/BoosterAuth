@@ -35,7 +35,10 @@
     <meta property="og:locale:alternate" content="@(lang == "tr" ? "en_US" : "tr_TR")" />
     <meta name="twitter:card" content="summary" />
     <meta name="theme-color" content="#173F38" />
-    <link rel="icon" href="/img/logo.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="~/css/fonts.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @if (cur == SiteCatalog.Home)
@@ -63,7 +66,7 @@
     <div class="wrap">
         <a class="brand" href="/@lang" aria-label="@m.T("home")">
             @SiteArt.Mark()
-            Booster <small>Auth</small>
+            Boosters <small>Auth</small>
         </a>
         <nav class="nav" aria-label="@m.T("nav.main")">
             <a href="/@lang" aria-current="@Current("")">@m.T("nav.product")</a>
@@ -109,7 +112,7 @@
     <div class="wrap">
         <div class="foot">
             <div>
-                <a class="brand" href="/@lang" aria-label="@m.T("home")">@SiteArt.Mark(onDark: true) Booster <small>Auth</small></a>
+                <a class="brand" href="/@lang" aria-label="@m.T("home")">@SiteArt.Mark(onDark: true) Boosters <small>Auth</small></a>
                 <p class="foot-tag">@m.T("footer.tagline")</p>
             </div>
             <div>

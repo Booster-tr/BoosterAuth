@@ -1,0 +1,171 @@
+@{ var m = (SitePageModel)Model!; var lang = m.Lang; }
+
+<section class="hero hero-glow">
+    <div class="wrap">
+        <p class="crumb reveal"><a href="/@lang/products">Products</a> / Boosters Auth</p>
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <span class="eyebrow reveal">Boosters Auth</span>
+                <h1 class="reveal reveal-d1">Multi-tenant identity and authorization, entirely on your server.</h1>
+                <p class="lead reveal reveal-d2">
+                    Boosters Auth brings an OIDC/OAuth2 identity provider and OpenFGA-based
+                    relationship authorization together in a single product. It runs on-prem,
+                    is licensed offline, and makes <strong>no outbound requests</strong> for license checks.
+                </p>
+                <div class="actions reveal reveal-d3">
+                    <a class="btn btn-primary btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                    <a class="btn btn-outline-light btn-lg" href="/@lang/products">@m.T("cta.back.products")</a>
+                </div>
+            </div>
+            <div class="hero-art reveal reveal-d2">
+                <img class="hero-mark" src="~/img/mark-dark-512.png" alt="Boosters Auth emblem" width="320" height="320" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Overview</span>
+            <h2 class="reveal reveal-d1">Identity and authorization on one platform</h2>
+            <p class="lead center reveal reveal-d2">
+                Authenticate your users, give your applications secure sign-in, and govern who can
+                access what with fine-grained rules.
+            </p>
+        </div>
+        <div class="grid grid-3 mt-4">
+            <article class="card reveal">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 14h5"/></svg></span>
+                <h3>Multi-tenant</h3>
+                <p>Isolate tenants with user pools, applications, roles and scopes.</p>
+            </article>
+            <article class="card reveal reveal-d1">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <h3>Standard identity</h3>
+                <p>OIDC/OAuth2, PKCE, consent screen, refresh and token exchange for modern apps.</p>
+            </article>
+            <article class="card reveal reveal-d2">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 6H15M6 8.5v7a2.5 2.5 0 0 0 2.5 2.5H15"/></svg></span>
+                <h3>Relationship authorization</h3>
+                <p>check, batch-check and lookup with OpenFGA; fine-grained access via schema management.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="split">
+            <div class="reveal">
+                <span class="eyebrow">Identity flows</span>
+                <h2>The right sign-in for every user</h2>
+                <p class="lead">
+                    Single sign-on (SSO) for seamless movement between your applications, plus a range
+                    of login methods to match your organization's needs.
+                </p>
+                <ul class="ticks">
+                    <li>Password, passwordless login (email code / SMS code) and second-channel MFA.</li>
+                    <li>Federation: Google, Microsoft, Apple, GitHub, Facebook, LinkedIn, X.</li>
+                    <li>Enterprise integration with generic OIDC and SAML providers.</li>
+                    <li>Directory authentication via LDAP / Active Directory (LDAPS / StartTLS).</li>
+                    <li>Invitations, self-service registration and end-user account management.</li>
+                </ul>
+            </div>
+            <div class="split-media reveal reveal-d1">
+                <img src="~/img/mark-light-512.png" alt="Identity flows" width="420" height="420" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="split flip">
+            <div class="split-media reveal">
+                <img src="~/img/mark-light-512.png" alt="Authorization" width="420" height="420" />
+            </div>
+            <div class="reveal reveal-d1">
+                <span class="eyebrow">Authorization</span>
+                <h2>You decide who can access what</h2>
+                <p class="lead">
+                    With an OpenFGA-based relationship model, you define permissions by the relationships
+                    between objects rather than by roles alone. Complex access rules stay clear and auditable.
+                </p>
+                <ul class="ticks">
+                    <li>Fast authorization checks with check / batch-check / lookup queries.</li>
+                    <li>Evolve your model safely with schema management.</li>
+                    <li>Roles and scopes flow into the token for your applications to use directly.</li>
+                    <li>Extra protection with a pool-level redirect domain policy.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Security &amp; compliance</span>
+            <h2 class="reveal reveal-d1">Secure by default, auditable</h2>
+        </div>
+        <div class="grid grid-3 mt-4">
+            <article class="card reveal">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+                <h3>Security headers</h3>
+                <p>CSP and security headers by default; the identity screens are hardened.</p>
+            </article>
+            <article class="card reveal reveal-d1">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>
+                <h3>Audit logging</h3>
+                <p>Security events are written to an audit trail; personal data is masked, never logged.</p>
+            </article>
+            <article class="card reveal reveal-d2">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>
+                <h3>Observability</h3>
+                <p>Logs, traces and metrics via OpenTelemetry; system health is visible at all times.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="split">
+            <div class="reveal">
+                <span class="eyebrow">Why on-prem and offline</span>
+                <h2>Your data stays on your server</h2>
+                <p class="lead">
+                    Boosters Auth runs in your own infrastructure and unlocks with an offline license.
+                    The product never makes outbound requests to validate the license, so your identity
+                    data stays within your organization's boundaries.
+                </p>
+                <ul class="ticks">
+                    <li>Deployed on the customer's server; no internet dependency.</li>
+                    <li>Personal data never leaves; control stays entirely with you.</li>
+                    <li>Deployment with Docker / Kubernetes and a YARP-based gateway.</li>
+                    <li>Legal texts (privacy / terms) are managed per tenant.</li>
+                </ul>
+                <div class="actions">
+                    <a class="btn btn-primary" href="/@lang/contact">@m.T("cta.contact")</a>
+                </div>
+            </div>
+            <div class="split-media reveal reveal-d1">
+                <img src="~/img/mark-light-512.png" alt="On-prem and offline" width="420" height="420" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>See Boosters Auth up close</h2>
+            <p class="lead">Let's plan your organization's identity and authorization needs together.</p>
+            <div class="actions center">
+                <a class="btn btn-primary btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                <a class="btn btn-outline-light btn-lg" href="/@lang/products">@m.T("cta.back.products")</a>
+            </div>
+        </div>
+    </div>
+</section>

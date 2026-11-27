@@ -1,0 +1,82 @@
+@{ var m = (SitePageModel)Model!; var lang = m.Lang; }
+
+<section class="hero hero-glow">
+    <div class="wrap">
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <span class="eyebrow reveal">Game studio</span>
+                <h1 class="reveal reveal-d1">Our Games</h1>
+                <p class="lead reveal reveal-d2">
+                    The Boosters Labs game studio brings the same engineering rigor we use in enterprise
+                    software to games. We design fast, enjoyable experiences built for players of every age.
+                </p>
+                <div class="actions reveal reveal-d3">
+                    <a class="btn btn-primary btn-lg" href="/@lang/games/block-boosters">Block Boosters</a>
+                    <a class="btn btn-outline-light btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                </div>
+            </div>
+            <div class="hero-art reveal reveal-d2">
+                <img class="hero-mark" src="~/img/mark-dark-512.png" alt="Boosters Labs emblem" width="320" height="320" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="split">
+            <div class="reveal">
+                <span class="pill pill-gold">Game</span>
+                <h2 class="mt-2">Block Boosters</h2>
+                <p class="lead">
+                    Intuitive controls, satisfying mechanics and progressively harder levels make for a
+                    puzzle/action experience that is easy to pick up and hard to put down.
+                </p>
+                <ul class="ticks mt-2">
+                    <li>Family friendly, designed for players of every age</li>
+                    <li>Clean, modern visuals</li>
+                    <li>Ad-free, fair and smooth gameplay</li>
+                </ul>
+                <div class="actions mt-3">
+                    <a class="btn btn-primary" href="/@lang/games/block-boosters">@m.T("cta.details")</a>
+                </div>
+            </div>
+            <div class="split-media reveal reveal-d1">
+                <div class="center">
+                    <img class="hero-mark" src="~/img/mark-light-512.png" alt="Block Boosters" width="220" height="220" />
+                    <h3 class="mt-3">Block Boosters</h3>
+                    <p>Puzzle / action · Coming soon</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Roadmap</span>
+            <h2 class="reveal reveal-d1">More on the way</h2>
+            <p class="lead center reveal reveal-d2">
+                Our studio keeps working on new projects. We love coming back with unexpected ideas;
+                if you want to be among the first to hear, drop us a line.
+            </p>
+            <div class="actions center mt-3 reveal reveal-d3">
+                <a class="btn btn-dark" href="/@lang/contact">@m.T("nav.contact")</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Let's play together</h2>
+            <p class="lead">Reach out about our games, collaboration or publishing opportunities.</p>
+            <div class="actions center">
+                <a class="btn btn-primary btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                <a class="btn btn-outline-light btn-lg" href="/@lang/about">@m.T("nav.about")</a>
+            </div>
+        </div>
+    </div>
+</section>

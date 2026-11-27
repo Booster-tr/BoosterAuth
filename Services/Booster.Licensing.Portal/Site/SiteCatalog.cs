@@ -10,7 +10,7 @@ public static class SiteCatalog
 {
     public static readonly string[] Languages = ["tr", "en"];
     public const string DefaultLanguage = "tr";
-    public const string ProductName = "Booster Auth";
+    public const string ProductName = "Boosters Auth";
 
     // Destek iletisim bilgileri: site, portal ve dokumanlar buradan okur (tek yerde).
     public const string SupportPhone = "0540 526 26 26";

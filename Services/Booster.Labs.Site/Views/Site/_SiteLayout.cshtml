@@ -1,0 +1,144 @@
+@inject SiteOptions Options
+@{
+    var m = (SitePageModel)Model!;
+    var lang = m.Lang;
+    var other = m.Other;
+    var baseUrl = Options.PublicUrl.TrimEnd('/');
+    var cur = m.Page;
+    var canonical = baseUrl + cur.Path(lang);
+    var title = cur == SiteCatalog.Home
+        ? cur.SeoTitle(lang)
+        : $"{cur.SeoTitle(lang)} · {SiteCatalog.CompanyName}";
+    bool Active(string slug) => slug.Length == 0 ? cur == SiteCatalog.Home : cur.Slug == slug || cur.Slug.StartsWith(slug + "/");
+    string? Current(string slug) => Active(slug) ? "page" : null;
+}
+<!DOCTYPE html>
+<html lang="@lang" class="no-js">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title</title>
+    <meta name="description" content="@cur.Description(lang)" />
+    <link rel="canonical" href="@canonical" />
+    @foreach (var l in SiteCatalog.Languages)
+    {
+        <link rel="alternate" hreflang="@l" href="@(baseUrl + cur.Path(l))" />
+    }
+    <link rel="alternate" hreflang="x-default" href="@(baseUrl + cur.Path(SiteCatalog.DefaultLanguage))" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@SiteCatalog.CompanyName" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:description" content="@cur.Description(lang)" />
+    <meta property="og:url" content="@canonical" />
+    <meta property="og:image" content="@(baseUrl)/img/logo-dark-512.png" />
+    <meta property="og:locale" content="@(lang == "tr" ? "tr_TR" : "en_US")" />
+    <meta property="og:locale:alternate" content="@(lang == "tr" ? "en_US" : "tr_TR")" />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0F1E2E" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
+
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "Organization",
+      "name": "@SiteCatalog.CompanyName",
+      "url": "@baseUrl",
+      "logo": "@(baseUrl)/img/logo-dark-512.png",
+      "description": "@cur.Description(lang)",
+      "email": "@Options.ContactEmail"
+    }
+    </script>
+    @await RenderSectionAsync("Head", required: false)
+</head>
+<body class="site">
+<a class="skip" href="#main">@m.T("skip")</a>
+
+<header class="top" data-header>
+    <div class="wrap top-in">
+        <a class="brand" href="/@lang" aria-label="@m.T("home")">
+            <img class="brand-logo" src="~/img/logo-light.png" alt="@SiteCatalog.CompanyName" width="190" height="40" />
+        </a>
+        <nav class="nav" aria-label="@m.T("nav.main")">
+            <a href="/@lang" aria-current="@Current("")">@m.T("nav.home")</a>
+            <a href="/@lang/products" aria-current="@Current("products")">@m.T("nav.products")</a>
+            <a href="/@lang/games" aria-current="@Current("games")">@m.T("nav.games")</a>
+            <a href="/@lang/about" aria-current="@Current("about")">@m.T("nav.about")</a>
+            <a href="/@lang/contact" aria-current="@Current("contact")">@m.T("nav.contact")</a>
+        </nav>
+        <div class="top-right">
+            <div class="lang" role="group" aria-label="@m.T("nav.lang")">
+                @if (lang == "tr")
+                {
+                    <span aria-current="true">TR</span><a href="@cur.Path("en")" hreflang="en" lang="en" title="English">EN</a>
+                }
+                else
+                {
+                    <a href="@cur.Path("tr")" hreflang="tr" lang="tr" title="Türkçe">TR</a><span aria-current="true">EN</span>
+                }
+            </div>
+            <a class="btn btn-sm btn-primary nav-cta" href="/@lang/contact">@m.T("cta.contact")</a>
+            <button class="burger" type="button" aria-expanded="false" aria-controls="m-menu" data-burger aria-label="@m.T("menu")">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+    <nav class="m-menu" id="m-menu" aria-label="@m.T("nav.mobile")" data-mobile hidden>
+        <a href="/@lang" aria-current="@Current("")">@m.T("nav.home")</a>
+        <a href="/@lang/products" aria-current="@Current("products")">@m.T("nav.products")</a>
+        <a href="/@lang/games" aria-current="@Current("games")">@m.T("nav.games")</a>
+        <a href="/@lang/about" aria-current="@Current("about")">@m.T("nav.about")</a>
+        <a href="/@lang/contact" aria-current="@Current("contact")">@m.T("nav.contact")</a>
+    </nav>
+</header>
+
+<main id="main">
+    @RenderBody()
+</main>
+
+<footer class="foot-band">
+    <div class="wrap">
+        <div class="foot">
+            <div class="foot-brand">
+                <img class="brand-logo" src="~/img/logo-dark.png" alt="@SiteCatalog.CompanyName" width="190" height="40" />
+                <p class="foot-tag">@m.T("footer.tagline")</p>
+            </div>
+            <div>
+                <h2 class="foot-h">@m.T("footer.products")</h2>
+                <ul>
+                    <li><a href="/@lang/products">@m.T("nav.products")</a></li>
+                    <li><a href="/@lang/products/boosters-auth">Boosters Auth</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2 class="foot-h">@m.T("footer.games")</h2>
+                <ul>
+                    <li><a href="/@lang/games">@m.T("nav.games")</a></li>
+                    <li><a href="/@lang/games/block-boosters">Block Boosters</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2 class="foot-h">@m.T("footer.company")</h2>
+                <ul>
+                    <li><a href="/@lang/about">@m.T("nav.about")</a></li>
+                    <li><a href="/@lang/contact">@m.T("nav.contact")</a></li>
+                    <li><a href="@cur.Path(other)" hreflang="@other" lang="@other">@m.T("lang.switch")</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="foot-bottom">
+            <p>© @DateTime.UtcNow.Year @SiteCatalog.CompanyName. @m.T("footer.rights")</p>
+            <a class="to-top" href="#main">@m.T("footer.toTop")</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

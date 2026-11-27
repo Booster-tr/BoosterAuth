@@ -1,0 +1,171 @@
+@{ var m = (SitePageModel)Model!; var lang = m.Lang; }
+
+<section class="hero hero-glow">
+    <div class="wrap">
+        <p class="crumb reveal"><a href="/@lang/products">Urunler</a> / Boosters Auth</p>
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <span class="eyebrow reveal">Boosters Auth</span>
+                <h1 class="reveal reveal-d1">Cok kiracili kimlik ve yetki, tamamen sizin sunucunuzda.</h1>
+                <p class="lead reveal reveal-d2">
+                    Boosters Auth; OIDC/OAuth2 kimlik saglayici ve OpenFGA tabanli iliskisel
+                    yetkilendirmeyi tek urunde bir araya getirir. On-prem calisir, cevrimdisi
+                    lisanslanir ve lisans dogrulamasi icin disariya <strong>hic istek atmaz</strong>.
+                </p>
+                <div class="actions reveal reveal-d3">
+                    <a class="btn btn-primary btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                    <a class="btn btn-outline-light btn-lg" href="/@lang/products">@m.T("cta.back.products")</a>
+                </div>
+            </div>
+            <div class="hero-art reveal reveal-d2">
+                <img class="hero-mark" src="~/img/mark-dark-512.png" alt="Boosters Auth amblem" width="320" height="320" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Genel bakis</span>
+            <h2 class="reveal reveal-d1">Kimlik ve yetki, tek platformda</h2>
+            <p class="lead center reveal reveal-d2">
+                Kullanicilarinizi dogrular, uygulamalariniza guvenli giris saglar ve kimin neye
+                erisebilecegini ince taneli kurallarla yonetirsiniz.
+            </p>
+        </div>
+        <div class="grid grid-3 mt-4">
+            <article class="card reveal">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 14h5"/></svg></span>
+                <h3>Cok kiracili</h3>
+                <p>Kullanici havuzlari, uygulamalar, roller ve kapsamlar ile kiracilarinizi birbirinden yalitirsiniz.</p>
+            </article>
+            <article class="card reveal reveal-d1">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+                <h3>Standart kimlik</h3>
+                <p>OIDC/OAuth2, PKCE, izin ekrani, yenileme ve token exchange ile modern uygulamalar.</p>
+            </article>
+            <article class="card reveal reveal-d2">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 6H15M6 8.5v7a2.5 2.5 0 0 0 2.5 2.5H15"/></svg></span>
+                <h3>Iliskisel yetki</h3>
+                <p>OpenFGA ile check, batch-check ve lookup; sema yonetimiyle ince taneli erisim.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="split">
+            <div class="reveal">
+                <span class="eyebrow">Kimlik akislari</span>
+                <h2>Her kullanici icin dogru giris</h2>
+                <p class="lead">
+                    Tek oturum acma (SSO) ile uygulamalariniz arasinda kesintisiz gecis;
+                    kurumunuzun ihtiyacina gore cok sayida giris yontemi.
+                </p>
+                <ul class="ticks">
+                    <li>Parola, parolasiz giris (e-posta kodu / SMS kodu) ve ikinci kanal MFA.</li>
+                    <li>Federasyon: Google, Microsoft, Apple, GitHub, Facebook, LinkedIn, X.</li>
+                    <li>Genel OIDC ve SAML saglayicilari ile kurumsal entegrasyon.</li>
+                    <li>LDAP / Active Directory (LDAPS / StartTLS) ile dizin dogrulamasi.</li>
+                    <li>Davet, self-servis kayit ve son kullanici hesap yonetimi.</li>
+                </ul>
+            </div>
+            <div class="split-media reveal reveal-d1">
+                <img src="~/img/mark-light-512.png" alt="Kimlik akislari" width="420" height="420" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="split flip">
+            <div class="split-media reveal">
+                <img src="~/img/mark-light-512.png" alt="Yetkilendirme" width="420" height="420" />
+            </div>
+            <div class="reveal reveal-d1">
+                <span class="eyebrow">Yetkilendirme</span>
+                <h2>Kimin neye erisebilecegini siz belirlersiniz</h2>
+                <p class="lead">
+                    OpenFGA tabanli iliskisel model ile izinleri rollere degil, nesneler arasindaki
+                    iliskilere gore tanimlarsiniz. Karmasik erisim kurallari net ve denetlenebilir kalir.
+                </p>
+                <ul class="ticks">
+                    <li>check / batch-check / lookup sorgulariyla hizli yetki kontrolu.</li>
+                    <li>Sema yonetimi ile modelinizi guvenle gelistirirsiniz.</li>
+                    <li>Roller ve kapsamlar token'a yansir; uygulamalariniz dogrudan kullanir.</li>
+                    <li>Havuz bazli yonlendirme (redirect) domain politikasiyla ek koruma.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section alt">
+    <div class="wrap">
+        <div class="head-block center">
+            <span class="eyebrow reveal">Guvenlik ve uyum</span>
+            <h2 class="reveal reveal-d1">Varsayilan olarak guvenli, denetlenebilir</h2>
+        </div>
+        <div class="grid grid-3 mt-4">
+            <article class="card reveal">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+                <h3>Guvenlik basliklari</h3>
+                <p>CSP ve guvenlik basliklari varsayilan; kimlik ekranlari sikilastirilmistir.</p>
+            </article>
+            <article class="card reveal reveal-d1">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>
+                <h3>Denetim kaydi (KVKK)</h3>
+                <p>Guvenlik olaylari denetim kaydina yazilir; kisisel veri maskelenir, loglanmaz.</p>
+            </article>
+            <article class="card reveal reveal-d2">
+                <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></span>
+                <h3>Gozlemlenebilirlik</h3>
+                <p>OpenTelemetry ile log, iz ve metrik; sistemin saglik durumu her an gorunur.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="split">
+            <div class="reveal">
+                <span class="eyebrow">Neden on-prem ve cevrimdisi</span>
+                <h2>Verileriniz sizin sunucunuzda kalir</h2>
+                <p class="lead">
+                    Boosters Auth kendi altyapinizda calisir ve cevrimdisi lisansla acilir.
+                    Urun, lisans dogrulamasi icin disariya hicbir istek atmaz; boylece kimlik
+                    verileriniz kurumunuzun sinirlari icinde kalir.
+                </p>
+                <ul class="ticks">
+                    <li>Kurulum musteri sunucusunda; internet bagimliligi yok.</li>
+                    <li>Kisisel veriler disari cikmaz; kontrol tamamen sizde.</li>
+                    <li>Docker / Kubernetes ile dagitim, YARP tabanli gateway.</li>
+                    <li>Yasal metinler (KVKK / gizlilik / kullanim kosullari) kiraci bazli yonetilir.</li>
+                </ul>
+                <div class="actions">
+                    <a class="btn btn-primary" href="/@lang/contact">@m.T("cta.contact")</a>
+                </div>
+            </div>
+            <div class="split-media reveal reveal-d1">
+                <img src="~/img/mark-light-512.png" alt="On-prem ve cevrimdisi" width="420" height="420" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="wrap">
+        <div class="cta-band reveal">
+            <h2>Boosters Auth'u yakindan gorun</h2>
+            <p class="lead">Kurumunuzun kimlik ve yetki ihtiyacini birlikte planlayalim.</p>
+            <div class="actions center">
+                <a class="btn btn-primary btn-lg" href="/@lang/contact">@m.T("cta.contact")</a>
+                <a class="btn btn-outline-light btn-lg" href="/@lang/products">@m.T("cta.back.products")</a>
+            </div>
+        </div>
+    </div>
+</section>
