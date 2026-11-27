@@ -21,6 +21,10 @@ public static class ServiceExtensions
         services.AddBoosterCacheLanguageTranslator();
         services.AddBoosterExceptionHandler();
 
+        // GET health (HealthCheckEndpoint) HealthCheckService ister. Onceden MassTransit kaydediyordu; Kafka kalkinca
+        // kayit da kalkti ve servis acilista coktu.
+        services.AddHealthChecks();
+
         services.AddNotificationSenders(configuration);
         services.AddGrpc();
 
