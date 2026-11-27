@@ -50,8 +50,11 @@
 
 <h2 id="updates">Updates</h2>
 <div class="code"><pre>docker compose pull
-docker compose up -d</pre></div>
-<p>The database schema is updated automatically on start. To pin a specific version, change <code>BOOSTER_VERSION</code> in <code>.env</code>.</p>
+docker compose up -d --remove-orphans</pre></div>
+<p>The database schema is updated automatically on start. <code>--remove-orphans</code> also removes the containers of services dropped in the new
+    release. To pin a specific version, change <code>BOOSTER_VERSION</code> in <code>.env</code>.</p>
+<p><b>Older installations:</b> Booster Auth no longer uses Kafka. If you updated from a release that included Kafka, you can also delete the old Kafka
+    data: <code>docker volume rm booster-auth_kafka_data</code> (the prefix is <code>COMPOSE_PROJECT_NAME</code> from <code>.env</code>).</p>
 
 <h2 id="backup">Backups</h2>
 <p>All persistent data lives in the installation folder. For a consistent backup:</p>
@@ -77,6 +80,9 @@ docker compose up -d</pre></div>
 <p>The license is missing, expired or invalid. Check the state on <b>System &gt; License</b> (<a href="/en/docs/licensing#states">License states</a>).</p>
 <h3>Sign-up e-mails do not arrive</h3>
 <p>Without SMTP settings no e-mail is sent. Use <code>docker compose logs booster-notification</code> to see delivery errors.</p>
+<p>Notifications are sent without waiting for a reply and a failed send is <b>not retried</b>: if the Notification service is down or the SMTP server
+    cannot be reached at that moment, the e-mail is lost. The user has to request the code or link again. When the service could not be reached,
+    <code>docker compose logs booster-idp</code> shows a warning containing <code>yeniden denenmeyecek</code>.</p>
 <h3>A service does not start</h3>
 <p>Check the status with <code>docker compose ps</code> and the error with <code>docker compose logs &lt;service&gt;</code>. If a value in <code>.env</code>
     still contains <code>CHANGE_ME</code>, the preparation step names the missing variable: <code>docker compose logs booster-init</code>.</p>

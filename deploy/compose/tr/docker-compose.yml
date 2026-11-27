@@ -3,7 +3,7 @@
 #
 #  Ilk kurulum:   ./kurulum.sh   (Windows: .\kurulum.ps1)  -> .env olusur
 #  Calistir:      docker compose up -d
-#  Guncelle:      docker compose pull && docker compose up -d
+#  Guncelle:      docker compose pull && docker compose up -d --remove-orphans
 #  Durdur:        docker compose down        (veri silinmez; veri ./data altinda)
 #
 #  Disariya acilan portlar:

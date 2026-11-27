@@ -78,11 +78,14 @@ Kayıt doğrulama, davet ve şifre sıfırlama e-postaları için `.env` dosyas�
 | --- | --- |
 | Durum | `docker compose ps` |
 | Loglar | `docker compose logs -f booster-idp` |
-| Güncelleme | `docker compose pull && docker compose up -d` |
+| Güncelleme | `docker compose pull && docker compose up -d --remove-orphans` |
 | Durdurma | `docker compose down` (veri silinmez) |
 | Yedek | `docker compose down` sonra `data/`, `pki/`, `secrets/` ve `.env` klasör/dosyalarını yedekleyin |
 
 Belirli bir sürüme sabitlemek için `.env` içinde `BOOSTER_VERSION` değerini değiştirin (varsayılan `latest`).
+
+Kafka içeren eski bir sürümden güncellediyseniz eski Kafka verisini silebilirsiniz: `docker volume rm booster-auth_kafka_data`
+(ön ek `.env` dosyasındaki `COMPOSE_PROJECT_NAME` değeridir).
 
 ## Klasörler
 
