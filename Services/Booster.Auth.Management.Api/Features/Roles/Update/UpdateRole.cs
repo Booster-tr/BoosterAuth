@@ -1,5 +1,4 @@
-using Booster.Auth.Common.Internal.Amqp.Events;
-using Booster.Auth.Common.Internal.Amqp.Extensions;
+using Booster.Auth.Management.Api.Managers.PoolDefinitionSyncManagers;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Constants;
@@ -13,7 +12,6 @@ using Booster.ExceptionManager.Abstraction.Exceptions;
 using FastEndpoints;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Management.Api.Features.Roles.Update;
 
@@ -32,7 +30,7 @@ public class UpdateRoleEndpoint : Endpoint<UpdateRoleCommand, UpdateRoleResponse
         {
             s.Summary = "Rolü günceller";
             s.Description = "Anahtar, görünen ad, açıklama ve kapsamları günceller. Kullanıcılara daha önce " +
-                            "atanmış rol adı IdP'de Kafka olayıyla güncellenir.";
+                            "atanmış rol adı IdP'de gRPC ile (yanıt beklenmeden) güncellenir.";
         });
     }
 
@@ -55,8 +53,7 @@ public class UpdateRoleCommandHandler(
     IAsyncRepository<RoleScope, AuthNDbContext> roleScopeRepository,
     IAsyncRepository<ScopeDefinition, AuthNDbContext> scopeDefinitionRepository,
     IClientDataCacheStore clientDataCacheStore,
-    IEventBus eventBus,
-    ILogger<UpdateRoleCommandHandler> logger)
+    IdpPoolDefinitionSync idpSync)
     : ICommandHandler<UpdateRoleCommand, UpdateRoleResponse>
 {
     public async Task<UpdateRoleResponse> ExecuteAsync(UpdateRoleCommand command, CancellationToken ct)
@@ -110,12 +107,7 @@ public class UpdateRoleCommandHandler(
         await clientDataCacheStore.InvalidatePoolAsync(command.UserPoolId, ct);
 
         if (keyChanged)
-            await eventBus.PublishOrLogAsync(new RoleChangedEvent
-            {
-                UserPoolId = command.UserPoolId,
-                RoleId = role.Id,
-                NewKey = key
-            }, logger, ct);
+            idpSync.RoleChanged(command.UserPoolId, role.Id, key);
 
         return new UpdateRoleResponse(role.Id);
     }

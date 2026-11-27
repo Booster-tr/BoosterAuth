@@ -1,9 +1,4 @@
-using Booster.Amqp.Constants;
-using Booster.Amqp.Extensions;
-using Booster.Auth.Common.Internal.Amqp.Events;
-using Booster.Auth.Common.Internal.Amqp.Extensions;
-using Booster.Auth.Idp.Features._amqp.Consumers.PoolDefinitionChanged;
-using MassTransit;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Idp.Managers.LicenseManagers;
 using Booster.Auth.Management.Contracts;
 using Booster.Licensing.Runtime;
@@ -59,24 +54,8 @@ public static class ServiceExtensions
 
         services.AddBoosterServices<IdpDbContext>(configuration);
 
-        services.AddBoosterMessaging<IdpDbContext>(
-            configuration,
-            configureRider: rider =>
-            {
-                rider.AddNotificationProducer();
-                rider.AddPrincipalEventProducers();
-                rider.AddConsumer<ScopeDefinitionChangedEventConsumer>();
-                rider.AddConsumer<RoleChangedEventConsumer>();
-            },
-            configureKafka: (cfg, context) =>
-            {
-                var groupId = context.GetRequiredService<AmqpSettings>().GroupId;
-
-                cfg.TopicEndpoint<string, ScopeDefinitionChangedEvent>(PoolDefinitionTopics.ScopeDefinitionChanged, groupId,
-                    e => e.AddConsumer<ScopeDefinitionChangedEvent, ScopeDefinitionChangedEventConsumer, IdpDbContext>(context));
-                cfg.TopicEndpoint<string, RoleChangedEvent>(PoolDefinitionTopics.RoleChanged, groupId,
-                    e => e.AddConsumer<RoleChangedEvent, RoleChangedEventConsumer, IdpDbContext>(context));
-            });
+        // Bildirimler Notification servisine gRPC ile, yanit beklenmeden gider (NotificationClient).
+        services.AddBoosterNotificationClient(configuration);
 
         var hashingOptions = services.AddSettings<HashingOptions>(configuration);
         services.AddHashing(hashingOptions);

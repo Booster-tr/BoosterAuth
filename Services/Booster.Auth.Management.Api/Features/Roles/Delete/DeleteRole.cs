@@ -1,5 +1,4 @@
-using Booster.Auth.Common.Internal.Amqp.Events;
-using Booster.Auth.Common.Internal.Amqp.Extensions;
+using Booster.Auth.Management.Api.Managers.PoolDefinitionSyncManagers;
 using Booster.Auth.Common.Internal.Constants;
 using Booster.Auth.Common.Internal.EntityExtensions;
 using Booster.Auth.Management.Api.Constants;
@@ -9,7 +8,6 @@ using Booster.Auth.Management.Api.Stores.ClientDataStores;
 using Booster.Authorization.Fga.Attributes;
 using Booster.Database.Repositories;
 using FastEndpoints;
-using IEventBus = Booster.Amqp.Bus.IEventBus;
 
 namespace Booster.Auth.Management.Api.Features.Roles.Delete;
 
@@ -28,7 +26,7 @@ public class DeleteRoleEndpoint : EndpointWithoutRequest<DeleteRoleResponse>
         {
             s.Summary = "Rolü siler";
             s.Description = "Rolü soft-delete ile kaldırır ve " +
-                            "havuzun varsayılan rollerinden çıkarılır. Kullanıcılardan IdP'de Kafka olayıyla kaldırılır.";
+                            "havuzun varsayılan rollerinden çıkarılır. Kullanıcılardan IdP'de gRPC ile (yanıt beklenmeden) kaldırılır.";
         });
     }
 
@@ -44,8 +42,7 @@ public class DeleteRoleCommandHandler(
     IAsyncRepository<Role, AuthNDbContext> roleRepository,
     IAsyncRepository<UserPool, AuthNDbContext> userPoolRepository,
     IClientDataCacheStore clientDataCacheStore,
-    IEventBus eventBus,
-    ILogger<DeleteRoleCommandHandler> logger)
+    IdpPoolDefinitionSync idpSync)
     : ICommandHandler<DeleteRoleCommand, DeleteRoleResponse>
 {
     public async Task<DeleteRoleResponse> ExecuteAsync(DeleteRoleCommand command, CancellationToken ct)
@@ -64,11 +61,7 @@ public class DeleteRoleCommandHandler(
         await roleRepository.SaveChangesAsync(ct);
         await clientDataCacheStore.InvalidatePoolAsync(command.UserPoolId, ct);
 
-        await eventBus.PublishOrLogAsync(new RoleChangedEvent
-        {
-            UserPoolId = command.UserPoolId,
-            RoleId = role!.Id
-        }, logger, ct);
+        idpSync.RoleChanged(command.UserPoolId, role!.Id);
 
         return new DeleteRoleResponse(role!.Id);
     }

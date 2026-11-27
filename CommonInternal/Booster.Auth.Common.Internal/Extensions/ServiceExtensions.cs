@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Booster.Auth.Common.Internal.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using Booster.Amqp.Constants;
-using Booster.Amqp.Extensions;
+using Booster.Auth.Common.Internal.Correlation;
 using Booster.Auth.Manager.Extensions;
 using Booster.Auth.Manager.Options;
 using Booster.Auth.Manager.RequestContexts;
@@ -23,7 +22,6 @@ using Booster.Database.Repositories;
 using Booster.ExceptionManager.Abstraction.Extensions;
 using Booster.Observability;
 using Booster.Auth.Common.Internal.Auditing;
-using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -157,31 +155,10 @@ public static class ServiceExtensions
         return app;
     }
 
-
-    public static IServiceCollection AddBoosterMessaging<TContext>(
-        this IServiceCollection services,
-        IConfiguration configuration,
-        Action<IBusRegistrationConfigurator>? configureConsumers = null,
-        Action<IRiderRegistrationConfigurator>? configureRider = null,
-        Action<IKafkaFactoryConfigurator, IRiderRegistrationContext>? configureKafka = null)
-        where TContext : DbContext
+    /// <summary>Istege correlation id verir (hata loglari ve yanit basligi: X-Correlation-ID).</summary>
+    public static WebApplication UseBoosterCorrelation(this WebApplication app)
     {
-        var amqpSettings = services.AddSettings<AmqpSettings>(configuration);
-
-        services.AddBoosterCorrelationContext();
-
-        services.AddKafkaBus<TContext>(
-            amqpSettings,
-            configureConsumers,
-            rider => configureRider?.Invoke(rider),
-            configureKafka);
-
-        return services;
-    }
-
-    public static WebApplication UseBoosterMessaging(this WebApplication app)
-    {
-        app.UseBoosterCorrelationContext();
+        app.UseMiddleware<CorrelationMiddleware>();
 
         return app;
     }

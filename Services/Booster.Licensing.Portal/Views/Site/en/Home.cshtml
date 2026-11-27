@@ -115,7 +115,7 @@
             <div><dt>Hardened services<small>read_only · non-root · cap_drop</small></dt>
                 <dd>Services run with read-only filesystems, as non-root users, with Linux capabilities dropped and <code>no-new-privileges</code> set.</dd></div>
             <div><dt>Small network surface<small>HTTPS · console</small></dt>
-                <dd>Only the HTTPS gateway and the admin console are exposed. PostgreSQL, Redis, Kafka and OpenFGA stay on the internal network.</dd></div>
+                <dd>Only the HTTPS gateway and the admin console are exposed. PostgreSQL, Redis and OpenFGA stay on the internal network.</dd></div>
             <div><dt>Your secrets stay yours<small>.env</small></dt>
                 <dd>The setup script generates every password and key at random; none of them is shared with us. If any value in <code>.env</code> is
                     still <code>CHANGE_ME</code>, the system refuses to start and names the variable.</dd></div>
@@ -239,7 +239,7 @@
                 <code>.env</code>. <code>docker compose up -d</code> brings the whole system up.</p>
             <ul class="after">
                 <li><b>Requirements</b><span>Docker Engine 24+ with Compose v2, 4 GB RAM, 10 GB disk</span></li>
-                <li><b>Included</b><span>PostgreSQL, Redis, Kafka and OpenFGA; none of them exposed</span></li>
+                <li><b>Included</b><span>PostgreSQL, Redis and OpenFGA; none of them exposed</span></li>
                 <li><b>HTTPS</b><span>A local CA and certificate are generated on first start</span></li>
                 <li><b>First sign-in</b><span>As <code>admin</code>; you change the password on first sign-in</span></li>
             </ul>

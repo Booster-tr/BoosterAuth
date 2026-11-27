@@ -1,4 +1,4 @@
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 
 namespace Booster.NotificationService.Infrastructures.Templating;
 

@@ -1,4 +1,4 @@
-using Booster.Auth.Common.Internal.Amqp.Extensions;
+using Booster.Auth.Management.Api.Managers.PoolDefinitionSyncManagers;
 using Booster.Auth.Common.Internal.Extensions;
 using Booster.Hashing.Extensions;
 using Booster.Hashing.Options;
@@ -25,9 +25,6 @@ public static class ServiceExtensions
     public static IServiceCollection AddAuthNServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddBoosterServices<AuthNDbContext>(configuration);
-        services.AddBoosterMessaging<AuthNDbContext>(
-            configuration,
-            configureRider: rider => rider.AddPoolDefinitionProducers());
         services.AddSettings<BootstrapOptions>(configuration);
 
         var hashingOptions = services.AddSettings<HashingOptions>(configuration);
@@ -51,22 +48,28 @@ public static class ServiceExtensions
 
         var idpSettings = services.AddSettings<IdpSettings>(configuration);
 
-        services.AddGrpcClient<PrincipalLookupService.PrincipalLookupServiceClient>(options =>
-        {
-            options.Address = new Uri(idpSettings.GrpcAddress);
-        })
-        .ConfigureChannel(channel =>
-        {
-            channel.HttpHandler = new SocketsHttpHandler
+        void AddIdpGrpcClient<TClient>() where TClient : class =>
+            services.AddGrpcClient<TClient>(options =>
             {
-                ConnectTimeout = TimeSpan.FromSeconds(idpSettings.TimeoutSeconds),
-                EnableMultipleHttp2Connections = true
-            };
-        });
+                options.Address = new Uri(idpSettings.GrpcAddress);
+            })
+            .ConfigureChannel(channel =>
+            {
+                channel.HttpHandler = new SocketsHttpHandler
+                {
+                    ConnectTimeout = TimeSpan.FromSeconds(idpSettings.TimeoutSeconds),
+                    EnableMultipleHttp2Connections = true
+                };
+            });
+
+        AddIdpGrpcClient<PrincipalLookupService.PrincipalLookupServiceClient>();
+
+        // Rol / kapsam ad degisikligi IdP'deki kullanici kopyalarina gRPC ile, yanit beklenmeden gider.
+        AddIdpGrpcClient<PoolDefinitionSyncService.PoolDefinitionSyncServiceClient>();
+        services.AddScoped<IdpPoolDefinitionSync>();
 
         services.AddBoosterCacheLanguageTranslator();
         services.AddBoosterExceptionHandler();
-
 
         return services;
     }

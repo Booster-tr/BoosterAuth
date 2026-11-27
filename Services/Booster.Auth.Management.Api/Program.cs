@@ -14,7 +14,7 @@ builder.Services.AddGrpc();
 var app = builder.Build();
 
 app.UseBoosterServices();
-app.UseBoosterMessaging();
+app.UseBoosterCorrelation();
 app.UseBoosterApi(wrapResponses: true);
 
 app.MapGrpcService<ClientDataGrpcService>();

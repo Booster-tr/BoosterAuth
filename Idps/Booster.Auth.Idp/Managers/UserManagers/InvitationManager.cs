@@ -1,5 +1,4 @@
-using IEventBus = Booster.Amqp.Bus.IEventBus;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Idp.Features._base.Entities;
 using Booster.Auth.Idp.Options;
 using Booster.Auth.Manager.RequestContexts;
@@ -27,14 +26,14 @@ public sealed class InvitationPendingData
 /// <summary>
 /// Davet: rastgele token + e-posta. Token 1 gun gecerli ve tek kullanimliktir (bildirim sablonu da "1 gun" der).
 /// <para>
-/// Olay EF outbox'a yazilir; outbox ancak SaveChanges ile kaydedilir. Bu yuzden cagiran, <see cref="SendAsync"/>'ten
-/// SONRA IdpDbContext'te SaveChanges cagirmalidir; aksi halde e-posta HIC gitmez.
+/// E-posta HEMEN ve yanit beklenmeden gider (<see cref="NotificationClient"/>). Bu yuzden cagiran, kullanici kaydini
+/// commit ettikten SONRA <see cref="SendAsync"/> cagirir; geri alinan bir kayit icin davet gitmez.
 /// </para>
 /// </summary>
 public sealed class InvitationManager(
     ISecureCacheStore<InvitationData> invitationStore,
     ISecureCacheStore<InvitationPendingData> pendingStore,
-    IEventBus eventBus,
+    NotificationClient notifications,
     IdpUiOptions uiOptions,
     IRequestContextAccessor requestContextAccessor)
 {
@@ -57,7 +56,7 @@ public sealed class InvitationManager(
         var token = await invitationStore.StoreAsync(data, Ttl, ct);
         await pendingStore.StoreAsync(PendingKey(isolationId, principal.Id), new InvitationPendingData { Nonce = nonce }, Ttl, ct);
 
-        await eventBus.PublishAsync(new NotificationRequestedEvent
+        notifications.Send(new NotificationRequest
         {
             TenantId = Guid.Empty,
             UserPoolId = isolationId,
@@ -71,7 +70,7 @@ public sealed class InvitationManager(
                 ["DisplayName"] = principal.DisplayName,
                 ["InvitationUrl"] = InvitationUrl(token)
             }
-        }, ct);
+        });
     }
 
     /// <summary>Gecerli, suresi dolmamis ve GUNCEL davet ise kaydi doner; degilse null.</summary>

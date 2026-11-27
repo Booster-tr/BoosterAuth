@@ -115,7 +115,7 @@
             <div><dt>Sertleştirilmiş servisler<small>read_only · non-root · cap_drop</small></dt>
                 <dd>Servisler salt okunur dosya sistemiyle, root olmayan kullanıcıyla, Linux yetkileri kaldırılmış ve <code>no-new-privileges</code> ile çalışır.</dd></div>
             <div><dt>Dar ağ yüzeyi<small>HTTPS · konsol</small></dt>
-                <dd>Dışarıya yalnızca HTTPS ağ geçidi ve yönetim konsolu açılır. PostgreSQL, Redis, Kafka ve OpenFGA iç ağda kalır.</dd></div>
+                <dd>Dışarıya yalnızca HTTPS ağ geçidi ve yönetim konsolu açılır. PostgreSQL, Redis ve OpenFGA iç ağda kalır.</dd></div>
             <div><dt>Gizli değerler sizde<small>.env</small></dt>
                 <dd>Kurulum betiği bütün parola ve anahtarları rastgele üretir; hiçbiri bizimle paylaşılmaz. <code>.env</code> içinde
                     <code>CHANGE_ME</code> kalan bir değer varsa sistem başlamaz ve eksik değişkenin adını söyler.</dd></div>
@@ -239,7 +239,7 @@
                 dosyasına yazar. <code>docker compose up -d</code> ile tüm sistem ayağa kalkar.</p>
             <ul class="after">
                 <li><b>Gereksinim</b><span>Docker Engine 24+ ve Compose v2, 4 GB bellek, 10 GB disk</span></li>
-                <li><b>Pakette</b><span>PostgreSQL, Redis, Kafka ve OpenFGA dahil; hiçbiri dışarıya açılmaz</span></li>
+                <li><b>Pakette</b><span>PostgreSQL, Redis ve OpenFGA dahil; hiçbiri dışarıya açılmaz</span></li>
                 <li><b>HTTPS</b><span>Yerel CA ve sertifika ilk açılışta otomatik üretilir</span></li>
                 <li><b>İlk giriş</b><span><code>admin</code> kullanıcısıyla; ilk girişte parola değiştirilir</span></li>
             </ul>

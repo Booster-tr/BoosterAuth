@@ -1,5 +1,5 @@
 using Booster.Database.Repositories;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Common.Internal.Helpers;
 using Booster.NotificationService.Constants;
 using Booster.NotificationService.Features._base;

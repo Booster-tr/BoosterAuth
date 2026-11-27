@@ -16,7 +16,7 @@ namespace Booster.Observability;
 /// <list type="bullet">
 /// <item>Loglar: isletim loglari <c>LogStream</c>'e, denetim kayitlari (<see cref="AuditCategory"/>) <c>AuditStream</c>'e
 /// ayri ayri gider; ikisi de once <see cref="SensitiveDataRedactor"/>'dan gecer.</item>
-/// <item>Trace: gelen HTTP / gRPC istekleri, giden HttpClient (gRPC dahil), Npgsql ve MassTransit (Kafka). Her log
+/// <item>Trace: gelen HTTP / gRPC istekleri, giden HttpClient (gRPC dahil) ve Npgsql. Her log
 /// satiri bulundugu istegin <c>trace_id</c>'sini tasir; log ile trace arasinda gecis yapilir.</item>
 /// <item>Metrik: ASP.NET Core, HttpClient ve .NET calisma zamani.</item>
 /// </list>
@@ -48,7 +48,6 @@ public static class ObservabilityExtensions
             logging.AddFilter("ZiggyCreatures", LogLevel.Warning);
             logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
             logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
-            logging.AddFilter("MassTransit", LogLevel.Warning);
             logging.AddFilter("Grpc", LogLevel.Warning);
             logging.AddFilter("System.Net.Http", LogLevel.Warning);
 
@@ -87,7 +86,7 @@ public static class ObservabilityExtensions
                     a.Filter = ctx => !IsProbe(ctx.Request.Path);
                 })
                 .AddHttpClientInstrumentation()
-                .AddSource("MassTransit", "Npgsql")
+                .AddSource("Npgsql")
                 .AddOtlpExporter(e => Apply(e, Exporter(endpoint!, "traces", headers, null))))
             .WithMetrics(m => m
                 .AddAspNetCoreInstrumentation()

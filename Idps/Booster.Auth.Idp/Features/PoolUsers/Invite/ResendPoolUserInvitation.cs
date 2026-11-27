@@ -55,8 +55,5 @@ public class ResendPoolUserInvitationCommandHandler(
             throw new BusinessException(IdpMessageKeys.InvitationNotPending);
 
         await invitations.SendAsync(principal, cmd.UserPoolId, ct);
-
-        // Davet olayi EF outbox'ta; SaveChanges olmadan e-posta GITMEZ (baska degisiklik olmasa da).
-        await principalRepository.SaveChangesAsync(ct);
     }
 }

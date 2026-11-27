@@ -94,7 +94,7 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
 
         request.LicenseId = license.Id;
         await db.SaveChangesAsync(ct);
-        await notifier.TrialIssuedAsync(customer, license, ct);
+        notifier.TrialIssued(customer, license);
         return new SelfServiceResult(license, null);
     }
 
@@ -140,7 +140,7 @@ public sealed class CustomerPortalService(LicensingDbContext db, LicenseIssuer i
             RequestedBy = requestedBy,
         });
         await db.SaveChangesAsync(ct);
-        await notifier.TransferredAsync(customer, license, moved, requestedBy, ct);
+        notifier.Transferred(customer, license, moved, requestedBy);
         return new SelfServiceResult(moved, null);
     }
 

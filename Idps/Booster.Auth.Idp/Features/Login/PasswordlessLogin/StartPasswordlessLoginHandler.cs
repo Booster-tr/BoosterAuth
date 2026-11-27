@@ -1,4 +1,4 @@
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.Auth.Database.Models;
 using Booster.Auth.Database.Models.Enums;
 using Booster.Auth.Idp.Managers.ExceptionManagers.Exceptions;
@@ -14,8 +14,6 @@ using Booster.ExceptionManager.Abstraction.Constants;
 using FastEndpoints;
 using FluentValidation;
 
-using IEventBus = Booster.Amqp.Bus.IEventBus;
-
 namespace Booster.Auth.Idp.Features.Login.PasswordlessLogin;
 
 public sealed class StartPasswordlessLoginHandler(
@@ -23,7 +21,7 @@ public sealed class StartPasswordlessLoginHandler(
     IClientDataStore clientDataStore,
     IProviderFactory providerFactory,
     IRequestContextAccessor requestContextAccessor,
-    IEventBus eventBus) : ICommandHandler<StartPasswordlessLoginCommand>
+    NotificationClient notifications) : ICommandHandler<StartPasswordlessLoginCommand>
 {
     public async Task ExecuteAsync(StartPasswordlessLoginCommand cmd, CancellationToken ct)
     {
@@ -58,7 +56,7 @@ public sealed class StartPasswordlessLoginHandler(
         if (result.Code is null)
             return;
 
-        await eventBus.PublishAsync(new NotificationRequestedEvent
+        notifications.Send(new NotificationRequest
         {
             TenantId = Guid.Empty,
             UserPoolId = client.IsolationId,
@@ -74,7 +72,7 @@ public sealed class StartPasswordlessLoginHandler(
                 ["ExpiresInMinutes"] =
                     ((int)Math.Ceiling((result.ExpiresAt!.Value - DateTimeOffset.UtcNow).TotalMinutes)).ToString()
             }
-        }, ct);
+        });
     }
 
     private static ProviderConfig BuildConfig(string providerType, ClientData client)

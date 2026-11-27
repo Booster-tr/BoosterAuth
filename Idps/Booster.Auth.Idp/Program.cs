@@ -105,12 +105,13 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.UseRouting();
 
-app.UseBoosterMessaging();
+app.UseBoosterCorrelation();
 app.UseBoosterApi();
 
 app.MapStaticAssets().AllowAnonymous();
 
 app.MapGrpcService<PrincipalLookupGrpcService>();
+app.MapGrpcService<Booster.Auth.Idp.Features.PoolDefinitions.Grpc.PoolDefinitionSyncGrpcService>();
 
 app.MapControllerRoute(
     name: "default",

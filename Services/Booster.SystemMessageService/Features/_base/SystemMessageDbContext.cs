@@ -1,7 +1,6 @@
 ﻿using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.SystemMessageService.Features.SystemMessages._base.Entities;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -15,9 +14,6 @@ public class SystemMessageDbContext(DbContextOptions<SystemMessageDbContext> opt
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.AddInboxStateEntity();
-        modelBuilder.AddOutboxMessageEntity();
-        modelBuilder.AddOutboxStateEntity();
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

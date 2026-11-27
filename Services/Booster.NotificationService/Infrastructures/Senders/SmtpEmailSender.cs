@@ -1,4 +1,4 @@
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.NotificationService.Features._base.Entities;
 using Booster.NotificationService.Infrastructures.Senders._base;
 using FluentEmail.Core;

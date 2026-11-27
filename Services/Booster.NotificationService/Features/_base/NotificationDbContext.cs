@@ -1,7 +1,6 @@
 using Booster.Auth.Database.DbContextBase;
 using Booster.Auth.Manager.RequestContexts;
 using Booster.NotificationService.Features._base.Entities;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -17,9 +16,6 @@ public class NotificationDbContext(DbContextOptions<NotificationDbContext> opt, 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.AddInboxStateEntity();
-        modelBuilder.AddOutboxMessageEntity();
-        modelBuilder.AddOutboxStateEntity();
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

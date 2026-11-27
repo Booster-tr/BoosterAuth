@@ -1,5 +1,5 @@
 using Booster.Database.Postgres.Models;
-using Booster.Auth.Common.Internal.Amqp.Events;
+using Booster.Auth.Common.Internal.Notifications;
 using Booster.NotificationService.Features._base.Entities.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -55,7 +55,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         builder.Property(x => x.PrincipalId).IsRequired(false);
         builder.Property(x => x.TemplateKey).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Channel).HasConversion<int>();
-        // Target ve Body SIFRELI saklanir (AES-GCM, NotificationRequestedEventConsumer): alici adresi, kod, davet baglantisi.
+        // Target ve Body SIFRELI saklanir (AES-GCM, NotificationDispatchGrpcService): alici adresi, kod, davet baglantisi.
         builder.Property(x => x.Target).HasMaxLength(500).IsRequired();
         builder.Property(x => x.LanguageCode).HasMaxLength(10).IsRequired();
         builder.Property(x => x.Subject).HasMaxLength(500).IsRequired(false);

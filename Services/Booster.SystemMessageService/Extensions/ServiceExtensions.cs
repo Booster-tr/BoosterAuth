@@ -1,5 +1,3 @@
-using Booster.Amqp.Constants;
-using Booster.Amqp.Extensions;
 using Booster.Auth.Common.Internal.Extensions;
 using Booster.Common.Extensions.ServiceExtensions;
 using Booster.ExceptionManager.Abstraction.Extensions;
@@ -28,23 +26,7 @@ public static class ServiceExtensions
         services.AddHostedService<CommonMessageSeeder>();
         services.AddHostedService<CacheSeederService>();
 
-        services.AddKafka(configuration);
-
         return services;
     }
 
-    public static IServiceCollection AddKafka(this IServiceCollection services, IConfiguration configuration)
-    {
-        var amqpSettings = services.AddSettings<AmqpSettings>(configuration);
-
-        services.AddBoosterCorrelationContext();
-
-        services.AddKafkaBus<SystemMessageDbContext>(
-            amqpSettings,
-            configureRider: rider =>
-            {
-            });
-
-        return services;
-    }
 }

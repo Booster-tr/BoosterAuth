@@ -27,7 +27,7 @@ var app = builder.Build();
 app.UseRewriter(new RewriteOptions().AddRewrite("^authz/version$", "version", skipRemainingRules: true));
 
 app.UseBoosterServices();
-app.UseBoosterMessaging();
+app.UseBoosterCorrelation();
 app.UseBoosterApi(wrapResponses: true);
 
 app.MapGrpcService<AuthorizationGrpcService>();
