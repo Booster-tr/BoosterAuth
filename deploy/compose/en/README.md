@@ -78,11 +78,14 @@ For sign-up verification, invitation and password reset e-mails, fill in the `MA
 | --- | --- |
 | Status | `docker compose ps` |
 | Logs | `docker compose logs -f booster-idp` |
-| Update | `docker compose pull && docker compose up -d` |
+| Update | `docker compose pull && docker compose up -d --remove-orphans` |
 | Stop | `docker compose down` (data is kept) |
 | Backup | `docker compose down`, then back up `data/`, `pki/`, `secrets/` and `.env` |
 
 To pin a specific version, change `BOOSTER_VERSION` in `.env` (default `latest`).
+
+If you updated from an older release that included Kafka, you can delete the old Kafka data: `docker volume rm booster-auth_kafka_data`
+(the prefix is `COMPOSE_PROJECT_NAME` from `.env`).
 
 ## Folders
 

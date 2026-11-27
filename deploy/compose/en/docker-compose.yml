@@ -3,7 +3,7 @@
 #
 #  First setup:  ./setup.sh   (Windows: .\setup.ps1)  -> creates .env
 #  Run:          docker compose up -d
-#  Update:       docker compose pull && docker compose up -d
+#  Update:       docker compose pull && docker compose up -d --remove-orphans
 #  Stop:         docker compose down        (data is kept under ./data)
 #
 #  Published ports:

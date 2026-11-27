@@ -50,9 +50,11 @@
 
 <h2 id="guncelleme">Güncelleme</h2>
 <div class="code"><pre>docker compose pull
-docker compose up -d</pre></div>
-<p>Veritabanı şeması açılışta otomatik güncellenir. Belirli bir sürüme sabitlemek için <code>.env</code> içinde <code>BOOSTER_VERSION</code>
-    değerini değiştirin.</p>
+docker compose up -d --remove-orphans</pre></div>
+<p>Veritabanı şeması açılışta otomatik güncellenir. <code>--remove-orphans</code>, yeni sürümde kaldırılan servislerin konteynerlerini de siler.
+    Belirli bir sürüme sabitlemek için <code>.env</code> içinde <code>BOOSTER_VERSION</code> değerini değiştirin.</p>
+<p><b>Eski kurulumlar:</b> Booster Auth artık Kafka kullanmaz. Kafka içeren bir sürümden güncellediyseniz eski Kafka verisini de silebilirsiniz:
+    <code>docker volume rm booster-auth_kafka_data</code> (ön ek, <code>.env</code> dosyasındaki <code>COMPOSE_PROJECT_NAME</code> değeridir).</p>
 
 <h2 id="yedek">Yedekleme</h2>
 <p>Tüm kalıcı veri kurulum klasöründedir. Tutarlı bir yedek için:</p>
@@ -78,6 +80,9 @@ docker compose up -d</pre></div>
 <p>Lisans yok, süresi dolmuş ya da geçersiz demektir. <b>Sistem &gt; Lisans</b> ekranındaki duruma bakın (<a href="/tr/docs/licensing#durumlar">Lisans durumları</a>).</p>
 <h3>Kayıt e-postası gelmiyor</h3>
 <p>SMTP ayarları boşsa e-posta gönderilmez. <code>docker compose logs booster-notification</code> ile gönderim hatalarını görebilirsiniz.</p>
+<p>Bildirimler yanıt beklenmeden gönderilir ve başarısız gönderim <b>yeniden denenmez</b>: o an Notification servisi kapalıysa ya da SMTP sunucusu
+    ulaşılamazsa e-posta kaybolur. Kullanıcı kodu ya da bağlantıyı yeniden istemelidir. Servise ulaşılamadığı durumu
+    <code>docker compose logs booster-idp</code> çıktısındaki <code>yeniden denenmeyecek</code> uyarısı gösterir.</p>
 <h3>Servis açılmıyor</h3>
 <p><code>docker compose ps</code> ile durumu, <code>docker compose logs &lt;servis&gt;</code> ile hatayı görün. <code>.env</code>'de <code>CHANGE_ME</code>
     kalan alan varsa hazırlık adımı hangi alanın eksik olduğunu yazar: <code>docker compose logs booster-init</code>.</p>
