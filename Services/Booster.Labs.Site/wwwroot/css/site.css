@@ -219,6 +219,14 @@ img { max-width: 100%; height: auto; display: block; }
 .info-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; }
 .info-list li { display: flex; gap: 14px; align-items: flex-start; }
 .info-list .ico { margin: 0; width: 44px; height: 44px; }
+.info-list a { color: var(--ink); }
+.info-list a:hover { color: var(--gold-2); }
+
+/* sosyal medya (placeholder; baglantilar sonra doldurulacak) */
+.socials { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.soc { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 11px; background: var(--white); border: 1px solid var(--line); color: var(--ink-2); transition: transform .15s var(--ease), color .2s, border-color .2s, box-shadow .2s; }
+.soc:hover { color: var(--gold-2); border-color: #d7e0ea; box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+.soc svg { width: 20px; height: 20px; }
 
 /* ---------------------------------------------------------------- footer */
 .foot-band { background: var(--navy-1); color: #9fb0c2; padding: clamp(48px, 6vw, 72px) 0 28px; }
