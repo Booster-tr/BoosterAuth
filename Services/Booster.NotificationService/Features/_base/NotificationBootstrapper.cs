@@ -193,17 +193,17 @@ public class NotificationBootstrapper(
 
         // --- Lisans portali (yalnizca Booster'in kendi musteri iletisimi) -------------------
         new(NotificationTemplateKeys.LicenseTrialIssued, NotificationChannel.Email,
-            "Booster Auth deneme lisansınız",
+            "Boosters Auth deneme lisansınız",
             EmailLayout.Wrap("Deneme lisansınız hazır; yönetim paneline yapıştırmanız yeterli.", "Deneme lisansınız hazır",
                 EmailLayout.Paragraph("Merhaba {{CustomerName}}, <b>{{InstallationId}}</b> kurulumunuz için deneme lisansınız üretildi. Bitiş: <b>{{ExpiresAt}}</b>.") +
-                EmailLayout.Paragraph("Booster Auth yönetim panelinde <b>Sistem &gt; Lisans</b> ekranını açın ve aşağıdaki anahtarı yapıştırın:") +
+                EmailLayout.Paragraph("Boosters Auth yönetim panelinde <b>Sistem &gt; Lisans</b> ekranını açın ve aşağıdaki anahtarı yapıştırın:") +
                 EmailLayout.TokenBox("{{Token}}") +
                 EmailLayout.Button("Lisanslarımı görüntüle", "{{PortalUrl}}"),
                 "Deneme süresi bitmeden lisans satın alarak kesintisiz devam edebilirsiniz."),
-            "Your Booster Auth trial license",
+            "Your Boosters Auth trial license",
             EmailLayout.Wrap("Your trial license is ready; just paste it into the management panel.", "Your trial license is ready",
                 EmailLayout.Paragraph("Hi {{CustomerName}}, a trial license has been issued for installation <b>{{InstallationId}}</b>. Expires: <b>{{ExpiresAt}}</b>.") +
-                EmailLayout.Paragraph("Open <b>System &gt; License</b> in the Booster Auth management panel and paste the key below:") +
+                EmailLayout.Paragraph("Open <b>System &gt; License</b> in the Boosters Auth management panel and paste the key below:") +
                 EmailLayout.TokenBox("{{Token}}") +
                 EmailLayout.Button("View my licenses", "{{PortalUrl}}"),
                 "Buy a license before the trial ends to continue without interruption.")),
@@ -230,14 +230,14 @@ public class NotificationBootstrapper(
             "Lisansınız hazır: {{ReferenceCode}}",
             EmailLayout.Wrap("Ödemeniz onaylandı; lisansınız hazır.", "Lisansınız hazır",
                 EmailLayout.Paragraph("Merhaba {{CustomerName}}, <b>{{ReferenceCode}}</b> siparişinizin ödemesi onaylandı. <b>{{PlanName}}</b> lisansınız <b>{{ExpiresAt}}</b> tarihine kadar geçerlidir.") +
-                EmailLayout.Paragraph("Booster Auth yönetim panelinde <b>Sistem &gt; Lisans</b> ekranına aşağıdaki anahtarı yapıştırın; servisler yeniden başlatılmadan geçerli olur:") +
+                EmailLayout.Paragraph("Boosters Auth yönetim panelinde <b>Sistem &gt; Lisans</b> ekranına aşağıdaki anahtarı yapıştırın; servisler yeniden başlatılmadan geçerli olur:") +
                 EmailLayout.TokenBox("{{Token}}") +
                 EmailLayout.Button("Lisansı görüntüle", "{{LicenseUrl}}"),
                 "Teşekkür ederiz."),
             "Your license is ready: {{ReferenceCode}}",
             EmailLayout.Wrap("Your payment is confirmed; your license is ready.", "Your license is ready",
                 EmailLayout.Paragraph("Hi {{CustomerName}}, payment for order <b>{{ReferenceCode}}</b> is confirmed. Your <b>{{PlanName}}</b> license is valid until <b>{{ExpiresAt}}</b>.") +
-                EmailLayout.Paragraph("Paste the key below into <b>System &gt; License</b> in the Booster Auth management panel; it takes effect without restarting the services:") +
+                EmailLayout.Paragraph("Paste the key below into <b>System &gt; License</b> in the Boosters Auth management panel; it takes effect without restarting the services:") +
                 EmailLayout.TokenBox("{{Token}}") +
                 EmailLayout.Button("View license", "{{LicenseUrl}}"),
                 "Thank you.")),

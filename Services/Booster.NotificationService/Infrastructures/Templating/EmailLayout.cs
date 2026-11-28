@@ -9,6 +9,9 @@ public static class EmailLayout
     private const string Canvas = "#f1f5f9";
     private const string Accent = "#4f46e5";
 
+    // Boosters Auth logosu (acik zeminli wordmark). E-posta istemcileri mutlak URL ister; portal public olarak servis eder.
+    private const string LogoUrl = "https://licensing.boosterslabs.com/img/logo-light.png";
+
     private const string FontStack =
         "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
 
@@ -21,7 +24,7 @@ public static class EmailLayout
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:100%;max-width:600px;background-color:{Surface};border:1px solid {Border};border-radius:12px;">
                 <tr>
                   <td style="padding:32px 32px 8px 32px;font-family:{FontStack};">
-                    <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:{Accent};">Booster</div>
+                    <img src="{LogoUrl}" alt="Boosters Auth" height="26" style="height:26px;width:auto;display:block;border:0;outline:none;text-decoration:none;" />
                   </td>
                 </tr>
                 <tr>
@@ -46,7 +49,7 @@ public static class EmailLayout
                 </tr>
               </table>
               <div style="font-family:{FontStack};font-size:12px;line-height:18px;color:{Muted};padding-top:16px;">
-                Booster
+                Boosters Auth
               </div>
             </td>
           </tr>
